@@ -125,13 +125,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    micButton.addEventListener('click', () => {
+    micButton.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent any default behavior
+        
         if (recognition) {
             if (isListening) {
                 stopListening();
             } else {
                 startListening();
             }
+        } else {
+            console.log('Speech recognition not supported in this browser');
+            
+            // Show error message
+            const errorToast = document.createElement('div');
+            errorToast.className = 'error-toast';
+            errorToast.textContent = 'Speech recognition is not supported in this browser.';
+            document.body.appendChild(errorToast);
+            
+            setTimeout(() => {
+                errorToast.classList.add('show');
+                setTimeout(() => {
+                    errorToast.classList.remove('show');
+                    setTimeout(() => {
+                        document.body.removeChild(errorToast);
+                    }, 300);
+                }, 3000);
+            }, 10);
         }
     });
 
@@ -270,51 +290,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to start listening
     function startListening() {
-        // Update the language before starting
-        recognition.lang = speechLanguage.value;
-        console.log('Starting speech recognition in:', recognition.lang);
-        
-        // Add language indicator to the button
-        micButton.setAttribute('data-lang', speechLanguage.options[speechLanguage.selectedIndex].text.split(' ')[0]);
-        
-        // Clear any existing timeout
-        if (recognitionTimeout) {
-            clearTimeout(recognitionTimeout);
-        }
-        
-        // Set a timeout to automatically stop listening after 10 seconds
-        recognitionTimeout = setTimeout(() => {
-            if (isListening) {
-                console.log('Speech recognition timed out');
+        if (recognition) {
+            try {
+                // Set the language from the dropdown
+                recognition.lang = speechLanguage.value;
+                
+                // Start recognition
+                recognition.start();
+                isListening = true;
+                
+                // Update UI
+                micButton.classList.add('recording');
+                micButton.setAttribute('data-lang', speechLanguage.options[speechLanguage.selectedIndex].text);
+                
+                // Set a timeout to automatically stop listening after 10 seconds
+                if (recognitionTimeout) {
+                    clearTimeout(recognitionTimeout);
+                }
+                recognitionTimeout = setTimeout(() => {
+                    if (isListening) {
+                        stopListening();
+                    }
+                }, 10000);
+                
+                console.log('Speech recognition started with language:', recognition.lang);
+            } catch (error) {
+                console.error('Error starting speech recognition:', error);
                 stopListening();
+                
+                // Show error message
+                const errorToast = document.createElement('div');
+                errorToast.className = 'error-toast';
+                errorToast.textContent = `Error starting speech recognition: ${error.message}`;
+                document.body.appendChild(errorToast);
+                
+                setTimeout(() => {
+                    errorToast.classList.add('show');
+                    setTimeout(() => {
+                        errorToast.classList.remove('show');
+                        setTimeout(() => {
+                            document.body.removeChild(errorToast);
+                        }, 300);
+                    }, 3000);
+                }, 10);
             }
-        }, 10000);
-        
-        micButton.classList.add('recording');
-        isListening = true;
-        
-        try {
-            recognition.start();
-        } catch (e) {
-            console.error('Speech recognition error:', e);
-            stopListening();
         }
     }
 
     // Function to stop listening
     function stopListening() {
-        if (recognitionTimeout) {
-            clearTimeout(recognitionTimeout);
-            recognitionTimeout = null;
-        }
-        
-        micButton.classList.remove('recording');
-        isListening = false;
-        
-        try {
-            recognition.stop();
-        } catch (e) {
-            console.error('Error stopping speech recognition:', e);
+        if (recognition) {
+            try {
+                recognition.stop();
+            } catch (error) {
+                console.error('Error stopping speech recognition:', error);
+            }
+            
+            isListening = false;
+            micButton.classList.remove('recording');
+            
+            if (recognitionTimeout) {
+                clearTimeout(recognitionTimeout);
+                recognitionTimeout = null;
+            }
+            
+            console.log('Speech recognition stopped');
         }
     }
 
@@ -683,5 +723,13 @@ While I can't provide a detailed answer right now, you might want to:
         } else {
             characterCount.classList.remove('warning');
         }
+        
+        // Initialize character count on page load
+        if (count === 0) {
+            characterCount.textContent = '0 characters';
+        }
     });
+
+    // Initialize character count on page load
+    characterCount.textContent = '0 characters';
 }); 
