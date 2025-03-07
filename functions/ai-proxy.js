@@ -1,7 +1,18 @@
 const fetch = require('node-fetch');
 const https = require('https');
 
+// Simple in-memory cache (will be cleared on function cold starts)
+const responseCache = {};
+
+// Simple analytics tracking
+let apiCallCount = 0;
+let successCount = 0;
+let errorCount = 0;
+const modelStats = {};
+
 exports.handler = async function(event, context) {
+  apiCallCount++;
+
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -18,6 +29,20 @@ exports.handler = async function(event, context) {
     
     if (!question) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Question is required' }) };
+    }
+
+    // Check cache first
+    const cacheKey = question.trim().toLowerCase();
+    if (responseCache[cacheKey]) {
+      console.log('Cache hit for question:', cacheKey);
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: responseCache[cacheKey]
+      };
     }
 
     // Get API details from environment variables
@@ -85,6 +110,10 @@ exports.handler = async function(event, context) {
         console.log('API response status:', response.status);
         
         if (response.ok) {
+          successCount++;
+          // Track model usage
+          if (!modelStats[model]) modelStats[model] = 0;
+          modelStats[model]++;
           const data = await response.json();
           console.log('API response received successfully');
           
@@ -97,6 +126,9 @@ exports.handler = async function(event, context) {
               choice.message.content = choice.message.reasoning_content;
             }
             
+            // Store in cache before returning
+            responseCache[cacheKey] = JSON.stringify(data);
+            
             return {
               statusCode: 200,
               headers: {
@@ -107,6 +139,8 @@ exports.handler = async function(event, context) {
             };
           }
           break; // Exit the loop if successful
+        } else {
+          errorCount++;
         }
       } catch (modelError) {
         console.log(`Error with model ${model}:`, modelError.message);
@@ -139,6 +173,15 @@ exports.handler = async function(event, context) {
     
   } catch (error) {
     console.log('Error:', error);
+    if (error.message.includes('ECONNREFUSED') || error.message.includes('ETIMEDOUT')) {
+      console.log('Network connectivity issue detected');
+      // Try a different approach or provide a more specific error message
+    }
+
+    if (error.message.includes('401')) {
+      console.log('Authentication error detected');
+      // Provide a specific error message about API key issues
+    }
     return {
       statusCode: 500,
       headers: {
@@ -199,6 +242,14 @@ async function fetchWithRetry(url, options, maxRetries = 3) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`API request attempt ${attempt}/${maxRetries}`);
+      console.log('Request options:', {
+        method: options.method,
+        headers: {
+          ...options.headers,
+          'Authorization': 'Bearer ***' // Hide the actual key
+        },
+        timeout: options.timeout
+      });
       const response = await fetch(url, options);
       return response;
     } catch (error) {

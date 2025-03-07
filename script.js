@@ -13,10 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const simpleApiButton = document.getElementById('simple-api-button');
     const speechLanguage = document.getElementById('speech-language');
     const checkEnvButton = document.getElementById('check-env-button');
+    const apiFunctionRadios = document.querySelectorAll('input[name="api-function"]');
     
     let diagnosticsData = null;
     let isListening = false;
     let recognitionTimeout = null;
+    let currentApiFunction = 'ai-proxy'; // Default
 
     // API configuration
     // Note: These values are now for reference only and not actually used for API calls
@@ -243,6 +245,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    apiFunctionRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            currentApiFunction = e.target.value;
+            console.log(`Switched to ${currentApiFunction} function`);
+        });
+    });
+
     // Function to start listening
     function startListening() {
         // Update the language before starting
@@ -326,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to fetch response from the API
     async function fetchAIResponse(question) {
         try {
-            const response = await fetch('/.netlify/functions/ai-proxy', {
+            const response = await fetch(`/.netlify/functions/${currentApiFunction}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
