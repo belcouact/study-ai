@@ -14,9 +14,6 @@
             <button id="check-api-button">Check API Connection</button>
             <span id="api-status"></span>
             <button id="show-diagnostics" class="hidden">Show Diagnostics</button>
-            <button id="direct-test-button">Direct API Test</button>
-            <button id="simple-api-button">Try Simple API</button>
-            <button id="check-env-button">Check Environment</button>
         </div>
         <div id="diagnostics-panel" class="hidden">
             <h3>API Diagnostics</h3>
@@ -51,21 +48,8 @@
                 </div>
             </div>
         </div>
-        <div class="api-options">
-            <label>
-                <input type="radio" name="api-function" value="ai-proxy" checked> Standard API
-            </label>
-            <label>
-                <input type="radio" name="api-function" value="simple-ai"> Simple API
-            </label>
-            <select id="model-select">
-                <option value="deepseek-r1">deepseek-r1</option>
-                <option value="deepseek-v3">deepseek-v3</option>
-            </select>
-            <button id="debug-response-button" class="hidden">Show Raw Response</button>
-            <button id="fallback-button">Use Local Fallback</button>
-        </div>
         <button id="retry-button" class="hidden">Retry Request</button>
+        <button id="debug-response-button" class="hidden">Show Raw Response</button>
     </div>
     <script src="script.js"></script>
 </body>
