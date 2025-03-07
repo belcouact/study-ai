@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 recognition.start();
                 isListening = true;
                 
-                // Update UI
+                // Update UI - use lowercase for English
                 micButton.classList.add('recording');
                 micButton.setAttribute('data-lang', hasChinese ? '中文' : 'english');
                 
