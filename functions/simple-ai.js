@@ -156,17 +156,8 @@ async function fetchWithRetry(url, options, maxRetries = 3) {
     try {
       console.log(`API request attempt ${attempt}/${maxRetries}`);
       
-      // Create a timeout promise
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), options.timeout || 30000);
-      });
-      
-      // Race the fetch against the timeout
-      const response = await Promise.race([
-        fetch(url, options),
-        timeoutPromise
-      ]);
-      
+      // Simple fetch without the race
+      const response = await fetch(url, options);
       return response;
     } catch (error) {
       console.log(`Attempt ${attempt} failed:`, error.message);

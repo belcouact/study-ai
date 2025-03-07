@@ -323,65 +323,46 @@ document.addEventListener('DOMContentLoaded', () => {
         const question = userInput.value.trim();
         if (!question) return;
         
-        lastQuestion = question;
-        
         try {
             // Show loading state
             loading.classList.remove('hidden');
             output.innerHTML = '';
-            retryButton.classList.add('hidden');
             
-            // Use the same approach as simpleApiButton
-            apiStatus.textContent = 'Sending to API...';
-            apiStatus.className = 'status-checking';
-            
+            // Use a very simple fetch approach
             const response = await fetch('/.netlify/functions/simple-ai', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ 
-                    question: question,
-                    model: currentModel
-                })
+                body: JSON.stringify({ question })
             });
             
+            const data = await response.json();
+            console.log('API response:', data);
+            
+            // Display raw response for debugging
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || `Request failed with status ${response.status}`);
+                output.innerHTML = `<div class="error-message">Error: ${data.error || response.status}</div>`;
+                return;
             }
             
-            const data = await response.json();
-            console.log('API response data:', data);
+            // Extract and display content
+            let content = "No content found in response";
             
-            // Store the raw response for debugging
-            lastRawResponse = data;
-            debugResponseButton.classList.remove('hidden');
-            
-            // Extract content from the response
-            let content = '';
             if (data.choices && data.choices[0] && data.choices[0].message) {
                 const message = data.choices[0].message;
-                content = message.content || message.reasoning_content || "No response content found";
-            } else {
-                content = "Received response in unexpected format. Check raw response for details.";
+                if (message.content) {
+                    content = message.content;
+                } else if (message.reasoning_content) {
+                    content = message.reasoning_content;
+                }
             }
             
-            // Format and display the response
-            const formattedResponse = formatResponse(content);
-            output.innerHTML = `<div class="ai-message">${formattedResponse}</div>`;
-            
-            // Clear status
-            apiStatus.textContent = '';
-            apiStatus.className = '';
+            output.innerHTML = `<div class="ai-message">${formatResponse(content)}</div>`;
             
         } catch (error) {
             console.error('Error:', error);
-            output.innerHTML = `<div class="error-message">Error: ${escapeHTML(error.message)}</div>`;
-            retryButton.classList.remove('hidden');
-            
-            apiStatus.textContent = `Error: ${error.message}`;
-            apiStatus.className = 'status-error';
+            output.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
         } finally {
             // Hide loading state
             loading.classList.add('hidden');
