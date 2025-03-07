@@ -6,6 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const loading = document.getElementById('loading');
     const checkApiButton = document.getElementById('check-api-button');
     const apiStatus = document.getElementById('api-status');
+    const showDiagnosticsButton = document.getElementById('show-diagnostics');
+    const diagnosticsPanel = document.getElementById('diagnostics-panel');
+    const diagnosticsOutput = document.getElementById('diagnostics-output');
+    
+    let diagnosticsData = null;
 
     // API configuration
     const API_KEY = 'sk-ee8971509c3446129f6c0b43ee362e13a4a642pjsvzv199t';
@@ -60,6 +65,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add event listener for the check API button
     checkApiButton.addEventListener('click', checkApiConnection);
+    
+    // Add event listener for the show diagnostics button
+    showDiagnosticsButton.addEventListener('click', () => {
+        if (diagnosticsPanel.classList.contains('hidden')) {
+            diagnosticsPanel.classList.remove('hidden');
+            showDiagnosticsButton.textContent = 'Hide Diagnostics';
+        } else {
+            diagnosticsPanel.classList.add('hidden');
+            showDiagnosticsButton.textContent = 'Show Diagnostics';
+        }
+    });
 
     // Function to handle form submission
     async function handleSubmit() {
@@ -99,37 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ question }),
-                timeout: 30000 // 30 second timeout
+                body: JSON.stringify({ question })
             });
 
-            const data = await response.json();
-            
             if (!response.ok) {
-                console.error('API error details:', data);
-                throw new Error(data.error || `Request failed with status ${response.status}`);
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || `Request failed with status ${response.status}`);
             }
 
+            const data = await response.json();
             return data.choices[0].message.content;
         } catch (error) {
             console.error('Fetch error details:', error);
-            
-            // If we're in development or testing, provide a fallback response
-            if (window.location.hostname === 'localhost' || 
-                window.location.hostname === '127.0.0.1' ||
-                window.location.hostname.includes('netlify.app')) {
-                console.log('Using fallback response due to API error');
-                return `I'm sorry, I couldn't connect to the AI service at this time. This could be due to:
-                
-1. API connectivity issues
-2. Rate limiting
-3. Invalid API credentials
-
-Error details: ${error.message}
-
-Please try again later or contact the site administrator.`;
-            }
-            
             throw error;
         }
     }
@@ -161,6 +158,8 @@ Please try again later or contact the site administrator.`;
     async function checkApiConnection() {
         apiStatus.textContent = 'Checking connection...';
         apiStatus.className = 'status-checking';
+        showDiagnosticsButton.classList.add('hidden');
+        diagnosticsPanel.classList.add('hidden');
         
         try {
             const response = await fetch('/.netlify/functions/api-health', {
@@ -168,8 +167,9 @@ Please try again later or contact the site administrator.`;
             });
             
             const data = await response.json();
+            diagnosticsData = data;
             
-            if (response.ok) {
+            if (data.status === 'ok') {
                 apiStatus.textContent = 'API connection successful!';
                 apiStatus.className = 'status-success';
                 console.log('API health check details:', data);
@@ -177,6 +177,16 @@ Please try again later or contact the site administrator.`;
                 apiStatus.textContent = `API connection failed: ${data.message || 'Unknown error'}`;
                 apiStatus.className = 'status-error';
                 console.error('API health check failed:', data);
+                
+                // Show diagnostics button
+                showDiagnosticsButton.classList.remove('hidden');
+                
+                // Display diagnostics
+                if (data.diagnostics) {
+                    diagnosticsOutput.textContent = JSON.stringify(data.diagnostics, null, 2);
+                } else {
+                    diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
+                }
             }
         } catch (error) {
             apiStatus.textContent = `Connection error: ${error.message}`;

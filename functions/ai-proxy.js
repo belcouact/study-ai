@@ -118,23 +118,74 @@ function generateLocalResponse(question) {
   }
   
   if (question.includes('what is') || question.includes('who is') || question.includes('explain')) {
-    return "I'm sorry, I can't provide detailed information in fallback mode. The main AI service is currently unavailable. Please try again later.";
-  }
-  
-  if (question.includes('weather') || question.includes('forecast')) {
-    return "I can't access real-time weather data in fallback mode. Please check a weather service or try again later when the main AI service is available.";
+    const searchTerm = question.replace(/what is|who is|explain/gi, '').trim();
+    return `I'm sorry, I can't provide detailed information about "${searchTerm}" in fallback mode. 
+
+You might want to try:
+1. Searching for "${searchTerm}" on Google
+2. Checking Wikipedia for information about "${searchTerm}"
+3. Trying again later when the main AI service is available`;
   }
   
   // Default response
   return `I'm currently operating in fallback mode because the main AI service is unavailable. 
 
-The API returned a 502 Bad Gateway error, which typically indicates:
-
+The API connection issue could be due to:
 1. The API server might be down or unreachable
 2. There might be network connectivity issues
-3. The API might be rejecting requests due to rate limiting or authentication issues
+3. The API credentials might be incorrect
 
 Your question was: "${question}"
 
-Please try again later when the service is restored.`;
+While I can't provide a detailed answer right now, you might want to:
+1. Try again later
+2. Search for this information on Google
+3. Contact the site administrator if the problem persists`;
+}
+
+// In the catch block or when the primary API fails
+console.log('Primary API failed, trying public fallback API...');
+
+// Use a free, public API as fallback
+try {
+  const FALLBACK_API_URL = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
+  const wordToLookup = question.split(' ')[0].toLowerCase();
+  
+  const fallbackResponse = await fetch(`${FALLBACK_API_URL}${wordToLookup}`);
+  
+  if (fallbackResponse.ok) {
+    const fallbackData = await fallbackResponse.json();
+    
+    let definition = "I couldn't find information about that.";
+    
+    if (Array.isArray(fallbackData) && fallbackData.length > 0) {
+      const entry = fallbackData[0];
+      if (entry.meanings && entry.meanings.length > 0) {
+        const meaning = entry.meanings[0];
+        if (meaning.definitions && meaning.definitions.length > 0) {
+          definition = `The word "${entry.word}" means: ${meaning.definitions[0].definition}`;
+        }
+      }
+    }
+    
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({
+        choices: [
+          {
+            message: {
+              content: `I'm currently in fallback mode using a dictionary API. ${definition}\n\nNote: The main AI service is unavailable.`,
+              role: "assistant"
+            }
+          }
+        ]
+      })
+    };
+  }
+} catch (fallbackError) {
+  console.log('Fallback API also failed:', fallbackError.message);
 } 

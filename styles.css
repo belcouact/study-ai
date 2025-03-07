@@ -213,4 +213,28 @@ button {
 .status-checking {
     color: #f39c12;
     font-style: italic;
+}
+
+#diagnostics-panel {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    font-family: monospace;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    overflow-x: auto;
+}
+
+#show-diagnostics {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 0.5rem 1rem;
+    margin-left: 1rem;
+}
+
+#show-diagnostics:hover {
+    background-color: #e0e0e0;
 } 
