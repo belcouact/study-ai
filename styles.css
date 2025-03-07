@@ -54,8 +54,26 @@ textarea#user-input:focus {
 
 .button-container {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 10px;
+}
+
+.api-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.right-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.diagnostics-controls {
+    display: flex;
+    margin-top: 10px;
+    justify-content: flex-start;
 }
 
 button {
@@ -213,14 +231,6 @@ button {
     margin-bottom: 1rem;
 }
 
-.api-check {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
-    justify-content: flex-start;
-    gap: 10px;
-}
-
 #check-api-button {
     background-color: #f0f0f0;
     color: #333;
@@ -234,6 +244,9 @@ button {
 
 #api-status {
     font-size: 0.85rem;
+    white-space: nowrap;
+    min-width: 150px;
+    display: inline-block;
 }
 
 .status-success {
@@ -247,8 +260,9 @@ button {
 }
 
 .status-checking {
-    color: #f39c12;
-    font-style: italic;
+    color: #3498db;
+    font-weight: bold;
+    animation: pulse 1.5s infinite;
 }
 
 #diagnostics-panel {
@@ -307,4 +321,31 @@ button {
 .error-toast.show {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
+}
+
+.error-message {
+    background-color: #fef0f0;
+    border-left: 4px solid #e74c3c;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.error-message h3 {
+    color: #e74c3c;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.error-message p {
+    margin-bottom: 0.5rem;
+}
+
+.system-message {
+    background-color: #f8f9fa;
+    border-left: 4px solid #3498db;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    color: #2c3e50;
 } 

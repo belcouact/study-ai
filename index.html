@@ -15,18 +15,22 @@
             <div class="input-container">
                 <textarea id="user-input" placeholder="Type your question here..."></textarea>
                 <div class="button-container">
-                    <div class="speech-controls">
-                        <button id="mic-button" title="Record your question (auto-detects language)">
-                            <i class="fas fa-microphone"></i>
-                        </button>
+                    <div class="api-controls">
+                        <button id="check-api-button">Check API Connection</button>
+                        <span id="api-status"></span>
                     </div>
-                    <button id="check-api-button">Check API Connection</button>
-                    <button id="submit-button">Submit</button>
+                    <div class="right-controls">
+                        <div class="speech-controls">
+                            <button id="mic-button" title="Record your question (auto-detects language)">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                        <button id="submit-button">Submit</button>
+                    </div>
                 </div>
                 
-                <!-- API status indicator -->
-                <div class="api-check">
-                    <span id="api-status"></span>
+                <!-- Diagnostics button container -->
+                <div class="diagnostics-controls">
                     <button id="show-diagnostics" class="hidden">Show Diagnostics</button>
                 </div>
             </div>

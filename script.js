@@ -361,6 +361,65 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!question) return;
         
         try {
+            // First check API connection
+            apiStatus.textContent = 'Checking connection...';
+            apiStatus.className = 'status-checking';
+            
+            try {
+                const healthResponse = await fetch('/.netlify/functions/api-health', {
+                    method: 'GET'
+                });
+                
+                const healthData = await healthResponse.json();
+                
+                if (healthData.status !== 'ok') {
+                    apiStatus.textContent = `API connection failed: ${healthData.message || 'Unknown error'}`;
+                    apiStatus.className = 'status-error';
+                    console.error('API health check failed before submission:', healthData);
+                    
+                    output.innerHTML = `
+                        <div class="error-message">
+                            <h3>API Connection Failed</h3>
+                            <p>Cannot submit your question because the API connection is not available.</p>
+                            <p>Error: ${healthData.message || 'Unknown error'}</p>
+                            <p>Please try again later or contact support.</p>
+                        </div>
+                    `;
+                    
+                    // Show diagnostics button
+                    showDiagnosticsButton.classList.remove('hidden');
+                    
+                    // Display diagnostics
+                    if (healthData.diagnostics) {
+                        diagnosticsOutput.textContent = JSON.stringify(healthData.diagnostics, null, 2);
+                    } else {
+                        diagnosticsOutput.textContent = JSON.stringify(healthData, null, 2);
+                    }
+                    
+                    return; // Stop here if API connection failed
+                }
+                
+                // API connection is good, update status
+                apiStatus.textContent = 'API connection successful!';
+                apiStatus.className = 'status-success';
+                
+            } catch (healthError) {
+                apiStatus.textContent = `Connection error: ${healthError.message}`;
+                apiStatus.className = 'status-error';
+                console.error('API check error before submission:', healthError);
+                
+                output.innerHTML = `
+                    <div class="error-message">
+                        <h3>API Connection Error</h3>
+                        <p>Cannot submit your question because the API connection check failed.</p>
+                        <p>Error: ${healthError.message}</p>
+                        <p>Please check your internet connection and try again.</p>
+                    </div>
+                `;
+                
+                return; // Stop here if API connection check failed
+            }
+            
             // Show loading state
             loading.classList.remove('hidden');
             output.innerHTML = '';
