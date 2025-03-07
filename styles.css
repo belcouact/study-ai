@@ -278,28 +278,14 @@ button {
 .speech-controls {
     display: flex;
     align-items: center;
+    justify-content: center;
     margin-right: 10px;
-}
-
-#speech-language {
-    margin-right: 5px;
-    padding: 5px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #f8f9fa;
-    font-size: 0.9rem;
-    min-width: 80px;
 }
 
 @media (max-width: 600px) {
     .speech-controls {
         flex-direction: column;
         align-items: flex-start;
-    }
-    
-    #speech-language {
-        margin-bottom: 5px;
-        width: 100%;
     }
 }
 
@@ -321,16 +307,4 @@ button {
 .error-toast.show {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
-}
-
-.character-count {
-    font-size: 0.8rem;
-    color: #666;
-    text-align: right;
-    margin-top: 4px;
-}
-
-.character-count.warning {
-    color: #e74c3c;
-    font-weight: bold;
 } 

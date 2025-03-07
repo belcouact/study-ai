@@ -11,14 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const diagnosticsOutput = document.getElementById('diagnostics-output');
     const directTestButton = document.getElementById('direct-test-button');
     const simpleApiButton = document.getElementById('simple-api-button');
-    const speechLanguage = document.getElementById('speech-language');
     const checkEnvButton = document.getElementById('check-env-button');
     const apiFunctionRadios = document.querySelectorAll('input[name="api-function"]');
     const debugResponseButton = document.getElementById('debug-response-button');
     const fallbackButton = document.getElementById('fallback-button');
     const retryButton = document.getElementById('retry-button');
     const modelSelect = document.getElementById('model-select');
-    const characterCount = document.querySelector('.character-count');
 
     let diagnosticsData = null;
     let isListening = false;
@@ -41,9 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
         recognition.continuous = false;
         recognition.interimResults = false;
         
-        // Set default language to Chinese (Mandarin)
-        recognition.lang = 'zh-CN';
-        
         recognition.onresult = (event) => {
             const transcript = event.results[0][0].transcript;
             const confidence = event.results[0][0].confidence;
@@ -55,7 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.warn('Low confidence in speech recognition result');
             }
             
+            // Append the transcript to the input
             userInput.value += transcript;
+            
+            // Update the language detection for next time based on what was just spoken
+            const hasChinese = /[\u4e00-\u9fff]/.test(transcript);
+            recognition.lang = hasChinese ? 'zh-CN' : 'en-US';
             
             // Automatically stop listening after getting a result
             stopListening();
@@ -152,13 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 300);
                 }, 3000);
             }, 10);
-        }
-    });
-
-    speechLanguage.addEventListener('change', () => {
-        if (recognition) {
-            recognition.lang = speechLanguage.value;
-            console.log('Speech recognition language set to:', speechLanguage.value);
         }
     });
 
@@ -292,8 +285,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function startListening() {
         if (recognition) {
             try {
-                // Set the language from the dropdown
-                recognition.lang = speechLanguage.value;
+                // Auto-detect language based on the current input
+                const inputText = userInput.value.trim();
+                
+                // Simple detection: if there are Chinese characters, use Chinese, otherwise English
+                const hasChinese = /[\u4e00-\u9fff]/.test(inputText);
+                recognition.lang = hasChinese ? 'zh-CN' : 'en-US';
                 
                 // Start recognition
                 recognition.start();
@@ -301,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Update UI
                 micButton.classList.add('recording');
-                micButton.setAttribute('data-lang', speechLanguage.options[speechLanguage.selectedIndex].text);
+                micButton.setAttribute('data-lang', hasChinese ? '中文' : 'english');
                 
                 // Set a timeout to automatically stop listening after 10 seconds
                 if (recognitionTimeout) {
@@ -313,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, 10000);
                 
-                console.log('Speech recognition started with language:', recognition.lang);
+                console.log('Speech recognition started with auto-detected language:', recognition.lang);
             } catch (error) {
                 console.error('Error starting speech recognition:', error);
                 stopListening();
@@ -712,24 +709,4 @@ While I can't provide a detailed answer right now, you might want to:
             }
         }
     });
-
-    userInput.addEventListener('input', () => {
-        const count = userInput.value.length;
-        characterCount.textContent = `${count} characters`;
-        
-        // Add warning if getting close to limits
-        if (count > 2000) {
-            characterCount.classList.add('warning');
-        } else {
-            characterCount.classList.remove('warning');
-        }
-        
-        // Initialize character count on page load
-        if (count === 0) {
-            characterCount.textContent = '0 characters';
-        }
-    });
-
-    // Initialize character count on page load
-    characterCount.textContent = '0 characters';
 }); 
