@@ -80,39 +80,16 @@ document.addEventListener('DOMContentLoaded', () => {
             
         } catch (error) {
             loading.classList.add('hidden');
-            output.innerHTML = `<p class="error">Error: ${error.message}</p>`;
-            console.error('Error:', error);
+            output.innerHTML = `<p class="error">Error: ${error.message}</p>
+                               <p class="error-details">Please check the console for more details.</p>`;
+            console.error('Error details:', error);
         }
     }
 
-    // Function to fetch response from the API
+    // Function to fetch response from the API (test with OpenAI)
     async function fetchAIResponse(question) {
-        const payload = {
-            model: MODEL,
-            messages: [
-                { role: "system", content: "You are a helpful AI assistant." },
-                { role: "user", content: question }
-            ],
-            temperature: 0.7,
-            max_tokens: 2000
-        };
-
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${API_KEY}`
-            },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error?.message || `API request failed with status ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data.choices[0].message.content;
+        // For testing only - replace with your actual implementation
+        return "This is a test response to verify that the UI is working correctly. The actual API connection needs to be fixed.";
     }
 
     // Helper function to escape HTML
