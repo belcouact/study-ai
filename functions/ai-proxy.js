@@ -15,12 +15,27 @@ exports.handler = async function(event, context) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Question is required' }) };
     }
 
-    // Define API details
-    const API_KEY = 'sk-3GX9xoFVBu39Ibbrdg5zhmDzudFHCCR9VTib76y8rAWgMh2G';
-    const API_BASE_URL = 'https://api.lkeap.cloud.tencent.com/v1';
+    // Get API details from environment variables
+    const API_KEY = process.env.API_KEY;
+    const API_BASE_URL = process.env.API_BASE_URL;
+    const DEFAULT_MODEL = process.env.API_MODEL || 'deepseek-r1';
+    
+    if (!API_KEY || !API_BASE_URL) {
+      console.error('Missing required environment variables: API_KEY or API_BASE_URL');
+      return {
+        statusCode: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ 
+          error: 'Server configuration error: Missing API credentials'
+        })
+      };
+    }
     
     // Try both available models
-    const models = ['deepseek-r1', 'deepseek-v3'];
+    const models = [DEFAULT_MODEL, 'deepseek-v3'];
 
     for (const model of models) {
       try {

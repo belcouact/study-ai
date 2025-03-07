@@ -7,9 +7,29 @@ const dnsLookup = promisify(dns.lookup);
 
 exports.handler = async function(event, context) {
   try {
-    // API details
-    const API_KEY = 'sk-3GX9xoFVBu39Ibbrdg5zhmDzudFHCCR9VTib76y8rAWgMh2G';
-    const API_BASE_URL = 'https://api.lkeap.cloud.tencent.com/v1';
+    // Get API details from environment variables
+    const API_KEY = process.env.API_KEY;
+    const API_BASE_URL = process.env.API_BASE_URL;
+    const DEFAULT_MODEL = process.env.API_MODEL || 'deepseek-r1';
+    
+    if (!API_KEY || !API_BASE_URL) {
+      return {
+        statusCode: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({
+          status: 'error',
+          message: 'Missing required environment variables: API_KEY or API_BASE_URL',
+          environmentCheck: {
+            API_KEY: API_KEY ? 'Set' : 'Missing',
+            API_BASE_URL: API_BASE_URL ? 'Set' : 'Missing',
+            API_MODEL: DEFAULT_MODEL ? 'Set' : 'Missing'
+          }
+        })
+      };
+    }
     
     console.log('Starting API health check');
     
@@ -56,7 +76,7 @@ exports.handler = async function(event, context) {
       // Use the first available model
       const model = modelsData.data && modelsData.data.length > 0 
         ? modelsData.data[0].id 
-        : 'deepseek-r1';
+        : DEFAULT_MODEL;
       
       const payload = {
         model: model,
@@ -110,6 +130,11 @@ exports.handler = async function(event, context) {
             chat: {
               model: model,
               response: chatData.choices && chatData.choices[0] ? chatData.choices[0].message : null
+            },
+            environmentCheck: {
+              API_KEY: 'Set',
+              API_BASE_URL: API_BASE_URL,
+              API_MODEL: DEFAULT_MODEL
             }
           })
         };
@@ -129,6 +154,11 @@ exports.handler = async function(event, context) {
           chatError: {
             status: chatResponse.status,
             statusText: chatResponse.statusText
+          },
+          environmentCheck: {
+            API_KEY: 'Set',
+            API_BASE_URL: API_BASE_URL,
+            API_MODEL: DEFAULT_MODEL
           }
         })
       };
@@ -147,6 +177,11 @@ exports.handler = async function(event, context) {
         details: {
           status: modelsResponse.status,
           statusText: modelsResponse.statusText
+        },
+        environmentCheck: {
+          API_KEY: 'Set',
+          API_BASE_URL: API_BASE_URL,
+          API_MODEL: DEFAULT_MODEL
         }
       })
     };
@@ -163,7 +198,12 @@ exports.handler = async function(event, context) {
         status: 'error',
         message: 'Failed to run health check',
         details: error.message,
-        stack: error.stack
+        stack: error.stack,
+        environmentCheck: {
+          API_KEY: process.env.API_KEY ? 'Set' : 'Missing',
+          API_BASE_URL: process.env.API_BASE_URL ? 'Set' : 'Missing',
+          API_MODEL: process.env.API_MODEL ? 'Set' : 'Missing'
+        }
       })
     };
   }

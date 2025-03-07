@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let recognitionTimeout = null;
 
     // API configuration
-    const API_KEY = 'sk-3GX9xoFVBu39Ibbrdg5zhmDzudFHCCR9VTib76y8rAWgMh2G';
+    // Note: These values are now for reference only and not actually used for API calls
+    // The actual values are stored in Netlify environment variables
     const API_BASE_URL = 'https://api.lkeap.cloud.tencent.com/v1';
     const MODEL = 'deepseek-r1';
 
