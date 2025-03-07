@@ -691,12 +691,24 @@ While I can't provide a detailed answer right now, you might want to:
         try {
             output.innerHTML = '<div>Testing Netlify function...</div>';
             
-            const response = await fetch('/.netlify/functions/hello-world');
-            const data = await response.json();
+            // Try to fetch the test function with a timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
             
-            console.log('Test function response:', data);
+            const response = await fetch('/.netlify/functions/test', {
+                signal: controller.signal
+            });
             
-            output.innerHTML = `<div>Test function response: ${JSON.stringify(data, null, 2)}</div>`;
+            clearTimeout(timeoutId);
+            
+            // Log the raw response
+            console.log('Raw response:', response);
+            
+            // Try to get the text content
+            const text = await response.text();
+            console.log('Response text:', text);
+            
+            output.innerHTML = `<div>Test function response: ${text}</div>`;
         } catch (error) {
             console.error('Test function error:', error);
             output.innerHTML = `<div class="error-message">Test function error: ${error.message}</div>`;
