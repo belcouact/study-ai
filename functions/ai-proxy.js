@@ -8,6 +8,11 @@ exports.handler = async function(event, context) {
   }
 
   try {
+    console.log('Environment variables check:');
+    console.log('API_KEY exists:', !!process.env.API_KEY);
+    console.log('API_BASE_URL:', process.env.API_BASE_URL);
+    console.log('API_MODEL:', process.env.API_MODEL || 'deepseek-r1');
+
     const body = JSON.parse(event.body);
     const question = body.question;
     

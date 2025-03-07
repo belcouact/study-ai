@@ -3,9 +3,35 @@ const https = require('https');
 
 exports.handler = async function(event, context) {
   try {
-    // API details
-    const API_KEY = 'sk-3GX9xoFVBu39Ibbrdg5zhmDzudFHCCR9VTib76y8rAWgMh2G';
-    const API_BASE_URL = 'https://api.lkeap.cloud.tencent.com/v1';
+    // Get API details from environment variables
+    const API_KEY = process.env.API_KEY;
+    const API_BASE_URL = process.env.API_BASE_URL;
+    const MODEL = process.env.API_MODEL || 'deepseek-r1';
+    
+    // Debug logging
+    console.log('Environment variables in direct-api-test:');
+    console.log('API_KEY exists:', !!API_KEY);
+    console.log('API_BASE_URL:', API_BASE_URL);
+    console.log('API_MODEL:', MODEL);
+    
+    if (!API_KEY || !API_BASE_URL) {
+      return {
+        statusCode: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({
+          status: 'error',
+          message: 'Missing required environment variables',
+          environmentCheck: {
+            API_KEY: API_KEY ? 'Set' : 'Missing',
+            API_BASE_URL: API_BASE_URL ? 'Set' : 'Missing',
+            API_MODEL: MODEL ? 'Set' : 'Missing'
+          }
+        })
+      };
+    }
     
     // Test different endpoints
     const endpoints = [
@@ -65,7 +91,7 @@ exports.handler = async function(event, context) {
         let postResult = null;
         if (endpoint === '/chat/completions') {
           const payload = {
-            model: 'deepseek-r1',
+            model: MODEL,
             messages: [
               { role: "system", content: "You are a helpful AI assistant." },
               { role: "user", content: "Hello" }
@@ -130,7 +156,12 @@ exports.handler = async function(event, context) {
       },
       body: JSON.stringify({
         status: 'completed',
-        results
+        results,
+        environmentCheck: {
+          API_KEY: API_KEY ? 'Set' : 'Missing',
+          API_BASE_URL: API_BASE_URL,
+          API_MODEL: MODEL
+        }
       })
     };
     
@@ -145,7 +176,12 @@ exports.handler = async function(event, context) {
       body: JSON.stringify({
         status: 'error',
         message: error.message,
-        stack: error.stack
+        stack: error.stack,
+        environmentCheck: {
+          API_KEY: process.env.API_KEY ? 'Set' : 'Missing',
+          API_BASE_URL: process.env.API_BASE_URL,
+          API_MODEL: process.env.API_MODEL
+        }
       })
     };
   }

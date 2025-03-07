@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const directTestButton = document.getElementById('direct-test-button');
     const simpleApiButton = document.getElementById('simple-api-button');
     const speechLanguage = document.getElementById('speech-language');
+    const checkEnvButton = document.getElementById('check-env-button');
     
     let diagnosticsData = null;
     let isListening = false;
@@ -208,6 +209,37 @@ document.addEventListener('DOMContentLoaded', () => {
             apiStatus.textContent = `Simple API error: ${error.message}`;
             apiStatus.className = 'status-error';
             console.error('Simple API error:', error);
+        }
+    });
+
+    // Add event listener for the check environment button
+    checkEnvButton.addEventListener('click', async () => {
+        try {
+            apiStatus.textContent = 'Checking environment variables...';
+            apiStatus.className = 'status-checking';
+            
+            const response = await fetch('/.netlify/functions/check-env');
+            const data = await response.json();
+            
+            console.log('Environment check results:', data);
+            
+            if (data.status === 'ok') {
+                apiStatus.textContent = 'Environment variables are set correctly!';
+                apiStatus.className = 'status-success';
+            } else {
+                apiStatus.textContent = `Environment issue: ${data.message}`;
+                apiStatus.className = 'status-error';
+            }
+            
+            // Show diagnostics
+            showDiagnosticsButton.classList.remove('hidden');
+            diagnosticsPanel.classList.remove('hidden');
+            diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
+            showDiagnosticsButton.textContent = 'Hide Diagnostics';
+        } catch (error) {
+            apiStatus.textContent = `Environment check failed: ${error.message}`;
+            apiStatus.className = 'status-error';
+            console.error('Environment check error:', error);
         }
     });
 
