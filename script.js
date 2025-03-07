@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const retryButton = document.getElementById('retry-button');
     const modelSelect = document.getElementById('model-select');
     const characterCount = document.querySelector('.character-count');
+    const testFunctionButton = document.getElementById('test-function-button');
     
     let diagnosticsData = null;
     let isListening = false;
@@ -328,19 +329,36 @@ document.addEventListener('DOMContentLoaded', () => {
             loading.classList.remove('hidden');
             output.innerHTML = '';
             
-            // Use a very simple fetch approach
+            console.log('Sending request to simple-ai function');
+            
+            // Add a timeout for the fetch request
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+            
             const response = await fetch('/.netlify/functions/simple-ai', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ question })
+                body: JSON.stringify({ question }),
+                signal: controller.signal
             });
             
-            const data = await response.json();
-            console.log('API response:', data);
+            // Clear the timeout
+            clearTimeout(timeoutId);
             
-            // Display raw response for debugging
+            console.log('Response received:', response.status);
+            
+            let data;
+            try {
+                data = await response.json();
+                console.log('Response data:', data);
+            } catch (parseError) {
+                console.error('Error parsing response:', parseError);
+                output.innerHTML = `<div class="error-message">Error parsing response: ${parseError.message}</div>`;
+                return;
+            }
+            
             if (!response.ok) {
                 output.innerHTML = `<div class="error-message">Error: ${data.error || response.status}</div>`;
                 return;
@@ -362,7 +380,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
         } catch (error) {
             console.error('Error:', error);
-            output.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+            
+            if (error.name === 'AbortError') {
+                output.innerHTML = `<div class="error-message">Request timed out. The server might be overloaded.</div>`;
+            } else {
+                output.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+            }
         } finally {
             // Hide loading state
             loading.classList.add('hidden');
@@ -661,6 +684,22 @@ While I can't provide a detailed answer right now, you might want to:
             characterCount.classList.add('warning');
         } else {
             characterCount.classList.remove('warning');
+        }
+    });
+
+    testFunctionButton.addEventListener('click', async () => {
+        try {
+            output.innerHTML = '<div>Testing Netlify function...</div>';
+            
+            const response = await fetch('/.netlify/functions/hello-world');
+            const data = await response.json();
+            
+            console.log('Test function response:', data);
+            
+            output.innerHTML = `<div>Test function response: ${JSON.stringify(data, null, 2)}</div>`;
+        } catch (error) {
+            console.error('Test function error:', error);
+            output.innerHTML = `<div class="error-message">Test function error: ${error.message}</div>`;
         }
     });
 }); 
