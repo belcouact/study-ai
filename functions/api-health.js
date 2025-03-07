@@ -7,37 +7,26 @@ exports.handler = async function(event, context) {
     
     console.log('Attempting to connect to API:', API_URL);
     
-    // Simple test request to check if the API is responsive
+    // Try a more realistic test request
     const payload = {
       model: 'deepseek-reasoner',
       messages: [
         { role: "system", content: "You are a helpful AI assistant." },
-        { role: "user", content: "Hello" }
+        { role: "user", content: "Say hello in one word" }
       ],
-      max_tokens: 5  // Request minimal tokens to save resources
+      max_tokens: 10,
+      temperature: 0.7
     };
 
-    // First, try a simple OPTIONS request to check connectivity
-    const pingResponse = await fetch(API_URL, {
-      method: 'OPTIONS',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).catch(err => {
-      console.log('Ping request failed:', err.message);
-      return { ok: false, status: 'network_error', statusText: err.message };
-    });
-
-    console.log('Ping response status:', pingResponse.status, pingResponse.statusText);
-
-    // Now try the actual API request
+    // Make the API request
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${API_KEY}`
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      timeout: 10000 // 10 second timeout
     }).catch(err => {
       console.log('API request failed:', err.message);
       return { ok: false, status: 'network_error', statusText: err.message };
@@ -49,18 +38,38 @@ exports.handler = async function(event, context) {
       const data = await response.json();
       console.log('API response data received');
       
-      return {
-        statusCode: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify({ 
-          status: 'ok', 
-          message: 'API connection successful',
-          details: { status: response.status }
-        })
-      };
+      // Check if the response has the expected format
+      if (data.choices && data.choices[0] && data.choices[0].message) {
+        return {
+          statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({ 
+            status: 'ok', 
+            message: 'API connection successful',
+            details: { 
+              status: response.status,
+              response: data.choices[0].message.content
+            }
+          })
+        };
+      } else {
+        // Response format is unexpected
+        return {
+          statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({ 
+            status: 'warning', 
+            message: 'API responded but with unexpected format',
+            details: data
+          })
+        };
+      }
     } else {
       let errorDetails = {};
       
