@@ -50,14 +50,14 @@ exports.handler = async function(event, context) {
       temperature: 0.7
     };
     
-    // Create a custom agent with a longer timeout
+    // Create a custom agent with a 90-second timeout
     const agent = new https.Agent({
       keepAlive: true,
-      timeout: 120000 // 120 seconds
+      timeout: 90000 // 90 seconds
     });
     
     try {
-      // Make the API request with the custom agent and longer timeout
+      // Make the API request with the custom agent and 90-second timeout
       const response = await fetch(`${API_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: {
@@ -66,7 +66,7 @@ exports.handler = async function(event, context) {
         },
         body: JSON.stringify(payload),
         agent: agent,
-        timeout: 120000 // 120 seconds
+        timeout: 90000 // 90 seconds
       });
       
       // Get the response data

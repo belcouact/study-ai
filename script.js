@@ -367,9 +367,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Create a controller for the timeout
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 seconds timeout
+            const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 seconds timeout
             
-            // Use a very simple approach with a longer timeout
+            // Use a very simple approach with a 90-second timeout
             const response = await fetch('/.netlify/functions/simple-ai', {
                 method: 'POST',
                 headers: {
@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error:', error);
             
             if (error.name === 'AbortError') {
-                output.innerHTML = `<div class="error-message">Request timed out after 120 seconds. The server might be overloaded.</div>`;
+                output.innerHTML = `<div class="error-message">Request timed out after 90 seconds. The server might be overloaded.</div>`;
             } else {
                 output.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
             }
