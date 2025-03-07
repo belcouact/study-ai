@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const micButton = document.getElementById('mic-button');
     const output = document.getElementById('output');
     const loading = document.getElementById('loading');
+    const checkApiButton = document.getElementById('check-api-button');
+    const apiStatus = document.getElementById('api-status');
 
     // API configuration
     const API_KEY = 'sk-ee8971509c3446129f6c0b43ee362e13a4a642pjsvzv199t';
@@ -55,6 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // Add event listener for the check API button
+    checkApiButton.addEventListener('click', checkApiConnection);
 
     // Function to handle form submission
     async function handleSubmit() {
@@ -131,5 +136,29 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
             // Line breaks
             .replace(/\n/g, '<br>');
+    }
+
+    // Function to check API connection
+    async function checkApiConnection() {
+        apiStatus.textContent = 'Checking connection...';
+        apiStatus.className = 'status-checking';
+        
+        try {
+            const response = await fetch('/.netlify/functions/api-health', {
+                method: 'GET'
+            });
+            
+            if (response.ok) {
+                apiStatus.textContent = 'API connection successful!';
+                apiStatus.className = 'status-success';
+            } else {
+                apiStatus.textContent = 'API connection failed.';
+                apiStatus.className = 'status-error';
+            }
+        } catch (error) {
+            apiStatus.textContent = `Connection error: ${error.message}`;
+            apiStatus.className = 'status-error';
+            console.error('API check error:', error);
+        }
     }
 }); 
