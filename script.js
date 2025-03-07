@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const showDiagnosticsButton = document.getElementById('show-diagnostics');
     const diagnosticsPanel = document.getElementById('diagnostics-panel');
     const diagnosticsOutput = document.getElementById('diagnostics-output');
+    const directTestButton = document.getElementById('direct-test-button');
     
     let diagnosticsData = null;
 
@@ -74,6 +75,32 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             diagnosticsPanel.classList.add('hidden');
             showDiagnosticsButton.textContent = 'Show Diagnostics';
+        }
+    });
+
+    // Add event listener for the direct test button
+    directTestButton.addEventListener('click', async () => {
+        try {
+            apiStatus.textContent = 'Running direct API test...';
+            apiStatus.className = 'status-checking';
+            
+            const response = await fetch('/.netlify/functions/direct-api-test');
+            const data = await response.json();
+            
+            console.log('Direct API test results:', data);
+            
+            // Show diagnostics
+            showDiagnosticsButton.classList.remove('hidden');
+            diagnosticsPanel.classList.remove('hidden');
+            diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
+            showDiagnosticsButton.textContent = 'Hide Diagnostics';
+            
+            apiStatus.textContent = 'Direct API test completed';
+            apiStatus.className = 'status-success';
+        } catch (error) {
+            apiStatus.textContent = `Direct API test failed: ${error.message}`;
+            apiStatus.className = 'status-error';
+            console.error('Direct API test error:', error);
         }
     });
 

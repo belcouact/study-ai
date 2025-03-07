@@ -31,42 +31,120 @@ exports.handler = async function(event, context) {
           { role: "user", content: question }
         ],
         temperature: 0.7,
-        max_tokens: 2000
+        max_tokens: 2000,
+        stream: false // Explicitly set stream to false
       };
 
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${API_KEY}`
-        },
-        body: JSON.stringify(payload),
-        timeout: 30000 // 30 second timeout
-      });
-
-      console.log('API response status:', response.status);
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('API response received successfully');
-        
-        return {
-          statusCode: 200,
+      // Try different request formats
+      try {
+        // First attempt with standard format
+        const response = await fetch(API_URL, {
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
+            'Authorization': `Bearer ${API_KEY}`
           },
-          body: JSON.stringify(data)
-        };
+          body: JSON.stringify(payload),
+          timeout: 30000
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('API response received successfully');
+          
+          return {
+            statusCode: 200,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify(data)
+          };
+        } else if (response.status === 401 || response.status === 403) {
+          // Try with a different auth format
+          console.log('Trying alternative authentication format...');
+          
+          const altResponse = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': API_KEY // Without "Bearer" prefix
+            },
+            body: JSON.stringify(payload),
+            timeout: 30000
+          });
+          
+          if (altResponse.ok) {
+            const data = await altResponse.json();
+            console.log('API response received successfully');
+            
+            return {
+              statusCode: 200,
+              headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+              },
+              body: JSON.stringify(data)
+            };
+          }
+        }
+      } catch (apiError) {
+        console.log('API error:', apiError.message);
       }
       
       // If we get here, the API request failed
-      console.log('API request failed, using local fallback');
+      console.log('API request failed, using fallback options');
+      
+      // Try using a public dictionary API as fallback
+      try {
+        console.log('Trying dictionary API fallback');
+        const FALLBACK_API_URL = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
+        const wordToLookup = question.split(' ')[0].toLowerCase();
+        
+        const fallbackResponse = await fetch(`${FALLBACK_API_URL}${wordToLookup}`);
+        
+        if (fallbackResponse.ok) {
+          const fallbackData = await fallbackResponse.json();
+          
+          let definition = "I couldn't find information about that.";
+          
+          if (Array.isArray(fallbackData) && fallbackData.length > 0) {
+            const entry = fallbackData[0];
+            if (entry.meanings && entry.meanings.length > 0) {
+              const meaning = entry.meanings[0];
+              if (meaning.definitions && meaning.definitions.length > 0) {
+                definition = `The word "${entry.word}" means: ${meaning.definitions[0].definition}`;
+              }
+            }
+          }
+          
+          return {
+            statusCode: 200,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify({
+              choices: [
+                {
+                  message: {
+                    content: `I'm currently in fallback mode using a dictionary API. ${definition}\n\nNote: The main AI service is unavailable.`,
+                    role: "assistant"
+                  }
+                }
+              ]
+            })
+          };
+        }
+      } catch (fallbackError) {
+        console.log('Dictionary API fallback failed:', fallbackError.message);
+      }
+      
     } catch (apiError) {
       console.log('API error:', apiError.message);
     }
     
-    // Use local fallback response
+    // Use local fallback response as last resort
     console.log('Generating local fallback response');
     
     // Generate a simple response based on the question
@@ -143,51 +221,4 @@ While I can't provide a detailed answer right now, you might want to:
 1. Try again later
 2. Search for this information on Google
 3. Contact the site administrator if the problem persists`;
-}
-
-// In the catch block or when the primary API fails
-console.log('Primary API failed, trying public fallback API...');
-
-// Use a free, public API as fallback
-try {
-  const FALLBACK_API_URL = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
-  const wordToLookup = question.split(' ')[0].toLowerCase();
-  
-  const fallbackResponse = await fetch(`${FALLBACK_API_URL}${wordToLookup}`);
-  
-  if (fallbackResponse.ok) {
-    const fallbackData = await fallbackResponse.json();
-    
-    let definition = "I couldn't find information about that.";
-    
-    if (Array.isArray(fallbackData) && fallbackData.length > 0) {
-      const entry = fallbackData[0];
-      if (entry.meanings && entry.meanings.length > 0) {
-        const meaning = entry.meanings[0];
-        if (meaning.definitions && meaning.definitions.length > 0) {
-          definition = `The word "${entry.word}" means: ${meaning.definitions[0].definition}`;
-        }
-      }
-    }
-    
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({
-        choices: [
-          {
-            message: {
-              content: `I'm currently in fallback mode using a dictionary API. ${definition}\n\nNote: The main AI service is unavailable.`,
-              role: "assistant"
-            }
-          }
-        ]
-      })
-    };
-  }
-} catch (fallbackError) {
-  console.log('Fallback API also failed:', fallbackError.message);
 } 
