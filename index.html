@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>AI Assistant</h1>
+        <div class="chat-container">
+            <div class="input-container">
+                <textarea id="user-input" placeholder="Type your question here..."></textarea>
+                <div class="button-container">
+                    <button id="mic-button" title="Record your question">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button id="submit-button">Submit</button>
+                </div>
+            </div>
+            <div class="output-container">
+                <div id="loading" class="hidden">
+                    <div class="spinner"></div>
+                    <p>Thinking...</p>
+                </div>
+                <div id="output">
+                    <p class="welcome-message">Hello! Ask me anything, and I'll do my best to help.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
