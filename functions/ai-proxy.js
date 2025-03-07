@@ -15,12 +15,18 @@ exports.handler = async function(event, context) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Question is required' }) };
     }
 
+    // Define API details
+    const API_KEY = 'sk-3GX9xoFVBu39Ibbrdg5zhmDzudFHCCR9VTib76y8rAWgMh2G';
+    const API_BASE_URL = 'https://api.lkeap.cloud.tencent.com/v1';
+    
     // Try both available models
     const models = ['deepseek-r1', 'deepseek-v3'];
 
     for (const model of models) {
       try {
         console.log(`Trying model: ${model}`);
+        
+        const API_URL = `${API_BASE_URL}/chat/completions`;
         
         const payload = {
           model: model,
@@ -40,16 +46,21 @@ exports.handler = async function(event, context) {
           timeout: 30000
         });
 
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${API_KEY}`
+        // Use the fetchWithRetry function for better reliability
+        const response = await fetchWithRetry(
+          API_URL,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${API_KEY}`
+            },
+            body: JSON.stringify(payload),
+            agent,
+            timeout: 30000
           },
-          body: JSON.stringify(payload),
-          agent,
-          timeout: 30000
-        });
+          3 // Number of retries
+        );
         
         console.log('API response status:', response.status);
         
@@ -161,7 +172,7 @@ While I can't provide a detailed answer right now, you might want to:
 3. Contact the site administrator if the problem persists`;
 }
 
-// Add this function to your ai-proxy.js
+// Improved fetchWithRetry function
 async function fetchWithRetry(url, options, maxRetries = 3) {
   let lastError;
   

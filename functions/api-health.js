@@ -7,161 +7,150 @@ const dnsLookup = promisify(dns.lookup);
 
 exports.handler = async function(event, context) {
   try {
-    // Updated API details
+    // API details
     const API_KEY = 'sk-3GX9xoFVBu39Ibbrdg5zhmDzudFHCCR9VTib76y8rAWgMh2G';
     const API_BASE_URL = 'https://api.lkeap.cloud.tencent.com/v1';
-    const API_URL = `${API_BASE_URL}/chat/completions`;
-    const MODEL = 'deepseek-r1';
     
-    console.log('Starting comprehensive API diagnostics');
+    console.log('Starting API health check');
     
-    // Step 1: DNS lookup to check if the domain exists
-    let dnsResult;
-    try {
-      const domain = new URL(API_URL).hostname;
-      console.log('Performing DNS lookup for:', domain);
-      dnsResult = await dnsLookup(domain);
-      console.log('DNS lookup successful:', dnsResult);
-    } catch (dnsError) {
-      console.log('DNS lookup failed:', dnsError.message);
-      dnsResult = { error: dnsError.message };
-    }
-    
-    // Step 2: Try a simple HTTPS request to check basic connectivity
-    let connectivityResult;
-    try {
-      console.log('Testing basic HTTPS connectivity');
-      const domain = new URL(API_URL).hostname;
-      const connectivityPromise = new Promise((resolve, reject) => {
-        const req = https.request({
-          hostname: domain,
-          port: 443,
-          path: '/',
-          method: 'HEAD',
-          timeout: 5000
-        }, (res) => {
-          resolve({ statusCode: res.statusCode, headers: res.headers });
-        });
-        
-        req.on('error', (e) => {
-          reject(e);
-        });
-        
-        req.on('timeout', () => {
-          req.destroy();
-          reject(new Error('Connection timed out'));
-        });
-        
-        req.end();
-      });
-      
-      connectivityResult = await connectivityPromise;
-      console.log('Basic connectivity test result:', connectivityResult);
-    } catch (connectError) {
-      console.log('Connectivity test failed:', connectError.message);
-      connectivityResult = { error: connectError.message };
-    }
-    
-    // Step 3: Try the actual API request
-    console.log('Attempting API request');
-    const payload = {
-      model: MODEL,
-      messages: [
-        { role: "system", content: "You are a helpful AI assistant." },
-        { role: "user", content: "Say hello in one word" }
-      ],
-      max_tokens: 10,
-      temperature: 0.7
-    };
-
+    // Create a custom agent to handle HTTPS requests
     const agent = new https.Agent({
-      rejectUnauthorized: false, // For testing only - allows self-signed certs
+      rejectUnauthorized: false, // For testing only
+      keepAlive: true,
       timeout: 10000
     });
-
-    const response = await fetch(API_URL, {
-      method: 'POST',
+    
+    // First, check the models endpoint which should be more reliable
+    const modelsUrl = `${API_BASE_URL}/models`;
+    console.log('Checking models endpoint:', modelsUrl);
+    
+    const modelsResponse = await fetch(modelsUrl, {
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${API_KEY}`
       },
-      body: JSON.stringify(payload),
       agent,
-      timeout: 10000 // 10 second timeout
+      timeout: 10000
     }).catch(err => {
-      console.log('API request failed:', err.message);
+      console.log('Models request failed:', err.message);
       return { ok: false, status: 'network_error', statusText: err.message };
     });
-
-    console.log('API response status:', response.status, response.statusText);
-
-    let responseData = null;
-    let responseText = null;
     
-    try {
-      if (response.status !== 'network_error') {
-        responseText = await response.text();
-        console.log('Response text:', responseText.substring(0, 200) + (responseText.length > 200 ? '...' : ''));
-        
+    console.log('Models response status:', modelsResponse.status);
+    
+    let modelsData = null;
+    if (modelsResponse.ok) {
+      try {
+        modelsData = await modelsResponse.json();
+        console.log('Models data received:', modelsData);
+      } catch (e) {
+        console.log('Failed to parse models response:', e.message);
+      }
+    }
+    
+    // If models endpoint worked, try a simple chat completion
+    if (modelsResponse.ok && modelsData) {
+      const chatUrl = `${API_BASE_URL}/chat/completions`;
+      console.log('Testing chat completions endpoint:', chatUrl);
+      
+      // Use the first available model
+      const model = modelsData.data && modelsData.data.length > 0 
+        ? modelsData.data[0].id 
+        : 'deepseek-r1';
+      
+      const payload = {
+        model: model,
+        messages: [
+          { role: "system", content: "You are a helpful AI assistant." },
+          { role: "user", content: "Say hello in one word" }
+        ],
+        max_tokens: 10,
+        temperature: 0.7,
+        stream: false
+      };
+      
+      const chatResponse = await fetch(chatUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify(payload),
+        agent,
+        timeout: 15000
+      }).catch(err => {
+        console.log('Chat request failed:', err.message);
+        return { ok: false, status: 'network_error', statusText: err.message };
+      });
+      
+      console.log('Chat response status:', chatResponse.status);
+      
+      let chatData = null;
+      if (chatResponse.ok) {
         try {
-          responseData = JSON.parse(responseText);
+          chatData = await chatResponse.json();
+          console.log('Chat data received:', chatData);
         } catch (e) {
-          console.log('Failed to parse response as JSON:', e.message);
+          console.log('Failed to parse chat response:', e.message);
         }
       }
-    } catch (e) {
-      console.log('Error reading response:', e.message);
-    }
-
-    // Compile all diagnostic information
-    const diagnostics = {
-      dns: dnsResult,
-      connectivity: connectivityResult,
-      apiRequest: {
-        url: API_URL,
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers ? Object.fromEntries(response.headers.entries()) : null,
-        responseData: responseData,
-        responseText: responseText ? (responseText.length > 500 ? responseText.substring(0, 500) + '...' : responseText) : null
+      
+      // If both endpoints worked, return success
+      if (chatResponse.ok && chatData) {
+        return {
+          statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({
+            status: 'ok',
+            message: 'API connection successful',
+            models: modelsData.data,
+            chat: {
+              model: model,
+              response: chatData.choices && chatData.choices[0] ? chatData.choices[0].message : null
+            }
+          })
+        };
       }
-    };
-
-    if (response.ok && responseData && responseData.choices && responseData.choices[0] && responseData.choices[0].message) {
+      
+      // If chat endpoint failed but models worked
       return {
         statusCode: 200,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         },
-        body: JSON.stringify({ 
-          status: 'ok', 
-          message: 'API connection successful',
-          details: { 
-            status: response.status,
-            response: responseData.choices[0].message.content
-          },
-          diagnostics
-        })
-      };
-    } else {
-      return {
-        statusCode: 200, // Return 200 so the frontend can display the diagnostics
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify({ 
-          status: 'error', 
-          message: 'API connection failed',
-          details: {
-            status: response.status,
-            statusText: response.statusText
-          },
-          diagnostics
+        body: JSON.stringify({
+          status: 'partial',
+          message: 'API models endpoint is working, but chat completions failed',
+          models: modelsData.data,
+          chatError: {
+            status: chatResponse.status,
+            statusText: chatResponse.statusText
+          }
         })
       };
     }
+    
+    // If models endpoint failed
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({
+        status: 'error',
+        message: 'API connection failed',
+        details: {
+          status: modelsResponse.status,
+          statusText: modelsResponse.statusText
+        }
+      })
+    };
+    
   } catch (error) {
     console.log('Health check error:', error);
     return {
@@ -170,9 +159,9 @@ exports.handler = async function(event, context) {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify({ 
-        status: 'error', 
-        message: 'Failed to run diagnostics',
+      body: JSON.stringify({
+        status: 'error',
+        message: 'Failed to run health check',
         details: error.message,
         stack: error.stack
       })

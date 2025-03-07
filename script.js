@@ -10,8 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const diagnosticsPanel = document.getElementById('diagnostics-panel');
     const diagnosticsOutput = document.getElementById('diagnostics-output');
     const directTestButton = document.getElementById('direct-test-button');
+    const simpleApiButton = document.getElementById('simple-api-button');
+    const speechLanguage = document.getElementById('speech-language');
     
     let diagnosticsData = null;
+    let isListening = false;
+    let recognitionTimeout = null;
 
     // API configuration
     const API_KEY = 'sk-3GX9xoFVBu39Ibbrdg5zhmDzudFHCCR9VTib76y8rAWgMh2G';
@@ -24,20 +28,76 @@ document.addEventListener('DOMContentLoaded', () => {
         recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.continuous = false;
         recognition.interimResults = false;
-        recognition.lang = 'en-US';
-
+        
+        // Set default language to Chinese (Mandarin)
+        recognition.lang = 'zh-CN';
+        
         recognition.onresult = (event) => {
             const transcript = event.results[0][0].transcript;
+            const confidence = event.results[0][0].confidence;
+            
+            console.log(`Speech recognized: "${transcript}" (confidence: ${Math.round(confidence * 100)}%)`);
+            
+            // If confidence is too low, maybe warn the user
+            if (confidence < 0.5) {
+                console.warn('Low confidence in speech recognition result');
+            }
+            
             userInput.value += transcript;
+            
+            // Automatically stop listening after getting a result
+            stopListening();
         };
 
         recognition.onend = () => {
-            micButton.classList.remove('recording');
+            stopListening();
         };
 
         recognition.onerror = (event) => {
             console.error('Speech recognition error:', event.error);
-            micButton.classList.remove('recording');
+            
+            // Show a message to the user based on the error
+            let errorMessage = '';
+            switch (event.error) {
+                case 'no-speech':
+                    errorMessage = 'No speech detected. Please try again.';
+                    break;
+                case 'aborted':
+                    errorMessage = 'Speech recognition was aborted.';
+                    break;
+                case 'audio-capture':
+                    errorMessage = 'No microphone detected. Please check your device.';
+                    break;
+                case 'network':
+                    errorMessage = 'Network error occurred. Please check your connection.';
+                    break;
+                case 'not-allowed':
+                    errorMessage = 'Microphone access denied. Please allow microphone access.';
+                    break;
+                case 'service-not-allowed':
+                    errorMessage = 'Speech recognition service not allowed.';
+                    break;
+                default:
+                    errorMessage = `Error: ${event.error}`;
+            }
+            
+            // Display the error briefly
+            const errorToast = document.createElement('div');
+            errorToast.className = 'error-toast';
+            errorToast.textContent = errorMessage;
+            document.body.appendChild(errorToast);
+            
+            setTimeout(() => {
+                errorToast.classList.add('show');
+                setTimeout(() => {
+                    errorToast.classList.remove('show');
+                    setTimeout(() => {
+                        document.body.removeChild(errorToast);
+                    }, 300);
+                }, 3000);
+            }, 10);
+            
+            stopListening();
         };
     } else {
         micButton.style.display = 'none';
@@ -55,12 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     micButton.addEventListener('click', () => {
         if (recognition) {
-            if (micButton.classList.contains('recording')) {
-                recognition.stop();
+            if (isListening) {
+                stopListening();
             } else {
-                micButton.classList.add('recording');
-                recognition.start();
+                startListening();
             }
+        }
+    });
+
+    speechLanguage.addEventListener('change', () => {
+        if (recognition) {
+            recognition.lang = speechLanguage.value;
+            console.log('Speech recognition language set to:', speechLanguage.value);
         }
     });
 
@@ -103,6 +169,96 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Direct API test error:', error);
         }
     });
+
+    // Add event listener for the simple API button
+    simpleApiButton.addEventListener('click', async () => {
+        const question = userInput.value.trim() || "Hello, how are you?";
+        
+        try {
+            apiStatus.textContent = 'Trying simple API...';
+            apiStatus.className = 'status-checking';
+            
+            const response = await fetch('/.netlify/functions/simple-ai', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ question })
+            });
+            
+            const data = await response.json();
+            
+            console.log('Simple API response:', data);
+            
+            if (response.ok) {
+                apiStatus.textContent = 'Simple API request successful!';
+                apiStatus.className = 'status-success';
+                
+                // Show the response
+                showDiagnosticsButton.classList.remove('hidden');
+                diagnosticsPanel.classList.remove('hidden');
+                diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
+                showDiagnosticsButton.textContent = 'Hide Diagnostics';
+            } else {
+                apiStatus.textContent = `Simple API failed: ${data.error || 'Unknown error'}`;
+                apiStatus.className = 'status-error';
+            }
+        } catch (error) {
+            apiStatus.textContent = `Simple API error: ${error.message}`;
+            apiStatus.className = 'status-error';
+            console.error('Simple API error:', error);
+        }
+    });
+
+    // Function to start listening
+    function startListening() {
+        // Update the language before starting
+        recognition.lang = speechLanguage.value;
+        console.log('Starting speech recognition in:', recognition.lang);
+        
+        // Add language indicator to the button
+        micButton.setAttribute('data-lang', speechLanguage.options[speechLanguage.selectedIndex].text.split(' ')[0]);
+        
+        // Clear any existing timeout
+        if (recognitionTimeout) {
+            clearTimeout(recognitionTimeout);
+        }
+        
+        // Set a timeout to automatically stop listening after 10 seconds
+        recognitionTimeout = setTimeout(() => {
+            if (isListening) {
+                console.log('Speech recognition timed out');
+                stopListening();
+            }
+        }, 10000);
+        
+        micButton.classList.add('recording');
+        isListening = true;
+        
+        try {
+            recognition.start();
+        } catch (e) {
+            console.error('Speech recognition error:', e);
+            stopListening();
+        }
+    }
+
+    // Function to stop listening
+    function stopListening() {
+        if (recognitionTimeout) {
+            clearTimeout(recognitionTimeout);
+            recognitionTimeout = null;
+        }
+        
+        micButton.classList.remove('recording');
+        isListening = false;
+        
+        try {
+            recognition.stop();
+        } catch (e) {
+            console.error('Error stopping speech recognition:', e);
+        }
+    }
 
     // Function to handle form submission
     async function handleSubmit() {

@@ -24,9 +24,17 @@
             <div class="input-container">
                 <textarea id="user-input" placeholder="Type your question here..."></textarea>
                 <div class="button-container">
-                    <button id="mic-button" title="Record your question">
-                        <i class="fas fa-microphone"></i>
-                    </button>
+                    <div class="speech-controls">
+                        <select id="speech-language" title="Select speech recognition language">
+                            <option value="zh-CN">中文 (Chinese)</option>
+                            <option value="en-US">English (US)</option>
+                            <option value="zh-HK">粵語 (Cantonese)</option>
+                            <option value="zh-TW">國語 (Taiwanese)</option>
+                        </select>
+                        <button id="mic-button" title="Record your question">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                    </div>
                     <button id="submit-button">Submit</button>
                 </div>
             </div>
