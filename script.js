@@ -86,10 +86,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Function to fetch response from the API (test with OpenAI)
+    // Function to fetch response from the API
     async function fetchAIResponse(question) {
-        // For testing only - replace with your actual implementation
-        return "This is a test response to verify that the UI is working correctly. The actual API connection needs to be fixed.";
+        try {
+            const response = await fetch('/.netlify/functions/ai-proxy', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ question })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || `Request failed with status ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.choices[0].message.content;
+        } catch (error) {
+            console.error('Fetch error details:', error);
+            throw error;
+        }
     }
 
     // Helper function to escape HTML

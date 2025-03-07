@@ -1,0 +1,8 @@
+{
+  "name": "ai-chat-interface",
+  "version": "1.0.0",
+  "description": "AI Chat Interface using DeepSeek Reasoner API",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+} 
