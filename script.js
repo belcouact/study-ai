@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkEnvButton = document.getElementById('check-env-button');
     const apiFunctionRadios = document.querySelectorAll('input[name="api-function"]');
     const debugResponseButton = document.getElementById('debug-response-button');
+    const fallbackButton = document.getElementById('fallback-button');
     
     let diagnosticsData = null;
     let isListening = false;
@@ -371,17 +372,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to fetch response from the API
     async function fetchAIResponse(question) {
         try {
+            // Show loading state
+            loading.classList.remove('hidden');
+            
+            // Add a timeout for the fetch request
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+            
             const response = await fetch(`/.netlify/functions/${currentApiFunction}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ question })
+                body: JSON.stringify({ question }),
+                signal: controller.signal
             });
+            
+            // Clear the timeout
+            clearTimeout(timeoutId);
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || `Request failed with status ${response.status}`);
+                let errorMessage = `Request failed with status ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.error || errorMessage;
+                    console.error('API error details:', errorData);
+                } catch (e) {
+                    // If we can't parse the error as JSON, just use the status message
+                }
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
@@ -391,11 +410,20 @@ document.addEventListener('DOMContentLoaded', () => {
             lastRawResponse = data;
             debugResponseButton.classList.remove('hidden');
             
-            // Use the new extraction function
+            // Use the extraction function
             return extractContentFromResponse(data);
         } catch (error) {
             console.error('Fetch error details:', error);
+            
+            // Check for timeout/abort errors
+            if (error.name === 'AbortError') {
+                return "The request took too long and was aborted. Please try again or try a different question.";
+            }
+            
             throw error;
+        } finally {
+            // Hide loading state
+            loading.classList.add('hidden');
         }
     }
 
@@ -473,4 +501,71 @@ document.addEventListener('DOMContentLoaded', () => {
             showDiagnosticsButton.classList.remove('hidden');
         }
     });
+
+    // Add event listener for the fallback button
+    fallbackButton.addEventListener('click', async () => {
+        const question = userInput.value.trim();
+        if (!question) {
+            alert('Please enter a question first.');
+            return;
+        }
+        
+        try {
+            // Show loading state
+            loading.classList.remove('hidden');
+            output.innerHTML = '';
+            
+            // Generate a local fallback response
+            const response = generateLocalResponse(question);
+            
+            // Format and display the response
+            const formattedResponse = formatResponse(response);
+            output.innerHTML = `<div class="ai-message">${formattedResponse}</div>`;
+        } catch (error) {
+            console.error('Error generating fallback response:', error);
+            output.innerHTML = `<div class="error-message">Error: ${escapeHTML(error.message)}</div>`;
+        } finally {
+            // Hide loading state
+            loading.classList.add('hidden');
+        }
+    });
+
+    // Function to generate a local response
+    function generateLocalResponse(question) {
+        question = question.toLowerCase();
+        
+        // Simple pattern matching for common questions
+        if (question.includes('hello') || question.includes('hi ')) {
+            return "Hello! I'm a local fallback assistant. The main AI service is currently unavailable, but I can help with basic questions.";
+        }
+        
+        if (question.includes('how are you')) {
+            return "I'm functioning as a fallback service since the main AI is unavailable. I can only provide simple responses.";
+        }
+        
+        if (question.includes('what is') || question.includes('who is') || question.includes('explain')) {
+            const searchTerm = question.replace(/what is|who is|explain/gi, '').trim();
+            return `I'm sorry, I can't provide detailed information about "${searchTerm}" in fallback mode. 
+
+You might want to try:
+1. Searching for "${searchTerm}" on Google
+2. Checking Wikipedia for information about "${searchTerm}"
+3. Trying again later when the main AI service is available`;
+        }
+        
+        // Default response
+        return `I'm currently operating in fallback mode because the main AI service is unavailable. 
+
+The API connection issue could be due to:
+1. The API server might be down or unreachable
+2. There might be network connectivity issues
+3. The API credentials might be incorrect
+
+Your question was: "${question}"
+
+While I can't provide a detailed answer right now, you might want to:
+1. Try again later
+2. Search for this information on Google
+3. Contact the site administrator if the problem persists`;
+    }
 }); 
