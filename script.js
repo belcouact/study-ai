@@ -14,11 +14,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const speechLanguage = document.getElementById('speech-language');
     const checkEnvButton = document.getElementById('check-env-button');
     const apiFunctionRadios = document.querySelectorAll('input[name="api-function"]');
+    const debugResponseButton = document.getElementById('debug-response-button');
     
     let diagnosticsData = null;
     let isListening = false;
     let recognitionTimeout = null;
     let currentApiFunction = 'ai-proxy'; // Default
+    let lastRawResponse = null;
 
     // API configuration
     // Note: These values are now for reference only and not actually used for API calls
@@ -249,6 +251,9 @@ document.addEventListener('DOMContentLoaded', () => {
         radio.addEventListener('change', (e) => {
             currentApiFunction = e.target.value;
             console.log(`Switched to ${currentApiFunction} function`);
+            
+            // Clear any previous response
+            output.innerHTML = '<p class="welcome-message">Switched to ' + currentApiFunction + '. Ask me anything!</p>';
         });
     });
 
@@ -332,6 +337,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Function to extract content from various response formats
+    function extractContentFromResponse(data) {
+        // Try to extract from standard OpenAI format
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            const message = data.choices[0].message;
+            if (message.content) return message.content;
+            if (message.reasoning_content) return message.reasoning_content;
+        }
+        
+        // Try to extract from simple-ai format
+        if (data.success && data.data) {
+            return extractContentFromResponse(data.data);
+        }
+        
+        // Try to extract from other possible formats
+        if (data.message && data.message.content) {
+            return data.message.content;
+        }
+        
+        if (data.content) {
+            return data.content;
+        }
+        
+        if (data.text) {
+            return data.text;
+        }
+        
+        // If we can't find a standard format, return a message with the raw data
+        return "Couldn't extract content from response. Raw data: " + JSON.stringify(data);
+    }
+
     // Function to fetch response from the API
     async function fetchAIResponse(question) {
         try {
@@ -349,15 +385,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await response.json();
+            console.log('API response data:', data);
             
-            // Handle different response formats
-            if (data.choices && data.choices[0] && data.choices[0].message) {
-                const message = data.choices[0].message;
-                // Use content or reasoning_content, whichever is available
-                return message.content || message.reasoning_content || "No response content found";
-            }
+            // Store the raw response for debugging
+            lastRawResponse = data;
+            debugResponseButton.classList.remove('hidden');
             
-            return "Unexpected response format from API";
+            // Use the new extraction function
+            return extractContentFromResponse(data);
         } catch (error) {
             console.error('Fetch error details:', error);
             throw error;
@@ -427,4 +462,15 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('API check error:', error);
         }
     }
+
+    // Add event listener for the debug button
+    debugResponseButton.addEventListener('click', () => {
+        if (lastRawResponse) {
+            // Show the raw response in the diagnostics panel
+            diagnosticsPanel.classList.remove('hidden');
+            diagnosticsOutput.textContent = JSON.stringify(lastRawResponse, null, 2);
+            showDiagnosticsButton.textContent = 'Hide Diagnostics';
+            showDiagnosticsButton.classList.remove('hidden');
+        }
+    });
 }); 
