@@ -216,9 +216,9 @@ button {
 .api-check {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-    gap: 1rem;
+    margin-top: 10px;
+    justify-content: flex-start;
+    gap: 10px;
 }
 
 #check-api-button {
@@ -226,6 +226,7 @@ button {
     color: #333;
     border: 1px solid #ddd;
     padding: 0.5rem 1rem;
+    font-size: 0.85rem;
 }
 
 #check-api-button:hover {
@@ -233,7 +234,7 @@ button {
 }
 
 #api-status {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .status-success {
@@ -256,7 +257,7 @@ button {
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 1rem;
-    margin-bottom: 1.5rem;
+    margin-top: 10px;
     font-family: monospace;
     font-size: 0.9rem;
     white-space: pre-wrap;
@@ -268,7 +269,7 @@ button {
     color: #333;
     border: 1px solid #ddd;
     padding: 0.5rem 1rem;
-    margin-left: 1rem;
+    font-size: 0.85rem;
 }
 
 #show-diagnostics:hover {
