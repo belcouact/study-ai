@@ -48,67 +48,98 @@ exports.handler = async function(event, context) {
       timeout: 30000
     });
     
-    // Use a single, simplified payload
-    const payload = {
-      model: MODEL,
-      messages: [
-        { role: "system", content: "You are a helpful AI assistant." },
-        { role: "user", content: question }
-      ],
-      max_tokens: 1000,
-      temperature: 0.7
-    };
-    
-    console.log('Sending request with payload:', JSON.stringify(payload).substring(0, 100) + '...');
-    
-    // Make the request
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`
+    // Try different payload formats
+    const payloads = [
+      // Standard format
+      {
+        model: MODEL,
+        messages: [
+          { role: "user", content: question }
+        ],
+        max_tokens: 1000
       },
-      body: JSON.stringify(payload),
-      agent,
-      timeout: 30000
-    });
-    
-    console.log('Response status:', response.status);
-    
-    if (!response.ok) {
-      let errorText = 'Unknown error';
-      try {
-        errorText = await response.text();
-        console.log('Error response:', errorText);
-      } catch (e) {
-        console.log('Could not read error response:', e.message);
+      // With system message
+      {
+        model: MODEL,
+        messages: [
+          { role: "system", content: "You are a helpful AI assistant." },
+          { role: "user", content: question }
+        ],
+        max_tokens: 1000
+      },
+      // With temperature
+      {
+        model: MODEL,
+        messages: [
+          { role: "user", content: question }
+        ],
+        max_tokens: 1000,
+        temperature: 0.7
       }
+    ];
+    
+    // Try each payload
+    for (let i = 0; i < payloads.length; i++) {
+      const payload = payloads[i];
+      console.log(`Trying payload format ${i+1}:`, JSON.stringify(payload).substring(0, 100) + '...');
       
-      return {
-        statusCode: response.status,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify({
-          error: `API request failed with status ${response.status}`,
-          details: errorText
-        })
-      };
+      try {
+        // Make the request
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${API_KEY}`
+          },
+          body: JSON.stringify(payload),
+          agent,
+          timeout: 30000
+        });
+        
+        console.log(`Payload ${i+1} response status:`, response.status);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`Payload ${i+1} successful:`, JSON.stringify(data).substring(0, 100) + '...');
+          
+          return {
+            statusCode: 200,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify({
+              success: true,
+              data: data,
+              payloadUsed: i+1
+            })
+          };
+        } else {
+          // Try to get error details
+          let errorText = '';
+          try {
+            errorText = await response.text();
+          } catch (e) {
+            errorText = 'Could not read error response';
+          }
+          console.log(`Payload ${i+1} error:`, errorText);
+        }
+      } catch (requestError) {
+        console.log(`Payload ${i+1} request error:`, requestError.message);
+      }
     }
     
-    // Process the successful response
-    const data = await response.json();
-    console.log('Successful response:', JSON.stringify(data).substring(0, 100) + '...');
-    
-    // Return the data directly without wrapping it
+    // If we get here, all payloads failed
     return {
-      statusCode: 200,
+      statusCode: 502,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify({
+        error: 'All API request formats failed',
+        details: 'Check server logs for more information'
+      })
     };
     
   } catch (error) {
@@ -120,8 +151,7 @@ exports.handler = async function(event, context) {
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        error: `Failed to process request: ${error.message}`,
-        stack: error.stack
+        error: `Failed to process request: ${error.message}`
       })
     };
   }
