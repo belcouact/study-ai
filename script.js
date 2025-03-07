@@ -328,14 +328,22 @@ document.addEventListener('DOMContentLoaded', () => {
             loading.classList.remove('hidden');
             output.innerHTML = '';
             
-            // Use a very simple approach
+            // Create a controller for the timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 seconds timeout
+            
+            // Use a very simple approach with a longer timeout
             const response = await fetch('/.netlify/functions/simple-ai', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ question })
+                body: JSON.stringify({ question }),
+                signal: controller.signal
             });
+            
+            // Clear the timeout
+            clearTimeout(timeoutId);
             
             // Try to parse the response
             let data;
@@ -370,7 +378,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
         } catch (error) {
             console.error('Error:', error);
-            output.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+            
+            if (error.name === 'AbortError') {
+                output.innerHTML = `<div class="error-message">Request timed out after 120 seconds. The server might be overloaded.</div>`;
+            } else {
+                output.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+            }
         } finally {
             // Hide loading state
             loading.classList.add('hidden');

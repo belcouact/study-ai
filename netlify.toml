@@ -5,3 +5,11 @@
   from = "/.netlify/functions/*"
   to = "/.netlify/functions/:splat"
   status = 200 
+
+[functions]
+  # Increase the function timeout to 120 seconds
+  node_bundler = "esbuild"
+  external_node_modules = ["node-fetch"]
+  
+  [functions.simple-ai]
+    timeout = 120 

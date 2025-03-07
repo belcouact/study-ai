@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const https = require('https');
 
 exports.handler = async function(event, context) {
   if (event.httpMethod !== 'POST') {
@@ -49,15 +50,23 @@ exports.handler = async function(event, context) {
       temperature: 0.7
     };
     
+    // Create a custom agent with a longer timeout
+    const agent = new https.Agent({
+      keepAlive: true,
+      timeout: 120000 // 120 seconds
+    });
+    
     try {
-      // Make the API request
+      // Make the API request with the custom agent and longer timeout
       const response = await fetch(`${API_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${API_KEY}`
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        agent: agent,
+        timeout: 120000 // 120 seconds
       });
       
       // Get the response data
