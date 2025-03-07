@@ -225,8 +225,7 @@ button {
     background-color: #f0f0f0;
     color: #333;
     border: 1px solid #ddd;
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
 }
 
 #check-api-button:hover {

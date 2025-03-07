@@ -395,6 +395,28 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Check if the response was successful
             if (!response.ok) {
+                console.error(`Error response: ${response.status} - ${response.statusText}`);
+                
+                // Special handling for 502 errors
+                if (response.status === 502) {
+                    const errorMessage = data.message || 'The server encountered a temporary error. This might be due to high traffic or maintenance.';
+                    const details = data.details ? `<br><br><strong>Details:</strong><br>Model: ${data.details.model}<br>Time: ${data.details.timestamp}` : '';
+                    
+                    output.innerHTML = `
+                        <div class="error-message">
+                            <h3>Server Error (502)</h3>
+                            <p>${errorMessage}</p>
+                            ${details}
+                            <p>Please try again in a few moments.</p>
+                        </div>
+                    `;
+                    
+                    // Show retry button
+                    retryButton.classList.remove('hidden');
+                    lastQuestion = question;
+                    return;
+                }
+                
                 output.innerHTML = `<div class="error-message">Error: ${data.error || response.status}</div>`;
                 return;
             }
@@ -687,26 +709,14 @@ While I can't provide a detailed answer right now, you might want to:
         if (lastQuestion) {
             retryButton.classList.add('hidden');
             output.innerHTML = '';
-            
-            // Try with the other API function
-            const currentFunction = currentApiFunction;
-            currentApiFunction = currentFunction === 'ai-proxy' ? 'simple-ai' : 'ai-proxy';
+            loading.classList.remove('hidden');
             
             // Show what we're doing
-            output.innerHTML = `<div class="system-message">Retrying with ${currentApiFunction}...</div>`;
+            output.innerHTML = `<div class="system-message">Retrying request...</div>`;
             
-            // Resubmit the question
-            try {
-                const response = await fetchAIResponse(lastQuestion);
-                const formattedResponse = formatResponse(response);
-                output.innerHTML = `<div class="ai-message">${formattedResponse}</div>`;
-            } catch (error) {
-                output.innerHTML = `<div class="error-message">Error: ${escapeHTML(error.message)}</div>`;
-                retryButton.classList.remove('hidden');
-                
-                // Switch back to original function
-                currentApiFunction = currentFunction;
-            }
+            // Resubmit the question using handleSubmit
+            userInput.value = lastQuestion;
+            setTimeout(handleSubmit, 500); // Small delay to ensure UI updates
         }
     });
 }); 

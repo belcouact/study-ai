@@ -58,6 +58,8 @@ exports.handler = async function(event, context) {
     
     try {
       // Make the API request with the custom agent and 90-second timeout
+      console.log(`Making API request to ${API_BASE_URL}/chat/completions with model ${MODEL}`);
+      
       const response = await fetch(`${API_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: {
@@ -68,6 +70,29 @@ exports.handler = async function(event, context) {
         agent: agent,
         timeout: 90000 // 90 seconds
       });
+      
+      console.log(`API response status: ${response.status}`);
+      
+      // If we get a 502 error, provide more detailed information
+      if (response.status === 502) {
+        console.error('Received 502 Bad Gateway error from API');
+        return {
+          statusCode: 502,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({
+            error: 'Bad Gateway (502) error from API server',
+            message: 'The API server returned an invalid response. This might be due to server overload or temporary issues.',
+            details: {
+              apiBaseUrl: API_BASE_URL.replace(/\/[^\/]+$/, '/***/'), // Redact the specific endpoint for security
+              model: MODEL,
+              timestamp: new Date().toISOString()
+            }
+          })
+        };
+      }
       
       // Get the response data
       const data = await response.json();
