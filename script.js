@@ -13,9 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let diagnosticsData = null;
 
     // API configuration
-    const API_KEY = 'sk-ee8971509c3446129f6c0b43ee362e13a4a642pjsvzv199t';
-    const API_URL = 'https://ai-gateway.vei.volces.com/v1/chat/completions';
-    const MODEL = 'deepseek-reasoner';
+    const API_KEY = 'sk-3GX9xoFVBu39Ibbrdg5zhmDzudFHCCR9VTib76y8rAWgMh2G';
+    const API_BASE_URL = 'https://api.lkeap.cloud.tencent.com/v1';
+    const MODEL = 'deepseek-r1';
 
     // Speech recognition setup
     let recognition = null;

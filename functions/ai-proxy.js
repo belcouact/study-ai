@@ -16,9 +16,11 @@ exports.handler = async function(event, context) {
 
     // Try to use the primary API
     try {
-      const API_KEY = 'sk-ee8971509c3446129f6c0b43ee362e13a4a642pjsvzv199t';
-      const API_URL = 'https://ai-gateway.vei.volces.com/v1/chat/completions';
-      const MODEL = 'deepseek-reasoner';
+      // Updated API details
+      const API_KEY = 'sk-3GX9xoFVBu39Ibbrdg5zhmDzudFHCCR9VTib76y8rAWgMh2G';
+      const API_BASE_URL = 'https://api.lkeap.cloud.tencent.com/v1';
+      const API_URL = `${API_BASE_URL}/chat/completions`;
+      const MODEL = 'deepseek-r1';
 
       console.log('Sending request to API for question:', question.substring(0, 50) + '...');
 
