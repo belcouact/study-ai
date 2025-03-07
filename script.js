@@ -99,18 +99,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ question })
+                body: JSON.stringify({ question }),
+                timeout: 30000 // 30 second timeout
             });
 
+            const data = await response.json();
+            
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || `Request failed with status ${response.status}`);
+                console.error('API error details:', data);
+                throw new Error(data.error || `Request failed with status ${response.status}`);
             }
 
-            const data = await response.json();
             return data.choices[0].message.content;
         } catch (error) {
             console.error('Fetch error details:', error);
+            
+            // If we're in development or testing, provide a fallback response
+            if (window.location.hostname === 'localhost' || 
+                window.location.hostname === '127.0.0.1' ||
+                window.location.hostname.includes('netlify.app')) {
+                console.log('Using fallback response due to API error');
+                return `I'm sorry, I couldn't connect to the AI service at this time. This could be due to:
+                
+1. API connectivity issues
+2. Rate limiting
+3. Invalid API credentials
+
+Error details: ${error.message}
+
+Please try again later or contact the site administrator.`;
+            }
+            
             throw error;
         }
     }
@@ -148,12 +167,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'GET'
             });
             
+            const data = await response.json();
+            
             if (response.ok) {
                 apiStatus.textContent = 'API connection successful!';
                 apiStatus.className = 'status-success';
+                console.log('API health check details:', data);
             } else {
-                apiStatus.textContent = 'API connection failed.';
+                apiStatus.textContent = `API connection failed: ${data.message || 'Unknown error'}`;
                 apiStatus.className = 'status-error';
+                console.error('API health check failed:', data);
             }
         } catch (error) {
             apiStatus.textContent = `Connection error: ${error.message}`;
