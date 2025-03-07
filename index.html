@@ -25,6 +25,7 @@
         <div class="chat-container">
             <div class="input-container">
                 <textarea id="user-input" placeholder="Type your question here..."></textarea>
+                <div class="character-count">0 characters</div>
                 <div class="button-container">
                     <div class="speech-controls">
                         <select id="speech-language" title="Select speech recognition language">
@@ -57,9 +58,14 @@
             <label>
                 <input type="radio" name="api-function" value="simple-ai"> Simple API
             </label>
+            <select id="model-select">
+                <option value="deepseek-r1">deepseek-r1</option>
+                <option value="deepseek-v3">deepseek-v3</option>
+            </select>
             <button id="debug-response-button" class="hidden">Show Raw Response</button>
             <button id="fallback-button">Use Local Fallback</button>
         </div>
+        <button id="retry-button" class="hidden">Retry Request</button>
     </div>
     <script src="script.js"></script>
 </body>

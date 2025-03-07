@@ -9,6 +9,7 @@ exports.handler = async function(event, context) {
   try {
     const body = JSON.parse(event.body);
     const question = body.question;
+    const requestedModel = body.model; // Get the requested model
     
     if (!question) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Question is required' }) };
@@ -17,7 +18,7 @@ exports.handler = async function(event, context) {
     // Get API details from environment variables
     const API_KEY = process.env.API_KEY;
     const API_BASE_URL = process.env.API_BASE_URL;
-    const MODEL = process.env.API_MODEL || 'deepseek-r1';
+    const MODEL = requestedModel || process.env.API_MODEL || 'deepseek-r1';
     
     // Debug logging
     console.log('Environment variables in simple-ai:');

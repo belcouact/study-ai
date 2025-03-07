@@ -16,12 +16,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiFunctionRadios = document.querySelectorAll('input[name="api-function"]');
     const debugResponseButton = document.getElementById('debug-response-button');
     const fallbackButton = document.getElementById('fallback-button');
+    const retryButton = document.getElementById('retry-button');
+    const modelSelect = document.getElementById('model-select');
+    const characterCount = document.querySelector('.character-count');
     
     let diagnosticsData = null;
     let isListening = false;
     let recognitionTimeout = null;
     let currentApiFunction = 'ai-proxy'; // Default
     let lastRawResponse = null;
+    let lastQuestion = null;
+    let currentModel = 'deepseek-r1';
 
     // API configuration
     // Note: These values are now for reference only and not actually used for API calls
@@ -258,6 +263,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    modelSelect.addEventListener('change', () => {
+        currentModel = modelSelect.value;
+        console.log('Model changed to:', currentModel);
+    });
+
     // Function to start listening
     function startListening() {
         // Update the language before starting
@@ -312,7 +322,9 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleSubmit() {
         const question = userInput.value.trim();
         if (!question) return;
-
+        
+        lastQuestion = question; // Store the question for retry
+        
         // Show loading indicator
         output.innerHTML = '';
         loading.classList.remove('hidden');
@@ -335,6 +347,9 @@ document.addEventListener('DOMContentLoaded', () => {
             output.innerHTML = `<p class="error">Error: ${error.message}</p>
                                <p class="error-details">Please check the console for more details.</p>`;
             console.error('Error details:', error);
+            
+            // Show retry button
+            retryButton.classList.remove('hidden');
         }
     }
 
@@ -344,7 +359,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.choices && data.choices[0] && data.choices[0].message) {
             const message = data.choices[0].message;
             if (message.content) return message.content;
-            if (message.reasoning_content) return message.reasoning_content;
+            if (message.reasoning_content) {
+                // Sometimes reasoning_content might be truncated
+                if (message.reasoning_content.length < 20) {
+                    return `The AI started to respond but was cut off. Here's what it said: "${message.reasoning_content}"\n\nPlease try asking again or rephrasing your question.`;
+                }
+                return message.reasoning_content;
+            }
         }
         
         // Try to extract from simple-ai format
@@ -369,8 +390,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return "Couldn't extract content from response. Raw data: " + JSON.stringify(data);
     }
 
+    // Add this at the top of your script
+    const responseCache = {};
+
     // Function to fetch response from the API
     async function fetchAIResponse(question) {
+        // Check cache first (only if not in development mode)
+        const cacheKey = question.trim().toLowerCase();
+        if (!window.location.hostname.includes('localhost') && responseCache[cacheKey]) {
+            console.log('Using cached response for:', cacheKey);
+            return responseCache[cacheKey];
+        }
+        
         try {
             // Show loading state
             loading.classList.remove('hidden');
@@ -384,7 +415,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ question }),
+                body: JSON.stringify({ 
+                    question,
+                    model: currentModel // Pass the selected model
+                }),
                 signal: controller.signal
             });
             
@@ -410,8 +444,13 @@ document.addEventListener('DOMContentLoaded', () => {
             lastRawResponse = data;
             debugResponseButton.classList.remove('hidden');
             
-            // Use the extraction function
-            return extractContentFromResponse(data);
+            // Extract content
+            const content = extractContentFromResponse(data);
+            
+            // Cache the response
+            responseCache[cacheKey] = content;
+            
+            return content;
         } catch (error) {
             console.error('Fetch error details:', error);
             
@@ -568,4 +607,44 @@ While I can't provide a detailed answer right now, you might want to:
 2. Search for this information on Google
 3. Contact the site administrator if the problem persists`;
     }
+
+    // Add event listener for retry button
+    retryButton.addEventListener('click', async () => {
+        if (lastQuestion) {
+            retryButton.classList.add('hidden');
+            output.innerHTML = '';
+            
+            // Try with the other API function
+            const currentFunction = currentApiFunction;
+            currentApiFunction = currentFunction === 'ai-proxy' ? 'simple-ai' : 'ai-proxy';
+            
+            // Show what we're doing
+            output.innerHTML = `<div class="system-message">Retrying with ${currentApiFunction}...</div>`;
+            
+            // Resubmit the question
+            try {
+                const response = await fetchAIResponse(lastQuestion);
+                const formattedResponse = formatResponse(response);
+                output.innerHTML = `<div class="ai-message">${formattedResponse}</div>`;
+            } catch (error) {
+                output.innerHTML = `<div class="error-message">Error: ${escapeHTML(error.message)}</div>`;
+                retryButton.classList.remove('hidden');
+                
+                // Switch back to original function
+                currentApiFunction = currentFunction;
+            }
+        }
+    });
+
+    userInput.addEventListener('input', () => {
+        const count = userInput.value.length;
+        characterCount.textContent = `${count} characters`;
+        
+        // Add warning if getting close to limits
+        if (count > 2000) {
+            characterCount.classList.add('warning');
+        } else {
+            characterCount.classList.remove('warning');
+        }
+    });
 }); 
