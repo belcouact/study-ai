@@ -151,7 +151,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await response.json();
-            return data.choices[0].message.content;
+            
+            // Handle different response formats
+            if (data.choices && data.choices[0] && data.choices[0].message) {
+                const message = data.choices[0].message;
+                // Use content or reasoning_content, whichever is available
+                return message.content || message.reasoning_content || "No response content found";
+            }
+            
+            return "Unexpected response format from API";
         } catch (error) {
             console.error('Fetch error details:', error);
             throw error;

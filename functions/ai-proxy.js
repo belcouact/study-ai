@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const https = require('https');
 
 exports.handler = async function(event, context) {
   // Only allow POST requests
@@ -14,30 +15,31 @@ exports.handler = async function(event, context) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Question is required' }) };
     }
 
-    // Try to use the primary API
-    try {
-      // Updated API details
-      const API_KEY = 'sk-3GX9xoFVBu39Ibbrdg5zhmDzudFHCCR9VTib76y8rAWgMh2G';
-      const API_BASE_URL = 'https://api.lkeap.cloud.tencent.com/v1';
-      const API_URL = `${API_BASE_URL}/chat/completions`;
-      const MODEL = 'deepseek-r1';
+    // Try both available models
+    const models = ['deepseek-r1', 'deepseek-v3'];
 
-      console.log('Sending request to API for question:', question.substring(0, 50) + '...');
-
-      const payload = {
-        model: MODEL,
-        messages: [
-          { role: "system", content: "You are a helpful AI assistant." },
-          { role: "user", content: question }
-        ],
-        temperature: 0.7,
-        max_tokens: 2000,
-        stream: false // Explicitly set stream to false
-      };
-
-      // Try different request formats
+    for (const model of models) {
       try {
-        // First attempt with standard format
+        console.log(`Trying model: ${model}`);
+        
+        const payload = {
+          model: model,
+          messages: [
+            { role: "system", content: "You are a helpful AI assistant." },
+            { role: "user", content: question }
+          ],
+          temperature: 0.7,
+          max_tokens: 2000,
+          stream: false
+        };
+        
+        // Create a custom agent to handle HTTPS requests
+        const agent = new https.Agent({
+          rejectUnauthorized: false, // For testing only
+          keepAlive: true,
+          timeout: 30000
+        });
+
         const response = await fetch(API_URL, {
           method: 'POST',
           headers: {
@@ -45,38 +47,24 @@ exports.handler = async function(event, context) {
             'Authorization': `Bearer ${API_KEY}`
           },
           body: JSON.stringify(payload),
+          agent,
           timeout: 30000
         });
+        
+        console.log('API response status:', response.status);
         
         if (response.ok) {
           const data = await response.json();
           console.log('API response received successfully');
           
-          return {
-            statusCode: 200,
-            headers: {
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*'
-            },
-            body: JSON.stringify(data)
-          };
-        } else if (response.status === 401 || response.status === 403) {
-          // Try with a different auth format
-          console.log('Trying alternative authentication format...');
-          
-          const altResponse = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': API_KEY // Without "Bearer" prefix
-            },
-            body: JSON.stringify(payload),
-            timeout: 30000
-          });
-          
-          if (altResponse.ok) {
-            const data = await altResponse.json();
-            console.log('API response received successfully');
+          // Check if the response has the expected format and adapt it if needed
+          if (data.choices && data.choices.length > 0) {
+            const choice = data.choices[0];
+            
+            // Handle the different response format (reasoning_content instead of content)
+            if (choice.message && choice.message.reasoning_content && !choice.message.content) {
+              choice.message.content = choice.message.reasoning_content;
+            }
             
             return {
               statusCode: 200,
@@ -87,61 +75,11 @@ exports.handler = async function(event, context) {
               body: JSON.stringify(data)
             };
           }
+          break; // Exit the loop if successful
         }
-      } catch (apiError) {
-        console.log('API error:', apiError.message);
+      } catch (modelError) {
+        console.log(`Error with model ${model}:`, modelError.message);
       }
-      
-      // If we get here, the API request failed
-      console.log('API request failed, using fallback options');
-      
-      // Try using a public dictionary API as fallback
-      try {
-        console.log('Trying dictionary API fallback');
-        const FALLBACK_API_URL = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
-        const wordToLookup = question.split(' ')[0].toLowerCase();
-        
-        const fallbackResponse = await fetch(`${FALLBACK_API_URL}${wordToLookup}`);
-        
-        if (fallbackResponse.ok) {
-          const fallbackData = await fallbackResponse.json();
-          
-          let definition = "I couldn't find information about that.";
-          
-          if (Array.isArray(fallbackData) && fallbackData.length > 0) {
-            const entry = fallbackData[0];
-            if (entry.meanings && entry.meanings.length > 0) {
-              const meaning = entry.meanings[0];
-              if (meaning.definitions && meaning.definitions.length > 0) {
-                definition = `The word "${entry.word}" means: ${meaning.definitions[0].definition}`;
-              }
-            }
-          }
-          
-          return {
-            statusCode: 200,
-            headers: {
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*'
-            },
-            body: JSON.stringify({
-              choices: [
-                {
-                  message: {
-                    content: `I'm currently in fallback mode using a dictionary API. ${definition}\n\nNote: The main AI service is unavailable.`,
-                    role: "assistant"
-                  }
-                }
-              ]
-            })
-          };
-        }
-      } catch (fallbackError) {
-        console.log('Dictionary API fallback failed:', fallbackError.message);
-      }
-      
-    } catch (apiError) {
-      console.log('API error:', apiError.message);
     }
     
     // Use local fallback response as last resort
@@ -221,4 +159,28 @@ While I can't provide a detailed answer right now, you might want to:
 1. Try again later
 2. Search for this information on Google
 3. Contact the site administrator if the problem persists`;
+}
+
+// Add this function to your ai-proxy.js
+async function fetchWithRetry(url, options, maxRetries = 3) {
+  let lastError;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`API request attempt ${attempt}/${maxRetries}`);
+      const response = await fetch(url, options);
+      return response;
+    } catch (error) {
+      console.log(`Attempt ${attempt} failed:`, error.message);
+      lastError = error;
+      
+      // Wait before retrying (exponential backoff)
+      if (attempt < maxRetries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt), 10000);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  
+  throw lastError;
 } 
