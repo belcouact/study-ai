@@ -380,11 +380,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Create a controller for the timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // Reduce timeout to 15 seconds to avoid waiting too long
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // Increase timeout to 30 seconds for streaming
         
         try {
-            // Skip the CORS proxy attempt since it's failing
-            console.log('Using Netlify function as proxy...');
+            console.log('Using Netlify function as proxy with streaming enabled...');
             
             // Set up a timer to show a preliminary response if the request takes too long
             const fallbackTimer = setTimeout(() => {
@@ -405,7 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 loading.classList.remove('hidden');
             }, 5000);
             
-            // Use the Netlify function with the new path
+            // Use the Netlify function with streaming enabled
             const response = await fetch('/api/simple-ai', {
                 method: 'POST',
                 headers: {
@@ -413,7 +412,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ 
                     question,
-                    model: currentModel || 'deepseek-r1'
+                    model: currentModel || 'deepseek-r1',
+                    stream: true // Enable streaming to avoid timeout issues
                 }),
                 signal: controller.signal
             });
@@ -453,25 +453,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 showDiagnosticsButton.classList.remove('hidden');
                 diagnosticsOutput.textContent = errorDetails;
                 
-                // Check for Lambda timeout error
-                if (response.status === 502 && errorData && errorData.errorType === 'Sandbox.Timedout') {
-                    console.log('Lambda function timed out, using local fallback response');
-                    
-                    // Use local fallback for timeout errors
-                    const fallbackResponse = generateLocalResponse(question);
-                    
-                    output.innerHTML = `
-                        <div class="system-message">
-                            <p>The server request timed out after 10 seconds. Here's a simplified response:</p>
-                        </div>
-                        <div class="ai-message">${formatResponse(fallbackResponse)}</div>
-                    `;
-                    
-                    // Store the last question
-                    lastQuestion = question;
-                    return;
-                }
-                
                 // Display appropriate error message based on status code
                 if (response.status === 502) {
                     output.innerHTML = `
@@ -499,6 +480,104 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(`Server returned status ${response.status}: ${errorMessage}`);
             }
             
+            // Check if we got a streaming response
+            const contentType = response.headers.get('Content-Type');
+            if (contentType && contentType.includes('text/event-stream')) {
+                // Handle streaming response
+                console.log('Received streaming response');
+                
+                // Hide loading indicator since we'll show content as it arrives
+                loading.classList.add('hidden');
+                
+                // Set up a reader for the stream
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let fullContent = '';
+                
+                // Process the stream
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    // Decode the chunk and add to buffer
+                    buffer += decoder.decode(value, { stream: true });
+                    
+                    // Process SSE format (data: lines)
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || ''; // Keep the last incomplete line in the buffer
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6); // Remove 'data: ' prefix
+                            
+                            // Check if it's the [DONE] message
+                            if (data.trim() === '[DONE]') continue;
+                            
+                            try {
+                                // Parse the JSON data
+                                const parsed = JSON.parse(data);
+                                
+                                // Extract the content if it exists
+                                if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
+                                    const content = parsed.choices[0].delta.content;
+                                    fullContent += content;
+                                    
+                                    // Format and display the accumulated output
+                                    output.innerHTML = `<div class="ai-message">${formatResponse(fullContent)}</div>`;
+                                }
+                            } catch (e) {
+                                console.error('Error parsing JSON:', e);
+                            }
+                        }
+                    }
+                }
+                
+                // Process any remaining data
+                if (buffer.length > 0) {
+                    const lines = buffer.split('\n');
+                    for (const line of lines) {
+                        if (line.startsWith('data: ') && line.slice(6).trim() !== '[DONE]') {
+                            try {
+                                const parsed = JSON.parse(line.slice(6));
+                                if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
+                                    const content = parsed.choices[0].delta.content;
+                                    fullContent += content;
+                                    
+                                    // Format and display the accumulated output
+                                    output.innerHTML = `<div class="ai-message">${formatResponse(fullContent)}</div>`;
+                                }
+                            } catch (e) {
+                                console.error('Error parsing JSON:', e);
+                            }
+                        }
+                    }
+                }
+                
+                // Store the last question
+                lastQuestion = question;
+                
+                // Clear the input
+                userInput.value = '';
+                
+                // Update status
+                apiStatus.textContent = 'Streaming completed';
+                apiStatus.className = 'status-success';
+                
+                // Store the raw response for debugging
+                lastRawResponse = { 
+                    streaming: true, 
+                    content: fullContent,
+                    model: currentModel || 'deepseek-r1'
+                };
+                debugResponseButton.classList.remove('hidden');
+                
+                return;
+            }
+            
+            // If we get here, it's a regular JSON response
+            console.log('Received regular JSON response');
+            
             // Parse the successful response
             const data = await response.json();
             diagnosticsData = data; // Store for diagnostics
@@ -512,24 +591,19 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Check if this is an abort error (timeout)
             if (error.name === 'AbortError') {
-                console.log('Request timed out, using local fallback response');
-                
-                // Use local fallback for timeout errors
-                const fallbackResponse = generateLocalResponse(question);
+                console.log('Request timed out');
                 
                 // Update status
-                apiStatus.textContent = 'Using local fallback due to timeout';
+                apiStatus.textContent = 'Request timed out';
                 apiStatus.className = 'status-error';
                 
                 output.innerHTML = `
-                    <div class="system-message">
-                        <p>The request timed out, so I'm providing a local response:</p>
+                    <div class="error-message">
+                        <h3>Request Timeout</h3>
+                        <p>The request took too long to complete.</p>
+                        <p>Please try again later or try a different question.</p>
                     </div>
-                    <div class="ai-message">${formatResponse(fallbackResponse)}</div>
                 `;
-                
-                // Store the last question
-                lastQuestion = question;
             } 
             // Only update UI if it wasn't already updated by the error handling above
             else if (apiStatus.className !== 'status-error') {

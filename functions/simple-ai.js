@@ -9,6 +9,7 @@ exports.handler = async function(event, context) {
   try {
     const body = JSON.parse(event.body);
     const question = body.question;
+    const stream = body.stream || false; // Get the stream parameter
     
     if (!question) {
       return { 
@@ -47,7 +48,8 @@ exports.handler = async function(event, context) {
         { role: "user", content: question }
       ],
       max_tokens: 1000,
-      temperature: 0.7
+      temperature: 0.7,
+      stream: stream // Add streaming parameter
     };
     
     // Create a custom agent with a 90-second timeout
@@ -58,7 +60,7 @@ exports.handler = async function(event, context) {
     
     try {
       // Make the API request with the custom agent and 90-second timeout
-      console.log(`Making API request to ${API_BASE_URL}/chat/completions with model ${MODEL}`);
+      console.log(`Making API request to ${API_BASE_URL}/chat/completions with model ${MODEL}, streaming: ${stream}`);
       
       const response = await fetch(`${API_BASE_URL}/chat/completions`, {
         method: 'POST',
@@ -94,18 +96,35 @@ exports.handler = async function(event, context) {
         };
       }
       
-      // Get the response data
-      const data = await response.json();
-      
-      // Return the data
-      return {
-        statusCode: response.status,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify(data)
-      };
+      // If streaming is enabled, pass through the streaming response
+      if (stream && response.ok) {
+        // For streaming responses, we need to return the raw response body
+        const responseBody = await response.text();
+        
+        return {
+          statusCode: response.status,
+          headers: {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: responseBody
+        };
+      } else {
+        // For non-streaming responses, parse and return the JSON
+        const data = await response.json();
+        
+        // Return the data
+        return {
+          statusCode: response.status,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify(data)
+        };
+      }
     } catch (apiError) {
       console.error('API request error:', apiError);
       
