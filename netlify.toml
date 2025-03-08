@@ -4,8 +4,16 @@
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["node-fetch"]
+  timeout = 90  # Set default timeout for all functions to 90 seconds
   
+  # Individual function settings can override the defaults
   [functions.simple-ai]
+    timeout = 90
+    
+  [functions.api-health]
+    timeout = 90
+    
+  [functions.direct-api-test]
     timeout = 90
 
 # Remove the problematic redirect rule

@@ -37,7 +37,7 @@ exports.handler = async function(event, context) {
     const agent = new https.Agent({
       rejectUnauthorized: false, // For testing only
       keepAlive: true,
-      timeout: 10000
+      timeout: 90000  // Increased from 10000 to 90000 (90 seconds)
     });
     
     // First, check the models endpoint which should be more reliable
@@ -49,8 +49,8 @@ exports.handler = async function(event, context) {
       headers: {
         'Authorization': `Bearer ${API_KEY}`
       },
-      agent,
-      timeout: 10000
+      agent: agent,
+      timeout: 90000  // Increased from 10000 to 90000 (90 seconds)
     }).catch(err => {
       console.log('Models request failed:', err.message);
       return { ok: false, status: 'network_error', statusText: err.message };
@@ -96,8 +96,8 @@ exports.handler = async function(event, context) {
           'Authorization': `Bearer ${API_KEY}`
         },
         body: JSON.stringify(payload),
-        agent,
-        timeout: 15000
+        agent: agent,
+        timeout: 90000  // Increased from 15000 to 90000 (90 seconds)
       }).catch(err => {
         console.log('Chat request failed:', err.message);
         return { ok: false, status: 'network_error', statusText: err.message };
