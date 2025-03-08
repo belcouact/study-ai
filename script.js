@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 apiStatus.textContent = 'Running direct API test...';
                 apiStatus.className = 'status-checking';
                 
-                const response = await fetch('/.netlify/functions/direct-api-test');
+                const response = await fetch('/api/direct-api-test');
                 const data = await response.json();
                 
                 console.log('Direct API test results:', data);
@@ -204,11 +204,17 @@ document.addEventListener('DOMContentLoaded', () => {
         simpleApiButton.addEventListener('click', async () => {
             const question = userInput.value.trim() || "Hello, how are you?";
             
+            if (!question) {
+                alert('Please enter a question first.');
+                return;
+            }
+            
             try {
-                apiStatus.textContent = 'Trying simple API...';
-                apiStatus.className = 'status-checking';
+                // Show loading state
+                loading.classList.remove('hidden');
+                output.innerHTML = '';
                 
-                const response = await fetch('/.netlify/functions/simple-ai', {
+                const response = await fetch('/api/simple-ai', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -217,26 +223,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 
                 const data = await response.json();
-                
                 console.log('Simple API response:', data);
                 
-                if (response.ok) {
-                    apiStatus.textContent = 'Simple API request successful!';
-                    apiStatus.className = 'status-success';
-                    
-                    // Show the response
-                    showDiagnosticsButton.classList.remove('hidden');
-                    diagnosticsPanel.classList.remove('hidden');
-                    diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
-                    showDiagnosticsButton.textContent = 'Hide Diagnostics';
-                } else {
-                    apiStatus.textContent = `Simple API failed: ${data.error || 'Unknown error'}`;
-                    apiStatus.className = 'status-error';
-                }
+                // Format and display the response
+                const content = extractContentFromResponse(data);
+                output.innerHTML = `<div class="ai-message">${formatResponse(content)}</div>`;
             } catch (error) {
-                apiStatus.textContent = `Simple API error: ${error.message}`;
-                apiStatus.className = 'status-error';
                 console.error('Simple API error:', error);
+                output.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+            } finally {
+                // Hide loading state
+                loading.classList.add('hidden');
             }
         });
     }
@@ -245,27 +242,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (checkEnvButton) {
         checkEnvButton.addEventListener('click', async () => {
             try {
-                apiStatus.textContent = 'Checking environment variables...';
+                apiStatus.textContent = 'Checking environment...';
                 apiStatus.className = 'status-checking';
                 
-                const response = await fetch('/.netlify/functions/check-env');
+                const response = await fetch('/api/check-env');
                 const data = await response.json();
                 
                 console.log('Environment check results:', data);
-                
-                if (data.status === 'ok') {
-                    apiStatus.textContent = 'Environment variables are set correctly!';
-                    apiStatus.className = 'status-success';
-                } else {
-                    apiStatus.textContent = `Environment issue: ${data.message}`;
-                    apiStatus.className = 'status-error';
-                }
                 
                 // Show diagnostics
                 showDiagnosticsButton.classList.remove('hidden');
                 diagnosticsPanel.classList.remove('hidden');
                 diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
                 showDiagnosticsButton.textContent = 'Hide Diagnostics';
+                
+                if (data.status === 'ok') {
+                    apiStatus.textContent = 'Environment check completed';
+                    apiStatus.className = 'status-success';
+                } else {
+                    apiStatus.textContent = `Environment check failed: ${data.message || 'Unknown error'}`;
+                    apiStatus.className = 'status-error';
+                }
             } catch (error) {
                 apiStatus.textContent = `Environment check failed: ${error.message}`;
                 apiStatus.className = 'status-error';
@@ -432,8 +429,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Fall back to Netlify function
             console.log('Using Netlify function as proxy...');
             
-            // Use the Netlify function
-            const response = await fetch('/.netlify/functions/simple-ai', {
+            // Use the Netlify function with the new path
+            const response = await fetch('/api/simple-ai', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -648,44 +645,51 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add this at the top of your script
     const responseCache = {};
 
-    // Function to fetch response from the API
+    // Function to fetch AI response
     async function fetchAIResponse(question) {
-        // Check cache first (only if not in development mode)
-        const cacheKey = question.trim().toLowerCase();
-        if (!window.location.hostname.includes('localhost') && responseCache[cacheKey]) {
-            console.log('Using cached response for:', cacheKey);
-            return responseCache[cacheKey];
-        }
+        if (!question) throw new Error('Question is required');
+        
+        // Show loading state
+        loading.classList.remove('hidden');
         
         try {
-            // Show loading state
-            loading.classList.remove('hidden');
+            // Create a cache key
+            const cacheKey = `${currentApiFunction}:${question}`;
             
-            // Add a timeout for the fetch request
+            // Check if we have a cached response
+            if (responseCache[cacheKey]) {
+                console.log('Using cached response');
+                return responseCache[cacheKey];
+            }
+            
+            // Create a controller for the timeout
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+            const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 seconds timeout
             
-            const response = await fetch(`/.netlify/functions/${currentApiFunction}`, {
+            // Make the request
+            const response = await fetch(`/api/${currentApiFunction}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
                     question,
-                    model: currentModel // Pass the selected model
+                    model: currentModel
                 }),
                 signal: controller.signal
             });
             
             // Clear the timeout
             clearTimeout(timeoutId);
-
+            
+            // Check if the response was successful
             if (!response.ok) {
-                let errorMessage = `Request failed with status ${response.status}`;
+                let errorMessage = `Error: ${response.status} ${response.statusText}`;
+                
                 try {
+                    // Try to get more details from the error response
                     const errorData = await response.json();
-                    errorMessage = errorData.error || errorMessage;
-                    console.error('API error details:', errorData);
+                    if (errorData.error) errorMessage = errorData.error;
                 } catch (e) {
                     // If we can't parse the error as JSON, just use the status message
                 }
@@ -756,7 +760,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             console.log('Starting API health check at', new Date().toISOString());
             
-            const response = await fetch('/.netlify/functions/api-health', {
+            const response = await fetch('/api/api-health', {
                 method: 'GET'
             });
             
