@@ -360,75 +360,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const question = userInput.value.trim();
         if (!question) return;
         
+        // Update status to indicate we're processing
+        apiStatus.textContent = 'Submitting question...';
+        apiStatus.className = 'status-checking';
+        showDiagnosticsButton.classList.add('hidden');
+        diagnosticsPanel.classList.add('hidden');
+        
+        // Show loading state
+        loading.classList.remove('hidden');
+        output.innerHTML = '';
+        
         try {
-            // First check API connection
-            apiStatus.textContent = 'Checking connection...';
-            apiStatus.className = 'status-checking';
-            
-            try {
-                const healthResponse = await fetch('/.netlify/functions/api-health', {
-                    method: 'GET'
-                });
-                
-                const healthData = await healthResponse.json();
-                
-                if (healthData.status !== 'ok') {
-                    apiStatus.textContent = `API connection failed: ${healthData.message || 'Unknown error'}`;
-                    apiStatus.className = 'status-error';
-                    console.error('API health check failed before submission:', healthData);
-                    
-                    output.innerHTML = `
-                        <div class="error-message">
-                            <h3>API Connection Failed</h3>
-                            <p>Cannot submit your question because the API connection is not available.</p>
-                            <p>Error: ${healthData.message || 'Unknown error'}</p>
-                            <p>Please try again later or contact support.</p>
-                        </div>
-                    `;
-                    
-                    // Show diagnostics button
-                    showDiagnosticsButton.classList.remove('hidden');
-                    
-                    // Display diagnostics
-                    if (healthData.diagnostics) {
-                        diagnosticsOutput.textContent = JSON.stringify(healthData.diagnostics, null, 2);
-                    } else {
-                        diagnosticsOutput.textContent = JSON.stringify(healthData, null, 2);
-                    }
-                    
-                    return; // Stop here if API connection failed
-                }
-                
-                // API connection is good, update status
-                apiStatus.textContent = 'API connection successful!';
-                apiStatus.className = 'status-success';
-                
-            } catch (healthError) {
-                apiStatus.textContent = `Connection error: ${healthError.message}`;
-                apiStatus.className = 'status-error';
-                console.error('API check error before submission:', healthError);
-                
-                output.innerHTML = `
-                    <div class="error-message">
-                        <h3>API Connection Error</h3>
-                        <p>Cannot submit your question because the API connection check failed.</p>
-                        <p>Error: ${healthError.message}</p>
-                        <p>Please check your internet connection and try again.</p>
-                    </div>
-                `;
-                
-                return; // Stop here if API connection check failed
-            }
-            
-            // Show loading state
-            loading.classList.remove('hidden');
-            output.innerHTML = '';
-            
             // Create a controller for the timeout
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 seconds timeout
             
-            // Use a very simple approach with a 90-second timeout
+            // Make the API request
             const response = await fetch('/.netlify/functions/simple-ai', {
                 method: 'POST',
                 headers: {
@@ -441,67 +388,97 @@ document.addEventListener('DOMContentLoaded', () => {
             // Clear the timeout
             clearTimeout(timeoutId);
             
-            // Try to parse the response
-            let data;
-            try {
-                data = await response.json();
-                console.log('Response data:', data);
-            } catch (parseError) {
-                console.error('Error parsing response:', parseError);
-                output.innerHTML = `<div class="error-message">Error parsing response: ${parseError.message}</div>`;
-                return;
-            }
+            // Parse the response
+            const data = await response.json();
+            diagnosticsData = data; // Store for diagnostics
             
             // Check if the response was successful
-            if (!response.ok) {
-                console.error(`Error response: ${response.status} - ${response.statusText}`);
+            if (response.ok && data.choices && data.choices[0]) {
+                // Update status
+                apiStatus.textContent = 'Request successful!';
+                apiStatus.className = 'status-success';
+                console.log('API response details:', data);
                 
-                // Special handling for 502 errors
+                // Extract and display content
+                let content = "No content found in response";
+                
+                if (data.choices[0].message) {
+                    const message = data.choices[0].message;
+                    if (message.content) {
+                        content = message.content;
+                    } else if (message.reasoning_content) {
+                        content = message.reasoning_content;
+                    }
+                }
+                
+                output.innerHTML = `<div class="ai-message">${formatResponse(content)}</div>`;
+                
+                // Store the last question for retry functionality
+                lastQuestion = question;
+                
+                // Store the raw response for debugging
+                lastRawResponse = data;
+                debugResponseButton.classList.remove('hidden');
+                
+            } else {
+                // Update status to show error
+                apiStatus.textContent = `Request failed: ${data.error || response.statusText || 'Unknown error'}`;
+                apiStatus.className = 'status-error';
+                console.error('API request failed:', data);
+                
+                // Show diagnostics button
+                showDiagnosticsButton.classList.remove('hidden');
+                
+                // Display error message
                 if (response.status === 502) {
-                    const errorMessage = data.message || 'The server encountered a temporary error. This might be due to high traffic or maintenance.';
-                    const details = data.details ? `<br><br><strong>Details:</strong><br>Model: ${data.details.model}<br>Time: ${data.details.timestamp}` : '';
-                    
                     output.innerHTML = `
                         <div class="error-message">
                             <h3>Server Error (502)</h3>
-                            <p>${errorMessage}</p>
-                            ${details}
+                            <p>The server encountered a temporary error. This might be due to high traffic or maintenance.</p>
                             <p>Please try again in a few moments.</p>
                         </div>
                     `;
-                    
-                    // Show retry button
-                    retryButton.classList.remove('hidden');
-                    lastQuestion = question;
-                    return;
+                } else {
+                    output.innerHTML = `
+                        <div class="error-message">
+                            <h3>Request Failed</h3>
+                            <p>Error: ${data.error || response.statusText || 'Unknown error'}</p>
+                        </div>
+                    `;
                 }
                 
-                output.innerHTML = `<div class="error-message">Error: ${data.error || response.status}</div>`;
-                return;
+                // Show retry button
+                retryButton.classList.remove('hidden');
+                
+                // Display diagnostics
+                diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
             }
-            
-            // Extract and display content
-            let content = "No content found in response";
-            
-            if (data.choices && data.choices[0] && data.choices[0].message) {
-                const message = data.choices[0].message;
-                if (message.content) {
-                    content = message.content;
-                } else if (message.reasoning_content) {
-                    content = message.reasoning_content;
-                }
-            }
-            
-            output.innerHTML = `<div class="ai-message">${formatResponse(content)}</div>`;
-            
         } catch (error) {
-            console.error('Error:', error);
+            // Handle errors
+            apiStatus.textContent = `Error: ${error.message}`;
+            apiStatus.className = 'status-error';
+            console.error('Request error:', error);
             
+            // Show error message
             if (error.name === 'AbortError') {
-                output.innerHTML = `<div class="error-message">Request timed out after 90 seconds. The server might be overloaded.</div>`;
+                output.innerHTML = `
+                    <div class="error-message">
+                        <h3>Request Timeout</h3>
+                        <p>The request took too long and was aborted. Please try again or try a different question.</p>
+                    </div>
+                `;
             } else {
-                output.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+                output.innerHTML = `
+                    <div class="error-message">
+                        <h3>Request Error</h3>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
             }
+            
+            // Show retry button
+            retryButton.classList.remove('hidden');
+            lastQuestion = question;
         } finally {
             // Hide loading state
             loading.classList.add('hidden');
