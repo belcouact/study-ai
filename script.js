@@ -374,36 +374,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showDiagnosticsButton.classList.add('hidden');
         diagnosticsPanel.classList.add('hidden');
         
-        // Check if streaming mode is enabled
-        const streamingModeEnabled = document.getElementById('streaming-mode').checked;
-        
-        if (streamingModeEnabled) {
-            // Use streaming API
-            try {
-                // Hide the standard loading indicator since we'll use the streaming one
-                loading.classList.add('hidden');
-                
-                // Call the streaming API
-                await callStreamingAPI(question, output);
-                
-                // Clear input after successful submission
-                userInput.value = '';
-                
-                // Update status to indicate success
-                apiStatus.textContent = 'Connected';
-                apiStatus.className = 'status-success';
-            } catch (error) {
-                console.error('Error calling streaming API:', error);
-                output.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-                
-                // Update status to indicate error
-                apiStatus.textContent = 'Error';
-                apiStatus.className = 'status-error';
-            }
-            return;
-        }
-        
-        // Non-streaming mode - continue with original implementation
         // Show loading state
         loading.classList.remove('hidden');
         output.innerHTML = '';
