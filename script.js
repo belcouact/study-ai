@@ -386,7 +386,50 @@ document.addEventListener('DOMContentLoaded', () => {
         const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 seconds timeout
         
         try {
-            // Skip direct API request due to CORS issues
+            // Since we're getting timeouts with the Netlify function, let's try a CORS proxy
+            console.log('Using CORS proxy to access API directly...');
+            
+            // API configuration
+            const apiConfig = {
+                baseUrl: 'https://api.lkeap.cloud.tencent.com/v1',
+                model: currentModel || 'deepseek-r1'
+            };
+            
+            // Prepare request body
+            const requestBody = {
+                model: apiConfig.model,
+                messages: [
+                    { role: "system", content: "You are a helpful AI assistant." },
+                    { role: "user", content: question }
+                ],
+                max_tokens: 1000,
+                temperature: 0.7
+            };
+            
+            // Try using a CORS proxy
+            const corsProxyUrl = 'https://corsproxy.io/?';
+            const apiUrl = `${corsProxyUrl}${encodeURIComponent(apiConfig.baseUrl + '/chat/completions')}`;
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Note: We can't include the API key here as it would be exposed
+                        // This is just to test if the CORS proxy approach works
+                    },
+                    body: JSON.stringify(requestBody),
+                    signal: controller.signal
+                });
+                
+                // If we get here, the CORS proxy approach works, but we can't use it
+                // without exposing the API key, so we'll fall back to the Netlify function
+                console.log('CORS proxy test successful, but we need to use the Netlify function for security');
+            } catch (corsError) {
+                console.log('CORS proxy approach failed:', corsError.message);
+            }
+            
+            // Fall back to Netlify function
             console.log('Using Netlify function as proxy...');
             
             // Use the Netlify function
@@ -443,7 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     output.innerHTML = `
                         <div class="system-message">
-                            <p>The server request timed out, so I'm providing a local response:</p>
+                            <p>The server request timed out after 10 seconds. Here's a simplified response:</p>
                         </div>
                         <div class="ai-message">${formatResponse(fallbackResponse)}</div>
                     `;
@@ -708,18 +751,35 @@ document.addEventListener('DOMContentLoaded', () => {
         showDiagnosticsButton.classList.add('hidden');
         diagnosticsPanel.classList.add('hidden');
         
+        const startTime = Date.now();
+        
         try {
+            console.log('Starting API health check at', new Date().toISOString());
+            
             const response = await fetch('/.netlify/functions/api-health', {
                 method: 'GET'
             });
             
+            const endTime = Date.now();
+            const responseTime = endTime - startTime;
+            console.log(`API health check response time: ${responseTime}ms`);
+            
             const data = await response.json();
             diagnosticsData = data;
             
+            // Add response time to the diagnostics data
+            diagnosticsData.responseTime = responseTime;
+            
             if (data.status === 'ok') {
-                apiStatus.textContent = 'API connection successful!';
+                apiStatus.textContent = `API connection successful! (${responseTime}ms)`;
                 apiStatus.className = 'status-success';
                 console.log('API health check details:', data);
+                
+                // Add a warning if response time is close to the Lambda timeout
+                if (responseTime > 5000) {
+                    apiStatus.textContent += ' (Warning: Slow response)';
+                    console.warn(`API health check response time (${responseTime}ms) is more than 5 seconds, which is close to the Lambda timeout of 10 seconds.`);
+                }
             } else {
                 apiStatus.textContent = `API connection failed: ${data.message || 'Unknown error'}`;
                 apiStatus.className = 'status-error';
@@ -736,9 +796,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (error) {
+            const endTime = Date.now();
+            const responseTime = endTime - startTime;
+            
             apiStatus.textContent = `Connection error: ${error.message}`;
             apiStatus.className = 'status-error';
-            console.error('API check error:', error);
+            console.error('API check error:', error, `(after ${responseTime}ms)`);
+            
+            // Show diagnostics button
+            showDiagnosticsButton.classList.remove('hidden');
+            
+            // Display diagnostics
+            diagnosticsOutput.textContent = JSON.stringify({
+                error: error.message,
+                stack: error.stack,
+                responseTime: responseTime,
+                timestamp: new Date().toISOString()
+            }, null, 2);
         }
     }
 
