@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Core elements that definitely exist
     const userInput = document.getElementById('user-input');
     const submitButton = document.getElementById('submit-button');
     const micButton = document.getElementById('mic-button');
@@ -9,18 +10,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const showDiagnosticsButton = document.getElementById('show-diagnostics');
     const diagnosticsPanel = document.getElementById('diagnostics-panel');
     const diagnosticsOutput = document.getElementById('diagnostics-output');
+    const debugResponseButton = document.getElementById('debug-response-button');
+    
+    // Optional elements - may not exist in all versions of the HTML
     const directTestButton = document.getElementById('direct-test-button');
     const simpleApiButton = document.getElementById('simple-api-button');
     const checkEnvButton = document.getElementById('check-env-button');
     const apiFunctionRadios = document.querySelectorAll('input[name="api-function"]');
-    const debugResponseButton = document.getElementById('debug-response-button');
     const fallbackButton = document.getElementById('fallback-button');
     const modelSelect = document.getElementById('model-select');
 
     let diagnosticsData = null;
     let isListening = false;
     let recognitionTimeout = null;
-    let currentApiFunction = 'ai-proxy'; // Default
+    let currentApiFunction = 'simple-ai'; // Default to simple-ai instead of ai-proxy
     let lastRawResponse = null;
     let lastQuestion = null;
     let currentModel = 'deepseek-r1';
@@ -168,117 +171,126 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Add event listener for the direct test button
-    directTestButton.addEventListener('click', async () => {
-        try {
-            apiStatus.textContent = 'Running direct API test...';
-            apiStatus.className = 'status-checking';
-            
-            const response = await fetch('/.netlify/functions/direct-api-test');
-            const data = await response.json();
-            
-            console.log('Direct API test results:', data);
-            
-            // Show diagnostics
-            showDiagnosticsButton.classList.remove('hidden');
-            diagnosticsPanel.classList.remove('hidden');
-            diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
-            showDiagnosticsButton.textContent = 'Hide Diagnostics';
-            
-            apiStatus.textContent = 'Direct API test completed';
-            apiStatus.className = 'status-success';
-        } catch (error) {
-            apiStatus.textContent = `Direct API test failed: ${error.message}`;
-            apiStatus.className = 'status-error';
-            console.error('Direct API test error:', error);
-        }
-    });
-
-    // Add event listener for the simple API button
-    simpleApiButton.addEventListener('click', async () => {
-        const question = userInput.value.trim() || "Hello, how are you?";
-        
-        try {
-            apiStatus.textContent = 'Trying simple API...';
-            apiStatus.className = 'status-checking';
-            
-            const response = await fetch('/.netlify/functions/simple-ai', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ question })
-            });
-            
-            const data = await response.json();
-            
-            console.log('Simple API response:', data);
-            
-            if (response.ok) {
-                apiStatus.textContent = 'Simple API request successful!';
-                apiStatus.className = 'status-success';
+    // Add event listeners for optional elements only if they exist
+    if (directTestButton) {
+        directTestButton.addEventListener('click', async () => {
+            try {
+                apiStatus.textContent = 'Running direct API test...';
+                apiStatus.className = 'status-checking';
                 
-                // Show the response
+                const response = await fetch('/.netlify/functions/direct-api-test');
+                const data = await response.json();
+                
+                console.log('Direct API test results:', data);
+                
+                // Show diagnostics
                 showDiagnosticsButton.classList.remove('hidden');
                 diagnosticsPanel.classList.remove('hidden');
                 diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
                 showDiagnosticsButton.textContent = 'Hide Diagnostics';
-            } else {
-                apiStatus.textContent = `Simple API failed: ${data.error || 'Unknown error'}`;
+                
+                apiStatus.textContent = 'Direct API test completed';
+                apiStatus.className = 'status-success';
+            } catch (error) {
+                apiStatus.textContent = `Direct API test failed: ${error.message}`;
                 apiStatus.className = 'status-error';
+                console.error('Direct API test error:', error);
             }
-        } catch (error) {
-            apiStatus.textContent = `Simple API error: ${error.message}`;
-            apiStatus.className = 'status-error';
-            console.error('Simple API error:', error);
-        }
-    });
+        });
+    }
+
+    // Add event listener for the simple API button
+    if (simpleApiButton) {
+        simpleApiButton.addEventListener('click', async () => {
+            const question = userInput.value.trim() || "Hello, how are you?";
+            
+            try {
+                apiStatus.textContent = 'Trying simple API...';
+                apiStatus.className = 'status-checking';
+                
+                const response = await fetch('/.netlify/functions/simple-ai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question })
+                });
+                
+                const data = await response.json();
+                
+                console.log('Simple API response:', data);
+                
+                if (response.ok) {
+                    apiStatus.textContent = 'Simple API request successful!';
+                    apiStatus.className = 'status-success';
+                    
+                    // Show the response
+                    showDiagnosticsButton.classList.remove('hidden');
+                    diagnosticsPanel.classList.remove('hidden');
+                    diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
+                    showDiagnosticsButton.textContent = 'Hide Diagnostics';
+                } else {
+                    apiStatus.textContent = `Simple API failed: ${data.error || 'Unknown error'}`;
+                    apiStatus.className = 'status-error';
+                }
+            } catch (error) {
+                apiStatus.textContent = `Simple API error: ${error.message}`;
+                apiStatus.className = 'status-error';
+                console.error('Simple API error:', error);
+            }
+        });
+    }
 
     // Add event listener for the check environment button
-    checkEnvButton.addEventListener('click', async () => {
-        try {
-            apiStatus.textContent = 'Checking environment variables...';
-            apiStatus.className = 'status-checking';
-            
-            const response = await fetch('/.netlify/functions/check-env');
-            const data = await response.json();
-            
-            console.log('Environment check results:', data);
-            
-            if (data.status === 'ok') {
-                apiStatus.textContent = 'Environment variables are set correctly!';
-                apiStatus.className = 'status-success';
-            } else {
-                apiStatus.textContent = `Environment issue: ${data.message}`;
+    if (checkEnvButton) {
+        checkEnvButton.addEventListener('click', async () => {
+            try {
+                apiStatus.textContent = 'Checking environment variables...';
+                apiStatus.className = 'status-checking';
+                
+                const response = await fetch('/.netlify/functions/check-env');
+                const data = await response.json();
+                
+                console.log('Environment check results:', data);
+                
+                if (data.status === 'ok') {
+                    apiStatus.textContent = 'Environment variables are set correctly!';
+                    apiStatus.className = 'status-success';
+                } else {
+                    apiStatus.textContent = `Environment issue: ${data.message}`;
+                    apiStatus.className = 'status-error';
+                }
+                
+                // Show diagnostics
+                showDiagnosticsButton.classList.remove('hidden');
+                diagnosticsPanel.classList.remove('hidden');
+                diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
+                showDiagnosticsButton.textContent = 'Hide Diagnostics';
+            } catch (error) {
+                apiStatus.textContent = `Environment check failed: ${error.message}`;
                 apiStatus.className = 'status-error';
+                console.error('Environment check error:', error);
             }
-            
-            // Show diagnostics
-            showDiagnosticsButton.classList.remove('hidden');
-            diagnosticsPanel.classList.remove('hidden');
-            diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
-            showDiagnosticsButton.textContent = 'Hide Diagnostics';
-        } catch (error) {
-            apiStatus.textContent = `Environment check failed: ${error.message}`;
-            apiStatus.className = 'status-error';
-            console.error('Environment check error:', error);
-        }
-    });
-
-    apiFunctionRadios.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            currentApiFunction = e.target.value;
-            console.log(`Switched to ${currentApiFunction} function`);
-            
-            // Clear any previous response
-            output.innerHTML = '<p class="welcome-message">Switched to ' + currentApiFunction + '. Ask me anything!</p>';
         });
-    });
+    }
 
-    modelSelect.addEventListener('change', () => {
-        currentModel = modelSelect.value;
-        console.log('Model changed to:', currentModel);
-    });
+    // Add event listeners for API function radio buttons
+    if (apiFunctionRadios && apiFunctionRadios.length > 0) {
+        apiFunctionRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                currentApiFunction = e.target.value;
+                console.log('API function changed to:', currentApiFunction);
+            });
+        });
+    }
+
+    // Add event listener for model select if it exists
+    if (modelSelect) {
+        modelSelect.addEventListener('change', () => {
+            currentModel = modelSelect.value;
+            console.log('Model changed to:', currentModel);
+        });
+    }
 
     // Function to start listening
     function startListening() {
@@ -369,127 +381,119 @@ document.addEventListener('DOMContentLoaded', () => {
         loading.classList.remove('hidden');
         output.innerHTML = '';
         
-        // API configuration
-        const currentConfig = {
-            baseUrl: 'https://api.lkeap.cloud.tencent.com/v1',
-            apiKey: 'sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // Replace with your actual API key
-            model: 'deepseek-r1'
-        };
-        
-        // Prepare request body
-        const requestBody = {
-            model: currentConfig.model,
-            messages: [
-                { role: "system", content: "You are a helpful AI assistant." },
-                { role: "user", content: question }
-            ],
-            max_tokens: 1000,
-            temperature: 0.7
-        };
-        
         // Create a controller for the timeout
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 seconds timeout
         
         try {
-            console.log('Attempting direct API request...');
+            // Skip direct API request due to CORS issues
+            console.log('Using Netlify function as proxy...');
             
-            try {
-                // Try direct API request first
-                const response = await fetch(currentConfig.baseUrl + '/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${currentConfig.apiKey}`,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(requestBody),
-                    signal: controller.signal
-                });
+            // Use the Netlify function
+            const response = await fetch('/.netlify/functions/simple-ai', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    question,
+                    model: currentModel || 'deepseek-r1'
+                }),
+                signal: controller.signal
+            });
+            
+            // Check if the response is ok
+            if (!response.ok) {
+                let errorMessage = `Server returned status ${response.status}`;
+                let errorDetails = '';
                 
-                // Handle error responses
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Direct API Error:', {
-                        status: response.status,
-                        statusText: response.statusText,
-                        error: errorText
-                    });
-                    throw new Error(`API returned status ${response.status}: ${response.statusText}`);
+                try {
+                    // Try to parse the error response as JSON
+                    const errorData = await response.json();
+                    errorDetails = JSON.stringify(errorData, null, 2);
+                    console.error('Server error details:', errorData);
+                    
+                    if (errorData.error) {
+                        errorMessage = errorData.error;
+                    }
+                } catch (parseError) {
+                    // If we can't parse as JSON, try to get the text
+                    try {
+                        errorDetails = await response.text();
+                    } catch (textError) {
+                        errorDetails = 'Could not retrieve error details';
+                    }
                 }
                 
-                // Parse the successful response
-                const data = await response.json();
-                diagnosticsData = data; // Store for diagnostics
+                // Update status
+                apiStatus.textContent = `Request failed: ${errorMessage}`;
+                apiStatus.className = 'status-error';
                 
-                // Process successful response
-                handleSuccessfulResponse(data, question);
+                // Show diagnostics button
+                showDiagnosticsButton.classList.remove('hidden');
+                diagnosticsOutput.textContent = errorDetails;
                 
-            } catch (directApiError) {
-                console.error('Direct API request failed:', directApiError);
-                apiStatus.textContent = 'Falling back to Netlify function...';
-                
-                // Fall back to Netlify function
-                console.log('Falling back to Netlify function...');
-                const netlifyResponse = await fetch('/.netlify/functions/simple-ai', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ question }),
-                    signal: controller.signal
-                });
-                
-                if (!netlifyResponse.ok) {
-                    const errorText = await netlifyResponse.text();
-                    console.error('Netlify Function Error:', {
-                        status: netlifyResponse.status,
-                        statusText: netlifyResponse.statusText,
-                        error: errorText
-                    });
-                    throw new Error(`Netlify function returned status ${netlifyResponse.status}: ${netlifyResponse.statusText}`);
+                // Display appropriate error message based on status code
+                if (response.status === 502) {
+                    output.innerHTML = `
+                        <div class="error-message">
+                            <h3>Server Error (502 Bad Gateway)</h3>
+                            <p>The server encountered an error while processing your request.</p>
+                            <p>This might be due to:</p>
+                            <ul>
+                                <li>The API service being temporarily unavailable</li>
+                                <li>High traffic or server load</li>
+                                <li>Network issues between our server and the API</li>
+                            </ul>
+                            <p>Please try again in a few moments.</p>
+                        </div>
+                    `;
+                } else {
+                    output.innerHTML = `
+                        <div class="error-message">
+                            <h3>Request Failed (${response.status})</h3>
+                            <p>Error: ${errorMessage}</p>
+                        </div>
+                    `;
                 }
                 
-                // Parse the successful response
-                const data = await netlifyResponse.json();
-                diagnosticsData = data; // Store for diagnostics
-                
-                // Process successful response
-                handleSuccessfulResponse(data, question);
+                throw new Error(`Server returned status ${response.status}: ${errorMessage}`);
             }
+            
+            // Parse the successful response
+            const data = await response.json();
+            diagnosticsData = data; // Store for diagnostics
+            
+            // Process successful response
+            handleSuccessfulResponse(data, question);
             
         } catch (error) {
             // Handle all errors
-            apiStatus.textContent = `Error: ${error.message}`;
-            apiStatus.className = 'status-error';
-            console.error('All request attempts failed:', error);
+            console.error('Request failed:', error);
             
-            // Show error message
-            if (error.name === 'AbortError') {
-                output.innerHTML = `
-                    <div class="error-message">
-                        <h3>Request Timeout</h3>
-                        <p>The request took too long and was aborted. Please try again or try a different question.</p>
-                    </div>
-                `;
-            } else {
-                output.innerHTML = `
-                    <div class="error-message">
-                        <h3>Request Error</h3>
-                        <p>Error: ${error.message}</p>
-                        <p>This could be due to CORS restrictions, network issues, or API unavailability.</p>
-                        <p>Check your browser console for more details.</p>
-                    </div>
-                `;
+            // Only update UI if it wasn't already updated by the error handling above
+            if (apiStatus.className !== 'status-error') {
+                apiStatus.textContent = `Error: ${error.message}`;
+                apiStatus.className = 'status-error';
+                
+                // Show error message
+                if (error.name === 'AbortError') {
+                    output.innerHTML = `
+                        <div class="error-message">
+                            <h3>Request Timeout</h3>
+                            <p>The request took too long and was aborted. Please try again or try a different question.</p>
+                        </div>
+                    `;
+                } else {
+                    output.innerHTML = `
+                        <div class="error-message">
+                            <h3>Request Error</h3>
+                            <p>Error: ${error.message}</p>
+                            <p>Please check your internet connection and try again.</p>
+                        </div>
+                    `;
+                }
             }
-            
-            // Show diagnostics button
-            showDiagnosticsButton.classList.remove('hidden');
-            diagnosticsOutput.textContent = JSON.stringify({
-                error: error.message,
-                stack: error.stack,
-                timestamp: new Date().toISOString()
-            }, null, 2);
             
             lastQuestion = question;
         } finally {
@@ -708,43 +712,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Add event listener for the debug button
-    debugResponseButton.addEventListener('click', () => {
-        if (lastRawResponse) {
-            // Show the raw response in the diagnostics panel
-            diagnosticsPanel.classList.remove('hidden');
-            diagnosticsOutput.textContent = JSON.stringify(lastRawResponse, null, 2);
-            showDiagnosticsButton.textContent = 'Hide Diagnostics';
-            showDiagnosticsButton.classList.remove('hidden');
-        }
-    });
+    if (debugResponseButton) {
+        debugResponseButton.addEventListener('click', () => {
+            if (lastRawResponse) {
+                // Show the raw response in the diagnostics panel
+                diagnosticsPanel.classList.remove('hidden');
+                diagnosticsOutput.textContent = JSON.stringify(lastRawResponse, null, 2);
+                showDiagnosticsButton.textContent = 'Hide Diagnostics';
+                showDiagnosticsButton.classList.remove('hidden');
+            }
+        });
+    }
 
     // Add event listener for the fallback button
-    fallbackButton.addEventListener('click', async () => {
-        const question = userInput.value.trim();
-        if (!question) {
-            alert('Please enter a question first.');
-            return;
-        }
-        
-        try {
-            // Show loading state
-            loading.classList.remove('hidden');
-            output.innerHTML = '';
+    if (fallbackButton) {
+        fallbackButton.addEventListener('click', async () => {
+            const question = userInput.value.trim();
+            if (!question) {
+                alert('Please enter a question first.');
+                return;
+            }
             
-            // Generate a local fallback response
-            const response = generateLocalResponse(question);
-            
-            // Format and display the response
-            const formattedResponse = formatResponse(response);
-            output.innerHTML = `<div class="ai-message">${formattedResponse}</div>`;
-        } catch (error) {
-            console.error('Error generating fallback response:', error);
-            output.innerHTML = `<div class="error-message">Error: ${escapeHTML(error.message)}</div>`;
-        } finally {
-            // Hide loading state
-            loading.classList.add('hidden');
-        }
-    });
+            try {
+                // Show loading state
+                loading.classList.remove('hidden');
+                output.innerHTML = '';
+                
+                // Generate a local fallback response
+                const response = generateLocalResponse(question);
+                
+                // Format and display the response
+                const formattedResponse = formatResponse(response);
+                output.innerHTML = `<div class="ai-message">${formattedResponse}</div>`;
+            } catch (error) {
+                console.error('Error generating fallback response:', error);
+                output.innerHTML = `<div class="error-message">Error: ${escapeHTML(error.message)}</div>`;
+            } finally {
+                // Hide loading state
+                loading.classList.add('hidden');
+            }
+        });
+    }
 
     // Function to generate a local response
     function generateLocalResponse(question) {
