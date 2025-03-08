@@ -369,61 +369,56 @@ document.addEventListener('DOMContentLoaded', () => {
         loading.classList.remove('hidden');
         output.innerHTML = '';
         
+        // API configuration
+        const currentConfig = {
+            baseUrl: 'https://api.lkeap.cloud.tencent.com/v1',
+            apiKey: 'sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // Replace with your actual API key
+            model: 'deepseek-r1'
+        };
+        
+        // Prepare request body
+        const requestBody = {
+            model: currentConfig.model,
+            messages: [
+                { role: "system", content: "You are a helpful AI assistant." },
+                { role: "user", content: question }
+            ],
+            max_tokens: 1000,
+            temperature: 0.7
+        };
+        
         try {
             // Create a controller for the timeout
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 seconds timeout
             
-            // Make the API request
-            const response = await fetch('/.netlify/functions/simple-ai', {
+            // Make the direct API request
+            const response = await fetch(currentConfig.baseUrl + '/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${currentConfig.apiKey}`,
+                    'Accept': 'application/json'
                 },
-                body: JSON.stringify({ question }),
+                body: JSON.stringify(requestBody),
                 signal: controller.signal
             });
             
             // Clear the timeout
             clearTimeout(timeoutId);
             
-            // Parse the response
-            const data = await response.json();
-            diagnosticsData = data; // Store for diagnostics
-            
-            // Check if the response was successful
-            if (response.ok && data.choices && data.choices[0]) {
-                // Update status
-                apiStatus.textContent = 'Request successful!';
-                apiStatus.className = 'status-success';
-                console.log('API response details:', data);
+            // Handle error responses
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('API Error:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    error: errorText
+                });
                 
-                // Extract and display content
-                let content = "No content found in response";
-                
-                if (data.choices[0].message) {
-                    const message = data.choices[0].message;
-                    if (message.content) {
-                        content = message.content;
-                    } else if (message.reasoning_content) {
-                        content = message.reasoning_content;
-                    }
-                }
-                
-                output.innerHTML = `<div class="ai-message">${formatResponse(content)}</div>`;
-                
-                // Store the last question for retry functionality
-                lastQuestion = question;
-                
-                // Store the raw response for debugging
-                lastRawResponse = data;
-                debugResponseButton.classList.remove('hidden');
-                
-            } else {
                 // Update status to show error
-                apiStatus.textContent = `Request failed: ${data.error || response.statusText || 'Unknown error'}`;
+                apiStatus.textContent = `Request failed: ${response.statusText || 'Unknown error'}`;
                 apiStatus.className = 'status-error';
-                console.error('API request failed:', data);
                 
                 // Show diagnostics button
                 showDiagnosticsButton.classList.remove('hidden');
@@ -440,15 +435,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     output.innerHTML = `
                         <div class="error-message">
-                            <h3>Request Failed</h3>
-                            <p>Error: ${data.error || response.statusText || 'Unknown error'}</p>
+                            <h3>Request Failed (${response.status})</h3>
+                            <p>Error: ${response.statusText || 'Unknown error'}</p>
+                            <p>Details: ${errorText}</p>
                         </div>
                     `;
                 }
                 
                 // Display diagnostics
-                diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
+                diagnosticsOutput.textContent = errorText;
+                return;
             }
+            
+            // Parse the successful response
+            const data = await response.json();
+            diagnosticsData = data; // Store for diagnostics
+            
+            // Update status
+            apiStatus.textContent = 'Request successful!';
+            apiStatus.className = 'status-success';
+            console.log('API response details:', data);
+            
+            // Extract and display content
+            let content = "No content found in response";
+            
+            if (data.choices && data.choices[0] && data.choices[0].message) {
+                const message = data.choices[0].message;
+                if (message.content) {
+                    content = message.content;
+                } else if (message.reasoning_content) {
+                    content = message.reasoning_content;
+                }
+            }
+            
+            output.innerHTML = `<div class="ai-message">${formatResponse(content)}</div>`;
+            
+            // Store the last question for retry functionality
+            lastQuestion = question;
+            
+            // Store the raw response for debugging
+            lastRawResponse = data;
+            debugResponseButton.classList.remove('hidden');
+            
         } catch (error) {
             // Handle errors
             apiStatus.textContent = `Error: ${error.message}`;
