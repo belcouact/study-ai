@@ -999,8 +999,133 @@ While I can't provide a detailed answer right now, you might want to:
             loadingIndicator.textContent = 'Connecting to AI...';
             outputElement.appendChild(loadingIndicator);
             
-            // Make the API call to the edge function
-            const response = await fetch('/api/streaming-ai', {
+            // Try the edge function first
+            try {
+                console.log('Trying edge function...');
+                // Make the API call to the edge function
+                const response = await fetch('/.netlify/edge-functions/streaming-ai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt }),
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Edge function error: ${response.status}`);
+                }
+                
+                // Remove loading indicator
+                outputElement.removeChild(loadingIndicator);
+                outputElement.classList.remove('loading');
+                
+                // Check the content type to determine if we got a streaming response or a fallback JSON response
+                const contentType = response.headers.get('Content-Type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    // This is a fallback response from the regular function
+                    console.log('Received fallback response (non-streaming)');
+                    const data = await response.json();
+                    
+                    // Display the content
+                    if (data.content) {
+                        outputElement.innerHTML = formatResponse(data.content);
+                    } else {
+                        outputElement.innerHTML = `<div class="system-message">
+                            <p>Received a fallback response without content.</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>`;
+                    }
+                    
+                    return;
+                }
+                
+                // If we get here, we have a streaming response
+                console.log('Processing streaming response');
+                
+                // Set up a reader for the stream
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let formattedOutput = '';
+                
+                // Process the stream
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    // Decode the chunk and add to buffer
+                    buffer += decoder.decode(value, { stream: true });
+                    
+                    // Process SSE format (data: lines)
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || ''; // Keep the last incomplete line in the buffer
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6); // Remove 'data: ' prefix
+                            
+                            // Check if it's the [DONE] message
+                            if (data.trim() === '[DONE]') continue;
+                            
+                            try {
+                                // Parse the JSON data
+                                const parsed = JSON.parse(data);
+                                
+                                // Extract the content if it exists
+                                if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
+                                    const content = parsed.choices[0].delta.content;
+                                    formattedOutput += content;
+                                    
+                                    // Format and display the accumulated output
+                                    outputElement.innerHTML = formatResponse(formattedOutput);
+                                }
+                            } catch (e) {
+                                console.error('Error parsing JSON:', e);
+                            }
+                        }
+                    }
+                }
+                
+                // Process any remaining data
+                if (buffer.length > 0) {
+                    const lines = buffer.split('\n');
+                    for (const line of lines) {
+                        if (line.startsWith('data: ') && line.slice(6).trim() !== '[DONE]') {
+                            try {
+                                const parsed = JSON.parse(line.slice(6));
+                                if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
+                                    const content = parsed.choices[0].delta.content;
+                                    formattedOutput += content;
+                                    
+                                    // Format and display the accumulated output
+                                    outputElement.innerHTML = formatResponse(formattedOutput);
+                                }
+                            } catch (e) {
+                                console.error('Error parsing JSON:', e);
+                            }
+                        }
+                    }
+                }
+                
+                // If we didn't get any content, show an error
+                if (!formattedOutput) {
+                    console.warn('No content received from streaming response');
+                    outputElement.innerHTML = `<div class="system-message">
+                        <p>No content was received from the streaming API.</p>
+                        <p>This might be due to an issue with the streaming connection or the API response format.</p>
+                    </div>`;
+                }
+                
+                return; // Successfully processed the streaming response
+            } catch (edgeError) {
+                console.error('Edge function failed:', edgeError);
+                // Continue to try the regular function
+            }
+            
+            // If we get here, the edge function failed, so try the regular function
+            console.log('Trying regular function...');
+            const fallbackResponse = await fetch('/.netlify/functions/streaming-ai', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1008,83 +1133,115 @@ While I can't provide a detailed answer right now, you might want to:
                 body: JSON.stringify({ prompt }),
             });
             
-            if (!response.ok) {
-                throw new Error(`API error: ${response.status}`);
-            }
-            
             // Remove loading indicator
             outputElement.removeChild(loadingIndicator);
             outputElement.classList.remove('loading');
             
-            // Set up a reader for the stream
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let buffer = '';
-            let formattedOutput = '';
-            
-            // Process the stream
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                
-                // Decode the chunk and add to buffer
-                buffer += decoder.decode(value, { stream: true });
-                
-                // Process SSE format (data: lines)
-                const lines = buffer.split('\n');
-                buffer = lines.pop() || ''; // Keep the last incomplete line in the buffer
-                
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const data = line.slice(6); // Remove 'data: ' prefix
-                        
-                        // Check if it's the [DONE] message
-                        if (data.trim() === '[DONE]') continue;
-                        
-                        try {
-                            // Parse the JSON data
-                            const parsed = JSON.parse(data);
-                            
-                            // Extract the content if it exists
-                            if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
-                                const content = parsed.choices[0].delta.content;
-                                formattedOutput += content;
-                                
-                                // Format and display the accumulated output
-                                outputElement.innerHTML = formatResponse(formattedOutput);
-                            }
-                        } catch (e) {
-                            console.error('Error parsing JSON:', e);
-                        }
-                    }
-                }
+            if (!fallbackResponse.ok) {
+                throw new Error(`Regular function error: ${fallbackResponse.status}`);
             }
             
-            // Process any remaining data
-            if (buffer.length > 0) {
-                const lines = buffer.split('\n');
-                for (const line of lines) {
-                    if (line.startsWith('data: ') && line.slice(6).trim() !== '[DONE]') {
-                        try {
-                            const parsed = JSON.parse(line.slice(6));
-                            if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
-                                const content = parsed.choices[0].delta.content;
-                                formattedOutput += content;
-                                
-                                // Format and display the accumulated output
-                                outputElement.innerHTML = formatResponse(formattedOutput);
-                            }
-                        } catch (e) {
-                            console.error('Error parsing JSON:', e);
-                        }
-                    }
-                }
+            const data = await fallbackResponse.json();
+            if (data.content) {
+                outputElement.innerHTML = formatResponse(data.content);
+                return;
+            } else {
+                outputElement.innerHTML = `<div class="system-message">
+                    <p>The fallback function returned a response without content.</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                </div>`;
             }
             
         } catch (error) {
             console.error('Error calling streaming API:', error);
-            outputElement.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            outputElement.innerHTML = `<div class="error">Error: ${error.message}</div>
+                <div class="system-message">
+                    <p>Both streaming and fallback attempts failed.</p>
+                    <p>Please try again or use the non-streaming mode.</p>
+                </div>`;
             outputElement.classList.remove('loading');
         }
+    }
+
+    // Add event listener for the test edge function button
+    const testEdgeButton = document.getElementById('test-edge-button');
+    if (testEdgeButton) {
+        testEdgeButton.addEventListener('click', async () => {
+            try {
+                apiStatus.textContent = 'Testing edge function...';
+                apiStatus.className = 'status-checking';
+                
+                // Try the edge function first
+                try {
+                    const response = await fetch('/.netlify/edge-functions/test');
+                    
+                    if (!response.ok) {
+                        throw new Error(`Edge function test failed: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    console.log('Edge function test results:', data);
+                    
+                    // Show diagnostics
+                    showDiagnosticsButton.classList.remove('hidden');
+                    diagnosticsPanel.classList.remove('hidden');
+                    diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
+                    showDiagnosticsButton.textContent = 'Hide Diagnostics';
+                    
+                    apiStatus.textContent = 'Edge function is working!';
+                    apiStatus.className = 'status-success';
+                    return;
+                } catch (edgeError) {
+                    console.error('Edge function test failed:', edgeError);
+                    // Continue to try the regular function
+                }
+                
+                // If we get here, the edge function failed, so try the regular function
+                console.log('Trying regular function test...');
+                const fallbackResponse = await fetch('/.netlify/functions/test-edge');
+                
+                if (!fallbackResponse.ok) {
+                    throw new Error(`Regular function test failed: ${fallbackResponse.status}`);
+                }
+                
+                const fallbackData = await fallbackResponse.json();
+                
+                console.log('Regular function test results:', fallbackData);
+                
+                // Show diagnostics
+                showDiagnosticsButton.classList.remove('hidden');
+                diagnosticsPanel.classList.remove('hidden');
+                diagnosticsOutput.textContent = JSON.stringify({
+                    ...fallbackData,
+                    note: "Edge function failed, using regular function instead."
+                }, null, 2);
+                showDiagnosticsButton.textContent = 'Hide Diagnostics';
+                
+                apiStatus.textContent = 'Regular function is working (Edge function failed)';
+                apiStatus.className = 'status-warning';
+                
+            } catch (error) {
+                apiStatus.textContent = `All function tests failed: ${error.message}`;
+                apiStatus.className = 'status-error';
+                console.error('Function test error:', error);
+                
+                // Show diagnostics
+                showDiagnosticsButton.classList.remove('hidden');
+                diagnosticsPanel.classList.remove('hidden');
+                diagnosticsOutput.textContent = JSON.stringify({ 
+                    error: error.message,
+                    stack: error.stack,
+                    timestamp: new Date().toISOString(),
+                    troubleshooting_tips: [
+                        "Check if Netlify Edge Functions are enabled for your site",
+                        "Verify that the functions are deployed correctly",
+                        "Check the Netlify logs for any deployment errors",
+                        "Make sure your Netlify site is properly configured"
+                    ]
+                }, null, 2);
+                showDiagnosticsButton.textContent = 'Hide Diagnostics';
+            }
+        });
     }
 }); 

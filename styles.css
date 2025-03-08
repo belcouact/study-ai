@@ -259,6 +259,11 @@ button {
     font-weight: bold;
 }
 
+.status-warning {
+    color: #f39c12;
+    font-weight: bold;
+}
+
 .status-checking {
     color: #3498db;
     font-weight: bold;
