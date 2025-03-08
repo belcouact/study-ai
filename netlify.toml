@@ -1,15 +1,22 @@
 [build]
   functions = "functions"
 
-[[redirects]]
-  from = "/.netlify/functions/*"
-  to = "/.netlify/functions/:splat"
-  status = 200 
-
 [functions]
-  # Set the function timeout to 90 seconds
   node_bundler = "esbuild"
   external_node_modules = ["node-fetch"]
   
   [functions.simple-ai]
-    timeout = 90 
+    timeout = 90
+
+# Remove the problematic redirect rule
+# [[redirects]]
+#   from = "/.netlify/functions/*"
+#   to = "/.netlify/functions/:splat"
+#   status = 200
+#   force = true
+
+# Fallback redirect for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200 
