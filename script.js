@@ -1003,7 +1003,7 @@ While I can't provide a detailed answer right now, you might want to:
             try {
                 console.log('Trying edge function...');
                 // Make the API call to the edge function
-                const response = await fetch('/.netlify/edge-functions/streaming-ai', {
+                const response = await fetch('/api/streaming-ai', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1173,7 +1173,7 @@ While I can't provide a detailed answer right now, you might want to:
                 
                 // Try the edge function first
                 try {
-                    const response = await fetch('/.netlify/edge-functions/test');
+                    const response = await fetch('/api/test-edge');
                     
                     if (!response.ok) {
                         throw new Error(`Edge function test failed: ${response.status}`);
