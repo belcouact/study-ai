@@ -374,6 +374,36 @@ document.addEventListener('DOMContentLoaded', () => {
         showDiagnosticsButton.classList.add('hidden');
         diagnosticsPanel.classList.add('hidden');
         
+        // Check if streaming mode is enabled
+        const streamingModeEnabled = document.getElementById('streaming-mode').checked;
+        
+        if (streamingModeEnabled) {
+            // Use streaming API
+            try {
+                // Hide the standard loading indicator since we'll use the streaming one
+                loading.classList.add('hidden');
+                
+                // Call the streaming API
+                await callStreamingAPI(question, output);
+                
+                // Clear input after successful submission
+                userInput.value = '';
+                
+                // Update status to indicate success
+                apiStatus.textContent = 'Connected';
+                apiStatus.className = 'status-success';
+            } catch (error) {
+                console.error('Error calling streaming API:', error);
+                output.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                
+                // Update status to indicate error
+                apiStatus.textContent = 'Error';
+                apiStatus.className = 'status-error';
+            }
+            return;
+        }
+        
+        // Non-streaming mode - continue with original implementation
         // Show loading state
         loading.classList.remove('hidden');
         output.innerHTML = '';
@@ -969,7 +999,7 @@ While I can't provide a detailed answer right now, you might want to:
             loadingIndicator.textContent = 'Connecting to AI...';
             outputElement.appendChild(loadingIndicator);
             
-            // Make the API call
+            // Make the API call to the edge function
             const response = await fetch('/api/streaming-ai', {
                 method: 'POST',
                 headers: {
@@ -990,6 +1020,7 @@ While I can't provide a detailed answer right now, you might want to:
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let buffer = '';
+            let formattedOutput = '';
             
             // Process the stream
             while (true) {
@@ -1017,11 +1048,10 @@ While I can't provide a detailed answer right now, you might want to:
                             // Extract the content if it exists
                             if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
                                 const content = parsed.choices[0].delta.content;
+                                formattedOutput += content;
                                 
-                                // Append the content to the output element
-                                const span = document.createElement('span');
-                                span.textContent = content;
-                                outputElement.appendChild(span);
+                                // Format and display the accumulated output
+                                outputElement.innerHTML = formatResponse(formattedOutput);
                             }
                         } catch (e) {
                             console.error('Error parsing JSON:', e);
@@ -1039,9 +1069,10 @@ While I can't provide a detailed answer right now, you might want to:
                             const parsed = JSON.parse(line.slice(6));
                             if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
                                 const content = parsed.choices[0].delta.content;
-                                const span = document.createElement('span');
-                                span.textContent = content;
-                                outputElement.appendChild(span);
+                                formattedOutput += content;
+                                
+                                // Format and display the accumulated output
+                                outputElement.innerHTML = formatResponse(formattedOutput);
                             }
                         } catch (e) {
                             console.error('Error parsing JSON:', e);
@@ -1056,61 +1087,4 @@ While I can't provide a detailed answer right now, you might want to:
             outputElement.classList.remove('loading');
         }
     }
-
-    // Get the streaming mode checkbox
-    const streamingModeCheckbox = document.getElementById('streaming-mode');
-    
-    // Submit button event listener
-    document.getElementById('submit-button').addEventListener('click', async function() {
-        const userInput = document.getElementById('user-input').value.trim();
-        if (!userInput) return;
-        
-        const outputElement = document.getElementById('output');
-        const loadingElement = document.getElementById('loading');
-        
-        // Clear previous output and show loading
-        outputElement.innerHTML = '';
-        loadingElement.classList.remove('hidden');
-        
-        try {
-            // Check if streaming mode is enabled
-            if (streamingModeCheckbox.checked) {
-                // Hide the standard loading indicator since we'll use the streaming one
-                loadingElement.classList.add('hidden');
-                
-                // Call the streaming API
-                await callStreamingAPI(userInput, outputElement);
-            } else {
-                // Use the original API call method
-                // ... existing API call code ...
-                
-                // Example of existing code (replace with your actual implementation):
-                const response = await fetch('/api/simple-ai', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ prompt: userInput }),
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`API error: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                // Hide loading and show response
-                loadingElement.classList.add('hidden');
-                outputElement.innerHTML = `<p>${data.response || data.message}</p>`;
-            }
-            
-            // Clear input after successful submission
-            document.getElementById('user-input').value = '';
-            
-        } catch (error) {
-            console.error('Error:', error);
-            loadingElement.classList.add('hidden');
-            outputElement.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-        }
-    });
 }); 
