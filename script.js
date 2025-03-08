@@ -387,101 +387,82 @@ document.addEventListener('DOMContentLoaded', () => {
             temperature: 0.7
         };
         
+        // Create a controller for the timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 seconds timeout
+        
         try {
-            // Create a controller for the timeout
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 seconds timeout
+            console.log('Attempting direct API request...');
             
-            // Make the direct API request
-            const response = await fetch(currentConfig.baseUrl + '/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${currentConfig.apiKey}`,
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(requestBody),
-                signal: controller.signal
-            });
-            
-            // Clear the timeout
-            clearTimeout(timeoutId);
-            
-            // Handle error responses
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('API Error:', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    error: errorText
+            try {
+                // Try direct API request first
+                const response = await fetch(currentConfig.baseUrl + '/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentConfig.apiKey}`,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody),
+                    signal: controller.signal
                 });
                 
-                // Update status to show error
-                apiStatus.textContent = `Request failed: ${response.statusText || 'Unknown error'}`;
-                apiStatus.className = 'status-error';
-                
-                // Show diagnostics button
-                showDiagnosticsButton.classList.remove('hidden');
-                
-                // Display error message
-                if (response.status === 502) {
-                    output.innerHTML = `
-                        <div class="error-message">
-                            <h3>Server Error (502)</h3>
-                            <p>The server encountered a temporary error. This might be due to high traffic or maintenance.</p>
-                            <p>Please try again in a few moments.</p>
-                        </div>
-                    `;
-                } else {
-                    output.innerHTML = `
-                        <div class="error-message">
-                            <h3>Request Failed (${response.status})</h3>
-                            <p>Error: ${response.statusText || 'Unknown error'}</p>
-                            <p>Details: ${errorText}</p>
-                        </div>
-                    `;
+                // Handle error responses
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Direct API Error:', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        error: errorText
+                    });
+                    throw new Error(`API returned status ${response.status}: ${response.statusText}`);
                 }
                 
-                // Display diagnostics
-                diagnosticsOutput.textContent = errorText;
-                return;
-            }
-            
-            // Parse the successful response
-            const data = await response.json();
-            diagnosticsData = data; // Store for diagnostics
-            
-            // Update status
-            apiStatus.textContent = 'Request successful!';
-            apiStatus.className = 'status-success';
-            console.log('API response details:', data);
-            
-            // Extract and display content
-            let content = "No content found in response";
-            
-            if (data.choices && data.choices[0] && data.choices[0].message) {
-                const message = data.choices[0].message;
-                if (message.content) {
-                    content = message.content;
-                } else if (message.reasoning_content) {
-                    content = message.reasoning_content;
+                // Parse the successful response
+                const data = await response.json();
+                diagnosticsData = data; // Store for diagnostics
+                
+                // Process successful response
+                handleSuccessfulResponse(data, question);
+                
+            } catch (directApiError) {
+                console.error('Direct API request failed:', directApiError);
+                apiStatus.textContent = 'Falling back to Netlify function...';
+                
+                // Fall back to Netlify function
+                console.log('Falling back to Netlify function...');
+                const netlifyResponse = await fetch('/.netlify/functions/simple-ai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question }),
+                    signal: controller.signal
+                });
+                
+                if (!netlifyResponse.ok) {
+                    const errorText = await netlifyResponse.text();
+                    console.error('Netlify Function Error:', {
+                        status: netlifyResponse.status,
+                        statusText: netlifyResponse.statusText,
+                        error: errorText
+                    });
+                    throw new Error(`Netlify function returned status ${netlifyResponse.status}: ${netlifyResponse.statusText}`);
                 }
+                
+                // Parse the successful response
+                const data = await netlifyResponse.json();
+                diagnosticsData = data; // Store for diagnostics
+                
+                // Process successful response
+                handleSuccessfulResponse(data, question);
             }
-            
-            output.innerHTML = `<div class="ai-message">${formatResponse(content)}</div>`;
-            
-            // Store the last question for retry functionality
-            lastQuestion = question;
-            
-            // Store the raw response for debugging
-            lastRawResponse = data;
-            debugResponseButton.classList.remove('hidden');
             
         } catch (error) {
-            // Handle errors
+            // Handle all errors
             apiStatus.textContent = `Error: ${error.message}`;
             apiStatus.className = 'status-error';
-            console.error('Request error:', error);
+            console.error('All request attempts failed:', error);
             
             // Show error message
             if (error.name === 'AbortError') {
@@ -496,15 +477,57 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="error-message">
                         <h3>Request Error</h3>
                         <p>Error: ${error.message}</p>
+                        <p>This could be due to CORS restrictions, network issues, or API unavailability.</p>
+                        <p>Check your browser console for more details.</p>
                     </div>
                 `;
             }
             
+            // Show diagnostics button
+            showDiagnosticsButton.classList.remove('hidden');
+            diagnosticsOutput.textContent = JSON.stringify({
+                error: error.message,
+                stack: error.stack,
+                timestamp: new Date().toISOString()
+            }, null, 2);
+            
             lastQuestion = question;
         } finally {
+            // Clear the timeout
+            clearTimeout(timeoutId);
+            
             // Hide loading state
             loading.classList.add('hidden');
         }
+    }
+    
+    // Helper function to handle successful responses
+    function handleSuccessfulResponse(data, question) {
+        // Update status
+        apiStatus.textContent = 'Request successful!';
+        apiStatus.className = 'status-success';
+        console.log('API response details:', data);
+        
+        // Extract and display content
+        let content = "No content found in response";
+        
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            const message = data.choices[0].message;
+            if (message.content) {
+                content = message.content;
+            } else if (message.reasoning_content) {
+                content = message.reasoning_content;
+            }
+        }
+        
+        output.innerHTML = `<div class="ai-message">${formatResponse(content)}</div>`;
+        
+        // Store the last question for retry functionality
+        lastQuestion = question;
+        
+        // Store the raw response for debugging
+        lastRawResponse = data;
+        debugResponseButton.classList.remove('hidden');
     }
 
     // Function to extract content from various response formats
