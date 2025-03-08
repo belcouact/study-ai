@@ -14,26 +14,6 @@
   
 [functions.api-health]
   timeout = 90
-  
-[functions.direct-api-test]
-  timeout = 90
-
-[functions.streaming-ai]
-  timeout = 90
-
-# Edge function for streaming
-[[edge_functions]]
-  path = "/api/streaming-ai"
-  function = "streaming-ai"
-
-# Test edge function
-[[edge_functions]]
-  path = "/api/test-edge"
-  function = "test"
-  
-# Ensure edge functions can access environment variables
-[context.production.environment]
-  NETLIFY_EDGE_FUNCTIONS_ENABLED = "true"
 
 [build.environment]
   NODE_VERSION = "18"

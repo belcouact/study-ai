@@ -355,18 +355,11 @@ button {
     color: #2c3e50;
 }
 
-/* Remove streaming toggle styles */
+/* Remove streaming-related styles */
 .streaming-toggle {
     display: none;
 }
 
-/* Loading indicator for streaming */
 .loading-indicator {
-    display: inline-block;
-    padding: 5px 10px;
-    background-color: #f0f0f0;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    font-style: italic;
-    color: #666;
+    display: none;
 } 
