@@ -380,54 +380,30 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Create a controller for the timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 seconds timeout
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // Reduce timeout to 15 seconds to avoid waiting too long
         
         try {
-            // Since we're getting timeouts with the Netlify function, let's try a CORS proxy
-            console.log('Using CORS proxy to access API directly...');
-            
-            // API configuration
-            const apiConfig = {
-                baseUrl: 'https://api.lkeap.cloud.tencent.com/v1',
-                model: currentModel || 'deepseek-r1'
-            };
-            
-            // Prepare request body
-            const requestBody = {
-                model: apiConfig.model,
-                messages: [
-                    { role: "system", content: "You are a helpful AI assistant." },
-                    { role: "user", content: question }
-                ],
-                max_tokens: 1000,
-                temperature: 0.7
-            };
-            
-            // Try using a CORS proxy
-            const corsProxyUrl = 'https://corsproxy.io/?';
-            const apiUrl = `${corsProxyUrl}${encodeURIComponent(apiConfig.baseUrl + '/chat/completions')}`;
-            
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // Note: We can't include the API key here as it would be exposed
-                        // This is just to test if the CORS proxy approach works
-                    },
-                    body: JSON.stringify(requestBody),
-                    signal: controller.signal
-                });
-                
-                // If we get here, the CORS proxy approach works, but we can't use it
-                // without exposing the API key, so we'll fall back to the Netlify function
-                console.log('CORS proxy test successful, but we need to use the Netlify function for security');
-            } catch (corsError) {
-                console.log('CORS proxy approach failed:', corsError.message);
-            }
-            
-            // Fall back to Netlify function
+            // Skip the CORS proxy attempt since it's failing
             console.log('Using Netlify function as proxy...');
+            
+            // Set up a timer to show a preliminary response if the request takes too long
+            const fallbackTimer = setTimeout(() => {
+                // If we're still waiting after 5 seconds, show a preliminary response
+                if (loading.classList.contains('hidden')) return; // Already completed
+                
+                console.log('Request taking longer than expected, showing preliminary response');
+                const preliminaryResponse = "I'm processing your question. This might take a moment...";
+                
+                output.innerHTML = `
+                    <div class="system-message">
+                        <p>Your request is taking longer than expected. Here's a preliminary response while you wait:</p>
+                    </div>
+                    <div class="ai-message">${formatResponse(preliminaryResponse)}</div>
+                `;
+                
+                // Keep the loading indicator visible
+                loading.classList.remove('hidden');
+            }, 5000);
             
             // Use the Netlify function with the new path
             const response = await fetch('/api/simple-ai', {
@@ -441,6 +417,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }),
                 signal: controller.signal
             });
+            
+            // Clear the fallback timer
+            clearTimeout(fallbackTimer);
             
             // Check if the response is ok
             if (!response.ok) {
@@ -760,43 +739,76 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             console.log('Starting API health check at', new Date().toISOString());
             
-            const response = await fetch('/api/api-health', {
-                method: 'GET'
-            });
+            // Set up a timeout for the health check
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
             
-            const endTime = Date.now();
-            const responseTime = endTime - startTime;
-            console.log(`API health check response time: ${responseTime}ms`);
-            
-            const data = await response.json();
-            diagnosticsData = data;
-            
-            // Add response time to the diagnostics data
-            diagnosticsData.responseTime = responseTime;
-            
-            if (data.status === 'ok') {
-                apiStatus.textContent = `API connection successful! (${responseTime}ms)`;
-                apiStatus.className = 'status-success';
-                console.log('API health check details:', data);
+            try {
+                const response = await fetch('/api/api-health', {
+                    method: 'GET',
+                    signal: controller.signal
+                });
                 
-                // Add a warning if response time is close to the Lambda timeout
-                if (responseTime > 5000) {
-                    apiStatus.textContent += ' (Warning: Slow response)';
-                    console.warn(`API health check response time (${responseTime}ms) is more than 5 seconds, which is close to the Lambda timeout of 10 seconds.`);
-                }
-            } else {
-                apiStatus.textContent = `API connection failed: ${data.message || 'Unknown error'}`;
-                apiStatus.className = 'status-error';
-                console.error('API health check failed:', data);
+                // Clear the timeout
+                clearTimeout(timeoutId);
                 
-                // Show diagnostics button
-                showDiagnosticsButton.classList.remove('hidden');
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                console.log(`API health check response time: ${responseTime}ms`);
                 
-                // Display diagnostics
-                if (data.diagnostics) {
-                    diagnosticsOutput.textContent = JSON.stringify(data.diagnostics, null, 2);
+                const data = await response.json();
+                diagnosticsData = data;
+                
+                // Add response time to the diagnostics data
+                diagnosticsData.responseTime = responseTime;
+                
+                if (data.status === 'ok') {
+                    apiStatus.textContent = `API connection successful! (${responseTime}ms)`;
+                    apiStatus.className = 'status-success';
+                    console.log('API health check details:', data);
+                    
+                    // Add a warning if response time is close to the Lambda timeout
+                    if (responseTime > 5000) {
+                        apiStatus.textContent += ' (Warning: Slow response)';
+                        console.warn(`API health check response time (${responseTime}ms) is more than 5 seconds, which is close to the Lambda timeout of 10 seconds.`);
+                        
+                        // Show diagnostics with performance warning
+                        showDiagnosticsButton.classList.remove('hidden');
+                        diagnosticsPanel.classList.remove('hidden');
+                        diagnosticsOutput.textContent = JSON.stringify({
+                            ...data,
+                            performance_warning: `Response time (${responseTime}ms) is more than 5 seconds, which is close to the Lambda timeout of 10 seconds. This may cause timeouts for more complex requests.`,
+                            recommendations: [
+                                "Try using simpler, shorter questions",
+                                "The API might be experiencing high load",
+                                "Consider trying again during off-peak hours"
+                            ]
+                        }, null, 2);
+                        showDiagnosticsButton.textContent = 'Hide Diagnostics';
+                    }
                 } else {
-                    diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
+                    apiStatus.textContent = `API connection failed: ${data.message || 'Unknown error'}`;
+                    apiStatus.className = 'status-error';
+                    console.error('API health check failed:', data);
+                    
+                    // Show diagnostics button
+                    showDiagnosticsButton.classList.remove('hidden');
+                    
+                    // Display diagnostics
+                    if (data.diagnostics) {
+                        diagnosticsOutput.textContent = JSON.stringify(data.diagnostics, null, 2);
+                    } else {
+                        diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
+                    }
+                }
+            } catch (fetchError) {
+                // Clear the timeout
+                clearTimeout(timeoutId);
+                
+                if (fetchError.name === 'AbortError') {
+                    throw new Error('API health check timed out after 15 seconds');
+                } else {
+                    throw fetchError;
                 }
             }
         } catch (error) {
@@ -809,14 +821,22 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Show diagnostics button
             showDiagnosticsButton.classList.remove('hidden');
+            diagnosticsPanel.classList.remove('hidden');
             
             // Display diagnostics
             diagnosticsOutput.textContent = JSON.stringify({
                 error: error.message,
                 stack: error.stack,
                 responseTime: responseTime,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                troubleshooting_tips: [
+                    "Check if the Netlify functions are deployed correctly",
+                    "Verify that the API credentials are set in the Netlify environment variables",
+                    "The API service might be experiencing issues or high load",
+                    "There might be network connectivity issues between Netlify and the API"
+                ]
             }, null, 2);
+            showDiagnosticsButton.textContent = 'Hide Diagnostics';
         }
     }
 
