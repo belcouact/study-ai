@@ -1,19 +1,55 @@
 [build]
-  functions = "functions"
+  publish = "."
+  command = "echo 'No build command'"
 
+[functions]
+  directory = "functions"
+  node_bundler = "esbuild"
+
+# Enable streaming for the streaming-ai function
+[[functions]]
+  name = "streaming-ai"
+  included_files = ["node_modules/**"]
+  external_node_modules = ["node-fetch"]
+  node_bundler = "esbuild"
+
+# Enable streaming for the streaming-ai function
+[[edge_functions]]
+  function = "streaming-ai"
+  path = "/api/streaming-ai"
+
+# Increase function timeout
+[functions.streaming-ai]
+  included_files = ["node_modules/**"]
+  external_node_modules = ["node-fetch"]
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# For local development
+[dev]
+  framework = "#static"
+  command = "echo 'No dev command'"
+  port = 8888
+  targetPort = 8888
+  publish = "."
+  autoLaunch = true
+  
+# Increase the function timeout
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["node-fetch"]
+  included_files = ["node_modules/**"]
+
+# Individual function settings
+[functions.simple-ai]
+  timeout = 90
   
-  # Individual function settings
-  [functions.simple-ai]
-    timeout = 90
-    
-  [functions.api-health]
-    timeout = 90
-    
-  [functions.direct-api-test]
-    timeout = 90
+[functions.api-health]
+  timeout = 90
+  
+[functions.direct-api-test]
+  timeout = 90
 
 # Remove the problematic redirect rule
 # [[redirects]]

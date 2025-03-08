@@ -955,4 +955,162 @@ While I can't provide a detailed answer right now, you might want to:
 3. Search for this information on Google
 4. Contact the site administrator if the problem persists`;
     }
+
+    // Function to call the streaming API endpoint
+    async function callStreamingAPI(prompt, outputElement) {
+        try {
+            // Clear previous content
+            outputElement.innerHTML = '';
+            outputElement.classList.add('loading');
+            
+            // Create a loading indicator
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'loading-indicator';
+            loadingIndicator.textContent = 'Connecting to AI...';
+            outputElement.appendChild(loadingIndicator);
+            
+            // Make the API call
+            const response = await fetch('/api/streaming-ai', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt }),
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+            
+            // Remove loading indicator
+            outputElement.removeChild(loadingIndicator);
+            outputElement.classList.remove('loading');
+            
+            // Set up a reader for the stream
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            
+            // Process the stream
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                
+                // Decode the chunk and add to buffer
+                buffer += decoder.decode(value, { stream: true });
+                
+                // Process SSE format (data: lines)
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || ''; // Keep the last incomplete line in the buffer
+                
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6); // Remove 'data: ' prefix
+                        
+                        // Check if it's the [DONE] message
+                        if (data.trim() === '[DONE]') continue;
+                        
+                        try {
+                            // Parse the JSON data
+                            const parsed = JSON.parse(data);
+                            
+                            // Extract the content if it exists
+                            if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
+                                const content = parsed.choices[0].delta.content;
+                                
+                                // Append the content to the output element
+                                const span = document.createElement('span');
+                                span.textContent = content;
+                                outputElement.appendChild(span);
+                            }
+                        } catch (e) {
+                            console.error('Error parsing JSON:', e);
+                        }
+                    }
+                }
+            }
+            
+            // Process any remaining data
+            if (buffer.length > 0) {
+                const lines = buffer.split('\n');
+                for (const line of lines) {
+                    if (line.startsWith('data: ') && line.slice(6).trim() !== '[DONE]') {
+                        try {
+                            const parsed = JSON.parse(line.slice(6));
+                            if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
+                                const content = parsed.choices[0].delta.content;
+                                const span = document.createElement('span');
+                                span.textContent = content;
+                                outputElement.appendChild(span);
+                            }
+                        } catch (e) {
+                            console.error('Error parsing JSON:', e);
+                        }
+                    }
+                }
+            }
+            
+        } catch (error) {
+            console.error('Error calling streaming API:', error);
+            outputElement.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            outputElement.classList.remove('loading');
+        }
+    }
+
+    // Get the streaming mode checkbox
+    const streamingModeCheckbox = document.getElementById('streaming-mode');
+    
+    // Submit button event listener
+    document.getElementById('submit-button').addEventListener('click', async function() {
+        const userInput = document.getElementById('user-input').value.trim();
+        if (!userInput) return;
+        
+        const outputElement = document.getElementById('output');
+        const loadingElement = document.getElementById('loading');
+        
+        // Clear previous output and show loading
+        outputElement.innerHTML = '';
+        loadingElement.classList.remove('hidden');
+        
+        try {
+            // Check if streaming mode is enabled
+            if (streamingModeCheckbox.checked) {
+                // Hide the standard loading indicator since we'll use the streaming one
+                loadingElement.classList.add('hidden');
+                
+                // Call the streaming API
+                await callStreamingAPI(userInput, outputElement);
+            } else {
+                // Use the original API call method
+                // ... existing API call code ...
+                
+                // Example of existing code (replace with your actual implementation):
+                const response = await fetch('/api/simple-ai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: userInput }),
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Hide loading and show response
+                loadingElement.classList.add('hidden');
+                outputElement.innerHTML = `<p>${data.response || data.message}</p>`;
+            }
+            
+            // Clear input after successful submission
+            document.getElementById('user-input').value = '';
+            
+        } catch (error) {
+            console.error('Error:', error);
+            loadingElement.classList.add('hidden');
+            outputElement.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+        }
+    });
 }); 
