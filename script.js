@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiFunctionRadios = document.querySelectorAll('input[name="api-function"]');
     const debugResponseButton = document.getElementById('debug-response-button');
     const fallbackButton = document.getElementById('fallback-button');
-    const retryButton = document.getElementById('retry-button');
     const modelSelect = document.getElementById('model-select');
 
     let diagnosticsData = null;
@@ -447,9 +446,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                 }
                 
-                // Show retry button
-                retryButton.classList.remove('hidden');
-                
                 // Display diagnostics
                 diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
             }
@@ -476,8 +472,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             }
             
-            // Show retry button
-            retryButton.classList.remove('hidden');
             lastQuestion = question;
         } finally {
             // Hide loading state
@@ -739,20 +733,4 @@ While I can't provide a detailed answer right now, you might want to:
 2. Search for this information on Google
 3. Contact the site administrator if the problem persists`;
     }
-
-    // Add event listener for retry button
-    retryButton.addEventListener('click', async () => {
-        if (lastQuestion) {
-            retryButton.classList.add('hidden');
-            output.innerHTML = '';
-            loading.classList.remove('hidden');
-            
-            // Show what we're doing
-            output.innerHTML = `<div class="system-message">Retrying request...</div>`;
-            
-            // Resubmit the question using handleSubmit
-            userInput.value = lastQuestion;
-            setTimeout(handleSubmit, 500); // Small delay to ensure UI updates
-        }
-    });
 }); 
