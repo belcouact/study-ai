@@ -406,10 +406,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 let errorMessage = `Server returned status ${response.status}`;
                 let errorDetails = '';
+                let errorData = null;
                 
                 try {
                     // Try to parse the error response as JSON
-                    const errorData = await response.json();
+                    errorData = await response.json();
                     errorDetails = JSON.stringify(errorData, null, 2);
                     console.error('Server error details:', errorData);
                     
@@ -432,6 +433,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Show diagnostics button
                 showDiagnosticsButton.classList.remove('hidden');
                 diagnosticsOutput.textContent = errorDetails;
+                
+                // Check for Lambda timeout error
+                if (response.status === 502 && errorData && errorData.errorType === 'Sandbox.Timedout') {
+                    console.log('Lambda function timed out, using local fallback response');
+                    
+                    // Use local fallback for timeout errors
+                    const fallbackResponse = generateLocalResponse(question);
+                    
+                    output.innerHTML = `
+                        <div class="system-message">
+                            <p>The server request timed out, so I'm providing a local response:</p>
+                        </div>
+                        <div class="ai-message">${formatResponse(fallbackResponse)}</div>
+                    `;
+                    
+                    // Store the last question
+                    lastQuestion = question;
+                    return;
+                }
                 
                 // Display appropriate error message based on status code
                 if (response.status === 502) {
@@ -471,28 +491,39 @@ document.addEventListener('DOMContentLoaded', () => {
             // Handle all errors
             console.error('Request failed:', error);
             
+            // Check if this is an abort error (timeout)
+            if (error.name === 'AbortError') {
+                console.log('Request timed out, using local fallback response');
+                
+                // Use local fallback for timeout errors
+                const fallbackResponse = generateLocalResponse(question);
+                
+                // Update status
+                apiStatus.textContent = 'Using local fallback due to timeout';
+                apiStatus.className = 'status-error';
+                
+                output.innerHTML = `
+                    <div class="system-message">
+                        <p>The request timed out, so I'm providing a local response:</p>
+                    </div>
+                    <div class="ai-message">${formatResponse(fallbackResponse)}</div>
+                `;
+                
+                // Store the last question
+                lastQuestion = question;
+            } 
             // Only update UI if it wasn't already updated by the error handling above
-            if (apiStatus.className !== 'status-error') {
+            else if (apiStatus.className !== 'status-error') {
                 apiStatus.textContent = `Error: ${error.message}`;
                 apiStatus.className = 'status-error';
                 
-                // Show error message
-                if (error.name === 'AbortError') {
-                    output.innerHTML = `
-                        <div class="error-message">
-                            <h3>Request Timeout</h3>
-                            <p>The request took too long and was aborted. Please try again or try a different question.</p>
-                        </div>
-                    `;
-                } else {
-                    output.innerHTML = `
-                        <div class="error-message">
-                            <h3>Request Error</h3>
-                            <p>Error: ${error.message}</p>
-                            <p>Please check your internet connection and try again.</p>
-                        </div>
-                    `;
-                }
+                output.innerHTML = `
+                    <div class="error-message">
+                        <h3>Request Error</h3>
+                        <p>Error: ${error.message}</p>
+                        <p>Please check your internet connection and try again.</p>
+                    </div>
+                `;
             }
             
             lastQuestion = question;
@@ -759,7 +790,7 @@ document.addEventListener('DOMContentLoaded', () => {
         question = question.toLowerCase();
         
         // Simple pattern matching for common questions
-        if (question.includes('hello') || question.includes('hi ')) {
+        if (question.includes('hello') || question.includes('hi ') || question.includes('hey')) {
             return "Hello! I'm a local fallback assistant. The main AI service is currently unavailable, but I can help with basic questions.";
         }
         
@@ -767,29 +798,63 @@ document.addEventListener('DOMContentLoaded', () => {
             return "I'm functioning as a fallback service since the main AI is unavailable. I can only provide simple responses.";
         }
         
-        if (question.includes('what is') || question.includes('who is') || question.includes('explain')) {
-            const searchTerm = question.replace(/what is|who is|explain/gi, '').trim();
+        if (question.includes('thank')) {
+            return "You're welcome! I'm happy to help, even in fallback mode. Please try again later when the main AI service is available for more comprehensive assistance.";
+        }
+        
+        if (question.includes('help') || question.includes('can you')) {
+            return `I'm currently in fallback mode with limited capabilities. Here's what I can help with:
+            
+1. Basic greetings and simple responses
+2. Suggesting resources for your questions
+3. Explaining why the main service might be unavailable
+
+For more complex assistance, please try again later when the main AI service is available.`;
+        }
+        
+        if (question.includes('what time') || question.includes('date') || question.includes('today')) {
+            const now = new Date();
+            return `I'm in fallback mode, but I can tell you that the current date and time on your device is: ${now.toLocaleString()}`;
+        }
+        
+        if (question.includes('what is') || question.includes('who is') || question.includes('explain') || question.includes('how to') || question.includes('why')) {
+            const searchTerm = question
+                .replace(/what is|who is|explain|how to|why/gi, '')
+                .replace(/\?/g, '')
+                .trim();
+                
             return `I'm sorry, I can't provide detailed information about "${searchTerm}" in fallback mode. 
 
 You might want to try:
 1. Searching for "${searchTerm}" on Google
 2. Checking Wikipedia for information about "${searchTerm}"
-3. Trying again later when the main AI service is available`;
+3. Looking for tutorials on YouTube if you're trying to learn how to do something
+4. Trying again later when the main AI service is available`;
+        }
+        
+        // Check for math-related questions
+        if (/[0-9+\-*\/=]/.test(question)) {
+            return `It looks like you might be asking about a calculation. In fallback mode, I can't perform calculations, but you can:
+
+1. Use your device's calculator app
+2. Try Google's calculator by typing your expression in the search bar
+3. Try again later when the main AI service is available`;
         }
         
         // Default response
-        return `I'm currently operating in fallback mode because the main AI service is unavailable. 
+        return `I'm currently operating in fallback mode because the main AI service is unavailable or timed out. 
 
 The API connection issue could be due to:
-1. The API server might be down or unreachable
-2. There might be network connectivity issues
-3. The API credentials might be incorrect
+1. The API server might be experiencing high traffic or temporary issues
+2. The request might be taking longer than the allowed time limit (10 seconds)
+3. There might be network connectivity issues
 
 Your question was: "${question}"
 
 While I can't provide a detailed answer right now, you might want to:
-1. Try again later
-2. Search for this information on Google
-3. Contact the site administrator if the problem persists`;
+1. Try again with a simpler or shorter question
+2. Try again later when the service might be less busy
+3. Search for this information on Google
+4. Contact the site administrator if the problem persists`;
     }
 }); 
