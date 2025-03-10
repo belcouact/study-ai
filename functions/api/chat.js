@@ -124,7 +124,11 @@ export async function onRequestPost(context) {
     try {
       const data = await response.json();
       return new Response(JSON.stringify(data), {
-        headers: { "Content-Type": "application/json" }
+        headers: { 
+          "Content-Type": "application/json; charset=utf-8",
+          "X-Content-Type-Options": "nosniff",
+          "Cache-Control": "no-store"
+        }
       });
     } catch (e) {
       const textContent = await response.text();
@@ -139,7 +143,11 @@ export async function onRequestPost(context) {
         ]
       }), {
         status: 502,
-        headers: { "Content-Type": "application/json" }
+        headers: { 
+          "Content-Type": "application/json; charset=utf-8",
+          "X-Content-Type-Options": "nosniff",
+          "Cache-Control": "no-store"
+        }
       });
     }
   } catch (error) {
@@ -154,7 +162,11 @@ export async function onRequestPost(context) {
       ]
     }), {
       status: 500,
-      headers: { "Content-Type": "application/json" }
+      headers: { 
+        "Content-Type": "application/json; charset=utf-8",
+        "X-Content-Type-Options": "nosniff",
+        "Cache-Control": "no-store"
+      }
     });
   }
 }
@@ -165,7 +177,9 @@ export function onRequestOptions() {
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization"
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "X-Content-Type-Options": "nosniff",
+      "Cache-Control": "no-store"
     }
   });
 } 

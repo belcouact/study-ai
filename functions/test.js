@@ -14,6 +14,10 @@ export async function onRequest(context) {
       "Check the Cloudflare Pages logs for any function errors"
     ]
   }), {
-    headers: { "Content-Type": "application/json" }
+    headers: { 
+      "Content-Type": "application/json; charset=utf-8",
+      "X-Content-Type-Options": "nosniff",
+      "Cache-Control": "no-store"
+    }
   });
 } 
