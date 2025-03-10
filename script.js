@@ -12,9 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const qaContainer = document.getElementById('qa-container');
     const createContainer = document.getElementById('create-container');
     
-    // Panel resizer elements
+    // Sidebar elements
     const leftPanel = document.querySelector('.left-panel');
-    const panelResizer = document.getElementById('panel-resizer');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
     const contentArea = document.querySelector('.content-area');
     
     // Optional elements - may not exist in all versions of the HTML
@@ -34,6 +34,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // The actual values are stored in Cloudflare Pages environment variables
     const API_BASE_URL = 'https://api.lkeap.cloud.tencent.com/v1';
     const MODEL = 'deepseek-r1';
+
+    // Sidebar toggle functionality
+    sidebarToggle.addEventListener('click', () => {
+        leftPanel.classList.toggle('hidden');
+        contentArea.classList.toggle('full-width');
+        sidebarToggle.classList.toggle('collapsed');
+        
+        // Save sidebar state to localStorage
+        const isSidebarHidden = leftPanel.classList.contains('hidden');
+        localStorage.setItem('sidebarHidden', isSidebarHidden);
+    });
+    
+    // Load saved sidebar state from localStorage
+    const savedSidebarState = localStorage.getItem('sidebarHidden');
+    if (savedSidebarState === 'true') {
+        leftPanel.classList.add('hidden');
+        contentArea.classList.add('full-width');
+        sidebarToggle.classList.add('collapsed');
+    }
 
     // Add event listener for the submit button
     submitButton.addEventListener('click', handleSubmit);
@@ -60,116 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update active button
         createButton.classList.add('active');
         qaButton.classList.remove('active');
-    });
-    
-    // Panel resizer functionality
-    let isResizing = false;
-    let lastDownX = 0;
-    
-    // Function to handle resize start
-    function startResize(clientX) {
-        isResizing = true;
-        lastDownX = clientX;
-        panelResizer.classList.add('active');
-        document.body.style.userSelect = 'none'; // Prevent text selection during resize
-        
-        // Add a visual indicator that resizing is active
-        document.body.classList.add('resizing');
-    }
-    
-    // Function to handle resize move
-    function doResize(clientX) {
-        if (!isResizing) return;
-        
-        // Calculate the new width with a smoother movement (reduce the sensitivity)
-        const offsetX = (clientX - lastDownX) * 0.8; // Apply a dampening factor
-        const newPanelWidth = Math.max(150, Math.min(400, leftPanel.offsetWidth + offsetX));
-        
-        // Apply the new width to all relevant elements
-        leftPanel.style.width = `${newPanelWidth}px`;
-        panelResizer.style.left = `${newPanelWidth}px`;
-        contentArea.style.marginLeft = `${newPanelWidth}px`;
-        
-        // Update the last position
-        lastDownX = clientX;
-        
-        // Force a repaint to make the movement smoother
-        window.requestAnimationFrame(() => {});
-    }
-    
-    // Function to handle resize end
-    function endResize() {
-        if (isResizing) {
-            isResizing = false;
-            panelResizer.classList.remove('active');
-            document.body.style.userSelect = ''; // Restore text selection
-            document.body.classList.remove('resizing');
-            
-            // Save the panel width preference to localStorage
-            localStorage.setItem('leftPanelWidth', leftPanel.style.width);
-        }
-    }
-    
-    // Mouse event handlers
-    panelResizer.addEventListener('mousedown', (e) => {
-        e.preventDefault(); // Prevent text selection
-        startResize(e.clientX);
-    });
-    
-    document.addEventListener('mousemove', (e) => {
-        doResize(e.clientX);
-    });
-    
-    document.addEventListener('mouseup', endResize);
-    
-    // Touch event handlers for mobile devices
-    panelResizer.addEventListener('touchstart', (e) => {
-        e.preventDefault(); // Prevent scrolling
-        startResize(e.touches[0].clientX);
-    });
-    
-    document.addEventListener('touchmove', (e) => {
-        if (isResizing) {
-            e.preventDefault(); // Prevent scrolling while resizing
-            doResize(e.touches[0].clientX);
-        }
-    });
-    
-    document.addEventListener('touchend', endResize);
-    document.addEventListener('touchcancel', endResize);
-    
-    // Double-click to reset to default width
-    panelResizer.addEventListener('dblclick', () => {
-        const defaultWidth = 200;
-        leftPanel.style.width = `${defaultWidth}px`;
-        panelResizer.style.left = `${defaultWidth}px`;
-        contentArea.style.marginLeft = `${defaultWidth}px`;
-        localStorage.setItem('leftPanelWidth', `${defaultWidth}px`);
-    });
-    
-    // Load saved panel width from localStorage
-    window.addEventListener('DOMContentLoaded', () => {
-        const savedWidth = localStorage.getItem('leftPanelWidth');
-        if (savedWidth) {
-            const width = parseInt(savedWidth);
-            if (!isNaN(width)) {
-                leftPanel.style.width = savedWidth;
-                panelResizer.style.left = savedWidth;
-                contentArea.style.marginLeft = savedWidth;
-            }
-        }
-        
-        // Ensure the resizer is properly initialized
-        setTimeout(() => {
-            // Force a resize event to ensure everything is properly positioned
-            window.dispatchEvent(new Event('resize'));
-            
-            // Make sure the panel resizer is visible and positioned correctly
-            panelResizer.style.left = leftPanel.offsetWidth + 'px';
-            contentArea.style.marginLeft = leftPanel.offsetWidth + 'px';
-            
-            console.log('Panel resizer initialized at width:', leftPanel.offsetWidth);
-        }, 100);
     });
     
     // Removed Enter key event listener to prevent submitting when Enter is pressed
