@@ -196,56 +196,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Function to handle form submission
+    // Main submit function
     async function handleSubmit() {
         const question = userInput.value.trim();
         
         if (!question) {
-            alert('请先输入问题');
+            showSystemMessage('Please enter a question.', 'warning');
             return;
         }
         
-        // Clear previous response
+        // Show loading indicator
+        loading.classList.remove('hidden');
         output.innerHTML = '';
         
-        // Show loading state
-        loading.classList.remove('hidden');
-        
         try {
-            const data = await fetchAIResponse(question);
-            
-            // Hide loading state
-            loading.classList.add('hidden');
+            // Call the AI API
+            const response = await fetchAIResponse(question);
             
             // Handle the response
-            handleSuccessfulResponse(data, question);
-            
+            handleSuccessfulResponse(response, question);
         } catch (error) {
-            // Hide loading state
+            console.error('Error:', error);
+            showSystemMessage(`Error: ${error.message}`, 'error');
+        } finally {
+            // Hide loading indicator
             loading.classList.add('hidden');
-            
-            // Show error message
-            output.innerHTML = `<div class="system-message error">
-                <p>Sorry, I encountered an error: ${error.message}</p>
-                <p>Please try again later or rephrase your question.</p>
-            </div>`;
-            
-            console.error('Request failed:', error);
         }
     }
     
-    // Helper function to handle successful responses
+    // Function to handle successful responses
     function handleSuccessfulResponse(data, question) {
-        // Update status (removed API status update)
-        console.log('API response details:', data);
-        
         // Extract and display content
         let content = extractContentFromResponse(data);
-        
-        // Check if the content contains literal '\n' characters and handle them
-        if (typeof content === 'string' && content.includes('\\n')) {
-            console.log('Content contains literal \\n characters, handling them...');
-        }
         
         // Format the response
         const formattedContent = formatResponse(content);
@@ -261,137 +243,52 @@ document.addEventListener('DOMContentLoaded', () => {
         // Store the last question for retry functionality
         lastQuestion = question;
     }
-
-    // Function to extract content from various response formats
+    
+    // Function to extract content from the API response
     function extractContentFromResponse(data) {
-        // Handle null or undefined data
-        if (!data) return "No response data received";
+        if (!data) return 'No response received.';
         
-        // If data is already a string, return it directly
-        if (typeof data === 'string') return data;
+        // Handle different response formats
+        if (typeof data === 'string') {
+            return data;
+        }
         
-        // Try to extract from standard OpenAI format
-        if (data.choices && data.choices[0]) {
-            // Check for message format
-            if (data.choices[0].message) {
-                const message = data.choices[0].message;
-                if (message.content) return message.content;
+        if (data.choices && data.choices.length > 0) {
+            const choice = data.choices[0];
+            if (choice.message && choice.message.content) {
+                return choice.message.content;
             }
-            
-            // Check for text/content format
-            if (data.choices[0].text) return data.choices[0].text;
-            if (data.choices[0].content) return data.choices[0].content;
+            if (choice.text) {
+                return choice.text;
+            }
         }
         
-        // If we have a direct content field
-        if (data.content) return data.content;
+        if (data.content) {
+            return data.content;
+        }
         
-        // If we have a message field
         if (data.message) {
-            if (typeof data.message === 'string') return data.message;
-            if (data.message.content) return data.message.content;
+            return data.message;
         }
         
-        // If we have a text field
-        if (data.text) return data.text;
-        
-        // If we have a response field
-        if (data.response) {
-            if (typeof data.response === 'string') return data.response;
-            if (data.response.content) return data.response.content;
-        }
-        
-        // If we have a raw data object, stringify it
-        try {
-            return JSON.stringify(data, null, 2);
-        } catch (e) {
-            return "Could not parse response data";
-        }
+        return JSON.stringify(data);
     }
-
-    // Add this at the top of your script
-    const responseCache = {};
-
+    
     // Function to fetch AI response
     async function fetchAIResponse(question) {
-        if (!question) throw new Error('Question is required');
+        // This is a placeholder function
+        // In a real application, this would make an API call to an AI service
         
-        // Show loading state
-        loading.classList.remove('hidden');
-        
-        try {
-            // Create a cache key
-            const cacheKey = `${currentApiFunction}:${question}`;
-            
-            // Check if we have a cached response
-            if (responseCache[cacheKey]) {
-                console.log('Using cached response');
-                return responseCache[cacheKey];
-            }
-            
-            // Create a controller for the timeout
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 300000); // 300 seconds timeout (5 minutes)
-            
-            // Make the request
-            const response = await fetch(`/api/${currentApiFunction}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                    messages: [
-                        { role: "user", content: question }
-                    ]
-                }),
-                signal: controller.signal
-            });
-            
-            // Clear the timeout
-            clearTimeout(timeoutId);
-            
-            // Check if the response was successful
-            if (!response.ok) {
-                let errorMessage = `Error: ${response.status} ${response.statusText}`;
-                
-                try {
-                    // Try to get more details from the error response
-                    const errorData = await response.json();
-                    if (errorData.error) errorMessage = errorData.error;
-                } catch (e) {
-                    // If we can't parse the error as JSON, just use the status message
-                }
-                throw new Error(errorMessage);
-            }
-
-            const data = await response.json();
-            console.log('API response data:', data);
-            
-            // Store the raw response for debugging
-            lastRawResponse = data;
-            
-            // Extract content
-            const content = extractContentFromResponse(data);
-            
-            // Cache the response
-            responseCache[cacheKey] = content;
-            
-            return content;
-        } catch (error) {
-            console.error('Fetch error details:', error);
-            
-            // Check for timeout/abort errors
-            if (error.name === 'AbortError') {
-                return "The request took too long and was aborted. Please try again or try a different question.";
-            }
-            
-            throw error;
-        } finally {
-            // Hide loading state
-            loading.classList.add('hidden');
-        }
+        // Simulate API call with a delay
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // Sample response for demonstration
+                const response = generateLocalResponse(question);
+                resolve(response);
+            }, 1500); // Simulate network delay
+        });
     }
-
+    
     // Function to escape HTML special characters
     function escapeHTML(text) {
         return text
@@ -401,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
     }
-
+    
     // Function to format the response with proper line breaks and formatting
     function formatResponse(text) {
         if (!text) return '';
@@ -487,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Highlight important information
             .replace(/!!(.*?)!!/g, '<span class="highlight">$1</span>');
     }
-
+    
     // Function to process math formulas
     function processMathFormulas(text) {
         // Process inline math: $formula$
@@ -502,509 +399,154 @@ document.addEventListener('DOMContentLoaded', () => {
         
         return text;
     }
-
-    // Helper function to format tables in markdown
+    
+    // Function to format tables in markdown
     function formatTables(text) {
-        // Split the text into lines
-        const lines = text.split('\n');
-        let inTable = false;
-        let tableContent = '';
-        let result = [];
+        const tableRegex = /\|(.+)\|\n\|(?:[-:]+\|)+\n((?:\|.+\|\n)+)/g;
         
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
+        return text.replace(tableRegex, function(match, headerRow, bodyRows) {
+            // Process header
+            const headers = headerRow.split('|').map(cell => cell.trim()).filter(cell => cell);
             
-            // Check if this is a table row (contains | character)
-            if (line.includes('|') && line.trim().startsWith('|')) {
-                if (!inTable) {
-                    // Start of a new table
-                    inTable = true;
-                    tableContent = '<table>';
-                }
-                
-                // Check if this is a header separator row
-                if (line.includes('---') || line.includes('===')) {
-                    continue; // Skip the separator row
-                }
-                
-                // Process the table row
-                const cells = line.split('|').filter(cell => cell.trim() !== '');
-                const isHeader = i > 0 && lines[i-1].includes('|') && 
-                                 (i+1 < lines.length && (lines[i+1].includes('---') || lines[i+1].includes('===')));
-                
-                tableContent += '<tr>';
+            // Process body rows
+            const rows = bodyRows.trim().split('\n');
+            
+            let tableHTML = '<table><thead><tr>';
+            
+            // Add headers
+            headers.forEach(header => {
+                tableHTML += `<th>${header}</th>`;
+            });
+            
+            tableHTML += '</tr></thead><tbody>';
+            
+            // Add rows
+            rows.forEach(row => {
+                const cells = row.split('|').map(cell => cell.trim()).filter(cell => cell);
+                tableHTML += '<tr>';
                 cells.forEach(cell => {
-                    if (isHeader) {
-                        tableContent += `<th>${cell.trim()}</th>`;
-                    } else {
-                        tableContent += `<td>${cell.trim()}</td>`;
-                    }
+                    tableHTML += `<td>${cell}</td>`;
                 });
-                tableContent += '</tr>';
-            } else if (inTable) {
-                // End of the table
-                inTable = false;
-                tableContent += '</table>';
-                result.push(tableContent);
-                result.push(line);
-            } else {
-                result.push(line);
-            }
-        }
-        
-        // If we're still in a table at the end of the text
-        if (inTable) {
-            tableContent += '</table>';
-            result.push(tableContent);
-        }
-        
-        return result.join('\n');
-    }
-
-    // Helper function to format lists in markdown
-    function formatLists(text) {
-        // Split the text into lines
-        const lines = text.split('\n');
-        let inList = false;
-        let listType = '';
-        let listContent = '';
-        let result = [];
-        
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
+                tableHTML += '</tr>';
+            });
             
-            // Check if this is an unordered list item
-            if (line.trim().match(/^[\*\-\+]\s/)) {
-                if (!inList || listType !== 'ul') {
-                    // Start of a new unordered list
-                    if (inList) {
-                        // Close the previous list
-                        listContent += `</${listType}>`;
-                        result.push(listContent);
-                    }
-                    inList = true;
-                    listType = 'ul';
-                    listContent = '<ul>';
-                }
-                
-                // Extract the list item content
-                const content = line.trim().replace(/^[\*\-\+]\s/, '');
-                listContent += `<li>${content}</li>`;
-            }
-            // Check if this is an ordered list item
-            else if (line.trim().match(/^\d+\.\s/)) {
-                if (!inList || listType !== 'ol') {
-                    // Start of a new ordered list
-                    if (inList) {
-                        // Close the previous list
-                        listContent += `</${listType}>`;
-                        result.push(listContent);
-                    }
-                    inList = true;
-                    listType = 'ol';
-                    listContent = '<ol>';
-                }
-                
-                // Extract the list item content
-                const content = line.trim().replace(/^\d+\.\s/, '');
-                listContent += `<li>${content}</li>`;
-            }
-            else if (inList) {
-                // End of the list
-                inList = false;
-                listContent += `</${listType}>`;
-                result.push(listContent);
-                result.push(line);
-            } else {
-                result.push(line);
-            }
-        }
-        
-        // If we're still in a list at the end of the text
-        if (inList) {
-            listContent += `</${listType}>`;
-            result.push(listContent);
-        }
-        
-        return result.join('\n');
-    }
-
-    // Add event listener for the fallback button
-    if (fallbackButton) {
-        fallbackButton.addEventListener('click', async () => {
-            const question = userInput.value.trim();
-            if (!question) {
-                alert('Please enter a question first.');
-                return;
-            }
-            
-            try {
-                // Show loading state
-                loading.classList.remove('hidden');
-                output.innerHTML = '';
-                
-                // Generate a local fallback response
-                const response = generateLocalResponse(question);
-                
-                // Format and display the response
-                const formattedResponse = formatResponse(response);
-                output.innerHTML = `<div class="ai-message">${formattedResponse}</div>`;
-            } catch (error) {
-                console.error('Error generating fallback response:', error);
-                output.innerHTML = `<div class="error-message">Error: ${escapeHTML(error.message)}</div>`;
-            } finally {
-                // Hide loading state
-                loading.classList.add('hidden');
-            }
+            tableHTML += '</tbody></table>';
+            return tableHTML;
         });
     }
-
-    // Function to generate a local response
+    
+    // Function to format lists
+    function formatLists(text) {
+        // Process unordered lists
+        let formattedText = text.replace(/^(\s*)-\s+(.+)$/gm, function(match, indent, content) {
+            const indentLevel = indent.length;
+            return `<ul style="margin-left: ${indentLevel * 20}px;"><li>${content}</li></ul>`;
+        });
+        
+        // Process ordered lists
+        formattedText = formattedText.replace(/^(\s*)\d+\.\s+(.+)$/gm, function(match, indent, content) {
+            const indentLevel = indent.length;
+            return `<ol style="margin-left: ${indentLevel * 20}px;"><li>${content}</li></ol>`;
+        });
+        
+        // Combine adjacent list items of the same type and level
+        formattedText = formattedText
+            .replace(/<\/ul>\s*<ul style="margin-left: (\d+)px;">/g, '')
+            .replace(/<\/ol>\s*<ol style="margin-left: (\d+)px;">/g, '');
+        
+        return formattedText;
+    }
+    
+    // Function to show system messages
+    function showSystemMessage(message, type = 'info') {
+        const messageElement = document.createElement('div');
+        messageElement.className = `system-message ${type}`;
+        messageElement.textContent = message;
+        
+        // Clear previous messages
+        const existingMessages = output.querySelectorAll('.system-message');
+        existingMessages.forEach(msg => msg.remove());
+        
+        // Add new message
+        output.prepend(messageElement);
+        
+        // Auto-remove after 5 seconds for non-error messages
+        if (type !== 'error') {
+            setTimeout(() => {
+                messageElement.remove();
+            }, 5000);
+        }
+    }
+    
+    // Function to generate a local response for demonstration
     function generateLocalResponse(question) {
-        question = question.toLowerCase();
+        // Convert question to lowercase for easier matching
+        const lowerQuestion = question.toLowerCase();
         
-        // Simple pattern matching for common questions
-        if (question.includes('hello') || question.includes('hi ') || question.includes('hey')) {
-            return "Hello! I'm a local fallback assistant. The main AI service is currently unavailable, but I can help with basic questions.";
+        // Sample responses for different types of questions
+        if (lowerQuestion.includes('hello') || lowerQuestion.includes('hi')) {
+            return "Hello! How can I help you today?";
         }
         
-        if (question.includes('how are you')) {
-            return "I'm functioning as a fallback service since the main AI is unavailable. I can only provide simple responses.";
+        if (lowerQuestion.includes('who are you') || lowerQuestion.includes('what are you')) {
+            return "I'm an AI assistant designed to help with your questions. I can provide information, explain concepts, and assist with various topics.";
         }
         
-        if (question.includes('thank')) {
-            return "You're welcome! I'm happy to help, even in fallback mode. Please try again later when the main AI service is available for more comprehensive assistance.";
+        if (lowerQuestion.includes('math') || lowerQuestion.includes('equation')) {
+            return "Here's a simple math equation: $E = mc^2$\n\nAnd here's a more complex one:\n\n$$\\int_{0}^{\\infty} e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}$$\n\nMathematical formulas can be rendered inline like $f(x) = x^2$ or as display equations.";
         }
         
-        if (question.includes('help') || question.includes('can you')) {
-            return `I'm currently in fallback mode with limited capabilities. Here's what I can help with:
-            
-1. Basic greetings and simple responses
-2. Suggesting resources for your questions
-3. Explaining why the main service might be unavailable
-
-For more complex assistance, please try again later when the main AI service is available.`;
+        if (lowerQuestion.includes('code') || lowerQuestion.includes('programming')) {
+            return "Here's a simple Python function:\n\n```python\ndef fibonacci(n):\n    if n <= 1:\n        return n\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)\n\n# Print the first 10 Fibonacci numbers\nfor i in range(10):\n    print(fibonacci(i))\n```\n\nThis code calculates and prints the first 10 numbers in the Fibonacci sequence.";
         }
         
-        if (question.includes('what time') || question.includes('date') || question.includes('today')) {
-            const now = new Date();
-            return `I'm in fallback mode, but I can tell you that the current date and time on your device is: ${now.toLocaleString()}`;
+        if (lowerQuestion.includes('table') || lowerQuestion.includes('data')) {
+            return "Here's a simple data table:\n\n| Name | Age | Occupation |\n|------|-----|------------|\n| John | 28  | Developer  |\n| Lisa | 32  | Designer   |\n| Mark | 45  | Manager    |\n| Sara | 39  | Analyst    |\n\nTables are useful for organizing structured data.";
         }
         
-        if (question.includes('what is') || question.includes('who is') || question.includes('explain') || question.includes('how to') || question.includes('why')) {
-            const searchTerm = question
-                .replace(/what is|who is|explain|how to|why/gi, '')
-                .replace(/\?/g, '')
-                .trim();
-                
-            return `I'm sorry, I can't provide detailed information about "${searchTerm}" in fallback mode. 
-
-You might want to try:
-1. Searching for "${searchTerm}" on Google
-2. Checking Wikipedia for information about "${searchTerm}"
-3. Looking for tutorials on YouTube if you're trying to learn how to do something
-4. Trying again later when the main AI service is available`;
+        if (lowerQuestion.includes('list') || lowerQuestion.includes('steps')) {
+            return "Here are some steps to follow:\n\n1. First, identify the problem\n2. Research possible solutions\n3. Choose the best approach\n4. Implement your solution\n5. Test and evaluate results\n\nAlternatively, here's a bullet point list:\n\n- Main point one\n- Main point two\n  - Sub-point A\n  - Sub-point B\n- Main point three";
         }
         
-        // Check for math-related questions
-        if (/[0-9+\-*\/=]/.test(question)) {
-            return `It looks like you might be asking about a calculation. In fallback mode, I can't perform calculations, but you can:
-
-1. Use your device's calculator app
-2. Try Google's calculator by typing your expression in the search bar
-3. Try again later when the main AI service is available`;
+        if (lowerQuestion.includes('poem') || lowerQuestion.includes('poetry') || lowerQuestion.includes('唐诗')) {
+            return "《静夜思》\n床前明月光，\n疑是地上霜。\n举头望明月，\n低头思故乡。\n\n这是唐代诗人李白的著名诗作，表达了诗人思乡之情。";
         }
         
-        // Default response
-        return `I'm currently operating in fallback mode because the main AI service is unavailable or timed out. 
-
-The API connection issue could be due to:
-1. The API server might be experiencing high traffic or temporary issues
-2. The request might be taking longer than the allowed time limit (10 seconds)
-3. There might be network connectivity issues
-
-Your question was: "${question}"
-
-While I can't provide a detailed answer right now, you might want to:
-1. Try again with a simpler or shorter question
-2. Try again later when the service might be less busy
-3. Search for this information on Google
-4. Contact the site administrator if the problem persists`;
+        // Default response for other questions
+        return "Thank you for your question. I'm a demonstration AI without access to real-time data or the internet. In a fully implemented version, I would connect to an AI service like DeepSeek to provide accurate and helpful responses to your queries.\n\nYou can try asking me about:\n- Math equations\n- Code examples\n- Data tables\n- Lists and steps\n- Chinese poetry\n\nOr just say hello!";
     }
-
-    // Function to call the streaming API endpoint
-    async function callStreamingAPI(prompt, outputElement) {
-        try {
-            // Clear previous content
-            outputElement.innerHTML = '';
-            outputElement.classList.add('loading');
-            
-            // Create a loading indicator
-            const loadingIndicator = document.createElement('div');
-            loadingIndicator.className = 'loading-indicator';
-            loadingIndicator.textContent = 'Connecting to AI...';
-            outputElement.appendChild(loadingIndicator);
-            
-            // Try the edge function first
-            try {
-                console.log('Trying edge function...');
-                // Make the API call to the edge function
-                const response = await fetch('/api/streaming-ai', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ prompt }),
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Edge function error: ${response.status}`);
-                }
-                
-                // Remove loading indicator
-                outputElement.removeChild(loadingIndicator);
-                outputElement.classList.remove('loading');
-                
-                // Check the content type to determine if we got a streaming response or a fallback JSON response
-                const contentType = response.headers.get('Content-Type');
-                
-                if (contentType && contentType.includes('application/json')) {
-                    // This is a fallback response from the regular function
-                    console.log('Received fallback response (non-streaming)');
-                    const data = await response.json();
-                    
-                    // Format and display the response
-                    if (data.content) {
-                        outputElement.innerHTML = formatResponse(data.content);
-                    } else {
-                        outputElement.innerHTML = `<div class="system-message">
-                            <p>The API returned a response without content.</p>
-                            <pre>${JSON.stringify(data, null, 2)}</pre>
-                        </div>`;
-                    }
-                    
-                    return;
-                }
-                
-                // If we get here, we have a streaming response
-                console.log('Received streaming response');
-                
-                // Set up a reader for the stream
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let buffer = '';
-                let fullContent = '';
-                
-                // Process the stream
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    
-                    // Decode the chunk and add to buffer
-                    buffer += decoder.decode(value, { stream: true });
-                    
-                    // Process SSE format (data: lines)
-                    const lines = buffer.split('\n');
-                    buffer = lines.pop() || ''; // Keep the last incomplete line in the buffer
-                    
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            const data = line.slice(6); // Remove 'data: ' prefix
-                            
-                            // Check if it's the [DONE] message
-                            if (data.trim() === '[DONE]') continue;
-                            
-                            try {
-                                // Parse the JSON data
-                                const parsed = JSON.parse(data);
-                                
-                                // Extract the content if it exists
-                                if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
-                                    const content = parsed.choices[0].delta.content;
-                                    fullContent += content;
-                                    
-                                    // Format and display the accumulated output
-                                    outputElement.innerHTML = formatResponse(fullContent);
-                                }
-                            } catch (e) {
-                                console.error('Error parsing JSON:', e);
-                            }
-                        }
-                    }
-                }
-                
-                // Streaming completed
-                
-                // Enable the submit button
-                submitButton.disabled = false;
-                
-                // Hide loading indicator
-                loading.classList.add('hidden');
-                
-                return;
-            } catch (edgeError) {
-                console.error('Edge function failed:', edgeError);
-                
-                // If we get here, the edge function failed, so try the regular function
-                console.log('Trying regular function test...');
-                const fallbackResponse = await fetch('/api/test');
-                
-                if (!fallbackResponse.ok) {
-                    throw new Error(`Regular function test failed: ${fallbackResponse.status}`);
-                }
-                
-                const fallbackData = await fallbackResponse.json();
-                
-                console.log('Regular function test results:', fallbackData);
-                
-                // Removed diagnostics code
-            }
-        } catch (error) {
-            console.error('Streaming error:', error);
-            
-            // Show timeout message if it was a timeout
-            if (error.name === 'AbortError') {
-                outputElement.innerHTML += `<div class="system-message warning">
-                    <p>The request is taking longer than expected. Please wait...</p>
-                </div>`;
-                
-                // Try again with non-streaming API
-                try {
-                    const data = await fetchAIResponse(prompt);
-                    handleSuccessfulResponse(data, prompt);
-                } catch (fallbackError) {
-                    outputElement.innerHTML = `<div class="system-message error">
-                        <p>Sorry, I encountered an error: ${fallbackError.message}</p>
-                        <p>Please try again later or rephrase your question.</p>
-                    </div>`;
-                }
-            } 
-            
-            // Enable the submit button
-            submitButton.disabled = false;
-            
-            // Hide loading indicator
-            loading.classList.add('hidden');
-        }
-    }
-
-    // Function to test the edge function
-    async function testEdgeFunction() {
-        try {
-            console.log('Testing edge function...');
-            
-            // Make a test request to the edge function
-            const response = await fetch('/api/test-edge');
-            
-            if (!response.ok) {
-                throw new Error(`Edge function test failed: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            console.log('Edge function test results:', data);
-            
-            // Removed diagnostics code
-            
-            return true;
-        } catch (error) {
-            console.error('Edge function test error:', error);
-            
-            // If we get here, the edge function failed, so try the regular function
-            console.log('Trying regular function test...');
-            const fallbackResponse = await fetch('/api/test');
-            
-            if (!fallbackResponse.ok) {
-                throw new Error(`Regular function test failed: ${fallbackResponse.status}`);
-            }
-            
-            const fallbackData = await fallbackResponse.json();
-            console.log('Regular function test results:', fallbackData);
-            
-            // Removed diagnostics code
-            
-            return false;
-        }
-    }
-
+    
     // Function to optimize the question
     async function optimizeQuestion() {
         const question = userInput.value.trim();
         
         if (!question) {
-            alert('请先输入问题');
+            showSystemMessage('Please enter a question to optimize.', 'warning');
             return;
         }
         
-        // Disable the optimize button and change its appearance
-        optimizeButton.disabled = true;
+        // Show optimizing state
         optimizeButton.classList.add('optimizing');
-        optimizeButton.textContent = '优化中...';
-        
-        // Show loading state
-        loading.classList.remove('hidden');
+        optimizeButton.textContent = 'Optimizing...';
         
         try {
-            // Send the optimization request to the API
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                    messages: [
-                        { 
-                            role: "user", 
-                            content: `请优化以下问题，使其更清晰、更具体，以便AI更好地理解和回答。只返回优化后的问题，不要添加任何解释或其他内容。\n\n原问题：${question}` 
-                        }
-                    ]
-                })
-            });
+            // In a real implementation, this would call an API
+            // For demonstration, we'll just simulate optimization
+            await new Promise(resolve => setTimeout(resolve, 1500));
             
-            // Check if the response was successful
-            if (!response.ok) {
-                throw new Error(`优化失败: ${response.status} ${response.statusText}`);
-            }
+            // Simulate an optimized question
+            const optimizedQuestion = `${question} (Please provide a detailed explanation with examples)`;
             
-            // Parse the response
-            const data = await response.json();
+            // Update the input with the optimized question
+            userInput.value = optimizedQuestion;
             
-            // Extract the optimized question
-            const optimizedQuestion = extractContentFromResponse(data);
-            
-            // Clean up the optimized question (remove quotes, etc.)
-            let cleanedQuestion = optimizedQuestion.trim();
-            
-            // Remove quotes if present
-            if ((cleanedQuestion.startsWith('"') && cleanedQuestion.endsWith('"')) || 
-                (cleanedQuestion.startsWith("'") && cleanedQuestion.endsWith("'"))) {
-                cleanedQuestion = cleanedQuestion.substring(1, cleanedQuestion.length - 1);
-            }
-            
-            // Remove "优化后的问题："/"优化问题："/"问题：" prefix if present
-            const prefixes = ["优化后的问题：", "优化问题：", "问题：", "优化后："];
-            for (const prefix of prefixes) {
-                if (cleanedQuestion.startsWith(prefix)) {
-                    cleanedQuestion = cleanedQuestion.substring(prefix.length).trim();
-                    break;
-                }
-            }
-            
-            // Update the input field with the optimized question
-            userInput.value = cleanedQuestion;
-            
-            // Focus on the input field
-            userInput.focus();
-            
-            console.log('Question optimized successfully');
+            // Show success message
+            showSystemMessage('Question optimized successfully!', 'success');
         } catch (error) {
             console.error('Error optimizing question:', error);
-            alert(`优化问题时出错: ${error.message}`);
+            showSystemMessage(`Error optimizing question: ${error.message}`, 'error');
         } finally {
-            // Hide loading state
-            loading.classList.add('hidden');
-            
-            // Re-enable the optimize button and restore its appearance
-            optimizeButton.disabled = false;
+            // Reset button state
             optimizeButton.classList.remove('optimizing');
             optimizeButton.textContent = '优化问题';
         }
