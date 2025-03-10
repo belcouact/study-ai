@@ -34,6 +34,7 @@ body {
     top: 0;
     z-index: 10;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    transition: width 0.3s ease;
 }
 
 .panel-buttons {
@@ -64,12 +65,30 @@ body {
     font-weight: bold;
 }
 
+/* Panel resizer */
+.panel-resizer {
+    width: 8px;
+    height: 100%;
+    background-color: transparent;
+    position: fixed;
+    left: 200px; /* Same as initial panel width */
+    top: 0;
+    z-index: 15;
+    cursor: ew-resize;
+    transition: left 0.3s ease;
+}
+
+.panel-resizer:hover, .panel-resizer.active {
+    background-color: rgba(52, 152, 219, 0.3);
+}
+
 /* Content area */
 .content-area {
     flex: 1;
-    margin-left: 200px;
+    margin-left: 200px; /* Same as initial panel width */
     height: 100%;
     overflow-y: auto;
+    transition: margin-left 0.3s ease;
 }
 
 /* Container for both modes */
@@ -284,6 +303,7 @@ button:active {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
 }
 
 #output {
@@ -410,6 +430,7 @@ button:active {
     padding: 1rem;
     margin-bottom: 1rem;
     border-radius: 4px;
+    width: 100%;
 }
 
 .system-message.error {
@@ -442,11 +463,11 @@ button:active {
     line-height: 1.8;
     text-align: center;
     margin: 2rem auto;
-    max-width: 80%;
     padding: 1rem;
     background-color: #fafafa;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    width: 100%;
 }
 
 .poetry .poem-title {
@@ -490,6 +511,7 @@ button:active {
     font-size: 1rem;
     color: #333;
     width: 100%;
+    max-width: 100%; /* Ensure it doesn't exceed the container width */
 }
 
 /* Loading indicator */
@@ -520,4 +542,35 @@ button:active {
 
 .hidden {
     display: none !important;
+}
+
+/* Math formula styling */
+.math-inline {
+    display: inline-block;
+    margin: 0 0.2em;
+    vertical-align: middle;
+    font-size: 1.1em;
+}
+
+.math-display {
+    display: block;
+    margin: 1em 0;
+    text-align: center;
+    overflow-x: auto;
+    padding: 0.5em 0;
+}
+
+/* Improve MathJax rendering */
+.MathJax {
+    font-size: 1.1em !important;
+}
+
+/* Style for math code blocks */
+.math-code {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 1em;
+    margin: 1em 0;
+    overflow-x: auto;
+    border-left: 3px solid #3498db;
 } 

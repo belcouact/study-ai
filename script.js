@@ -12,6 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const qaContainer = document.getElementById('qa-container');
     const createContainer = document.getElementById('create-container');
     
+    // Panel resizer elements
+    const leftPanel = document.querySelector('.left-panel');
+    const panelResizer = document.getElementById('panel-resizer');
+    const contentArea = document.querySelector('.content-area');
+    
     // Optional elements - may not exist in all versions of the HTML
     const directTestButton = document.getElementById('direct-test-button');
     const simpleApiButton = document.getElementById('simple-api-button');
@@ -55,6 +60,38 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update active button
         createButton.classList.add('active');
         qaButton.classList.remove('active');
+    });
+    
+    // Panel resizer functionality
+    let isResizing = false;
+    let lastDownX = 0;
+    
+    panelResizer.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        lastDownX = e.clientX;
+        panelResizer.classList.add('active');
+        document.body.style.userSelect = 'none'; // Prevent text selection during resize
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+        
+        const offsetX = e.clientX - lastDownX;
+        const newPanelWidth = Math.max(150, Math.min(400, leftPanel.offsetWidth + offsetX));
+        
+        leftPanel.style.width = `${newPanelWidth}px`;
+        panelResizer.style.left = `${newPanelWidth}px`;
+        contentArea.style.marginLeft = `${newPanelWidth}px`;
+        
+        lastDownX = e.clientX;
+    });
+    
+    document.addEventListener('mouseup', () => {
+        if (isResizing) {
+            isResizing = false;
+            panelResizer.classList.remove('active');
+            document.body.style.userSelect = ''; // Restore text selection
+        }
     });
     
     // Removed Enter key event listener to prevent submitting when Enter is pressed
@@ -228,6 +265,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Display the formatted content
         output.innerHTML = `<div class="ai-message">${formattedContent}</div>`;
+        
+        // Render math formulas
+        if (window.MathJax && typeof window.MathJax.typeset === 'function') {
+            window.MathJax.typeset();
+        }
         
         // Store the last question for retry functionality
         lastQuestion = question;
@@ -409,9 +451,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<div class="poetry">${formattedPoem}</div>`;
         }
         
+        // Process math formulas
+        escapedText = processMathFormulas(escapedText);
+        
         // Detect and format code blocks
         const codeBlockRegex = /```([a-z]*)\n([\s\S]*?)```/g;
         escapedText = escapedText.replace(codeBlockRegex, function(match, language, code) {
+            // Check if this is a math block
+            if (language === 'math') {
+                return `<div class="math-code">${code}</div>`;
+            }
             return `<pre><code class="language-${language}">${code}</code></pre>`;
         });
         
@@ -433,7 +482,8 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/^(.+)$/gm, function(match) {
                 if (!match.startsWith('<p>') && !match.startsWith('<h') && 
                     !match.startsWith('<ul') && !match.startsWith('<ol') && 
-                    !match.startsWith('<pre') && !match.startsWith('<blockquote')) {
+                    !match.startsWith('<pre') && !match.startsWith('<blockquote') &&
+                    !match.startsWith('<div class="math')) {
                     return `<p>${match}</p>`;
                 }
                 return match;
@@ -449,6 +499,21 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
             // Highlight important information
             .replace(/!!(.*?)!!/g, '<span class="highlight">$1</span>');
+    }
+
+    // Function to process math formulas
+    function processMathFormulas(text) {
+        // Process inline math: $formula$
+        text = text.replace(/\$([^\$\n]+?)\$/g, function(match, formula) {
+            return `<span class="math-inline">\\(${formula}\\)</span>`;
+        });
+        
+        // Process display math: $$formula$$
+        text = text.replace(/\$\$([\s\S]+?)\$\$/g, function(match, formula) {
+            return `<div class="math-display">\\[${formula}\\]</div>`;
+        });
+        
+        return text;
     }
 
     // Helper function to format tables in markdown
