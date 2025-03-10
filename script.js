@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const showDiagnosticsButton = document.getElementById('show-diagnostics');
     const diagnosticsPanel = document.getElementById('diagnostics-panel');
     const diagnosticsOutput = document.getElementById('diagnostics-output');
-    const debugResponseButton = document.getElementById('debug-response-button');
     
     // Optional elements - may not exist in all versions of the HTML
     const directTestButton = document.getElementById('direct-test-button');
@@ -24,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let isListening = false;
     let recognitionTimeout = null;
     let currentApiFunction = 'chat'; // Updated to use the Cloudflare Pages function
-    let lastRawResponse = null;
     let lastQuestion = null;
     let currentModel = 'deepseek-r1';
 
@@ -570,7 +568,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     content: fullContent,
                     model: currentModel || 'deepseek-r1'
                 };
-                debugResponseButton.classList.remove('hidden');
                 
                 return;
             }
@@ -643,10 +640,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Store the last question for retry functionality
         lastQuestion = question;
-        
-        // Store the raw response for debugging
-        lastRawResponse = data;
-        debugResponseButton.classList.remove('hidden');
     }
 
     // Function to extract content from various response formats
@@ -733,7 +726,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Store the raw response for debugging
             lastRawResponse = data;
-            debugResponseButton.classList.remove('hidden');
             
             // Extract content
             const content = extractContentFromResponse(data);
@@ -859,19 +851,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             throw error;
         }
-    }
-
-    // Add event listener for the debug button
-    if (debugResponseButton) {
-        debugResponseButton.addEventListener('click', () => {
-            if (lastRawResponse) {
-                // Show the raw response in the diagnostics panel
-                diagnosticsPanel.classList.remove('hidden');
-                diagnosticsOutput.textContent = JSON.stringify(lastRawResponse, null, 2);
-                showDiagnosticsButton.textContent = 'Hide Diagnostics';
-                showDiagnosticsButton.classList.remove('hidden');
-            }
-        });
     }
 
     // Add event listener for the fallback button

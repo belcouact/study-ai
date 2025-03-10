@@ -51,11 +51,11 @@ export async function onRequestPost(context) {
     
     console.log(`Making request to: ${apiUrl}`);
     
-    // Create an AbortController with a 60-second timeout
+    // Create an AbortController with a 120-second timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       controller.abort();
-    }, 60000); // 60 seconds timeout
+    }, 120000); // 120 seconds timeout (2 minutes)
     
     try {
       const response = await fetch(apiUrl, {
@@ -178,7 +178,7 @@ export async function onRequestPost(context) {
       if (error.name === 'AbortError') {
         return new Response(JSON.stringify({ 
           error: "Request timeout",
-          message: "The request to the API timed out after 60 seconds",
+          message: "The request to the API timed out after 120 seconds",
           troubleshooting_tips: [
             "The API service might be experiencing high load",
             "Try again later or with a simpler request",
