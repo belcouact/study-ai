@@ -158,6 +158,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 contentArea.style.marginLeft = savedWidth;
             }
         }
+        
+        // Ensure the resizer is properly initialized
+        setTimeout(() => {
+            // Force a resize event to ensure everything is properly positioned
+            window.dispatchEvent(new Event('resize'));
+            
+            // Make sure the panel resizer is visible and positioned correctly
+            panelResizer.style.left = leftPanel.offsetWidth + 'px';
+            contentArea.style.marginLeft = leftPanel.offsetWidth + 'px';
+            
+            console.log('Panel resizer initialized at width:', leftPanel.offsetWidth);
+        }, 100);
     });
     
     // Removed Enter key event listener to prevent submitting when Enter is pressed
