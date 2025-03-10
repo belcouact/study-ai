@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Core elements that definitely exist
     const userInput = document.getElementById('user-input');
     const submitButton = document.getElementById('submit-button');
-    const micButton = document.getElementById('mic-button');
     const output = document.getElementById('output');
     const loading = document.getElementById('loading');
     const showDiagnosticsButton = document.getElementById('show-diagnostics');
@@ -18,8 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const modelSelect = document.getElementById('model-select');
 
     let diagnosticsData = null;
-    let isListening = false;
-    let recognitionTimeout = null;
     let currentApiFunction = 'chat'; // Updated to use the Cloudflare Pages function
     let lastQuestion = null;
     let currentModel = 'deepseek-r1';
@@ -30,126 +27,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const API_BASE_URL = 'https://api.lkeap.cloud.tencent.com/v1';
     const MODEL = 'deepseek-r1';
 
-    // Speech recognition setup
-    let recognition = null;
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            const confidence = event.results[0][0].confidence;
-            
-            console.log(`Speech recognized: "${transcript}" (confidence: ${Math.round(confidence * 100)}%)`);
-            
-            // If confidence is too low, maybe warn the user
-            if (confidence < 0.5) {
-                console.warn('Low confidence in speech recognition result');
-            }
-            
-            // Append the transcript to the input
-            userInput.value += transcript;
-            
-            // Update the language detection for next time based on what was just spoken
-            const hasChinese = /[\u4e00-\u9fff]/.test(transcript);
-            recognition.lang = hasChinese ? 'zh-CN' : 'en-US';
-            
-            // Automatically stop listening after getting a result
-            stopListening();
-        };
-
-        recognition.onend = () => {
-            stopListening();
-        };
-
-        recognition.onerror = (event) => {
-            console.error('Speech recognition error:', event.error);
-            
-            // Show a message to the user based on the error
-            let errorMessage = '';
-            switch (event.error) {
-                case 'no-speech':
-                    errorMessage = 'No speech detected. Please try again.';
-                    break;
-                case 'aborted':
-                    errorMessage = 'Speech recognition was aborted.';
-                    break;
-                case 'audio-capture':
-                    errorMessage = 'No microphone detected. Please check your device.';
-                    break;
-                case 'network':
-                    errorMessage = 'Network error occurred. Please check your connection.';
-                    break;
-                case 'not-allowed':
-                    errorMessage = 'Microphone access denied. Please allow microphone access.';
-                    break;
-                case 'service-not-allowed':
-                    errorMessage = 'Speech recognition service not allowed.';
-                    break;
-                default:
-                    errorMessage = `Error: ${event.error}`;
-            }
-            
-            // Display the error briefly
-            const errorToast = document.createElement('div');
-            errorToast.className = 'error-toast';
-            errorToast.textContent = errorMessage;
-            document.body.appendChild(errorToast);
-            
-            setTimeout(() => {
-                errorToast.classList.add('show');
-                setTimeout(() => {
-                    errorToast.classList.remove('show');
-                    setTimeout(() => {
-                        document.body.removeChild(errorToast);
-                    }, 300);
-                }, 3000);
-            }, 10);
-            
-            stopListening();
-        };
-    } else {
-        micButton.style.display = 'none';
-        console.log('Speech recognition not supported in this browser');
-    }
-
-    // Event listeners
+    // Add event listener for the submit button
     submitButton.addEventListener('click', handleSubmit);
-    userInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && e.ctrlKey) {
-            e.preventDefault();
+    
+    // Add event listener for Enter key in the input field
+    userInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
             handleSubmit();
-        }
-    });
-
-    micButton.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevent any default behavior
-        
-        if (recognition) {
-            if (isListening) {
-                stopListening();
-            } else {
-                startListening();
-            }
-        } else {
-            console.log('Speech recognition not supported in this browser');
-            
-            // Show error message
-            const errorToast = document.createElement('div');
-            errorToast.className = 'error-toast';
-            errorToast.textContent = 'Speech recognition is not supported in this browser.';
-            document.body.appendChild(errorToast);
-            
-            setTimeout(() => {
-                errorToast.classList.add('show');
-                setTimeout(() => {
-                    errorToast.classList.remove('show');
-                    setTimeout(() => {
-                        document.body.removeChild(errorToast);
-                    }, 300);
-                }, 3000);
-            }, 10);
         }
     });
 
@@ -283,80 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Function to start listening
-    function startListening() {
-        if (recognition) {
-            try {
-                // Auto-detect language based on the current input
-                const inputText = userInput.value.trim();
-                
-                // Simple detection: if there are Chinese characters, use Chinese, otherwise English
-                const hasChinese = /[\u4e00-\u9fff]/.test(inputText);
-                recognition.lang = hasChinese ? 'zh-CN' : 'en-US';
-                
-                // Start recognition
-                recognition.start();
-                isListening = true;
-                
-                // Update UI - use lowercase for English
-                micButton.classList.add('recording');
-                micButton.setAttribute('data-lang', hasChinese ? '中文' : 'english');
-                
-                // Set a timeout to automatically stop listening after 10 seconds
-                if (recognitionTimeout) {
-                    clearTimeout(recognitionTimeout);
-                }
-                recognitionTimeout = setTimeout(() => {
-                    if (isListening) {
-                        stopListening();
-                    }
-                }, 10000);
-                
-                console.log('Speech recognition started with auto-detected language:', recognition.lang);
-            } catch (error) {
-                console.error('Error starting speech recognition:', error);
-                stopListening();
-                
-                // Show error message
-                const errorToast = document.createElement('div');
-                errorToast.className = 'error-toast';
-                errorToast.textContent = `Error starting speech recognition: ${error.message}`;
-                document.body.appendChild(errorToast);
-                
-                setTimeout(() => {
-                    errorToast.classList.add('show');
-                    setTimeout(() => {
-                        errorToast.classList.remove('show');
-                        setTimeout(() => {
-                            document.body.removeChild(errorToast);
-                        }, 300);
-                    }, 3000);
-                }, 10);
-            }
-        }
-    }
-
-    // Function to stop listening
-    function stopListening() {
-        if (recognition) {
-            try {
-                recognition.stop();
-            } catch (error) {
-                console.error('Error stopping speech recognition:', error);
-            }
-            
-            isListening = false;
-            micButton.classList.remove('recording');
-            
-            if (recognitionTimeout) {
-                clearTimeout(recognitionTimeout);
-                recognitionTimeout = null;
-            }
-            
-            console.log('Speech recognition stopped');
-        }
-    }
-
     // Function to handle form submission
     async function handleSubmit() {
         const question = userInput.value.trim();
@@ -390,6 +201,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Sorry, I encountered an error: ${error.message}</p>
                 <p>Please try again later or rephrase your question.</p>
             </div>`;
+            
+            console.error('Request failed:', error);
             
             // Show diagnostics button
             showDiagnosticsButton.classList.remove('hidden');
@@ -520,27 +333,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Helper function to escape HTML
+    // Function to escape HTML special characters
     function escapeHTML(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
-    // Function to format the response with basic markdown support
+    // Function to format the response with proper line breaks and formatting
     function formatResponse(text) {
-        // This is a simple implementation - for a more robust solution, consider using a markdown library
-        return text
-            // Code blocks
-            .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-            // Inline code
-            .replace(/`([^`]+)`/g, '<code>$1</code>')
-            // Bold
+        if (!text) return '';
+        
+        // Escape HTML special characters
+        let escapedText = escapeHTML(text);
+        
+        // Handle Chinese poetry formatting
+        if (escapedText.includes('《') && escapedText.includes('》')) {
+            // Replace double newlines with paragraph breaks
+            escapedText = escapedText.replace(/\n\n/g, '</p><p>');
+            
+            // Replace single newlines with line breaks
+            escapedText = escapedText.replace(/\n/g, '<br>');
+            
+            // Wrap in paragraphs
+            escapedText = `<p>${escapedText}</p>`;
+            
+            // Add poetry class for styling
+            return `<div class="poetry">${escapedText}</div>`;
+        }
+        
+        // Regular formatting for non-poetry text
+        return escapedText
+            .replace(/\n\n/g, '</p><p>')
+            .replace(/\n/g, '<br>')
+            .replace(/^(.+)$/gm, '$1')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            // Italic
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            // Line breaks
-            .replace(/\n/g, '<br>');
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+            .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+            .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+            .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+            .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+            .replace(/^\s*[-*+] (.*)$/gm, '<li>$1</li>')
+            .replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>')
+            .replace(/<\/ul><ul>/g, '')
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
     }
 
     // Add event listener for the fallback button
