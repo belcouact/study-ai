@@ -56,19 +56,19 @@ export async function onRequestGet(context) {
       
       try {
         // Make a simple OPTIONS request to test the API endpoint
-        const apiResponse = await fetch(apiUrl, {
+        const endpointResponse = await fetch(apiUrl, {
           method: "OPTIONS",
           headers: hasApiKey ? { "Authorization": `Bearer ${apiKey}` } : {},
           signal: controller.signal
         });
         
-        apiConnectivity = apiResponse.ok ? "success" : "partial";
+        apiConnectivity = endpointResponse.ok ? "success" : "partial";
         apiResponse = {
           baseConnectivity: "success",
           apiEndpoint: apiUrl,
-          status: apiResponse.status,
-          statusText: apiResponse.statusText,
-          headers: Object.fromEntries([...apiResponse.headers.entries()])
+          status: endpointResponse.status,
+          statusText: endpointResponse.statusText,
+          headers: Object.fromEntries([...endpointResponse.headers.entries()])
         };
       } catch (endpointError) {
         // API endpoint test failed but base domain is reachable
