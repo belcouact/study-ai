@@ -6,6 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const output = document.getElementById('output');
     const loading = document.getElementById('loading');
     
+    // Panel navigation elements
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    
     // Optional elements - may not exist in all versions of the HTML
     const directTestButton = document.getElementById('direct-test-button');
     const simpleApiButton = document.getElementById('simple-api-button');
@@ -29,6 +35,27 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Add event listener for the optimize button
     optimizeButton.addEventListener('click', optimizeQuestion);
+    
+    // Add event listeners for panel navigation
+    qaButton.addEventListener('click', () => {
+        // Show Q&A container, hide Create container
+        qaContainer.classList.remove('hidden');
+        createContainer.classList.add('hidden');
+        
+        // Update active button
+        qaButton.classList.add('active');
+        createButton.classList.remove('active');
+    });
+    
+    createButton.addEventListener('click', () => {
+        // Show Create container, hide Q&A container
+        createContainer.classList.remove('hidden');
+        qaContainer.classList.add('hidden');
+        
+        // Update active button
+        createButton.classList.add('active');
+        qaButton.classList.remove('active');
+    });
     
     // Removed Enter key event listener to prevent submitting when Enter is pressed
 

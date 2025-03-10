@@ -7,26 +7,49 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <div class="chat-container">
-            <div class="input-container">
-                <div class="welcome-message">Hello! Ask me anything, and I'll do my best to help.</div>
-                <textarea id="user-input" placeholder="Type your question here..."></textarea>
-                <div class="button-container">
-                    <div class="right-controls">
-                        <button id="optimize-button" title="优化您的问题以获得更好的回答">优化问题</button>
-                        <button id="submit-button">提交问题</button>
+    <div class="app-container">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <div class="panel-buttons">
+                <button id="qa-button" class="panel-button active">问答</button>
+                <button id="create-button" class="panel-button">出题</button>
+            </div>
+        </div>
+        
+        <!-- Right Content Area -->
+        <div class="content-area">
+            <!-- Q&A Chat Container -->
+            <div id="qa-container" class="container">
+                <div class="chat-container">
+                    <div class="input-container">
+                        <div class="welcome-message">Hello! Ask me anything, and I'll do my best to help.</div>
+                        <textarea id="user-input" placeholder="Type your question here..."></textarea>
+                        <div class="button-container">
+                            <div class="right-controls">
+                                <button id="optimize-button" title="优化您的问题以获得更好的回答">优化问题</button>
+                                <button id="submit-button">提交问题</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="output-container">
+                        <div id="loading" class="hidden">
+                            <div class="spinner"></div>
+                            <p>Thinking...</p>
+                        </div>
+                        <div id="output">
+                            <!-- Output will appear here -->
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <div class="output-container">
-                <div id="loading" class="hidden">
-                    <div class="spinner"></div>
-                    <p>Thinking...</p>
-                </div>
-                <div id="output">
-                    <!-- Output will appear here -->
+            <!-- Create Questions Container (initially hidden) -->
+            <div id="create-container" class="container hidden">
+                <div class="create-content">
+                    <h2>出题模式</h2>
+                    <p>在这里您可以创建问题和练习。</p>
+                    <!-- Content for the create questions mode will go here -->
                 </div>
             </div>
         </div>
