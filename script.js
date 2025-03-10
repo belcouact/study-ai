@@ -66,31 +66,97 @@ document.addEventListener('DOMContentLoaded', () => {
     let isResizing = false;
     let lastDownX = 0;
     
-    panelResizer.addEventListener('mousedown', (e) => {
+    // Function to handle resize start
+    function startResize(clientX) {
         isResizing = true;
-        lastDownX = e.clientX;
+        lastDownX = clientX;
         panelResizer.classList.add('active');
         document.body.style.userSelect = 'none'; // Prevent text selection during resize
-    });
+        
+        // Add a visual indicator that resizing is active
+        document.body.classList.add('resizing');
+    }
     
-    document.addEventListener('mousemove', (e) => {
+    // Function to handle resize move
+    function doResize(clientX) {
         if (!isResizing) return;
         
-        const offsetX = e.clientX - lastDownX;
+        // Calculate the new width with a smoother movement (reduce the sensitivity)
+        const offsetX = (clientX - lastDownX) * 0.8; // Apply a dampening factor
         const newPanelWidth = Math.max(150, Math.min(400, leftPanel.offsetWidth + offsetX));
         
+        // Apply the new width to all relevant elements
         leftPanel.style.width = `${newPanelWidth}px`;
         panelResizer.style.left = `${newPanelWidth}px`;
         contentArea.style.marginLeft = `${newPanelWidth}px`;
         
-        lastDownX = e.clientX;
-    });
+        // Update the last position
+        lastDownX = clientX;
+        
+        // Force a repaint to make the movement smoother
+        window.requestAnimationFrame(() => {});
+    }
     
-    document.addEventListener('mouseup', () => {
+    // Function to handle resize end
+    function endResize() {
         if (isResizing) {
             isResizing = false;
             panelResizer.classList.remove('active');
             document.body.style.userSelect = ''; // Restore text selection
+            document.body.classList.remove('resizing');
+            
+            // Save the panel width preference to localStorage
+            localStorage.setItem('leftPanelWidth', leftPanel.style.width);
+        }
+    }
+    
+    // Mouse event handlers
+    panelResizer.addEventListener('mousedown', (e) => {
+        e.preventDefault(); // Prevent text selection
+        startResize(e.clientX);
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        doResize(e.clientX);
+    });
+    
+    document.addEventListener('mouseup', endResize);
+    
+    // Touch event handlers for mobile devices
+    panelResizer.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Prevent scrolling
+        startResize(e.touches[0].clientX);
+    });
+    
+    document.addEventListener('touchmove', (e) => {
+        if (isResizing) {
+            e.preventDefault(); // Prevent scrolling while resizing
+            doResize(e.touches[0].clientX);
+        }
+    });
+    
+    document.addEventListener('touchend', endResize);
+    document.addEventListener('touchcancel', endResize);
+    
+    // Double-click to reset to default width
+    panelResizer.addEventListener('dblclick', () => {
+        const defaultWidth = 200;
+        leftPanel.style.width = `${defaultWidth}px`;
+        panelResizer.style.left = `${defaultWidth}px`;
+        contentArea.style.marginLeft = `${defaultWidth}px`;
+        localStorage.setItem('leftPanelWidth', `${defaultWidth}px`);
+    });
+    
+    // Load saved panel width from localStorage
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedWidth = localStorage.getItem('leftPanelWidth');
+        if (savedWidth) {
+            const width = parseInt(savedWidth);
+            if (!isNaN(width)) {
+                leftPanel.style.width = savedWidth;
+                panelResizer.style.left = savedWidth;
+                contentArea.style.marginLeft = savedWidth;
+            }
         }
     });
     

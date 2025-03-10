@@ -35,12 +35,16 @@ body {
     z-index: 10;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
     transition: width 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    position: relative;
 }
 
 .panel-buttons {
     display: flex;
     flex-direction: column;
     padding: 1rem;
+    margin-bottom: 80px;
 }
 
 .panel-button {
@@ -67,25 +71,46 @@ body {
 
 /* Panel resizer */
 .panel-resizer {
-    width: 8px;
+    width: 12px;
     height: 100%;
-    background-color: transparent;
+    background-color: #e0e0e0;
     position: fixed;
-    left: 200px; /* Same as initial panel width */
+    left: 200px;
     top: 0;
     z-index: 15;
     cursor: ew-resize;
-    transition: left 0.3s ease;
+    transition: background-color 0.2s ease;
+    background-image: linear-gradient(to right, #ccc, #ccc);
+    background-size: 2px 20px;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .panel-resizer:hover, .panel-resizer.active {
-    background-color: rgba(52, 152, 219, 0.3);
+    background-color: rgba(52, 152, 219, 0.5);
+    background-image: linear-gradient(to right, #fff, #fff);
+}
+
+.panel-resizer::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 50px;
+    width: 4px;
+    background-color: #bbb;
+    border-radius: 2px;
+}
+
+.panel-resizer:hover::after, .panel-resizer.active::after {
+    background-color: #fff;
 }
 
 /* Content area */
 .content-area {
     flex: 1;
-    margin-left: 200px; /* Same as initial panel width */
+    margin-left: 200px;
     height: 100%;
     overflow-y: auto;
     transition: margin-left 0.3s ease;
@@ -310,7 +335,7 @@ button:active {
     min-height: 100px;
     line-height: 1.6;
     width: 100%;
-    max-width: calc(100% - 2rem); /* Same as input box width accounting for padding */
+    max-width: calc(100% - 2rem);
 }
 
 #output p {
@@ -511,7 +536,7 @@ button:active {
     font-size: 1rem;
     color: #333;
     width: 100%;
-    max-width: 100%; /* Ensure it doesn't exceed the container width */
+    max-width: 100%;
 }
 
 /* Loading indicator */
@@ -522,7 +547,7 @@ button:active {
     justify-content: center;
     padding: 2rem;
     width: 100%;
-    max-width: calc(100% - 2rem); /* Same as input box width accounting for padding */
+    max-width: calc(100% - 2rem);
 }
 
 .spinner {
@@ -573,4 +598,47 @@ button:active {
     margin: 1em 0;
     overflow-x: auto;
     border-left: 3px solid #3498db;
+}
+
+/* Add a visual indicator when resizing is active */
+body.resizing {
+    cursor: ew-resize !important;
+}
+
+body.resizing::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.05);
+    pointer-events: none;
+    z-index: 5;
+}
+
+body.resizing .panel-resizer {
+    background-color: rgba(52, 152, 219, 0.7);
+}
+
+/* Improve the visual feedback for the resizer */
+.panel-resizer:active {
+    width: 14px; /* Slightly wider when active */
+}
+
+/* Panel footer */
+.panel-footer {
+    position: absolute;
+    bottom: 15px;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    line-height: 1.4;
+}
+
+.panel-footer p {
+    margin: 0 0 5px 0;
 } 
