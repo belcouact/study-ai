@@ -10,13 +10,25 @@ export async function onRequestGet(context) {
   // Get API base URL
   const apiBaseUrl = env.API_BASE_URL || "https://api.deepseek.com";
   
+  // Extract the base domain for connectivity test
+  let connectivityTestUrl;
+  try {
+    const url = new URL(apiBaseUrl);
+    // Just test the base domain, not the full path
+    connectivityTestUrl = `${url.protocol}//${url.hostname}`;
+  } catch (e) {
+    // If URL parsing fails, use the original
+    connectivityTestUrl = apiBaseUrl;
+  }
+  
   // Test connectivity to the API
   let apiConnectivity = "unknown";
   let apiResponse = null;
   
   try {
     // Make a simple HEAD request to test connectivity
-    const response = await fetch(apiBaseUrl, {
+    console.log(`Testing connectivity to: ${connectivityTestUrl}`);
+    const response = await fetch(connectivityTestUrl, {
       method: "HEAD",
       headers: hasApiKey ? { "Authorization": `Bearer ${apiKey}` } : {}
     });
@@ -44,13 +56,21 @@ export async function onRequestGet(context) {
       hasApiKey: hasApiKey,
       apiKeyPreview: apiKeyPreview,
       apiBaseUrl: apiBaseUrl,
+      connectivityTestUrl: connectivityTestUrl,
       maxTokens: env.MAX_TOKENS || "4096 (default)",
       temperature: env.TEMPERATURE || "0.7 (default)"
     },
     apiConnectivity: apiConnectivity,
     apiResponse: apiResponse,
+    apiUrlAnalysis: {
+      includesCompletionsPath: apiBaseUrl.includes('/chat/completions'),
+      recommendedFormat: apiBaseUrl.includes('/chat/completions') ? 
+        "Your API_BASE_URL already includes the endpoint path" : 
+        "Your API_BASE_URL should be the base URL without the endpoint path"
+    },
     troubleshooting_tips: [
       "If apiConnectivity is 'error', check your API_BASE_URL",
+      "Make sure the API endpoint exists and is accessible",
       "If hasApiKey is false, set the DEEPSEEK_API_KEY environment variable in the Cloudflare Pages dashboard",
       "Make sure your API key has the correct permissions",
       "Check if the API service is available"

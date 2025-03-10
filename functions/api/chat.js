@@ -38,7 +38,16 @@ export async function onRequestPost(context) {
     
     // Forward request to DeepSeek API
     const apiBaseUrl = env.API_BASE_URL || "https://api.deepseek.com";
-    const apiUrl = `${apiBaseUrl}/v1/chat/completions`;
+    
+    // Check if the API_BASE_URL already includes the endpoint path
+    let apiUrl;
+    if (apiBaseUrl.includes('/chat/completions')) {
+      // If the base URL already includes the endpoint path, use it as is
+      apiUrl = apiBaseUrl;
+    } else {
+      // Otherwise, append the endpoint path
+      apiUrl = `${apiBaseUrl}/v1/chat/completions`;
+    }
     
     console.log(`Making request to: ${apiUrl}`);
     
