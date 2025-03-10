@@ -181,9 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             console.error('Request failed:', error);
         }
-        
-        // Clear the input
-        userInput.value = '';
     }
     
     // Helper function to handle successful responses
