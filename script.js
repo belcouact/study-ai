@@ -2,11 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Core elements that definitely exist
     const userInput = document.getElementById('user-input');
     const submitButton = document.getElementById('submit-button');
+    const optimizeButton = document.getElementById('optimize-button');
     const output = document.getElementById('output');
     const loading = document.getElementById('loading');
-    const showDiagnosticsButton = document.getElementById('show-diagnostics');
-    const diagnosticsPanel = document.getElementById('diagnostics-panel');
-    const diagnosticsOutput = document.getElementById('diagnostics-output');
     
     // Optional elements - may not exist in all versions of the HTML
     const directTestButton = document.getElementById('direct-test-button');
@@ -16,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const fallbackButton = document.getElementById('fallback-button');
     const modelSelect = document.getElementById('model-select');
 
-    let diagnosticsData = null;
     let currentApiFunction = 'chat'; // Updated to use the Cloudflare Pages function
     let lastQuestion = null;
     let currentModel = 'deepseek-r1';
@@ -30,20 +27,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add event listener for the submit button
     submitButton.addEventListener('click', handleSubmit);
     
+    // Add event listener for the optimize button
+    optimizeButton.addEventListener('click', optimizeQuestion);
+    
     // Removed Enter key event listener to prevent submitting when Enter is pressed
 
-    // Add event listener for the show diagnostics button
-    showDiagnosticsButton.addEventListener('click', () => {
-        if (diagnosticsPanel.classList.contains('hidden')) {
-            diagnosticsPanel.classList.remove('hidden');
-            showDiagnosticsButton.textContent = 'Hide Diagnostics';
-        } else {
-            diagnosticsPanel.classList.add('hidden');
-            showDiagnosticsButton.textContent = 'Show Diagnostics';
-        }
-    });
+    // Removed show diagnostics button event listener
 
-    // Add event listeners for optional elements only if they exist
+    // Add event listener for the direct test button (if it exists)
     if (directTestButton) {
         directTestButton.addEventListener('click', async () => {
             try {
@@ -56,11 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Hide loading state
                 loading.classList.add('hidden');
                 
-                // Show diagnostics
-                showDiagnosticsButton.classList.remove('hidden');
-                diagnosticsPanel.classList.remove('hidden');
-                diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
-                showDiagnosticsButton.textContent = 'Hide Diagnostics';
+                // Removed diagnostics code
                 
                 console.log('Direct API test completed:', data);
             } catch (error) {
@@ -72,7 +59,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Add event listener for the simple API button
+    // Add event listener for the check environment button (if it exists)
+    if (checkEnvButton) {
+        checkEnvButton.addEventListener('click', async () => {
+            try {
+                // Show loading state
+                loading.classList.remove('hidden');
+                
+                const response = await fetch('/api/check-env');
+                const data = await response.json();
+                
+                // Hide loading state
+                loading.classList.add('hidden');
+                
+                // Removed diagnostics code
+                
+                if (data.status === 'ok') {
+                    console.log('Environment check completed:', data);
+                } else {
+                    console.error('Environment check failed:', data);
+                }
+            } catch (error) {
+                // Hide loading state
+                loading.classList.add('hidden');
+                
+                console.error('Environment check failed:', error);
+            }
+        });
+    }
+
+    // Add event listeners for optional elements only if they exist
     if (simpleApiButton) {
         simpleApiButton.addEventListener('click', async () => {
             const question = userInput.value.trim() || "Hello, how are you?";
@@ -107,39 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } finally {
                 // Hide loading state
                 loading.classList.add('hidden');
-            }
-        });
-    }
-
-    // Add event listener for the check environment button
-    if (checkEnvButton) {
-        checkEnvButton.addEventListener('click', async () => {
-            try {
-                // Show loading state
-                loading.classList.remove('hidden');
-                
-                const response = await fetch('/api/check-env');
-                const data = await response.json();
-                
-                // Hide loading state
-                loading.classList.add('hidden');
-                
-                // Show diagnostics
-                showDiagnosticsButton.classList.remove('hidden');
-                diagnosticsPanel.classList.remove('hidden');
-                diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
-                showDiagnosticsButton.textContent = 'Hide Diagnostics';
-                
-                if (data.status === 'ok') {
-                    console.log('Environment check completed:', data);
-                } else {
-                    console.error('Environment check failed:', data);
-                }
-            } catch (error) {
-                // Hide loading state
-                loading.classList.add('hidden');
-                
-                console.error('Environment check failed:', error);
             }
         });
     }
@@ -197,9 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
             
             console.error('Request failed:', error);
-            
-            // Show diagnostics button
-            showDiagnosticsButton.classList.remove('hidden');
         }
         
         // Clear the input
@@ -578,12 +558,12 @@ While I can't provide a detailed answer right now, you might want to:
                     console.log('Received fallback response (non-streaming)');
                     const data = await response.json();
                     
-                    // Display the content
+                    // Format and display the response
                     if (data.content) {
                         outputElement.innerHTML = formatResponse(data.content);
                     } else {
                         outputElement.innerHTML = `<div class="system-message">
-                            <p>Received a fallback response without content.</p>
+                            <p>The API returned a response without content.</p>
                             <pre>${JSON.stringify(data, null, 2)}</pre>
                         </div>`;
                     }
@@ -592,13 +572,13 @@ While I can't provide a detailed answer right now, you might want to:
                 }
                 
                 // If we get here, we have a streaming response
-                console.log('Processing streaming response');
+                console.log('Received streaming response');
                 
                 // Set up a reader for the stream
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
                 let buffer = '';
-                let formattedOutput = '';
+                let fullContent = '';
                 
                 // Process the stream
                 while (true) {
@@ -626,46 +606,16 @@ While I can't provide a detailed answer right now, you might want to:
                                 // Extract the content if it exists
                                 if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
                                     const content = parsed.choices[0].delta.content;
-                                    formattedOutput += content;
+                                    fullContent += content;
                                     
                                     // Format and display the accumulated output
-                                    outputElement.innerHTML = formatResponse(formattedOutput);
+                                    outputElement.innerHTML = formatResponse(fullContent);
                                 }
                             } catch (e) {
                                 console.error('Error parsing JSON:', e);
                             }
                         }
                     }
-                }
-                
-                // Process any remaining data
-                if (buffer.length > 0) {
-                    const lines = buffer.split('\n');
-                    for (const line of lines) {
-                        if (line.startsWith('data: ') && line.slice(6).trim() !== '[DONE]') {
-                            try {
-                                const parsed = JSON.parse(line.slice(6));
-                                if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
-                                    const content = parsed.choices[0].delta.content;
-                                    formattedOutput += content;
-                                    
-                                    // Format and display the accumulated output
-                                    outputElement.innerHTML = formatResponse(formattedOutput);
-                                }
-                            } catch (e) {
-                                console.error('Error parsing JSON:', e);
-                            }
-                        }
-                    }
-                }
-                
-                // If we didn't get any content, show an error
-                if (!formattedOutput) {
-                    console.warn('No content received from streaming response');
-                    outputElement.innerHTML = `<div class="system-message">
-                        <p>No content was received from the streaming API.</p>
-                        <p>This might be due to an issue with the streaming connection or the API response format.</p>
-                    </div>`;
                 }
                 
                 // Streaming completed
@@ -679,40 +629,21 @@ While I can't provide a detailed answer right now, you might want to:
                 return;
             } catch (edgeError) {
                 console.error('Edge function failed:', edgeError);
-                // Continue to try the regular function
+                
+                // If we get here, the edge function failed, so try the regular function
+                console.log('Trying regular function test...');
+                const fallbackResponse = await fetch('/api/test');
+                
+                if (!fallbackResponse.ok) {
+                    throw new Error(`Regular function test failed: ${fallbackResponse.status}`);
+                }
+                
+                const fallbackData = await fallbackResponse.json();
+                
+                console.log('Regular function test results:', fallbackData);
+                
+                // Removed diagnostics code
             }
-            
-            // If we get here, the edge function failed, so try the regular function
-            console.log('Trying regular function test...');
-            const fallbackResponse = await fetch('/api/test');
-            
-            // Remove loading indicator
-            outputElement.removeChild(loadingIndicator);
-            outputElement.classList.remove('loading');
-            
-            if (!fallbackResponse.ok) {
-                throw new Error(`Regular function test failed: ${fallbackResponse.status}`);
-            }
-            
-            const fallbackData = await fallbackResponse.json();
-            
-            console.log('Regular function test results:', fallbackData);
-            
-            // Show diagnostics
-            showDiagnosticsButton.classList.remove('hidden');
-            diagnosticsPanel.classList.remove('hidden');
-            diagnosticsOutput.textContent = JSON.stringify({
-                ...fallbackData,
-                note: "Edge function failed, using regular function instead.",
-                troubleshooting_tips: [
-                    "Check if Cloudflare Pages Functions are enabled for your site",
-                    "Check your function code for errors",
-                    "Check the Cloudflare Pages logs for any deployment errors",
-                    "Make sure your Cloudflare Pages site is properly configured"
-                ]
-            }, null, 2);
-            showDiagnosticsButton.textContent = 'Hide Diagnostics';
-            
         } catch (error) {
             console.error('Streaming error:', error);
             
@@ -742,91 +673,125 @@ While I can't provide a detailed answer right now, you might want to:
         }
     }
 
-    // Add event listener for the test edge function button
-    const testEdgeButton = document.getElementById('test-edge-button');
-    if (testEdgeButton) {
-        testEdgeButton.addEventListener('click', async () => {
-            try {
-                apiStatus.textContent = 'Testing edge function...';
-                apiStatus.className = 'status-checking';
-                
-                // Try the edge function first
-                try {
-                    const response = await fetch('/api/test-edge');
-                    
-                    if (!response.ok) {
-                        throw new Error(`Edge function test failed: ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    
-                    console.log('Edge function test results:', data);
-                    
-                    // Show diagnostics
-                    showDiagnosticsButton.classList.remove('hidden');
-                    diagnosticsPanel.classList.remove('hidden');
-                    diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
-                    showDiagnosticsButton.textContent = 'Hide Diagnostics';
-                    
-                    apiStatus.textContent = 'Edge function is working!';
-                    apiStatus.className = 'status-success';
-                    return;
-                } catch (edgeError) {
-                    console.error('Edge function test failed:', edgeError);
-                    // Continue to try the regular function
-                }
-                
-                // If we get here, the edge function failed, so try the regular function
-                console.log('Trying regular function test...');
-                const fallbackResponse = await fetch('/api/test');
-                
-                if (!fallbackResponse.ok) {
-                    throw new Error(`Regular function test failed: ${fallbackResponse.status}`);
-                }
-                
-                const fallbackData = await fallbackResponse.json();
-                
-                console.log('Regular function test results:', fallbackData);
-                
-                // Show diagnostics
-                showDiagnosticsButton.classList.remove('hidden');
-                diagnosticsPanel.classList.remove('hidden');
-                diagnosticsOutput.textContent = JSON.stringify({
-                    ...fallbackData,
-                    note: "Edge function failed, using regular function instead.",
-                    troubleshooting_tips: [
-                        "Check if Cloudflare Pages Functions are enabled for your site",
-                        "Check your function code for errors",
-                        "Check the Cloudflare Pages logs for any deployment errors",
-                        "Make sure your Cloudflare Pages site is properly configured"
-                    ]
-                }, null, 2);
-                showDiagnosticsButton.textContent = 'Hide Diagnostics';
-                
-                apiStatus.textContent = 'Regular function is working (Edge function failed)';
-                apiStatus.className = 'status-warning';
-                
-            } catch (error) {
-                apiStatus.textContent = `All function tests failed: ${error.message}`;
-                apiStatus.className = 'status-error';
-                console.error('Function test error:', error);
-                
-                // Show diagnostics
-                showDiagnosticsButton.classList.remove('hidden');
-                diagnosticsPanel.classList.remove('hidden');
-                diagnosticsOutput.textContent = JSON.stringify({ 
-                    error: error.message,
-                    stack: error.stack,
-                    timestamp: new Date().toISOString(),
-                    troubleshooting_tips: [
-                        "Check if Cloudflare Pages Functions are enabled for your site",
-                        "Check your function code for errors",
-                        "Check the Cloudflare Pages logs for any deployment errors",
-                        "Make sure your Cloudflare Pages site is properly configured"
-                    ]
-                }, null, 2);
-                showDiagnosticsButton.textContent = 'Hide Diagnostics';
+    // Function to test the edge function
+    async function testEdgeFunction() {
+        try {
+            console.log('Testing edge function...');
+            
+            // Make a test request to the edge function
+            const response = await fetch('/api/test-edge');
+            
+            if (!response.ok) {
+                throw new Error(`Edge function test failed: ${response.status}`);
             }
-        });
+            
+            const data = await response.json();
+            console.log('Edge function test results:', data);
+            
+            // Removed diagnostics code
+            
+            return true;
+        } catch (error) {
+            console.error('Edge function test error:', error);
+            
+            // If we get here, the edge function failed, so try the regular function
+            console.log('Trying regular function test...');
+            const fallbackResponse = await fetch('/api/test');
+            
+            if (!fallbackResponse.ok) {
+                throw new Error(`Regular function test failed: ${fallbackResponse.status}`);
+            }
+            
+            const fallbackData = await fallbackResponse.json();
+            console.log('Regular function test results:', fallbackData);
+            
+            // Removed diagnostics code
+            
+            return false;
+        }
+    }
+
+    // Function to optimize the question
+    async function optimizeQuestion() {
+        const question = userInput.value.trim();
+        
+        if (!question) {
+            alert('请先输入问题');
+            return;
+        }
+        
+        // Disable the optimize button and change its appearance
+        optimizeButton.disabled = true;
+        optimizeButton.classList.add('optimizing');
+        optimizeButton.textContent = '优化中...';
+        
+        // Show loading state
+        loading.classList.remove('hidden');
+        
+        try {
+            // Send the optimization request to the API
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    messages: [
+                        { 
+                            role: "user", 
+                            content: `请优化以下问题，使其更清晰、更具体，以便AI更好地理解和回答。只返回优化后的问题，不要添加任何解释或其他内容。\n\n原问题：${question}` 
+                        }
+                    ]
+                })
+            });
+            
+            // Check if the response was successful
+            if (!response.ok) {
+                throw new Error(`优化失败: ${response.status} ${response.statusText}`);
+            }
+            
+            // Parse the response
+            const data = await response.json();
+            
+            // Extract the optimized question
+            const optimizedQuestion = extractContentFromResponse(data);
+            
+            // Clean up the optimized question (remove quotes, etc.)
+            let cleanedQuestion = optimizedQuestion.trim();
+            
+            // Remove quotes if present
+            if ((cleanedQuestion.startsWith('"') && cleanedQuestion.endsWith('"')) || 
+                (cleanedQuestion.startsWith("'") && cleanedQuestion.endsWith("'"))) {
+                cleanedQuestion = cleanedQuestion.substring(1, cleanedQuestion.length - 1);
+            }
+            
+            // Remove "优化后的问题："/"优化问题："/"问题：" prefix if present
+            const prefixes = ["优化后的问题：", "优化问题：", "问题：", "优化后："];
+            for (const prefix of prefixes) {
+                if (cleanedQuestion.startsWith(prefix)) {
+                    cleanedQuestion = cleanedQuestion.substring(prefix.length).trim();
+                    break;
+                }
+            }
+            
+            // Update the input field with the optimized question
+            userInput.value = cleanedQuestion;
+            
+            // Focus on the input field
+            userInput.focus();
+            
+            console.log('Question optimized successfully');
+        } catch (error) {
+            console.error('Error optimizing question:', error);
+            alert(`优化问题时出错: ${error.message}`);
+        } finally {
+            // Hide loading state
+            loading.classList.add('hidden');
+            
+            // Re-enable the optimize button and restore its appearance
+            optimizeButton.disabled = false;
+            optimizeButton.classList.remove('optimizing');
+            optimizeButton.textContent = '优化问题';
+        }
     }
 }); 

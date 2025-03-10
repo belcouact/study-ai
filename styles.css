@@ -70,12 +70,6 @@ textarea#user-input:focus {
     align-items: center;
 }
 
-.diagnostics-controls {
-    display: flex;
-    margin-top: 10px;
-    justify-content: flex-start;
-}
-
 button {
     padding: 0.6rem 1.2rem;
     border: none;
@@ -86,12 +80,27 @@ button {
 }
 
 #submit-button {
-    background-color: #3498db;
+    background-color: #4CAF50;
     color: white;
 }
 
 #submit-button:hover {
-    background-color: #2980b9;
+    background-color: #45a049;
+}
+
+#optimize-button {
+    background-color: #2196F3;
+    color: white;
+    margin-right: 10px;
+}
+
+#optimize-button:hover {
+    background-color: #0b7dda;
+}
+
+#optimize-button.optimizing {
+    background-color: #ccc;
+    cursor: wait;
 }
 
 /* Removed microphone button styles */
@@ -288,29 +297,40 @@ button {
 }
 */
 
+/* Removed diagnostics controls styles */
+/*
+.diagnostics-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+*/
+
+/* Removed diagnostics panel styles */
+/*
 #diagnostics-panel {
     background-color: #f8f9fa;
     border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 4px;
     padding: 1rem;
-    margin-top: 10px;
-    font-family: monospace;
-    font-size: 0.9rem;
-    white-space: pre-wrap;
-    overflow-x: auto;
+    margin-bottom: 1rem;
+    display: none;
+    overflow: auto;
+    max-height: 300px;
 }
 
 #show-diagnostics {
     background-color: #f0f0f0;
     color: #333;
     border: 1px solid #ddd;
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
 }
 
 #show-diagnostics:hover {
     background-color: #e0e0e0;
 }
+*/
 
 /* Removed speech controls styles */
 /*
