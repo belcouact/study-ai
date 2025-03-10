@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let diagnosticsData = null;
     let isListening = false;
     let recognitionTimeout = null;
-    let currentApiFunction = 'simple-ai'; // Default to simple-ai instead of ai-proxy
+    let currentApiFunction = 'chat'; // Updated to use the Cloudflare Pages function
     let lastRawResponse = null;
     let lastQuestion = null;
     let currentModel = 'deepseek-r1';
@@ -411,9 +411,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
-                    question,
-                    model: currentModel || 'deepseek-r1',
-                    stream: true // Enable streaming to avoid timeout issues
+                    messages: [
+                        { role: "user", content: question }
+                    ]
                 }),
                 signal: controller.signal
             });
@@ -637,16 +637,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('API response details:', data);
         
         // Extract and display content
-        let content = "No content found in response";
-        
-        if (data.choices && data.choices[0] && data.choices[0].message) {
-            const message = data.choices[0].message;
-            if (message.content) {
-                content = message.content;
-            } else if (message.reasoning_content) {
-                content = message.reasoning_content;
-            }
-        }
+        let content = extractContentFromResponse(data);
         
         output.innerHTML = `<div class="ai-message">${formatResponse(content)}</div>`;
         
@@ -664,35 +655,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.choices && data.choices[0] && data.choices[0].message) {
             const message = data.choices[0].message;
             if (message.content) return message.content;
-            if (message.reasoning_content) {
-                // Sometimes reasoning_content might be truncated
-                if (message.reasoning_content.length < 20) {
-                    return `The AI started to respond but was cut off. Here's what it said: "${message.reasoning_content}"\n\nPlease try asking again or rephrasing your question.`;
-                }
-                return message.reasoning_content;
-            }
         }
         
-        // Try to extract from simple-ai format
-        if (data.success && data.data) {
-            return extractContentFromResponse(data.data);
-        }
+        // If we have a direct content field
+        if (data.content) return data.content;
         
-        // Try to extract from other possible formats
-        if (data.message && data.message.content) {
-            return data.message.content;
-        }
+        // If we have a message field
+        if (data.message && data.message.content) return data.message.content;
         
-        if (data.content) {
-            return data.content;
-        }
+        // If we have a raw text field
+        if (data.text) return data.text;
         
-        if (data.text) {
-            return data.text;
-        }
+        // If we have a response field
+        if (data.response) return data.response;
         
-        // If we can't find a standard format, return a message with the raw data
-        return "Couldn't extract content from response. Raw data: " + JSON.stringify(data);
+        // If we have a raw data object, stringify it
+        return JSON.stringify(data, null, 2);
     }
 
     // Add this at the top of your script
@@ -726,8 +704,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
-                    question,
-                    model: currentModel
+                    messages: [
+                        { role: "user", content: question }
+                    ]
                 }),
                 signal: controller.signal
             });
@@ -803,102 +782,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to check API connection
     async function checkApiConnection() {
-        apiStatus.textContent = 'Checking connection...';
+        // Show loading state
+        loading.classList.remove('hidden');
+        apiStatus.textContent = 'Checking API connection...';
         apiStatus.className = 'status-checking';
-        showDiagnosticsButton.classList.add('hidden');
-        diagnosticsPanel.classList.add('hidden');
         
-        const startTime = Date.now();
+        // Create a controller for the timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
         
         try {
-            console.log('Starting API health check at', new Date().toISOString());
+            const response = await fetch('/api/debug', {
+                method: 'GET',
+                signal: controller.signal
+            });
             
-            // Set up a timeout for the health check
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+            // Clear the timeout
+            clearTimeout(timeoutId);
             
-            try {
-                const response = await fetch('/api/test');
-                
-                // Clear the timeout
-                clearTimeout(timeoutId);
-                
-                const endTime = Date.now();
-                const responseTime = endTime - startTime;
-                console.log(`API health check response time: ${responseTime}ms`);
-                
-                const data = await response.json();
-                diagnosticsData = data;
-                
-                // Add response time to the diagnostics data
-                diagnosticsData.responseTime = responseTime;
-                
-                if (data.status === 'ok') {
-                    apiStatus.textContent = `API connection successful! (${responseTime}ms)`;
-                    apiStatus.className = 'status-success';
-                    console.log('API health check details:', data);
-                    
-                    // Add a warning if response time is close to the Lambda timeout
-                    if (responseTime > 5000) {
-                        apiStatus.textContent += ' (Warning: Slow response)';
-                        console.warn(`API health check response time (${responseTime}ms) is more than 5 seconds, which is close to the Lambda timeout of 10 seconds.`);
-                        
-                        // Show diagnostics with performance warning
-                        showDiagnosticsButton.classList.remove('hidden');
-                        diagnosticsPanel.classList.remove('hidden');
-                        diagnosticsOutput.textContent = JSON.stringify({
-                            ...data,
-                            performance_warning: `Response time (${responseTime}ms) is more than 5 seconds, which is close to the Lambda timeout of 10 seconds. This may cause timeouts for more complex requests.`,
-                            recommendations: [
-                                "Try using simpler, shorter questions",
-                                "The API might be experiencing high load",
-                                "Consider trying again during off-peak hours"
-                            ]
-                        }, null, 2);
-                        showDiagnosticsButton.textContent = 'Hide Diagnostics';
-                    }
-                } else {
-                    apiStatus.textContent = `API connection failed: ${data.message || 'Unknown error'}`;
-                    apiStatus.className = 'status-error';
-                    console.error('API health check failed:', data);
-                    
-                    // Show diagnostics button
-                    showDiagnosticsButton.classList.remove('hidden');
-                    
-                    // Display diagnostics
-                    if (data.diagnostics) {
-                        diagnosticsOutput.textContent = JSON.stringify(data.diagnostics, null, 2);
-                    } else {
-                        diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
-                    }
-                }
-            } catch (fetchError) {
-                // Clear the timeout
-                clearTimeout(timeoutId);
-                
-                if (fetchError.name === 'AbortError') {
-                    throw new Error('API health check timed out after 15 seconds');
-                } else {
-                    throw fetchError;
-                }
+            // Hide loading state
+            loading.classList.add('hidden');
+            
+            if (!response.ok) {
+                apiStatus.textContent = `Error: ${response.status} ${response.statusText}`;
+                apiStatus.className = 'status-error';
+                throw new Error(`API check failed: ${response.status} ${response.statusText}`);
             }
-        } catch (error) {
-            const endTime = Date.now();
-            const responseTime = endTime - startTime;
             
-            apiStatus.textContent = `Connection error: ${error.message}`;
-            apiStatus.className = 'status-error';
-            console.error('API check error:', error, `(after ${responseTime}ms)`);
+            const data = await response.json();
             
-            // Show diagnostics button
+            // Show diagnostics
             showDiagnosticsButton.classList.remove('hidden');
             diagnosticsPanel.classList.remove('hidden');
+            diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
+            showDiagnosticsButton.textContent = 'Hide Diagnostics';
             
-            // Display diagnostics
+            // Update status based on API connectivity
+            if (data.apiConnectivity === 'success') {
+                apiStatus.textContent = 'API is connected and working!';
+                apiStatus.className = 'status-success';
+            } else {
+                apiStatus.textContent = 'API connection issue detected';
+                apiStatus.className = 'status-warning';
+            }
+            
+            // Store diagnostics data
+            diagnosticsData = data;
+            
+            return data;
+        } catch (error) {
+            // Clear the timeout
+            clearTimeout(timeoutId);
+            
+            // Hide loading state
+            loading.classList.add('hidden');
+            
+            // Update status
+            apiStatus.textContent = `Error: ${error.message}`;
+            apiStatus.className = 'status-error';
+            
+            // Show diagnostics
+            showDiagnosticsButton.classList.remove('hidden');
+            diagnosticsPanel.classList.remove('hidden');
             diagnosticsOutput.textContent = JSON.stringify({
                 error: error.message,
                 stack: error.stack,
-                responseTime: responseTime,
                 timestamp: new Date().toISOString(),
                 troubleshooting_tips: [
                     "Check if the Cloudflare Pages functions are deployed correctly",
@@ -908,6 +856,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 ]
             }, null, 2);
             showDiagnosticsButton.textContent = 'Hide Diagnostics';
+            
+            throw error;
         }
     }
 
