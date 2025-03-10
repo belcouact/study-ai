@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const question = userInput.value.trim();
         
         if (!question) {
-            alert('Please enter a question');
+            alert('请先输入问题');
             return;
         }
         
@@ -385,6 +385,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<div class="poetry">${formattedPoem}</div>`;
         }
         
+        // Detect and format code blocks
+        const codeBlockRegex = /```([a-z]*)\n([\s\S]*?)```/g;
+        escapedText = escapedText.replace(codeBlockRegex, function(match, language, code) {
+            return `<pre><code class="language-${language}">${code}</code></pre>`;
+        });
+        
+        // Format tables
+        escapedText = formatTables(escapedText);
+        
+        // Format lists with proper indentation
+        escapedText = formatLists(escapedText);
+        
         // Regular formatting for non-poetry text
         return escapedText
             // Handle literal '\n' characters that might still be in the text
@@ -395,8 +407,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/\n/g, '<br>')
             // Wrap in paragraphs if not already
             .replace(/^(.+)$/gm, function(match) {
-                if (!match.startsWith('<p>')) {
-                    return match;
+                if (!match.startsWith('<p>') && !match.startsWith('<h') && 
+                    !match.startsWith('<ul') && !match.startsWith('<ol') && 
+                    !match.startsWith('<pre') && !match.startsWith('<blockquote')) {
+                    return `<p>${match}</p>`;
                 }
                 return match;
             })
@@ -404,14 +418,139 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
             .replace(/`([^`]+)`/g, '<code>$1</code>')
-            .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
             .replace(/^# (.*$)/gm, '<h1>$1</h1>')
             .replace(/^## (.*$)/gm, '<h2>$1</h2>')
             .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-            .replace(/^\s*[-*+] (.*)$/gm, '<li>$1</li>')
-            .replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>')
-            .replace(/<\/ul><ul>/g, '')
-            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+            .replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>')
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+            // Highlight important information
+            .replace(/!!(.*?)!!/g, '<span class="highlight">$1</span>');
+    }
+
+    // Helper function to format tables in markdown
+    function formatTables(text) {
+        // Split the text into lines
+        const lines = text.split('\n');
+        let inTable = false;
+        let tableContent = '';
+        let result = [];
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            
+            // Check if this is a table row (contains | character)
+            if (line.includes('|') && line.trim().startsWith('|')) {
+                if (!inTable) {
+                    // Start of a new table
+                    inTable = true;
+                    tableContent = '<table>';
+                }
+                
+                // Check if this is a header separator row
+                if (line.includes('---') || line.includes('===')) {
+                    continue; // Skip the separator row
+                }
+                
+                // Process the table row
+                const cells = line.split('|').filter(cell => cell.trim() !== '');
+                const isHeader = i > 0 && lines[i-1].includes('|') && 
+                                 (i+1 < lines.length && (lines[i+1].includes('---') || lines[i+1].includes('===')));
+                
+                tableContent += '<tr>';
+                cells.forEach(cell => {
+                    if (isHeader) {
+                        tableContent += `<th>${cell.trim()}</th>`;
+                    } else {
+                        tableContent += `<td>${cell.trim()}</td>`;
+                    }
+                });
+                tableContent += '</tr>';
+            } else if (inTable) {
+                // End of the table
+                inTable = false;
+                tableContent += '</table>';
+                result.push(tableContent);
+                result.push(line);
+            } else {
+                result.push(line);
+            }
+        }
+        
+        // If we're still in a table at the end of the text
+        if (inTable) {
+            tableContent += '</table>';
+            result.push(tableContent);
+        }
+        
+        return result.join('\n');
+    }
+
+    // Helper function to format lists in markdown
+    function formatLists(text) {
+        // Split the text into lines
+        const lines = text.split('\n');
+        let inList = false;
+        let listType = '';
+        let listContent = '';
+        let result = [];
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            
+            // Check if this is an unordered list item
+            if (line.trim().match(/^[\*\-\+]\s/)) {
+                if (!inList || listType !== 'ul') {
+                    // Start of a new unordered list
+                    if (inList) {
+                        // Close the previous list
+                        listContent += `</${listType}>`;
+                        result.push(listContent);
+                    }
+                    inList = true;
+                    listType = 'ul';
+                    listContent = '<ul>';
+                }
+                
+                // Extract the list item content
+                const content = line.trim().replace(/^[\*\-\+]\s/, '');
+                listContent += `<li>${content}</li>`;
+            }
+            // Check if this is an ordered list item
+            else if (line.trim().match(/^\d+\.\s/)) {
+                if (!inList || listType !== 'ol') {
+                    // Start of a new ordered list
+                    if (inList) {
+                        // Close the previous list
+                        listContent += `</${listType}>`;
+                        result.push(listContent);
+                    }
+                    inList = true;
+                    listType = 'ol';
+                    listContent = '<ol>';
+                }
+                
+                // Extract the list item content
+                const content = line.trim().replace(/^\d+\.\s/, '');
+                listContent += `<li>${content}</li>`;
+            }
+            else if (inList) {
+                // End of the list
+                inList = false;
+                listContent += `</${listType}>`;
+                result.push(listContent);
+                result.push(line);
+            } else {
+                result.push(line);
+            }
+        }
+        
+        // If we're still in a list at the end of the text
+        if (inList) {
+            listContent += `</${listType}>`;
+            result.push(listContent);
+        }
+        
+        return result.join('\n');
     }
 
     // Add event listener for the fallback button
