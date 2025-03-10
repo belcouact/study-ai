@@ -6,18 +6,43 @@ export async function onRequestPost(context) {
     // Get API key from environment variables
     const apiKey = env.DEEPSEEK_API_KEY;
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: "API key not configured" }), {
+      return new Response(JSON.stringify({ 
+        error: "API key not configured",
+        troubleshooting_tips: [
+          "Set the DEEPSEEK_API_KEY environment variable in your Cloudflare Pages dashboard",
+          "Make sure the API key is correct and has not expired"
+        ]
+      }), {
         status: 500,
         headers: { "Content-Type": "application/json" }
       });
     }
     
     // Get request body
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      return new Response(JSON.stringify({ 
+        error: "Invalid JSON in request body",
+        message: e.message,
+        troubleshooting_tips: [
+          "Check that your request includes a valid JSON body",
+          "Verify the Content-Type header is set to application/json"
+        ]
+      }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
     
     // Forward request to DeepSeek API
     const apiBaseUrl = env.API_BASE_URL || "https://api.deepseek.com";
-    const response = await fetch(`${apiBaseUrl}/v1/chat/completions`, {
+    const apiUrl = `${apiBaseUrl}/v1/chat/completions`;
+    
+    console.log(`Making request to: ${apiUrl}`);
+    
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -31,13 +56,103 @@ export async function onRequestPost(context) {
       })
     });
     
-    // Return the API response
-    const data = await response.json();
-    return new Response(JSON.stringify(data), {
-      headers: { "Content-Type": "application/json" }
-    });
+    // Check if response is OK
+    if (!response.ok) {
+      const contentType = response.headers.get("content-type");
+      
+      // If response is HTML (error page)
+      if (contentType && contentType.includes("text/html")) {
+        const htmlContent = await response.text();
+        const firstLine = htmlContent.split('\n')[0].substring(0, 100);
+        
+        return new Response(JSON.stringify({
+          error: "Received HTML instead of JSON from API",
+          status: response.status,
+          statusText: response.statusText,
+          contentType: contentType,
+          htmlPreview: firstLine,
+          troubleshooting_tips: [
+            "The API endpoint may be incorrect - check API_BASE_URL",
+            "The API service might be down or experiencing issues",
+            "Your API key might be invalid or expired",
+            "There might be network connectivity issues"
+          ]
+        }), {
+          status: 502,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+      
+      // Try to parse error as JSON
+      try {
+        const errorData = await response.json();
+        return new Response(JSON.stringify({
+          error: "API request failed",
+          status: response.status,
+          statusText: response.statusText,
+          apiError: errorData,
+          troubleshooting_tips: [
+            "Check your API key is valid",
+            "Verify the request format is correct",
+            "The API service might be experiencing issues"
+          ]
+        }), {
+          status: response.status,
+          headers: { "Content-Type": "application/json" }
+        });
+      } catch (e) {
+        // If can't parse as JSON, return text
+        const textContent = await response.text();
+        return new Response(JSON.stringify({
+          error: "API request failed with non-JSON response",
+          status: response.status,
+          statusText: response.statusText,
+          responseText: textContent.substring(0, 500),
+          troubleshooting_tips: [
+            "Check your API key is valid",
+            "Verify the API endpoint is correct",
+            "The API service might be experiencing issues"
+          ]
+        }), {
+          status: response.status,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+    }
+    
+    // Try to parse the successful response
+    try {
+      const data = await response.json();
+      return new Response(JSON.stringify(data), {
+        headers: { "Content-Type": "application/json" }
+      });
+    } catch (e) {
+      const textContent = await response.text();
+      return new Response(JSON.stringify({
+        error: "Failed to parse API response as JSON",
+        message: e.message,
+        responseText: textContent.substring(0, 500),
+        troubleshooting_tips: [
+          "The API might be returning malformed JSON",
+          "The response might be HTML instead of JSON",
+          "Check if the API endpoint is correct"
+        ]
+      }), {
+        status: 502,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ 
+      error: "Server error processing request",
+      message: error.message,
+      stack: error.stack,
+      troubleshooting_tips: [
+        "This is likely a bug in the serverless function",
+        "Check the Cloudflare Pages function logs for more details",
+        "Verify that all environment variables are set correctly in the Cloudflare Pages dashboard"
+      ]
+    }), {
       status: 500,
       headers: { "Content-Type": "application/json" }
     });

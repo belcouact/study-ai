@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // API configuration
     // Note: These values are now for reference only and not actually used for API calls
-    // The actual values are stored in Netlify environment variables
+    // The actual values are stored in Cloudflare Pages environment variables
     const API_BASE_URL = 'https://api.lkeap.cloud.tencent.com/v1';
     const MODEL = 'deepseek-r1';
 
@@ -383,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const timeoutId = setTimeout(() => controller.abort(), 30000); // Increase timeout to 30 seconds for streaming
         
         try {
-            console.log('Using Netlify function as proxy with streaming enabled...');
+            console.log('Using Cloudflare Pages function as proxy with streaming enabled...');
             
             // Set up a timer to show a preliminary response if the request takes too long
             const fallbackTimer = setTimeout(() => {
@@ -404,8 +404,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 loading.classList.remove('hidden');
             }, 5000);
             
-            // Use the Netlify function with streaming enabled
-            const response = await fetch('/api/simple-ai', {
+            // Use the Cloudflare function with streaming enabled
+            const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -818,10 +818,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
             
             try {
-                const response = await fetch('/api/api-health', {
-                    method: 'GET',
-                    signal: controller.signal
-                });
+                const response = await fetch('/api/test');
                 
                 // Clear the timeout
                 clearTimeout(timeoutId);
@@ -904,10 +901,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 responseTime: responseTime,
                 timestamp: new Date().toISOString(),
                 troubleshooting_tips: [
-                    "Check if the Netlify functions are deployed correctly",
-                    "Verify that the API credentials are set in the Netlify environment variables",
+                    "Check if the Cloudflare Pages functions are deployed correctly",
+                    "Verify that the API credentials are set in the Cloudflare Pages environment variables",
                     "The API service might be experiencing issues or high load",
-                    "There might be network connectivity issues between Netlify and the API"
+                    "There might be network connectivity issues between Cloudflare and the API"
                 ]
             }, null, 2);
             showDiagnosticsButton.textContent = 'Hide Diagnostics';
@@ -1168,33 +1165,38 @@ While I can't provide a detailed answer right now, you might want to:
             }
             
             // If we get here, the edge function failed, so try the regular function
-            console.log('Trying regular function...');
-            const fallbackResponse = await fetch('/.netlify/functions/streaming-ai', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ prompt }),
-            });
+            console.log('Trying regular function test...');
+            const fallbackResponse = await fetch('/api/test');
             
             // Remove loading indicator
             outputElement.removeChild(loadingIndicator);
             outputElement.classList.remove('loading');
             
             if (!fallbackResponse.ok) {
-                throw new Error(`Regular function error: ${fallbackResponse.status}`);
+                throw new Error(`Regular function test failed: ${fallbackResponse.status}`);
             }
             
-            const data = await fallbackResponse.json();
-            if (data.content) {
-                outputElement.innerHTML = formatResponse(data.content);
-                return;
-            } else {
-                outputElement.innerHTML = `<div class="system-message">
-                    <p>The fallback function returned a response without content.</p>
-                    <pre>${JSON.stringify(data, null, 2)}</pre>
-                </div>`;
-            }
+            const fallbackData = await fallbackResponse.json();
+            
+            console.log('Regular function test results:', fallbackData);
+            
+            // Show diagnostics
+            showDiagnosticsButton.classList.remove('hidden');
+            diagnosticsPanel.classList.remove('hidden');
+            diagnosticsOutput.textContent = JSON.stringify({
+                ...fallbackData,
+                note: "Edge function failed, using regular function instead.",
+                troubleshooting_tips: [
+                    "Check if Cloudflare Pages Functions are enabled for your site",
+                    "Check your function code for errors",
+                    "Check the Cloudflare Pages logs for any deployment errors",
+                    "Make sure your Cloudflare Pages site is properly configured"
+                ]
+            }, null, 2);
+            showDiagnosticsButton.textContent = 'Hide Diagnostics';
+            
+            apiStatus.textContent = 'Regular function is working (Edge function failed)';
+            apiStatus.className = 'status-warning';
             
         } catch (error) {
             console.error('Error calling streaming API:', error);
@@ -1243,7 +1245,7 @@ While I can't provide a detailed answer right now, you might want to:
                 
                 // If we get here, the edge function failed, so try the regular function
                 console.log('Trying regular function test...');
-                const fallbackResponse = await fetch('/.netlify/functions/test-edge');
+                const fallbackResponse = await fetch('/api/test');
                 
                 if (!fallbackResponse.ok) {
                     throw new Error(`Regular function test failed: ${fallbackResponse.status}`);
@@ -1258,7 +1260,13 @@ While I can't provide a detailed answer right now, you might want to:
                 diagnosticsPanel.classList.remove('hidden');
                 diagnosticsOutput.textContent = JSON.stringify({
                     ...fallbackData,
-                    note: "Edge function failed, using regular function instead."
+                    note: "Edge function failed, using regular function instead.",
+                    troubleshooting_tips: [
+                        "Check if Cloudflare Pages Functions are enabled for your site",
+                        "Check your function code for errors",
+                        "Check the Cloudflare Pages logs for any deployment errors",
+                        "Make sure your Cloudflare Pages site is properly configured"
+                    ]
                 }, null, 2);
                 showDiagnosticsButton.textContent = 'Hide Diagnostics';
                 
@@ -1278,10 +1286,10 @@ While I can't provide a detailed answer right now, you might want to:
                     stack: error.stack,
                     timestamp: new Date().toISOString(),
                     troubleshooting_tips: [
-                        "Check if Netlify Edge Functions are enabled for your site",
-                        "Verify that the functions are deployed correctly",
-                        "Check the Netlify logs for any deployment errors",
-                        "Make sure your Netlify site is properly configured"
+                        "Check if Cloudflare Pages Functions are enabled for your site",
+                        "Check your function code for errors",
+                        "Check the Cloudflare Pages logs for any deployment errors",
+                        "Make sure your Cloudflare Pages site is properly configured"
                     ]
                 }, null, 2);
                 showDiagnosticsButton.textContent = 'Hide Diagnostics';
