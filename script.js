@@ -220,7 +220,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Extract and display content
         let content = extractContentFromResponse(data);
         
-        output.innerHTML = `<div class="ai-message">${formatResponse(content)}</div>`;
+        // Check if the content contains literal '\n' characters and handle them
+        if (typeof content === 'string' && content.includes('\\n')) {
+            console.log('Content contains literal \\n characters, handling them...');
+        }
+        
+        // Format the response
+        const formattedContent = formatResponse(content);
+        
+        // Display the formatted content
+        output.innerHTML = `<div class="ai-message">${formattedContent}</div>`;
         
         // Store the last question for retry functionality
         lastQuestion = question;
@@ -228,26 +237,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to extract content from various response formats
     function extractContentFromResponse(data) {
+        // Handle null or undefined data
+        if (!data) return "No response data received";
+        
+        // If data is already a string, return it directly
+        if (typeof data === 'string') return data;
+        
         // Try to extract from standard OpenAI format
-        if (data.choices && data.choices[0] && data.choices[0].message) {
-            const message = data.choices[0].message;
-            if (message.content) return message.content;
+        if (data.choices && data.choices[0]) {
+            // Check for message format
+            if (data.choices[0].message) {
+                const message = data.choices[0].message;
+                if (message.content) return message.content;
+            }
+            
+            // Check for text/content format
+            if (data.choices[0].text) return data.choices[0].text;
+            if (data.choices[0].content) return data.choices[0].content;
         }
         
         // If we have a direct content field
         if (data.content) return data.content;
         
         // If we have a message field
-        if (data.message && data.message.content) return data.message.content;
+        if (data.message) {
+            if (typeof data.message === 'string') return data.message;
+            if (data.message.content) return data.message.content;
+        }
         
-        // If we have a raw text field
+        // If we have a text field
         if (data.text) return data.text;
         
         // If we have a response field
-        if (data.response) return data.response;
+        if (data.response) {
+            if (typeof data.response === 'string') return data.response;
+            if (data.response.content) return data.response.content;
+        }
         
         // If we have a raw data object, stringify it
-        return JSON.stringify(data, null, 2);
+        try {
+            return JSON.stringify(data, null, 2);
+        } catch (e) {
+            return "Could not parse response data";
+        }
     }
 
     // Add this at the top of your script
@@ -350,26 +382,51 @@ document.addEventListener('DOMContentLoaded', () => {
         // Escape HTML special characters
         let escapedText = escapeHTML(text);
         
+        // Handle literal '\n' characters in the text (convert them to actual newlines)
+        escapedText = escapedText.replace(/\\n/g, '\n');
+        
         // Handle Chinese poetry formatting
         if (escapedText.includes('《') && escapedText.includes('》')) {
-            // Replace double newlines with paragraph breaks
-            escapedText = escapedText.replace(/\n\n/g, '</p><p>');
+            // Split the text into lines
+            const lines = escapedText.split('\n');
+            let formattedPoem = '';
             
-            // Replace single newlines with line breaks
-            escapedText = escapedText.replace(/\n/g, '<br>');
-            
-            // Wrap in paragraphs
-            escapedText = `<p>${escapedText}</p>`;
+            // Process each line
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                // Skip empty lines
+                if (!line) continue;
+                
+                // If it's a title line (contains 《》)
+                if (line.includes('《') && line.includes('》')) {
+                    formattedPoem += `<h3 class="poem-title">${line}</h3>`;
+                } else {
+                    // Regular poem line
+                    formattedPoem += `<div class="poem-line">${line}</div>`;
+                }
+            }
             
             // Add poetry class for styling
-            return `<div class="poetry">${escapedText}</div>`;
+            return `<div class="poetry">${formattedPoem}</div>`;
         }
         
         // Regular formatting for non-poetry text
         return escapedText
+            // Handle literal '\n' characters that might still be in the text
+            .replace(/\\n/g, '\n')
+            // Replace double newlines with paragraph breaks
             .replace(/\n\n/g, '</p><p>')
+            // Replace single newlines with line breaks
             .replace(/\n/g, '<br>')
-            .replace(/^(.+)$/gm, '$1')
+            // Wrap in paragraphs if not already
+            .replace(/^(.+)$/gm, function(match) {
+                if (!match.startsWith('<p>')) {
+                    return match;
+                }
+                return match;
+            })
+            // Format markdown
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
             .replace(/`([^`]+)`/g, '<code>$1</code>')

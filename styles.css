@@ -373,16 +373,24 @@ button {
     text-align: center;
     margin: 2rem auto;
     max-width: 80%;
+    padding: 1rem;
+    background-color: #fafafa;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.poetry p {
-    margin-bottom: 1.5rem;
-}
-
-.poetry p:first-child {
-    font-size: 1.2rem;
+.poetry .poem-title {
+    font-size: 1.3rem;
     font-weight: bold;
     margin-bottom: 1.5rem;
+    color: #333;
+    text-align: center;
+}
+
+.poetry .poem-line {
+    margin-bottom: 0.5rem;
+    line-height: 1.8;
+    font-size: 1.1rem;
 }
 
 /* Add responsive styling for poetry on mobile */
@@ -390,5 +398,14 @@ button {
     .poetry {
         max-width: 95%;
         font-size: 0.95rem;
+        padding: 0.8rem;
+    }
+    
+    .poetry .poem-title {
+        font-size: 1.2rem;
+    }
+    
+    .poetry .poem-line {
+        font-size: 1rem;
     }
 } 
