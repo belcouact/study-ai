@@ -30,13 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add event listener for the submit button
     submitButton.addEventListener('click', handleSubmit);
     
-    // Add event listener for Enter key in the input field
-    userInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            handleSubmit();
-        }
-    });
+    // Removed Enter key event listener to prevent submitting when Enter is pressed
 
     // Add event listener for the show diagnostics button
     showDiagnosticsButton.addEventListener('click', () => {
@@ -304,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Create a controller for the timeout
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 90000); // 90 seconds timeout
+            const timeoutId = setTimeout(() => controller.abort(), 300000); // 300 seconds timeout (5 minutes)
             
             // Make the request
             const response = await fetch(`/api/${currentApiFunction}`, {

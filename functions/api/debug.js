@@ -35,11 +35,11 @@ export async function onRequestGet(context) {
   let apiConnectivity = "unknown";
   let apiResponse = null;
   
-  // Create an AbortController with a 60-second timeout
+  // Create an AbortController with a 120-second timeout
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {
     controller.abort();
-  }, 60000); // 60 seconds timeout (1 minute)
+  }, 120000); // 120 seconds timeout (2 minutes)
   
   try {
     // Test the actual API endpoint with a simple GET request
@@ -94,7 +94,7 @@ export async function onRequestGet(context) {
     if (error.name === 'AbortError') {
       apiConnectivity = "timeout";
       apiResponse = {
-        error: "Request timed out after 60 seconds",
+        error: "Request timed out after 120 seconds",
         message: "The connectivity test request timed out"
       };
     } else {
