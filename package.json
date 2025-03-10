@@ -4,5 +4,9 @@
   "description": "AI Chat Interface using DeepSeek Reasoner API",
   "dependencies": {
     "node-fetch": "^2.6.7"
+  },
+  "scripts": {
+    "deploy": "npm run build && npx wrangler pages publish dist",
+    "deploy:staging": "npm run build && npx wrangler pages publish dist --branch=staging"
   }
 } 

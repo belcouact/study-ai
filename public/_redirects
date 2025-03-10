@@ -1,0 +1,9 @@
+# Redirects from what the browser requests to what we serve
+# Examples:
+# /home              /                   301
+# /blog/my-post.php  /blog/my-post       301
+# /news              /blog               302
+# /google            https://google.com  301
+
+# Fallback for single-page applications (SPA)
+/*    /index.html   200 

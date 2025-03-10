@@ -1,0 +1,34 @@
+[build]
+command = "npm run build" # Adjust based on your build command
+publish = "dist" # Adjust based on your output directory
+
+[site]
+bucket = "./dist" # Adjust based on your output directory
+
+# Environment variables for all environments
+[vars]
+# Example: PUBLIC_API_URL = "https://api.example.com"
+
+# Functions configuration
+[functions]
+directory = "functions"
+# Uncomment to include node_modules in the bundle
+# node_compat = true
+
+# Production environment variables
+[env.production]
+name = "production"
+# Production-specific variables
+[env.production.vars]
+# Example: ENVIRONMENT = "production"
+
+# Staging environment variables
+[env.staging]
+name = "staging"
+# Staging-specific variables
+[env.staging.vars]
+# Example: ENVIRONMENT = "staging"
+
+# Secrets are not stored in this file
+# Use `wrangler secret put SECRET_NAME` to set secrets
+# Or set them in the Cloudflare Dashboard 
