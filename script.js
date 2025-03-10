@@ -5,8 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const micButton = document.getElementById('mic-button');
     const output = document.getElementById('output');
     const loading = document.getElementById('loading');
-    const checkApiButton = document.getElementById('check-api-button');
-    const apiStatus = document.getElementById('api-status');
     const showDiagnosticsButton = document.getElementById('show-diagnostics');
     const diagnosticsPanel = document.getElementById('diagnostics-panel');
     const diagnosticsOutput = document.getElementById('diagnostics-output');
@@ -155,9 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Add event listener for the check API button
-    checkApiButton.addEventListener('click', checkApiConnection);
-    
     // Add event listener for the show diagnostics button
     showDiagnosticsButton.addEventListener('click', () => {
         if (diagnosticsPanel.classList.contains('hidden')) {
@@ -173,13 +168,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (directTestButton) {
         directTestButton.addEventListener('click', async () => {
             try {
-                apiStatus.textContent = 'Running direct API test...';
-                apiStatus.className = 'status-checking';
+                // Show loading state
+                loading.classList.remove('hidden');
                 
-                const response = await fetch('/api/direct-api-test');
+                const response = await fetch('/api/direct-test');
                 const data = await response.json();
                 
-                console.log('Direct API test results:', data);
+                // Hide loading state
+                loading.classList.add('hidden');
                 
                 // Show diagnostics
                 showDiagnosticsButton.classList.remove('hidden');
@@ -187,12 +183,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
                 showDiagnosticsButton.textContent = 'Hide Diagnostics';
                 
-                apiStatus.textContent = 'Direct API test completed';
-                apiStatus.className = 'status-success';
+                console.log('Direct API test completed:', data);
             } catch (error) {
-                apiStatus.textContent = `Direct API test failed: ${error.message}`;
-                apiStatus.className = 'status-error';
-                console.error('Direct API test error:', error);
+                // Hide loading state
+                loading.classList.add('hidden');
+                
+                console.error('Direct API test failed:', error);
             }
         });
     }
@@ -240,13 +236,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (checkEnvButton) {
         checkEnvButton.addEventListener('click', async () => {
             try {
-                apiStatus.textContent = 'Checking environment...';
-                apiStatus.className = 'status-checking';
+                // Show loading state
+                loading.classList.remove('hidden');
                 
                 const response = await fetch('/api/check-env');
                 const data = await response.json();
                 
-                console.log('Environment check results:', data);
+                // Hide loading state
+                loading.classList.add('hidden');
                 
                 // Show diagnostics
                 showDiagnosticsButton.classList.remove('hidden');
@@ -255,16 +252,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 showDiagnosticsButton.textContent = 'Hide Diagnostics';
                 
                 if (data.status === 'ok') {
-                    apiStatus.textContent = 'Environment check completed';
-                    apiStatus.className = 'status-success';
+                    console.log('Environment check completed:', data);
                 } else {
-                    apiStatus.textContent = `Environment check failed: ${data.message || 'Unknown error'}`;
-                    apiStatus.className = 'status-error';
+                    console.error('Environment check failed:', data);
                 }
             } catch (error) {
-                apiStatus.textContent = `Environment check failed: ${error.message}`;
-                apiStatus.className = 'status-error';
-                console.error('Environment check error:', error);
+                // Hide loading state
+                loading.classList.add('hidden');
+                
+                console.error('Environment check failed:', error);
             }
         });
     }
@@ -364,273 +360,48 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to handle form submission
     async function handleSubmit() {
         const question = userInput.value.trim();
-        if (!question) return;
         
-        // Update status to indicate we're processing
-        apiStatus.textContent = 'Submitting question...';
-        apiStatus.className = 'status-checking';
-        showDiagnosticsButton.classList.add('hidden');
-        diagnosticsPanel.classList.add('hidden');
+        if (!question) {
+            alert('Please enter a question');
+            return;
+        }
+        
+        // Clear previous response
+        output.innerHTML = '';
         
         // Show loading state
         loading.classList.remove('hidden');
-        output.innerHTML = '';
-        
-        // Create a controller for the timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // Increase timeout to 30 seconds for streaming
         
         try {
-            console.log('Using Cloudflare Pages function as proxy with streaming enabled...');
-            
-            // Set up a timer to show a preliminary response if the request takes too long
-            const fallbackTimer = setTimeout(() => {
-                // If we're still waiting after 5 seconds, show a preliminary response
-                if (loading.classList.contains('hidden')) return; // Already completed
-                
-                console.log('Request taking longer than expected, showing preliminary response');
-                const preliminaryResponse = "I'm processing your question. This might take a moment...";
-                
-                output.innerHTML = `
-                    <div class="system-message">
-                        <p>Your request is taking longer than expected. Here's a preliminary response while you wait:</p>
-                    </div>
-                    <div class="ai-message">${formatResponse(preliminaryResponse)}</div>
-                `;
-                
-                // Keep the loading indicator visible
-                loading.classList.remove('hidden');
-            }, 5000);
-            
-            // Use the Cloudflare function with streaming enabled
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                    messages: [
-                        { role: "user", content: question }
-                    ]
-                }),
-                signal: controller.signal
-            });
-            
-            // Clear the fallback timer
-            clearTimeout(fallbackTimer);
-            
-            // Check if the response is ok
-            if (!response.ok) {
-                let errorMessage = `Server returned status ${response.status}`;
-                let errorDetails = '';
-                let errorData = null;
-                
-                try {
-                    // Try to parse the error response as JSON
-                    errorData = await response.json();
-                    errorDetails = JSON.stringify(errorData, null, 2);
-                    console.error('Server error details:', errorData);
-                    
-                    if (errorData.error) {
-                        errorMessage = errorData.error;
-                    }
-                } catch (parseError) {
-                    // If we can't parse as JSON, try to get the text
-                    try {
-                        errorDetails = await response.text();
-                    } catch (textError) {
-                        errorDetails = 'Could not retrieve error details';
-                    }
-                }
-                
-                // Update status
-                apiStatus.textContent = `Request failed: ${errorMessage}`;
-                apiStatus.className = 'status-error';
-                
-                // Show diagnostics button
-                showDiagnosticsButton.classList.remove('hidden');
-                diagnosticsOutput.textContent = errorDetails;
-                
-                // Display appropriate error message based on status code
-                if (response.status === 502) {
-                    output.innerHTML = `
-                        <div class="error-message">
-                            <h3>Server Error (502 Bad Gateway)</h3>
-                            <p>The server encountered an error while processing your request.</p>
-                            <p>This might be due to:</p>
-                            <ul>
-                                <li>The API service being temporarily unavailable</li>
-                                <li>High traffic or server load</li>
-                                <li>Network issues between our server and the API</li>
-                            </ul>
-                            <p>Please try again in a few moments.</p>
-                        </div>
-                    `;
-                } else {
-                    output.innerHTML = `
-                        <div class="error-message">
-                            <h3>Request Failed (${response.status})</h3>
-                            <p>Error: ${errorMessage}</p>
-                        </div>
-                    `;
-                }
-                
-                throw new Error(`Server returned status ${response.status}: ${errorMessage}`);
-            }
-            
-            // Check if we got a streaming response
-            const contentType = response.headers.get('Content-Type');
-            if (contentType && contentType.includes('text/event-stream')) {
-                // Handle streaming response
-                console.log('Received streaming response');
-                
-                // Hide loading indicator since we'll show content as it arrives
-                loading.classList.add('hidden');
-                
-                // Set up a reader for the stream
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let buffer = '';
-                let fullContent = '';
-                
-                // Process the stream
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    
-                    // Decode the chunk and add to buffer
-                    buffer += decoder.decode(value, { stream: true });
-                    
-                    // Process SSE format (data: lines)
-                    const lines = buffer.split('\n');
-                    buffer = lines.pop() || ''; // Keep the last incomplete line in the buffer
-                    
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            const data = line.slice(6); // Remove 'data: ' prefix
-                            
-                            // Check if it's the [DONE] message
-                            if (data.trim() === '[DONE]') continue;
-                            
-                            try {
-                                // Parse the JSON data
-                                const parsed = JSON.parse(data);
-                                
-                                // Extract the content if it exists
-                                if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
-                                    const content = parsed.choices[0].delta.content;
-                                    fullContent += content;
-                                    
-                                    // Format and display the accumulated output
-                                    output.innerHTML = `<div class="ai-message">${formatResponse(fullContent)}</div>`;
-                                }
-                            } catch (e) {
-                                console.error('Error parsing JSON:', e);
-                            }
-                        }
-                    }
-                }
-                
-                // Process any remaining data
-                if (buffer.length > 0) {
-                    const lines = buffer.split('\n');
-                    for (const line of lines) {
-                        if (line.startsWith('data: ') && line.slice(6).trim() !== '[DONE]') {
-                            try {
-                                const parsed = JSON.parse(line.slice(6));
-                                if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
-                                    const content = parsed.choices[0].delta.content;
-                                    fullContent += content;
-                                    
-                                    // Format and display the accumulated output
-                                    output.innerHTML = `<div class="ai-message">${formatResponse(fullContent)}</div>`;
-                                }
-                            } catch (e) {
-                                console.error('Error parsing JSON:', e);
-                            }
-                        }
-                    }
-                }
-                
-                // Store the last question
-                lastQuestion = question;
-                
-                // Clear the input
-                userInput.value = '';
-                
-                // Update status
-                apiStatus.textContent = 'Streaming completed';
-                apiStatus.className = 'status-success';
-                
-                // Store the raw response for debugging
-                lastRawResponse = { 
-                    streaming: true, 
-                    content: fullContent,
-                    model: currentModel || 'deepseek-r1'
-                };
-                
-                return;
-            }
-            
-            // If we get here, it's a regular JSON response
-            console.log('Received regular JSON response');
-            
-            // Parse the successful response
-            const data = await response.json();
-            diagnosticsData = data; // Store for diagnostics
-            
-            // Process successful response
-            handleSuccessfulResponse(data, question);
-            
-        } catch (error) {
-            // Handle all errors
-            console.error('Request failed:', error);
-            
-            // Check if this is an abort error (timeout)
-            if (error.name === 'AbortError') {
-                console.log('Request timed out');
-                
-                // Update status
-                apiStatus.textContent = 'Request timed out';
-                apiStatus.className = 'status-error';
-                
-                output.innerHTML = `
-                    <div class="error-message">
-                        <h3>Request Timeout</h3>
-                        <p>The request took too long to complete.</p>
-                        <p>Please try again later or try a different question.</p>
-                    </div>
-                `;
-            } 
-            // Only update UI if it wasn't already updated by the error handling above
-            else if (apiStatus.className !== 'status-error') {
-                apiStatus.textContent = `Error: ${error.message}`;
-                apiStatus.className = 'status-error';
-                
-                output.innerHTML = `
-                    <div class="error-message">
-                        <h3>Request Error</h3>
-                        <p>Error: ${error.message}</p>
-                        <p>Please check your internet connection and try again.</p>
-                    </div>
-                `;
-            }
-            
-            lastQuestion = question;
-        } finally {
-            // Clear the timeout
-            clearTimeout(timeoutId);
+            const data = await fetchAIResponse(question);
             
             // Hide loading state
             loading.classList.add('hidden');
+            
+            // Handle the response
+            handleSuccessfulResponse(data, question);
+            
+        } catch (error) {
+            // Hide loading state
+            loading.classList.add('hidden');
+            
+            // Show error message
+            output.innerHTML = `<div class="system-message error">
+                <p>Sorry, I encountered an error: ${error.message}</p>
+                <p>Please try again later or rephrase your question.</p>
+            </div>`;
+            
+            // Show diagnostics button
+            showDiagnosticsButton.classList.remove('hidden');
         }
+        
+        // Clear the input
+        userInput.value = '';
     }
     
     // Helper function to handle successful responses
     function handleSuccessfulResponse(data, question) {
-        // Update status
-        apiStatus.textContent = 'Request successful!';
-        apiStatus.className = 'status-success';
+        // Update status (removed API status update)
         console.log('API response details:', data);
         
         // Extract and display content
@@ -770,87 +541,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
             // Line breaks
             .replace(/\n/g, '<br>');
-    }
-
-    // Function to check API connection
-    async function checkApiConnection() {
-        // Show loading state
-        loading.classList.remove('hidden');
-        apiStatus.textContent = 'Checking API connection...';
-        apiStatus.className = 'status-checking';
-        
-        // Create a controller for the timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
-        
-        try {
-            const response = await fetch('/api/debug', {
-                method: 'GET',
-                signal: controller.signal
-            });
-            
-            // Clear the timeout
-            clearTimeout(timeoutId);
-            
-            // Hide loading state
-            loading.classList.add('hidden');
-            
-            if (!response.ok) {
-                apiStatus.textContent = `Error: ${response.status} ${response.statusText}`;
-                apiStatus.className = 'status-error';
-                throw new Error(`API check failed: ${response.status} ${response.statusText}`);
-            }
-            
-            const data = await response.json();
-            
-            // Show diagnostics
-            showDiagnosticsButton.classList.remove('hidden');
-            diagnosticsPanel.classList.remove('hidden');
-            diagnosticsOutput.textContent = JSON.stringify(data, null, 2);
-            showDiagnosticsButton.textContent = 'Hide Diagnostics';
-            
-            // Update status based on API connectivity
-            if (data.apiConnectivity === 'success') {
-                apiStatus.textContent = 'API is connected and working!';
-                apiStatus.className = 'status-success';
-            } else {
-                apiStatus.textContent = 'API connection issue detected';
-                apiStatus.className = 'status-warning';
-            }
-            
-            // Store diagnostics data
-            diagnosticsData = data;
-            
-            return data;
-        } catch (error) {
-            // Clear the timeout
-            clearTimeout(timeoutId);
-            
-            // Hide loading state
-            loading.classList.add('hidden');
-            
-            // Update status
-            apiStatus.textContent = `Error: ${error.message}`;
-            apiStatus.className = 'status-error';
-            
-            // Show diagnostics
-            showDiagnosticsButton.classList.remove('hidden');
-            diagnosticsPanel.classList.remove('hidden');
-            diagnosticsOutput.textContent = JSON.stringify({
-                error: error.message,
-                stack: error.stack,
-                timestamp: new Date().toISOString(),
-                troubleshooting_tips: [
-                    "Check if the Cloudflare Pages functions are deployed correctly",
-                    "Verify that the API credentials are set in the Cloudflare Pages environment variables",
-                    "The API service might be experiencing issues or high load",
-                    "There might be network connectivity issues between Cloudflare and the API"
-                ]
-            }, null, 2);
-            showDiagnosticsButton.textContent = 'Hide Diagnostics';
-            
-            throw error;
-        }
     }
 
     // Add event listener for the fallback button
@@ -1087,7 +777,15 @@ While I can't provide a detailed answer right now, you might want to:
                     </div>`;
                 }
                 
-                return; // Successfully processed the streaming response
+                // Streaming completed
+                
+                // Enable the submit button
+                submitButton.disabled = false;
+                
+                // Hide loading indicator
+                loading.classList.add('hidden');
+                
+                return;
             } catch (edgeError) {
                 console.error('Edge function failed:', edgeError);
                 // Continue to try the regular function
@@ -1124,17 +822,32 @@ While I can't provide a detailed answer right now, you might want to:
             }, null, 2);
             showDiagnosticsButton.textContent = 'Hide Diagnostics';
             
-            apiStatus.textContent = 'Regular function is working (Edge function failed)';
-            apiStatus.className = 'status-warning';
-            
         } catch (error) {
-            console.error('Error calling streaming API:', error);
-            outputElement.innerHTML = `<div class="error">Error: ${error.message}</div>
-                <div class="system-message">
-                    <p>Both streaming and fallback attempts failed.</p>
-                    <p>Please try again or use the non-streaming mode.</p>
+            console.error('Streaming error:', error);
+            
+            // Show timeout message if it was a timeout
+            if (error.name === 'AbortError') {
+                outputElement.innerHTML += `<div class="system-message warning">
+                    <p>The request is taking longer than expected. Please wait...</p>
                 </div>`;
-            outputElement.classList.remove('loading');
+                
+                // Try again with non-streaming API
+                try {
+                    const data = await fetchAIResponse(prompt);
+                    handleSuccessfulResponse(data, prompt);
+                } catch (fallbackError) {
+                    outputElement.innerHTML = `<div class="system-message error">
+                        <p>Sorry, I encountered an error: ${fallbackError.message}</p>
+                        <p>Please try again later or rephrase your question.</p>
+                    </div>`;
+                }
+            } 
+            
+            // Enable the submit button
+            submitButton.disabled = false;
+            
+            // Hide loading indicator
+            loading.classList.add('hidden');
         }
     }
 

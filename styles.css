@@ -231,6 +231,8 @@ button {
     margin-bottom: 1rem;
 }
 
+/* Removed API check button styles */
+/*
 #check-api-button {
     background-color: #f0f0f0;
     color: #333;
@@ -241,14 +243,20 @@ button {
 #check-api-button:hover {
     background-color: #e0e0e0;
 }
+*/
 
+/* Removed API status styles */
+/*
 #api-status {
     font-size: 0.85rem;
     white-space: nowrap;
     min-width: 150px;
     display: inline-block;
 }
+*/
 
+/* Removed status classes */
+/*
 .status-success {
     color: #27ae60;
     font-weight: bold;
@@ -267,8 +275,8 @@ button {
 .status-checking {
     color: #3498db;
     font-weight: bold;
-    animation: pulse 1.5s infinite;
 }
+*/
 
 #diagnostics-panel {
     background-color: #f8f9fa;
