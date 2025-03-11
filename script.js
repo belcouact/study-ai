@@ -1791,8 +1791,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Function to handle evaluate button click
-    async function handleEvaluateClick() {
+    // Make handleEvaluateClick available globally
+    window.handleEvaluateClick = async function() {
         const evaluateButton = document.getElementById('evaluate-button');
         const evaluationResult = document.getElementById('evaluation-result');
         
@@ -1904,7 +1904,7 @@ document.addEventListener('DOMContentLoaded', () => {
             evaluateButton.textContent = '成绩评估';
             evaluateButton.style.backgroundColor = '#4299e1';
         }
-    }
+    };
     
     // Initialize the page
     populateGradeOptions(schoolSelect.value);
