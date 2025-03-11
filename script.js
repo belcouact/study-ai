@@ -254,9 +254,7 @@ function displayCurrentQuestion() {
     // Format and display question text with MathJax
     const questionText = document.getElementById('question-text');
     if (questionText) {
-        // Process math expressions in the question text
-        const formattedText = formatMathExpressions(question.questionText);
-        questionText.innerHTML = formattedText;
+        questionText.innerHTML = formatMathExpressions(question.questionText);
     }
     
     // Create 2x2 grid for choices
@@ -288,17 +286,26 @@ function displayCurrentQuestion() {
         `;
     }
     
-    // If user has already answered this question, select their answer
+    // If user has already answered this question, select their answer and show result
     if (window.userAnswers && window.userAnswers[window.currentQuestionIndex]) {
         const answerRadio = document.getElementById(`choice-${window.userAnswers[window.currentQuestionIndex].toLowerCase()}`);
         if (answerRadio) {
             answerRadio.checked = true;
         }
         
-        // Show the answer container if already answered
+        // Show the answer container
         const answerContainer = document.getElementById('answer-container');
         if (answerContainer) {
             answerContainer.classList.remove('hidden');
+            answerContainer.style.cssText = `
+                margin-top: 20px;
+                padding: 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                background-color: #f9f9f9;
+                width: 100%;
+                box-sizing: border-box;
+            `;
             
             // Display result with math formatting
             const selectedAnswer = window.userAnswers[window.currentQuestionIndex];
@@ -306,19 +313,24 @@ function displayCurrentQuestion() {
             const answerResult = document.getElementById('answer-result');
             
             if (answerResult) {
-                if (selectedAnswer === correctAnswer) {
-                    answerResult.innerHTML = formatMathExpressions(`✓ 正确！答案是：${correctAnswer}`);
-                    answerResult.style.color = '#28a745';
-                } else {
-                    answerResult.innerHTML = formatMathExpressions(`✗ 错误。正确答案是：${correctAnswer}`);
-                    answerResult.style.color = '#dc3545';
-                }
+                const resultText = selectedAnswer === correctAnswer 
+                    ? `✓ 正确！答案是：${correctAnswer}`
+                    : `✗ 错误。正确答案是：${correctAnswer}`;
+                
+                answerResult.innerHTML = formatMathExpressions(resultText);
+                answerResult.style.color = selectedAnswer === correctAnswer ? '#28a745' : '#dc3545';
+                answerResult.style.marginBottom = '10px';
             }
             
             // Display explanation with math formatting
             const answerExplanation = document.getElementById('answer-explanation');
             if (answerExplanation) {
                 answerExplanation.innerHTML = formatMathExpressions(question.explanation);
+                answerExplanation.style.cssText = `
+                    line-height: 1.6;
+                    margin-top: 10px;
+                    white-space: pre-wrap;
+                `;
             }
         }
     } else {
@@ -327,6 +339,17 @@ function displayCurrentQuestion() {
         if (answerContainer) {
             answerContainer.classList.add('hidden');
         }
+    }
+    
+    // Ensure create container has enough space
+    const createContainer = document.getElementById('create-container');
+    if (createContainer) {
+        createContainer.style.cssText = `
+            min-height: 600px;
+            height: auto;
+            padding-bottom: 40px;
+            overflow-y: auto;
+        `;
     }
     
     // Render math expressions
@@ -511,17 +534,47 @@ function initializeFormLayout() {
     // Create a flex container for the dropdowns
     const dropdownContainer = document.createElement('div');
     dropdownContainer.className = 'dropdown-container';
+    dropdownContainer.style.cssText = `
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: nowrap;
+    `;
     
     // Move all select elements into the dropdown container
     const selects = formContainer.querySelectorAll('select');
     selects.forEach(select => {
         const wrapper = document.createElement('div');
         wrapper.className = 'select-wrapper';
+        wrapper.style.cssText = `
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        `;
+        
         // Get the label for this select
         const label = formContainer.querySelector(`label[for="${select.id}"]`);
         if (label) {
+            label.style.cssText = `
+                margin-bottom: 5px;
+                font-size: 14px;
+                white-space: nowrap;
+            `;
             wrapper.appendChild(label);
         }
+        
+        // Style the select element
+        select.style.cssText = `
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        `;
+        
         wrapper.appendChild(select);
         dropdownContainer.appendChild(wrapper);
     });
@@ -529,6 +582,11 @@ function initializeFormLayout() {
     // Insert the dropdown container at the start of the form
     const form = document.getElementById('question-form');
     if (form) {
+        // Remove any existing dropdown container
+        const existingContainer = form.querySelector('.dropdown-container');
+        if (existingContainer) {
+            existingContainer.remove();
+        }
         form.insertBefore(dropdownContainer, form.firstChild);
     }
 }
