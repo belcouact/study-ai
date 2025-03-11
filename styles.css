@@ -6,7 +6,7 @@
 }
 
 :root {
-    --sidebar-width: 200px;
+    --sidebar-width: 180px;
     --primary-color: #2c3e50;
     --secondary-color: #3498db;
     --text-color: #333;
@@ -25,6 +25,7 @@ body {
 .app-container {
     height: 100vh;
     position: relative;
+    display: flex;
 }
 
 /* Left panel */
@@ -114,45 +115,38 @@ body {
 
 /* Content area */
 .content-area {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: var(--sidebar-width);
+    margin-left: var(--sidebar-width);
+    padding: 1.5rem;
+    height: 100vh;
     overflow-y: auto;
-    transition: left 0.3s ease;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 20px;
+    transition: margin-left 0.3s ease;
+    flex: 1;
+    max-width: none;
 }
 
-/* When sidebar is hidden */
 .content-area.full-width {
-    left: 0;
+    margin-left: 0;
+    width: 100%;
+    flex: 1;
 }
 
 /* Container for both modes */
 .container {
-    width: 800px;
     max-width: 100%;
-    height: auto;
-    min-height: calc(100% - 40px);
-    display: flex;
-    flex-direction: column;
-    background-color: #fff;
+    margin: 0 auto;
+    padding: 1rem;
+    background-color: white;
     border-radius: 8px;
     box-shadow: var(--shadow);
-    padding: 1rem;
+    min-height: 80vh;
 }
 
 /* Create content */
 .create-content {
     padding: 1rem;
-    height: 100%;
     width: 100%;
-    display: flex;
-    flex-direction: column;
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
 .create-content h2 {
@@ -544,10 +538,13 @@ button:active {
 .question-form-container {
     background-color: #fff;
     border-radius: 8px;
-    padding: 1.5rem;
-    margin-top: 1.5rem;
+    padding: 1.5rem 2rem;
+    margin-top: 1rem;
     box-shadow: var(--shadow);
     transition: all 0.3s ease;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .question-form-container h3 {
@@ -559,12 +556,13 @@ button:active {
 .form-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    gap: 1.5rem;
 }
 
 .form-group {
     flex: 1;
-    margin-right: 1rem;
+    min-width: 0;
 }
 
 .form-group:last-child {
@@ -576,6 +574,7 @@ button:active {
     margin-bottom: 0.5rem;
     font-weight: 500;
     color: var(--text-color);
+    white-space: nowrap;
 }
 
 .form-group select {
@@ -633,10 +632,13 @@ button:active {
 .questions-display-container {
     background-color: #fff;
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 1.5rem 2rem;
     margin-top: 1.5rem;
     box-shadow: var(--shadow);
     transition: all 0.3s ease;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #question-navigation {
@@ -658,10 +660,11 @@ button:active {
 }
 
 .question-text {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    line-height: 1.7;
+    margin-bottom: 2rem;
     color: var(--text-color);
+    padding: 0 1rem;
 }
 
 .choices-container {
@@ -672,7 +675,7 @@ button:active {
     display: flex;
     align-items: flex-start;
     margin-bottom: 1rem;
-    padding: 0.8rem;
+    padding: 1rem 1.5rem;
     border: 1px solid var(--border-color);
     border-radius: 4px;
     transition: background-color 0.2s;
@@ -712,7 +715,7 @@ button:active {
 .answer-container {
     background-color: #f8f9fa;
     border-radius: 6px;
-    padding: 1.2rem;
+    padding: 1.5rem 2rem;
     margin-bottom: 1.5rem;
     border-left: 4px solid var(--secondary-color);
 }
