@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             subjectSelect.appendChild(optionElement);
         });
     }
-    
+
     // Add event listener for the direct test button (if it exists)
     if (directTestButton) {
         directTestButton.addEventListener('click', async () => {
