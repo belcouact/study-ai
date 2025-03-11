@@ -318,34 +318,300 @@ function displayCurrentQuestion() {
 
         // Add click handler for evaluate button
         const evaluateButton = document.getElementById('evaluate-button');
-        if (evaluateButton) {
-            evaluateButton.onclick = async function() {
-                this.disabled = true;
-                this.textContent = '评估中...';
-                this.style.backgroundColor = '#90cdf4';
+        if (evaluateButton && !evaluateButton.hasEventListener) {
+            evaluateButton.hasEventListener = true;
+            evaluateButton.addEventListener('click', handleEvaluateClick);
+        }
+    }
+    
+    // Update question counter with responsive styling
+    const questionCounter = document.getElementById('question-counter');
+    if (questionCounter) {
+        questionCounter.style.cssText = `
+            font-size: clamp(14px, 2.5vw, 16px);
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: #edf2f7;
+            border-radius: 20px;
+            display: inline-block;
+            width: fit-content;
+        `;
+        questionCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
+    }
+    
+    // Format and display question text with responsive styling
+    const questionText = document.getElementById('question-text');
+    if (questionText) {
+        questionText.style.cssText = `
+            font-size: clamp(16px, 3vw, 18px);
+            color: #2d3748;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            box-sizing: border-box;
+        `;
+        questionText.innerHTML = formatMathExpressions(question.questionText);
+    }
+    
+    // Create responsive grid for choices with single selection
+    const choicesContainer = document.getElementById('choices-container');
+    if (choicesContainer) {
+        choicesContainer.innerHTML = `
+            <div class="choices-grid" style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+                gap: clamp(10px, 2vw, 20px);
+                margin: 25px 0;
+                width: 100%;
+            ">
+                ${['A', 'B', 'C', 'D'].map(letter => `
+                    <div class="choice-cell" data-value="${letter}" style="
+                        padding: clamp(10px, 2vw, 15px);
+                        border: 2px solid #e2e8f0;
+                        border-radius: 12px;
+                        background-color: white;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        user-select: none;
+                        -webkit-tap-highlight-color: transparent;
+                    ">
+                        <div class="choice-indicator" style="
+                            width: 28px;
+                            height: 28px;
+                            border-radius: 50%;
+                            background: #edf2f7;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: 500;
+                            color: #4a5568;
+                            flex-shrink: 0;
+                        ">${letter}</div>
+                        <div class="choice-text" style="
+                            flex: 1;
+                            font-size: clamp(14px, 2.5vw, 16px);
+                            color: #2d3748;
+                            line-height: 1.5;
+                        ">${formatMathExpressions(question.choices[letter])}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        // Add enhanced interaction effects for choice cells
+        const choiceCells = choicesContainer.querySelectorAll('.choice-cell');
+        let selectedCell = null;
+
+        choiceCells.forEach(cell => {
+            const indicator = cell.querySelector('.choice-indicator');
+            
+            // Function to update cell styles
+            const updateCellStyles = (cell, isSelected) => {
+                cell.style.borderColor = isSelected ? '#4299e1' : '#e2e8f0';
+                cell.style.backgroundColor = isSelected ? '#ebf8ff' : 'white';
+                cell.querySelector('.choice-indicator').style.backgroundColor = isSelected ? '#4299e1' : '#edf2f7';
+                cell.querySelector('.choice-indicator').style.color = isSelected ? 'white' : '#4a5568';
+            };
+            
+            // Click handling with single choice enforcement
+            cell.addEventListener('click', () => {
+                if (selectedCell) {
+                    updateCellStyles(selectedCell, false);
+                }
+                selectedCell = cell;
+                updateCellStyles(cell, true);
                 
-                try {
-                    // Calculate score
-                    let correctCount = 0;
-                    window.userAnswers.forEach((answer, index) => {
-                        if (answer === window.questions[index].answer) {
-                            correctCount++;
-                        }
-                    });
-                    const scorePercentage = (correctCount / window.questions.length) * 100;
+                // Save the answer
+                const value = cell.dataset.value;
+                window.userAnswers[window.currentQuestionIndex] = value;
+            });
+            
+            // Touch and hover effects
+            cell.addEventListener('touchstart', () => {
+                if (cell !== selectedCell) {
+                    cell.style.backgroundColor = '#f7fafc';
+                }
+            }, { passive: true });
+            
+            cell.addEventListener('touchend', () => {
+                if (cell !== selectedCell) {
+                    cell.style.backgroundColor = 'white';
+                }
+            }, { passive: true });
+            
+            cell.addEventListener('mouseover', () => {
+                if (cell !== selectedCell) {
+                    cell.style.borderColor = '#cbd5e0';
+                    cell.style.backgroundColor = '#f7fafc';
+                    cell.style.transform = 'translateY(-1px)';
+                }
+            });
+            
+            cell.addEventListener('mouseout', () => {
+                if (cell !== selectedCell) {
+                    cell.style.borderColor = '#e2e8f0';
+                    cell.style.backgroundColor = 'white';
+                    cell.style.transform = 'none';
+                }
+            });
 
-                    // Prepare test results data
-                    const testResults = window.questions.map((question, index) => ({
-                        questionText: question.questionText,
-                        userAnswer: window.userAnswers[index],
-                        correctAnswer: question.answer,
-                        isCorrect: window.userAnswers[index] === question.answer,
-                        explanation: question.explanation
-                    }));
+            // Set initial state if answer exists
+            if (window.userAnswers[window.currentQuestionIndex] === cell.dataset.value) {
+                selectedCell = cell;
+                updateCellStyles(cell, true);
+            }
+        });
+    }
+    
+    // Style the answer container when showing results
+    if (window.userAnswers && window.userAnswers[window.currentQuestionIndex]) {
+        const answerContainer = document.getElementById('answer-container');
+        if (answerContainer) {
+            answerContainer.classList.remove('hidden');
+            answerContainer.style.cssText = `
+                margin-top: 30px;
+                padding: 25px;
+                border-radius: 12px;
+                background-color: white;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                width: 100%;
+                box-sizing: border-box;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            const selectedAnswer = window.userAnswers[window.currentQuestionIndex];
+            const correctAnswer = question.answer;
+            const isCorrect = selectedAnswer === correctAnswer;
+            
+            // Style the result section
+            const answerResult = document.getElementById('answer-result');
+            if (answerResult) {
+                answerResult.style.cssText = `
+                    font-size: 18px;
+                    font-weight: 500;
+                    color: ${isCorrect ? '#48bb78' : '#e53e3e'};
+                    margin-bottom: 20px;
+                    padding: 15px;
+                    background: ${isCorrect ? '#f0fff4' : '#fff5f5'};
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                `;
+                
+                const resultText = isCorrect 
+                    ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 正确！答案是：${correctAnswer}`
+                    : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> 错误。正确答案是：${correctAnswer}`;
+                
+                answerResult.innerHTML = formatMathExpressions(resultText);
+            }
+            
+            // Style the explanation section
+            const answerExplanation = document.getElementById('answer-explanation');
+            if (answerExplanation) {
+                answerExplanation.style.cssText = `
+                    font-size: 16px;
+                    color: #4a5568;
+                    line-height: 1.8;
+                    margin-top: 20px;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                    white-space: pre-wrap;
+                `;
+                answerExplanation.innerHTML = formatMathExpressions(question.explanation);
+            }
+            
+            // Check if all questions are answered after showing the current answer
+            const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
+                                       window.userAnswers.every(answer => answer !== null);
+            
+            if (allQuestionsAnswered) {
+                // Calculate score
+                let correctCount = 0;
+                window.userAnswers.forEach((answer, index) => {
+                    if (answer === window.questions[index].answer) {
+                        correctCount++;
+                    }
+                });
+                const scorePercentage = (correctCount / window.questions.length) * 100;
 
-                    // Create evaluation prompt
-                    const prompt = `请对以下测试结果进行全面评估。总题数：${window.questions.length}，正确题数：${correctCount}，正确率：${scorePercentage.toFixed(1)}%。
-                    
+                // Create or update score summary container
+                let scoreSummaryContainer = document.getElementById('score-summary-container');
+                if (!scoreSummaryContainer) {
+                    scoreSummaryContainer = document.createElement('div');
+                    scoreSummaryContainer.id = 'score-summary-container';
+                    answerContainer.parentNode.insertBefore(scoreSummaryContainer, answerContainer.nextSibling);
+                }
+
+                scoreSummaryContainer.style.cssText = `
+                    margin-top: 30px;
+                    padding: 25px;
+                    border-radius: 12px;
+                    background-color: white;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                    text-align: center;
+                `;
+
+                scoreSummaryContainer.innerHTML = `
+                    <div style="
+                        font-size: 24px;
+                        font-weight: bold;
+                        color: #2d3748;
+                        margin-bottom: 15px;
+                    ">测试完成！</div>
+                    <div style="
+                        font-size: 18px;
+                        color: #4a5568;
+                        margin-bottom: 20px;
+                    ">
+                        总题数: ${window.questions.length} | 
+                        正确: ${correctCount} | 
+                        正确率: ${scorePercentage.toFixed(1)}%
+                    </div>
+                    <button id="evaluate-button" style="
+                        padding: 12px 25px;
+                        font-size: 16px;
+                        font-weight: 500;
+                        background-color: #4299e1;
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+                    ">成绩评估</button>
+                    <div id="evaluation-result" style="display: none; margin-top: 20px;"></div>
+                `;
+
+                // Add click handler for evaluate button
+                const evaluateButton = document.getElementById('evaluate-button');
+                evaluateButton.addEventListener('click', async () => {
+                    evaluateButton.disabled = true;
+                    evaluateButton.textContent = '评估中...';
+
+                    try {
+                        // Prepare test results data
+                        const testResults = window.questions.map((question, index) => ({
+                            questionText: question.questionText,
+                            userAnswer: window.userAnswers[index],
+                            correctAnswer: question.answer,
+                            isCorrect: window.userAnswers[index] === question.answer,
+                            explanation: question.explanation
+                        }));
+
+                        // Create evaluation prompt
+                        const prompt = `请对以下测试结果进行全面评估。总题数：${window.questions.length}，正确题数：${correctCount}，正确率：${scorePercentage.toFixed(1)}%。
+                        
 测试详情：${JSON.stringify(testResults, null, 2)}
 
 请从以下四个方面进行详细分析：
@@ -356,62 +622,48 @@ function displayCurrentQuestion() {
 
 请按照以上四个标题分段输出评估结果。`;
 
-                    // Call API for evaluation
-                    const response = await fetchAIResponse(prompt);
-                    const evaluationContent = extractContentFromResponse(response);
+                        // Call API for evaluation
+                        const response = await fetchAIResponse(prompt);
+                        const evaluationContent = extractContentFromResponse(response);
 
-                    // Get or create evaluation result container
-                    let evaluationResult = document.getElementById('evaluation-result');
-                    if (!evaluationResult) {
-                        evaluationResult = document.createElement('div');
-                        evaluationResult.id = 'evaluation-result';
-                        this.parentNode.appendChild(evaluationResult);
+                        // Display evaluation result
+                        const evaluationResult = document.getElementById('evaluation-result');
+                        evaluationResult.style.cssText = `
+                            display: block;
+                            margin-top: 25px;
+                            padding: 20px;
+                            background: #f8f9fa;
+                            border-radius: 8px;
+                            text-align: left;
+                            line-height: 1.6;
+                        `;
+
+                        // Format the evaluation content with sections
+                        const formattedEvaluation = evaluationContent
+                            .split(/(?=总体表现评价|知识点掌握情况|易错点分析|针对性改进建议)/)
+                            .map(section => {
+                                const title = section.match(/^[^：\n]+/);
+                                if (title) {
+                                    return `<div style="margin-bottom: 20px;">
+                                        <h3 style="color: #2d3748; margin-bottom: 10px;">${title[0]}</h3>
+                                        <div style="color: #4a5568;">${section.replace(title[0], '').trim()}</div>
+                                    </div>`;
+                                }
+                                return section;
+                            })
+                            .join('');
+
+                        evaluationResult.innerHTML = formattedEvaluation;
+
+                    } catch (error) {
+                        console.error('Evaluation error:', error);
+                        showSystemMessage('评估过程出错，请重试', 'error');
+                    } finally {
+                        evaluateButton.disabled = false;
+                        evaluateButton.textContent = '成绩评估';
                     }
-
-                    // Display evaluation result with responsive styling
-                    evaluationResult.style.cssText = `
-                        display: block;
-                        margin-top: 25px;
-                        padding: clamp(15px, 3vw, 20px);
-                        background: #f8f9fa;
-                        border-radius: 8px;
-                        text-align: left;
-                        line-height: 1.6;
-                        font-size: clamp(14px, 2.5vw, 16px);
-                        animation: fadeIn 0.3s ease;
-                    `;
-
-                    // Format the evaluation content with sections
-                    const formattedEvaluation = evaluationContent
-                        .split(/(?=总体表现评价|知识点掌握情况|易错点分析|针对性改进建议)/)
-                        .map(section => {
-                            const title = section.match(/^[^：\n]+/);
-                            if (title) {
-                                return `<div style="margin-bottom: 20px;">
-                                    <h3 style="
-                                        color: #2d3748;
-                                        margin-bottom: 10px;
-                                        font-size: clamp(16px, 3vw, 18px);
-                                    ">${title[0]}</h3>
-                                    <div style="color: #4a5568;">${section.replace(title[0], '').trim()}</div>
-                                </div>`;
-                            }
-                            return section;
-                        })
-                        .join('');
-
-                    evaluationResult.innerHTML = formattedEvaluation;
-                    evaluationResult.style.display = 'block';
-
-                } catch (error) {
-                    console.error('Evaluation error:', error);
-                    showSystemMessage('评估过程出错，请重试', 'error');
-                } finally {
-                    this.disabled = false;
-                    this.textContent = '成绩评估';
-                    this.style.backgroundColor = '#4299e1';
-                }
-            };
+                });
+            }
         }
     } else {
         const answerContainer = document.getElementById('answer-container');
@@ -1484,6 +1736,104 @@ document.addEventListener('DOMContentLoaded', () => {
             // Remove optimizing class from button
             optimizeButton.classList.remove('optimizing');
             optimizeButton.textContent = '优化问题';
+        }
+    }
+    
+    // Add the evaluation click handler function
+    async function handleEvaluateClick() {
+        const evaluateButton = document.getElementById('evaluate-button');
+        const evaluationResult = document.getElementById('evaluation-result');
+        
+        if (!evaluateButton || !evaluationResult) return;
+        
+        evaluateButton.disabled = true;
+        evaluateButton.textContent = '评估中...';
+        evaluateButton.style.backgroundColor = '#90cdf4';
+        
+        try {
+            // Calculate score
+            let correctCount = 0;
+            window.userAnswers.forEach((answer, index) => {
+                if (answer === window.questions[index].answer) {
+                    correctCount++;
+                }
+            });
+            const scorePercentage = (correctCount / window.questions.length) * 100;
+
+            // Prepare test results data
+            const testResults = window.questions.map((question, index) => ({
+                questionText: question.questionText,
+                userAnswer: window.userAnswers[index],
+                correctAnswer: question.answer,
+                isCorrect: window.userAnswers[index] === question.answer,
+                explanation: question.explanation
+            }));
+
+            // Create evaluation prompt
+            const prompt = `请对以下测试结果进行全面评估。总题数：${window.questions.length}，正确题数：${correctCount}，正确率：${scorePercentage.toFixed(1)}%。
+            
+测试详情：${JSON.stringify(testResults, null, 2)}
+
+请从以下四个方面进行详细分析：
+1. 总体表现评价：根据正确率和答题情况给出整体评价
+2. 知识点掌握情况：分析各个知识点的掌握程度
+3. 易错点分析：总结做错题目的共同特点和原因
+4. 针对性改进建议：提供具体的学习建议和改进方向
+
+请按照以上四个标题分段输出评估结果。`;
+
+            // Call API for evaluation
+            const response = await fetchAIResponse(prompt);
+            const evaluationContent = extractContentFromResponse(response);
+
+            // Display evaluation result with responsive styling
+            evaluationResult.style.cssText = `
+                display: block;
+                margin-top: 25px;
+                padding: clamp(15px, 3vw, 20px);
+                background: #f8f9fa;
+                border-radius: 8px;
+                text-align: left;
+                line-height: 1.6;
+                font-size: clamp(14px, 2.5vw, 16px);
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.5s ease-out;
+            `;
+
+            // Format the evaluation content with sections
+            const formattedEvaluation = evaluationContent
+                .split(/(?=总体表现评价|知识点掌握情况|易错点分析|针对性改进建议)/)
+                .map(section => {
+                    const title = section.match(/^[^：\n]+/);
+                    if (title) {
+                        return `<div style="margin-bottom: 20px;">
+                            <h3 style="
+                                color: #2d3748;
+                                margin-bottom: 10px;
+                                font-size: clamp(16px, 3vw, 18px);
+                            ">${title[0]}</h3>
+                            <div style="color: #4a5568;">${section.replace(title[0], '').trim()}</div>
+                        </div>`;
+                    }
+                    return section;
+                })
+                .join('');
+
+            evaluationResult.innerHTML = formattedEvaluation;
+            
+            // Animate the evaluation result
+            requestAnimationFrame(() => {
+                evaluationResult.style.maxHeight = evaluationResult.scrollHeight + 'px';
+            });
+
+        } catch (error) {
+            console.error('Evaluation error:', error);
+            showSystemMessage('评估过程出错，请重试', 'error');
+        } finally {
+            evaluateButton.disabled = false;
+            evaluateButton.textContent = '成绩评估';
+            evaluateButton.style.backgroundColor = '#4299e1';
         }
     }
     
