@@ -1948,7 +1948,7 @@ document.addEventListener('DOMContentLoaded', () => {
             max-width: 100%;
             padding: clamp(10px, 3vw, 20px);
             margin: 0;
-            background: transparent;
+            background-color: white;
             border-radius: 8px;
             box-sizing: border-box;
             font-size: clamp(14px, 4vw, 16px);
