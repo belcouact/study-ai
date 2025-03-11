@@ -636,7 +636,40 @@ function initializeFormLayout() {
         if (existingContainer) {
             existingContainer.remove();
         }
+        
+        // Remove the header if it exists
+        const header = form.querySelector('h3');
+        if (header && header.textContent.includes('设置问题参数')) {
+            header.remove();
+        }
+        
+        // Insert dropdowns at the start
         form.insertBefore(dropdownContainer, form.firstChild);
+        
+        // Move API function radio buttons to the bottom
+        const apiRadioContainer = document.querySelector('.api-function-container');
+        if (apiRadioContainer) {
+            // Remove it from current position
+            apiRadioContainer.remove();
+            
+            // Style the container
+            apiRadioContainer.style.cssText = `
+                margin-top: auto;
+                padding: 15px 0;
+                border-top: 1px solid #eee;
+                margin-top: 20px;
+            `;
+            
+            // Find the panel footer
+            const panelFooter = form.querySelector('.panel-footer');
+            if (panelFooter) {
+                // Insert before the panel footer
+                form.insertBefore(apiRadioContainer, panelFooter);
+            } else {
+                // If no footer, append to the end of the form
+                form.appendChild(apiRadioContainer);
+            }
+        }
     }
 }
 
