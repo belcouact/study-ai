@@ -1,3 +1,119 @@
+// Global function to fetch AI response for question generation
+async function fetchAIResponse(prompt) {
+    console.log('Fetching AI response with prompt:', prompt);
+    
+    try {
+        // Show loading indicator if it exists
+        const loading = document.getElementById('loading');
+        if (loading) {
+            loading.classList.remove('hidden');
+        }
+        
+        // Since we're having issues with the API endpoints, let's directly use mock responses
+        // This ensures the application works reliably without depending on external APIs
+        console.log('Using mock response for reliable operation');
+        return createMockResponse(prompt);
+    } catch (error) {
+        console.error('Error in fetchAIResponse:', error);
+        
+        // Fall back to mock responses if there's an error
+        console.warn('Error in API calls, falling back to mock response');
+        return createMockResponse(prompt);
+    } finally {
+        // Hide loading indicator if it exists
+        const loading = document.getElementById('loading');
+        if (loading) {
+            loading.classList.add('hidden');
+        }
+    }
+}
+
+// Helper function to create mock responses when API fails
+function createMockResponse(prompt) {
+    // Extract parameters from the prompt to customize the mock response
+    const schoolType = prompt.match(/(\d+)道(小学|初中|高中|大学)/)?.[2] || '高中';
+    const grade = prompt.match(/(小学|初中|高中|大学)(一年级|二年级|三年级|四年级|五年级|六年级|初一|初二|初三|高一|高二|高三|大一|大二|大三|大四)/)?.[2] || '高一';
+    const subject = prompt.match(/(语文|数学|英语|物理|化学|生物|历史|地理|政治)/)?.[1] || '数学';
+    
+    // Create a mock response based on the subject
+    let mockContent = '';
+    
+    if (subject === '数学') {
+        mockContent = `题目：下列哪个是二次函数的标准形式？
+A. y = ax + b
+B. y = ax² + bx + c (a ≠ 0)
+C. y = a/x + b
+D. y = a^x + b
+
+答案：B
+解析：本题主要考察二次函数的标准形式的识别。解题思路是回顾二次函数的定义和表达式形式。首先，二次函数是指自变量的最高次幂为2的函数，其标准形式为y = ax² + bx + c (a ≠ 0)，其中a、b、c是常数，且a不等于0。选项分析：A选项y = ax + b是一次函数的表达式，最高次幂为1；B选项y = ax² + bx + c (a ≠ 0)是二次函数的标准形式，最高次幂为2；C选项y = a/x + b是反比例函数与常数的和，不是多项式函数；D选项y = a^x + b是指数函数与常数的和。需要注意的是二次函数中a不能为0，否则就变成一次函数了。总的来说，二次函数是初中数学中的重要函数类型，它的图像是抛物线。同学们在解题时要特别注意区分不同类型的函数表达式，掌握各种基本函数的特征。`;
+    } else if (subject === '物理') {
+        mockContent = `题目：下列关于光的传播说法正确的是：
+A. 光在真空中传播速度约为3×10^8 m/s
+B. 光在介质中的传播速度总是大于真空中的速度
+C. 光在传播过程中不需要介质
+D. 光在均匀介质中沿曲线传播
+
+答案：A
+解析：本题主要考察光的传播特性。解题思路是回顾光的传播规律和特性。首先，光是一种电磁波，在真空中传播速度约为3×10^8 m/s，这是一个物理常数，通常用字母c表示。选项分析：A选项正确，光在真空中传播速度确实约为3×10^8 m/s；B选项错误，光在介质中的传播速度总是小于真空中的速度，介质的折射率n = c/v < 1，其中v是光在介质中的速度；C选项部分正确但表述不完整，光作为电磁波可以在真空中传播，但这不意味着它在传播过程中"不需要"介质，而是可以在没有介质的情况下传播；D选项错误，根据光的直线传播定律，光在均匀介质中沿直线传播，只有在介质不均匀或经过反射、折射等情况下才会改变传播方向。需要注意的是光的传播特性是物理学中的基础知识，与波动光学和几何光学密切相关。总的来说，光的传播遵循一定的规律，包括直线传播、反射、折射等。同学们在解题时要特别注意区分光在不同环境下的传播特性。`;
+    } else {
+        mockContent = `题目：关于${subject}的基本概念，下列说法错误的是：
+A. 第一个概念的描述
+B. 第二个概念的描述
+C. 第三个概念的描述
+D. 第四个概念的描述
+
+答案：C
+解析：本题考察${subject}的基本概念。A选项正确；B选项正确；C选项错误，因为它与${subject}的基本原理相矛盾；D选项正确。因此，错误的选项是C。`;
+    }
+    
+    // Create a mock API response object
+    return {
+        choices: [{
+            message: {
+                content: mockContent
+            }
+        }]
+    };
+}
+
+// Function to extract content from API response
+function extractContentFromResponse(data) {
+    console.log('Extracting content from response:', data);
+    
+    try {
+        // Handle different API response formats
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            // OpenAI-like format
+            return data.choices[0].message.content;
+        } else if (data.response) {
+            // Simple API format
+            return data.response;
+        } else if (data.content) {
+            // Direct content format
+            return data.content;
+        } else if (typeof data === 'string') {
+            // Already a string
+            return data;
+        } else {
+            // Try to find content in the response
+            const possibleContentFields = ['text', 'answer', 'result', 'output', 'generated_text'];
+            for (const field of possibleContentFields) {
+                if (data[field]) {
+                    return data[field];
+                }
+            }
+            
+            // If all else fails, stringify the entire response
+            console.warn('Could not extract content from response, using stringified response');
+            return JSON.stringify(data);
+        }
+    } catch (error) {
+        console.error('Error extracting content from response:', error);
+        return '';
+    }
+}
+
 // Global function to display the current question
 function displayCurrentQuestion() {
     console.log('displayCurrentQuestion called', window.currentQuestionIndex);
@@ -755,211 +871,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Store the last question for retry functionality
         lastQuestion = question;
-    }
-    
-    // Function to extract content from API response
-    function extractContentFromResponse(data) {
-        console.log('Extracting content from response:', data);
-        
-        try {
-            // Handle different API response formats
-            if (data.choices && data.choices[0] && data.choices[0].message) {
-                // OpenAI-like format
-                return data.choices[0].message.content;
-            } else if (data.response) {
-                // Simple API format
-                return data.response;
-            } else if (data.content) {
-                // Direct content format
-                return data.content;
-            } else if (typeof data === 'string') {
-                // Already a string
-                return data;
-            } else {
-                // Try to find content in the response
-                const possibleContentFields = ['text', 'answer', 'result', 'output', 'generated_text'];
-                for (const field of possibleContentFields) {
-                    if (data[field]) {
-                        return data[field];
-                    }
-                }
-                
-                // If all else fails, stringify the entire response
-                console.warn('Could not extract content from response, using stringified response');
-                return JSON.stringify(data);
-            }
-        } catch (error) {
-            console.error('Error extracting content from response:', error);
-            return '';
-        }
-    }
-    
-    // Global function to fetch AI response for question generation
-    async function fetchAIResponse(prompt) {
-        console.log('Fetching AI response with prompt:', prompt);
-        
-        try {
-            // Show loading indicator if it exists
-            const loading = document.getElementById('loading');
-            if (loading) {
-                loading.classList.remove('hidden');
-            }
-            
-            // Since we're having issues with the API endpoints, let's directly use mock responses
-            // This ensures the application works reliably without depending on external APIs
-            console.log('Using mock response for reliable operation');
-            return createMockResponse(prompt);
-            
-            /* Commented out API calls that are causing issues
-            // Try to use a public API that doesn't require authentication
-            // Using a more compatible endpoint format
-            console.log('Attempting to use a compatible API endpoint');
-            
-            // First try with the original endpoint
-            try {
-                const response = await fetch('https://study-llm.pages.dev/api/generate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        prompt: prompt
-                    })
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('API response received:', data);
-                    return data;
-                }
-                
-                console.warn(`First API attempt failed with status ${response.status}`);
-            } catch (firstApiError) {
-                console.warn('First API attempt error:', firstApiError);
-            }
-            
-            // Second attempt with a different format
-            try {
-                const response = await fetch('https://study-llm.pages.dev/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        messages: [
-                            {
-                                role: "user",
-                                content: prompt
-                            }
-                        ]
-                    })
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Second API attempt succeeded:', data);
-                    return data;
-                }
-                
-                console.warn(`Second API attempt failed with status ${response.status}`);
-            } catch (secondApiError) {
-                console.warn('Second API attempt error:', secondApiError);
-            }
-            
-            // If all API attempts fail, fall back to mock responses
-            console.warn('All API attempts failed, falling back to mock response');
-            return createMockResponse(prompt);
-            */
-        } catch (error) {
-            console.error('Error in fetchAIResponse:', error);
-            
-            // Fall back to mock responses if there's an error
-            console.warn('Error in API calls, falling back to mock response');
-            return createMockResponse(prompt);
-        } finally {
-            // Hide loading indicator if it exists
-            const loading = document.getElementById('loading');
-            if (loading) {
-                loading.classList.add('hidden');
-            }
-        }
-    }
-    
-    // Helper function to create mock responses when API fails
-    function createMockResponse(prompt) {
-        // Extract parameters from the prompt to customize the mock response
-        const schoolType = prompt.match(/(\d+)道(小学|初中|高中|大学)/)?.[2] || '高中';
-        const grade = prompt.match(/(小学|初中|高中|大学)(一年级|二年级|三年级|四年级|五年级|六年级|初一|初二|初三|高一|高二|高三|大一|大二|大三|大四)/)?.[2] || '高一';
-        const subject = prompt.match(/(语文|数学|英语|物理|化学|生物|历史|地理|政治)/)?.[1] || '数学';
-        
-        // Create a mock response based on the subject
-        let mockContent = '';
-        
-        if (subject === '数学') {
-            mockContent = `题目：下列哪个是二次函数的标准形式？
-A. y = ax + b
-B. y = ax² + bx + c (a ≠ 0)
-C. y = a/x + b
-D. y = a^x + b
-
-答案：B
-解析：本题主要考察二次函数的标准形式的识别。解题思路是回顾二次函数的定义和表达式形式。首先，二次函数是指自变量的最高次幂为2的函数，其标准形式为y = ax² + bx + c (a ≠ 0)，其中a、b、c是常数，且a不等于0。选项分析：A选项y = ax + b是一次函数的表达式，最高次幂为1；B选项y = ax² + bx + c (a ≠ 0)是二次函数的标准形式，最高次幂为2；C选项y = a/x + b是反比例函数与常数的和，不是多项式函数；D选项y = a^x + b是指数函数与常数的和。需要注意的是二次函数中a不能为0，否则就变成一次函数了。总的来说，二次函数是初中数学中的重要函数类型，它的图像是抛物线。同学们在解题时要特别注意区分不同类型的函数表达式，掌握各种基本函数的特征。
-
-题目：若函数f(x)=x²-2x+3的最小值为m，则m的值是多少？
-A. 1
-B. 2
-C. 3
-D. 4
-
-答案：B
-解析：本题考察二次函数的最小值问题。对于二次函数f(x)=ax²+bx+c(a>0)，其最小值点的横坐标为x=-b/(2a)，最小值为f(-b/(2a))。对于函数f(x)=x²-2x+3，a=1，b=-2，c=3，所以最小值点的横坐标为x=-(-2)/(2×1)=1，最小值为f(1)=1²-2×1+3=1-2+3=2。因此，函数f(x)=x²-2x+3的最小值m=2，选B。
-
-题目：已知等比数列{an}的前三项为3，6，12，则该数列的通项公式为：
-A. an=3×2^(n-1)
-B. an=3×2^n
-C. an=3×3^(n-1)
-D. an=3×3^n
-
-答案：A
-解析：本题考察等比数列的通项公式。已知等比数列{an}的前三项为3，6，12，可以求出公比q=a₂/a₁=6/3=2，且a₁=3。等比数列的通项公式为an=a₁×q^(n-1)，代入a₁=3，q=2，得an=3×2^(n-1)。因此，选A。`;
-        } else if (subject === '物理') {
-            mockContent = `题目：下列关于光的传播说法正确的是：
-A. 光在真空中传播速度约为3×10^8 m/s
-B. 光在介质中的传播速度总是大于真空中的速度
-C. 光在传播过程中不需要介质
-D. 光在均匀介质中沿曲线传播
-
-答案：A
-解析：本题主要考察光的传播特性。解题思路是回顾光的传播规律和特性。首先，光是一种电磁波，在真空中传播速度约为3×10^8 m/s，这是一个物理常数，通常用字母c表示。选项分析：A选项正确，光在真空中传播速度确实约为3×10^8 m/s；B选项错误，光在介质中的传播速度总是小于真空中的速度，介质的折射率n = c/v < 1，其中v是光在介质中的速度；C选项部分正确但表述不完整，光作为电磁波可以在真空中传播，但这不意味着它在传播过程中"不需要"介质，而是可以在没有介质的情况下传播；D选项错误，根据光的直线传播定律，光在均匀介质中沿直线传播，只有在介质不均匀或经过反射、折射等情况下才会改变传播方向。需要注意的是光的传播特性是物理学中的基础知识，与波动光学和几何光学密切相关。总的来说，光的传播遵循一定的规律，包括直线传播、反射、折射等。同学们在解题时要特别注意区分光在不同环境下的传播特性。`;
-        } else {
-            // Default mock content for other subjects
-            mockContent = `题目：下列选项中，正确的是：
-A. 选项A
-B. 选项B
-C. 选项C
-D. 选项D
-
-答案：B
-解析：这是一道${schoolType}${grade}${subject}的题目。根据题目要求，正确答案是B。
-
-题目：关于${subject}的基本概念，下列说法错误的是：
-A. 第一个概念的描述
-B. 第二个概念的描述
-C. 第三个概念的描述
-D. 第四个概念的描述
-
-答案：C
-解析：本题考察${subject}的基本概念。A选项正确；B选项正确；C选项错误，因为它与${subject}的基本原理相矛盾；D选项正确。因此，错误的选项是C。`;
-        }
-        
-        // Create a mock API response object
-        return {
-            choices: [{
-                message: {
-                    content: mockContent
-                }
-            }]
-        };
     }
     
     // Function to escape HTML special characters
