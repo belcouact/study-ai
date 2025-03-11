@@ -646,6 +646,35 @@ function initializeFormLayout() {
         // Insert dropdowns at the start
         form.insertBefore(dropdownContainer, form.firstChild);
         
+        // Create a button container
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.cssText = `
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        `;
+        
+        // Move the generate questions button
+        const generateButton = document.getElementById('generate-questions-button');
+        if (generateButton) {
+            generateButton.style.cssText = `
+                padding: 10px 30px;
+                font-size: 16px;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            `;
+            buttonContainer.appendChild(generateButton);
+        }
+        
+        // Insert button container after the form container
+        formContainer.parentNode.insertBefore(buttonContainer, formContainer.nextSibling);
+        
         // Create a spacer div
         const spacer = document.createElement('div');
         spacer.style.cssText = `
