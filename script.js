@@ -101,19 +101,18 @@ function handleGenerateQuestionsClick() {
     const subjectSelect = document.getElementById('subject-select');
     const difficultySelect = document.getElementById('difficulty-select');
     const questionCountSelect = document.getElementById('question-count-select');
-    const questionFormContainer = document.getElementById('question-form-container');
+    const generateQuestionsButton = document.getElementById('generate-questions-button');
     const questionsDisplayContainer = document.getElementById('questions-display-container');
-    const loading = document.getElementById('loading');
     
     if (!schoolSelect || !gradeSelect || !semesterSelect || !subjectSelect || 
-        !difficultySelect || !questionCountSelect || !questionFormContainer || 
-        !questionsDisplayContainer || !loading) {
+        !difficultySelect || !questionCountSelect || !generateQuestionsButton) {
         console.error('One or more form elements not found');
         return;
     }
     
-    // Show loading state
-    loading.classList.remove('hidden');
+    // Show loading state on button
+    generateQuestionsButton.textContent = '生成中...';
+    generateQuestionsButton.disabled = true;
     
     // Collect form data
     const schoolType = schoolSelect.value;
@@ -154,7 +153,7 @@ D. [选项D]
                 window.userAnswers = Array(parsedQuestions.length).fill(null);
                 window.currentQuestionIndex = 0;
                 
-                // Show the questions display without hiding the form
+                // Show the questions display container
                 questionsDisplayContainer.classList.remove('hidden');
                 
                 // Display the first question
@@ -167,14 +166,17 @@ D. [选项D]
                 console.error('Error processing questions:', error);
                 showSystemMessage('生成题目时出错，请重试', 'error');
             } finally {
-                // Hide loading state
-                loading.classList.add('hidden');
+                // Reset button state
+                generateQuestionsButton.textContent = '出题';
+                generateQuestionsButton.disabled = false;
             }
         })
         .catch(error => {
             console.error('API error:', error);
             showSystemMessage('API调用失败，请重试', 'error');
-            loading.classList.add('hidden');
+            // Reset button state
+            generateQuestionsButton.textContent = '出题';
+            generateQuestionsButton.disabled = false;
         });
 }
 
