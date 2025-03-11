@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Debug all clicks
+    document.addEventListener('click', (e) => {
+        console.log('Element clicked:', e.target);
+        if (e.target.id === 'generate-questions-button') {
+            console.log('Generate questions button clicked via document listener');
+        }
+    });
+    
     // Core elements that definitely exist
     const userInput = document.getElementById('user-input');
     const submitButton = document.getElementById('submit-button');
@@ -124,86 +132,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Generate Questions button click event
     if (generateQuestionsButton) {
-        generateQuestionsButton.addEventListener('click', async () => {
-            // Show loading state
-            loading.classList.remove('hidden');
-            
-            // Collect form data
-            const schoolType = schoolSelect.value;
-            const grade = gradeSelect.value;
-            const semester = document.getElementById('semester-select').value;
-            const subject = subjectSelect.value;
-            const difficulty = document.getElementById('difficulty-select').value;
-            const questionCount = document.getElementById('question-count-select').value;
-            
-            // Create system prompt
-            const systemPrompt = `作为一位经验丰富的${schoolType}${subject}老师，请严格按照以下格式生成${questionCount}道${grade}年级${semester}的选择题，难度要求为${difficulty}级。
-
-严格的格式要求：
-每道题必须包含以下六个部分，缺一不可：
-1. "题目："后接具体题目
-2. "A."后接选项A的内容
-3. "B."后接选项B的内容
-4. "C."后接选项C的内容
-5. "D."后接选项D的内容
-6. "答案："后接正确选项（必须是A、B、C、D其中之一）
-7. "解析："后必须包含完整的解析（至少100字）
-
-解析部分必须包含以下内容（缺一不可）：
-1. 解题思路和方法
-2. 关键知识点解释
-3. 正确答案的推导过程
-4. 为什么其他选项是错误的
-5. 相关知识点的总结
-6. 易错点提醒
-
-示例格式：
-题目：[题目内容]
-A. [选项A内容]
-B. [选项B内容]
-C. [选项C内容]
-D. [选项D内容]
-答案：[A或B或C或D]
-解析：本题主要考察[知识点]。解题思路是[详细说明]。首先，[推导过程]。选项分析：A选项[分析]，B选项[分析]，C选项[分析]，D选项[分析]。需要注意的是[易错点]。总的来说，[知识点总结]。同学们在解题时要特别注意[关键提醒]。
-
-题目质量要求：
-1. 题目表述必须清晰、准确，无歧义
-2. 选项内容必须完整，符合逻辑
-3. 所有选项必须有实际意义，不能有无意义的干扰项
-4. 难度必须符合年级水平
-5. 解析必须详尽，有教育意义`;
-            
-            try {
-                // Call API to generate questions
-                const response = await fetchAIResponse(systemPrompt);
-                
-                // Parse the response to extract questions
-                questions = parseQuestionsFromResponse(response);
-                
-                // Reset user answers and current question index
-                userAnswers = Array(questions.length).fill(null);
-                currentQuestionIndex = 0;
-                
-                // Hide the form and show the questions display
-                questionFormContainer.classList.add('hidden');
-                questionsDisplayContainer.classList.remove('hidden');
-                
-                // Display the first question
-                displayCurrentQuestion();
-                
-                // Update navigation buttons
-                updateNavigationButtons();
-                
-                // Show success message
-                showSystemMessage(`已生成 ${questions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`, 'success');
-            } catch (error) {
-                console.error('Error generating questions:', error);
-                showSystemMessage('生成题目时出错，请重试', 'error');
-            } finally {
-                // Hide loading state
-                loading.classList.add('hidden');
-            }
-        });
+        console.log('Found generate questions button:', generateQuestionsButton);
+        
+        generateQuestionsButton.addEventListener('click', handleGenerateQuestionsClick);
+    } else {
+        console.error('Generate questions button not found');
     }
     
     // Submit Answer button click event
@@ -894,7 +827,214 @@ D. [选项D内容]
         }
     }
     
+    // Global function to handle generate questions button click
+    function handleGenerateQuestionsClick() {
+        console.log('handleGenerateQuestionsClick called');
+        
+        // Get form elements
+        const schoolSelect = document.getElementById('school-select');
+        const gradeSelect = document.getElementById('grade-select');
+        const semesterSelect = document.getElementById('semester-select');
+        const subjectSelect = document.getElementById('subject-select');
+        const difficultySelect = document.getElementById('difficulty-select');
+        const questionCountSelect = document.getElementById('question-count-select');
+        const questionFormContainer = document.getElementById('question-form-container');
+        const questionsDisplayContainer = document.getElementById('questions-display-container');
+        const loading = document.getElementById('loading');
+        
+        if (!schoolSelect || !gradeSelect || !semesterSelect || !subjectSelect || 
+            !difficultySelect || !questionCountSelect || !questionFormContainer || 
+            !questionsDisplayContainer || !loading) {
+            console.error('One or more form elements not found');
+            return;
+        }
+        
+        // Show loading state
+        loading.classList.remove('hidden');
+        
+        // Collect form data
+        const schoolType = schoolSelect.value;
+        const grade = gradeSelect.value;
+        const semester = semesterSelect.value;
+        const subject = subjectSelect.value;
+        const difficulty = difficultySelect.value;
+        const questionCount = questionCountSelect.value;
+        
+        console.log('Form data collected:', { schoolType, grade, semester, subject, difficulty, questionCount });
+        
+        // Simulate API response
+        const simulatedResponse = {
+            choices: [{
+                message: {
+                    content: `题目：下列哪个是二次函数的标准形式？
+A. y = ax + b
+B. y = ax² + bx + c (a ≠ 0)
+C. y = a/x + b
+D. y = a^x + b
+
+答案：B
+解析：本题主要考察二次函数的标准形式的识别。解题思路是回顾二次函数的定义和表达式形式。首先，二次函数是指自变量的最高次幂为2的函数，其标准形式为y = ax² + bx + c (a ≠ 0)，其中a、b、c是常数，且a不等于0。选项分析：A选项y = ax + b是一次函数的表达式，最高次幂为1；B选项y = ax² + bx + c (a ≠ 0)是二次函数的标准形式，最高次幂为2；C选项y = a/x + b是反比例函数与常数的和，不是多项式函数；D选项y = a^x + b是指数函数与常数的和。需要注意的是二次函数中a不能为0，否则就变成一次函数了。总的来说，二次函数是初中数学中的重要函数类型，它的图像是抛物线。同学们在解题时要特别注意区分不同类型的函数表达式，掌握各种基本函数的特征。
+
+题目：下列关于光的传播说法正确的是：
+A. 光在真空中传播速度约为3×10^8 m/s
+B. 光在介质中的传播速度总是大于真空中的速度
+C. 光在传播过程中不需要介质
+D. 光在均匀介质中沿曲线传播
+
+答案：A
+解析：本题主要考察光的传播特性。解题思路是回顾光的传播规律和特性。首先，光是一种电磁波，在真空中传播速度约为3×10^8 m/s，这是一个物理常数，通常用字母c表示。选项分析：A选项正确，光在真空中传播速度确实约为3×10^8 m/s；B选项错误，光在介质中的传播速度总是小于真空中的速度，介质的折射率n = c/v > 1，其中v是光在介质中的速度；C选项部分正确但表述不完整，光作为电磁波可以在真空中传播，但这不意味着它在传播过程中"不需要"介质，而是可以在没有介质的情况下传播；D选项错误，根据光的直线传播定律，光在均匀介质中沿直线传播，只有在介质不均匀或经过反射、折射等情况下才会改变传播方向。需要注意的是光的传播特性是物理学中的基础知识，与波动光学和几何光学密切相关。总的来说，光的传播遵循一定的规律，包括直线传播、反射、折射等。同学们在解题时要特别注意区分光在不同环境下的传播特性。`
+                }
+            }]
+        };
+        
+        try {
+            // Parse the response
+            const parsedQuestions = parseQuestionsFromResponse(simulatedResponse);
+            console.log('Parsed questions:', parsedQuestions);
+            
+            // Make variables globally available
+            window.questions = parsedQuestions;
+            window.userAnswers = Array(parsedQuestions.length).fill(null);
+            window.currentQuestionIndex = 0;
+            
+            // Hide the form and show the questions display
+            questionFormContainer.classList.add('hidden');
+            questionsDisplayContainer.classList.remove('hidden');
+            
+            // Display the first question
+            window.displayCurrentQuestion = function() {
+                const question = window.questions[window.currentQuestionIndex];
+                
+                // Update question counter
+                document.getElementById('question-counter').textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
+                
+                // Display question text and choices
+                document.getElementById('question-text').textContent = question.questionText;
+                document.getElementById('choice-a-text').textContent = question.choices.A;
+                document.getElementById('choice-b-text').textContent = question.choices.B;
+                document.getElementById('choice-c-text').textContent = question.choices.C;
+                document.getElementById('choice-d-text').textContent = question.choices.D;
+                
+                // Clear any selected radio buttons
+                document.querySelectorAll('input[name="choice"]').forEach(radio => {
+                    radio.checked = false;
+                });
+                
+                // If user has already answered this question, select their answer
+                if (window.userAnswers[window.currentQuestionIndex]) {
+                    document.getElementById(`choice-${window.userAnswers[window.currentQuestionIndex].toLowerCase()}`).checked = true;
+                    
+                    // Show the answer container if already answered
+                    document.getElementById('answer-container').classList.remove('hidden');
+                    
+                    // Display result
+                    const selectedAnswer = window.userAnswers[window.currentQuestionIndex];
+                    const correctAnswer = question.answer;
+                    const answerResult = document.getElementById('answer-result');
+                    
+                    if (selectedAnswer === correctAnswer) {
+                        answerResult.textContent = `✓ 正确！答案是：${correctAnswer}`;
+                        answerResult.style.color = '#28a745';
+                    } else {
+                        answerResult.textContent = `✗ 错误。正确答案是：${correctAnswer}`;
+                        answerResult.style.color = '#dc3545';
+                    }
+                    
+                    // Display explanation
+                    document.getElementById('answer-explanation').textContent = question.explanation;
+                } else {
+                    // Hide the answer container if not answered
+                    document.getElementById('answer-container').classList.add('hidden');
+                }
+            };
+            
+            // Update navigation buttons
+            window.updateNavigationButtons = function() {
+                document.getElementById('prev-question-button').disabled = window.currentQuestionIndex <= 0;
+                document.getElementById('next-question-button').disabled = window.currentQuestionIndex >= window.questions.length - 1;
+            };
+            
+            // Call the functions
+            window.displayCurrentQuestion();
+            window.updateNavigationButtons();
+            
+            // Show success message
+            const messageElement = document.createElement('div');
+            messageElement.className = 'system-message success';
+            messageElement.textContent = `已生成 ${parsedQuestions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`;
+            document.body.appendChild(messageElement);
+            setTimeout(() => messageElement.remove(), 5000);
+        } catch (error) {
+            console.error('Error processing questions:', error);
+            const messageElement = document.createElement('div');
+            messageElement.className = 'system-message error';
+            messageElement.textContent = '生成题目时出错，请重试';
+            document.body.appendChild(messageElement);
+            setTimeout(() => messageElement.remove(), 5000);
+        } finally {
+            // Hide loading state
+            loading.classList.add('hidden');
+        }
+    }
+    
     // Initialize the page
     populateGradeOptions(schoolSelect.value);
     populateSubjectOptions(schoolSelect.value);
+
+    // Add event listeners for navigation and submit buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        // Submit Answer button click event
+        document.getElementById('submit-answer-button').addEventListener('click', function() {
+            // Get the selected answer
+            const selectedAnswer = document.querySelector('input[name="choice"]:checked');
+            
+            if (!selectedAnswer) {
+                alert('请选择一个答案');
+                return;
+            }
+            
+            // Save the user's answer
+            window.userAnswers[window.currentQuestionIndex] = selectedAnswer.value;
+            
+            // Get the correct answer
+            const correctAnswer = window.questions[window.currentQuestionIndex].answer;
+            
+            // Show the answer container
+            document.getElementById('answer-container').classList.remove('hidden');
+            
+            // Display result
+            const answerResult = document.getElementById('answer-result');
+            if (selectedAnswer.value === correctAnswer) {
+                answerResult.textContent = `✓ 正确！答案是：${correctAnswer}`;
+                answerResult.style.color = '#28a745';
+            } else {
+                answerResult.textContent = `✗ 错误。正确答案是：${correctAnswer}`;
+                answerResult.style.color = '#dc3545';
+            }
+            
+            // Display explanation
+            document.getElementById('answer-explanation').textContent = window.questions[window.currentQuestionIndex].explanation;
+            
+            // Enable navigation buttons
+            document.getElementById('next-question-button').disabled = window.currentQuestionIndex >= window.questions.length - 1;
+            document.getElementById('prev-question-button').disabled = window.currentQuestionIndex <= 0;
+        });
+        
+        // Navigation button click events
+        document.getElementById('prev-question-button').addEventListener('click', function() {
+            if (window.currentQuestionIndex > 0) {
+                window.currentQuestionIndex--;
+                window.displayCurrentQuestion();
+                window.updateNavigationButtons();
+            }
+        });
+        
+        document.getElementById('next-question-button').addEventListener('click', function() {
+            if (window.currentQuestionIndex < window.questions.length - 1) {
+                window.currentQuestionIndex++;
+                window.displayCurrentQuestion();
+                window.updateNavigationButtons();
+            }
+        });
+    });
 }); 
