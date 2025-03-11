@@ -251,23 +251,42 @@ function displayCurrentQuestion() {
         questionCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
     }
     
-    // Display question text and choices
+    // Format and display question text with MathJax
     const questionText = document.getElementById('question-text');
-    const choiceAText = document.getElementById('choice-a-text');
-    const choiceBText = document.getElementById('choice-b-text');
-    const choiceCText = document.getElementById('choice-c-text');
-    const choiceDText = document.getElementById('choice-d-text');
+    if (questionText) {
+        // Process math expressions in the question text
+        const formattedText = formatMathExpressions(question.questionText);
+        questionText.innerHTML = formattedText;
+    }
     
-    if (questionText) questionText.textContent = question.questionText;
-    if (choiceAText) choiceAText.textContent = question.choices.A;
-    if (choiceBText) choiceBText.textContent = question.choices.B;
-    if (choiceCText) choiceCText.textContent = question.choices.C;
-    if (choiceDText) choiceDText.textContent = question.choices.D;
-    
-    // Clear any selected radio buttons
-    document.querySelectorAll('input[name="choice"]').forEach(radio => {
-        radio.checked = false;
-    });
+    // Create 2x2 grid for choices
+    const choicesContainer = document.getElementById('choices-container');
+    if (choicesContainer) {
+        choicesContainer.innerHTML = `
+            <div class="choices-grid">
+                <div class="choice-row">
+                    <div class="choice-cell">
+                        <input type="radio" name="choice" id="choice-a" value="A">
+                        <label for="choice-a" id="choice-a-text">${formatMathExpressions(question.choices.A)}</label>
+                    </div>
+                    <div class="choice-cell">
+                        <input type="radio" name="choice" id="choice-b" value="B">
+                        <label for="choice-b" id="choice-b-text">${formatMathExpressions(question.choices.B)}</label>
+                    </div>
+                </div>
+                <div class="choice-row">
+                    <div class="choice-cell">
+                        <input type="radio" name="choice" id="choice-c" value="C">
+                        <label for="choice-c" id="choice-c-text">${formatMathExpressions(question.choices.C)}</label>
+                    </div>
+                    <div class="choice-cell">
+                        <input type="radio" name="choice" id="choice-d" value="D">
+                        <label for="choice-d" id="choice-d-text">${formatMathExpressions(question.choices.D)}</label>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
     
     // If user has already answered this question, select their answer
     if (window.userAnswers && window.userAnswers[window.currentQuestionIndex]) {
@@ -280,27 +299,27 @@ function displayCurrentQuestion() {
         const answerContainer = document.getElementById('answer-container');
         if (answerContainer) {
             answerContainer.classList.remove('hidden');
-        }
-        
-        // Display result
-        const selectedAnswer = window.userAnswers[window.currentQuestionIndex];
-        const correctAnswer = question.answer;
-        const answerResult = document.getElementById('answer-result');
-        
-        if (answerResult) {
-            if (selectedAnswer === correctAnswer) {
-                answerResult.textContent = `✓ 正确！答案是：${correctAnswer}`;
-                answerResult.style.color = '#28a745';
-            } else {
-                answerResult.textContent = `✗ 错误。正确答案是：${correctAnswer}`;
-                answerResult.style.color = '#dc3545';
+            
+            // Display result with math formatting
+            const selectedAnswer = window.userAnswers[window.currentQuestionIndex];
+            const correctAnswer = question.answer;
+            const answerResult = document.getElementById('answer-result');
+            
+            if (answerResult) {
+                if (selectedAnswer === correctAnswer) {
+                    answerResult.innerHTML = formatMathExpressions(`✓ 正确！答案是：${correctAnswer}`);
+                    answerResult.style.color = '#28a745';
+                } else {
+                    answerResult.innerHTML = formatMathExpressions(`✗ 错误。正确答案是：${correctAnswer}`);
+                    answerResult.style.color = '#dc3545';
+                }
             }
-        }
-        
-        // Display explanation
-        const answerExplanation = document.getElementById('answer-explanation');
-        if (answerExplanation) {
-            answerExplanation.textContent = question.explanation;
+            
+            // Display explanation with math formatting
+            const answerExplanation = document.getElementById('answer-explanation');
+            if (answerExplanation) {
+                answerExplanation.innerHTML = formatMathExpressions(question.explanation);
+            }
         }
     } else {
         // Hide the answer container if not answered
@@ -309,6 +328,34 @@ function displayCurrentQuestion() {
             answerContainer.classList.add('hidden');
         }
     }
+    
+    // Render math expressions
+    if (window.MathJax) {
+        window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+    }
+}
+
+// Function to format math expressions
+function formatMathExpressions(text) {
+    if (!text) return '';
+    
+    // Replace simple math expressions with LaTeX
+    text = text.replace(/\b(\d+[+\-*/]\d+)\b/g, '\\($1\\)');
+    
+    // Replace fractions
+    text = text.replace(/(\d+)\/(\d+)/g, '\\(\\frac{$1}{$2}\\)');
+    
+    // Replace powers
+    text = text.replace(/(\d+)\^(\d+)/g, '\\($1^{$2}\\)');
+    
+    // Replace square roots
+    text = text.replace(/sqrt\(([^)]+)\)/g, '\\(\\sqrt{$1}\\)');
+    
+    // Replace existing LaTeX delimiters
+    text = text.replace(/\$\$(.*?)\$\$/g, '\\[$1\\]');
+    text = text.replace(/\$(.*?)\$/g, '\\($1\\)');
+    
+    return text;
 }
 
 // Global function to update navigation buttons
@@ -430,25 +477,59 @@ function showSystemMessage(message, type = 'info') {
     messageElement.className = `system-message ${type}`;
     messageElement.textContent = message;
     
-    // Get the output element
-    const output = document.getElementById('output');
-    if (!output) {
-        console.error('Output element not found');
-        return;
+    // Get the questions display container
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    
+    // Create status container if it doesn't exist
+    let statusContainer = document.getElementById('status-container');
+    if (!statusContainer) {
+        statusContainer = document.createElement('div');
+        statusContainer.id = 'status-container';
+        statusContainer.className = 'status-container';
+        questionsDisplayContainer.insertBefore(statusContainer, questionsDisplayContainer.firstChild);
     }
     
     // Clear previous messages
-    const existingMessages = output.querySelectorAll('.system-message');
-    existingMessages.forEach(msg => msg.remove());
+    statusContainer.innerHTML = '';
     
     // Add new message
-    output.prepend(messageElement);
+    statusContainer.appendChild(messageElement);
     
     // Auto-remove after 5 seconds for non-error messages
     if (type !== 'error') {
         setTimeout(() => {
             messageElement.remove();
         }, 5000);
+    }
+}
+
+// Initialize the page with form layout
+function initializeFormLayout() {
+    const formContainer = document.getElementById('question-form-container');
+    if (!formContainer) return;
+    
+    // Create a flex container for the dropdowns
+    const dropdownContainer = document.createElement('div');
+    dropdownContainer.className = 'dropdown-container';
+    
+    // Move all select elements into the dropdown container
+    const selects = formContainer.querySelectorAll('select');
+    selects.forEach(select => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'select-wrapper';
+        // Get the label for this select
+        const label = formContainer.querySelector(`label[for="${select.id}"]`);
+        if (label) {
+            wrapper.appendChild(label);
+        }
+        wrapper.appendChild(select);
+        dropdownContainer.appendChild(wrapper);
+    });
+    
+    // Insert the dropdown container at the start of the form
+    const form = document.getElementById('question-form');
+    if (form) {
+        form.insertBefore(dropdownContainer, form.firstChild);
     }
 }
 
@@ -1078,6 +1159,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the page
     populateGradeOptions(schoolSelect.value);
     populateSubjectOptions(schoolSelect.value);
+
+    // Initialize form layout
+    initializeFormLayout();
 
     // Add event listener for generate questions button
     if (generateQuestionsButton) {
