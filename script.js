@@ -719,13 +719,14 @@ function initializeFormLayout() {
         dropdownContainer.appendChild(wrapper);
     });
     
-    // Create a button container inside the form
+    // Create a more compact button container
     const buttonContainer = document.createElement('div');
     buttonContainer.style.cssText = `
         display: flex;
         justify-content: center;
         padding: 10px 0;
-        margin: 5px 0;
+        margin: 5px 0 10px 0;
+        border-bottom: 1px solid #edf2f7;
     `;
     
     // Style the generate questions button
@@ -742,11 +743,63 @@ function initializeFormLayout() {
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
-            width: 100%;
-            max-width: 200px;
         `;
         
         buttonContainer.appendChild(generateButton);
+    }
+    
+    // Style the API function container with reduced spacing
+    const apiRadioContainer = document.querySelector('.api-function-container');
+    if (apiRadioContainer) {
+        apiRadioContainer.style.cssText = `
+            padding: 12px;
+            margin-top: 5px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #edf2f7;
+            border-radius: 0 0 12px 12px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        `;
+        
+        // Style radio buttons and labels
+        const radioButtons = apiRadioContainer.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach(radio => {
+            const label = radio.nextElementSibling;
+            if (label) {
+                const wrapper = document.createElement('div');
+                wrapper.style.cssText = `
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 6px 12px;
+                    background: white;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                `;
+                
+                radio.style.cssText = `
+                    width: 14px;
+                    height: 14px;
+                    cursor: pointer;
+                    accent-color: #4299e1;
+                    margin: 0;
+                `;
+                
+                label.style.cssText = `
+                    font-size: 13px;
+                    color: #4a5568;
+                    cursor: pointer;
+                    margin: 0;
+                `;
+                
+                // Move radio and label to the wrapper
+                radio.parentNode.insertBefore(wrapper, radio);
+                wrapper.appendChild(radio);
+                wrapper.appendChild(label);
+            }
+        });
     }
     
     // Insert elements in the correct order with minimal spacing
@@ -773,9 +826,8 @@ function initializeFormLayout() {
         }
         
         // Insert containers in the correct order
-        form.innerHTML = ''; // Clear the form
-        form.appendChild(dropdownContainer);
-        form.appendChild(buttonContainer);
+        form.insertBefore(dropdownContainer, form.firstChild);
+        formContainer.parentNode.insertBefore(buttonContainer, formContainer.nextSibling);
     }
 }
 
