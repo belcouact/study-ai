@@ -235,6 +235,121 @@ function extractContentFromResponse(data) {
     }
 }
 
+// Function to show results popup
+function showResultsPopup() {
+    // Calculate score
+    let correctCount = 0;
+    window.userAnswers.forEach((answer, index) => {
+        if (answer === window.questions[index].answer) {
+            correctCount++;
+        }
+    });
+    const scorePercentage = (correctCount / window.questions.length) * 100;
+
+    // Create modal container
+    let modalContainer = document.getElementById('results-modal');
+    if (!modalContainer) {
+        modalContainer = document.createElement('div');
+        modalContainer.id = 'results-modal';
+        modalContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        `;
+        document.body.appendChild(modalContainer);
+    }
+
+    // Create modal content
+    modalContainer.innerHTML = `
+        <div style="
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        ">
+            <button id="close-modal" style="
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #4a5568;
+                padding: 5px;
+            ">×</button>
+            
+            <div style="
+                text-align: center;
+                margin-bottom: 25px;
+            ">
+                <h2 style="
+                    font-size: clamp(24px, 4vw, 28px);
+                    color: #2d3748;
+                    margin-bottom: 20px;
+                ">测试完成！</h2>
+                
+                <div style="
+                    font-size: clamp(16px, 3vw, 18px);
+                    color: #4a5568;
+                    margin-bottom: 25px;
+                ">
+                    总题数: ${window.questions.length} | 
+                    正确: ${correctCount} | 
+                    正确率: ${scorePercentage.toFixed(1)}%
+                </div>
+                
+                <button id="evaluate-button" style="
+                    padding: 12px 25px;
+                    font-size: clamp(14px, 2.5vw, 16px);
+                    font-weight: 500;
+                    background-color: #4299e1;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+                ">成绩评估</button>
+            </div>
+            
+            <div id="evaluation-result" style="
+                display: none;
+                margin-top: 20px;
+                padding: 20px;
+                background: #f8f9fa;
+                border-radius: 8px;
+            "></div>
+        </div>
+    `;
+
+    // Add event listeners
+    document.getElementById('close-modal').addEventListener('click', () => {
+        modalContainer.remove();
+    });
+
+    document.getElementById('evaluate-button').addEventListener('click', handleEvaluateClick);
+
+    // Close modal when clicking outside
+    modalContainer.addEventListener('click', (e) => {
+        if (e.target === modalContainer) {
+            modalContainer.remove();
+        }
+    });
+}
+
 // Global function to display the current question
 function displayCurrentQuestion() {
     console.log('displayCurrentQuestion called', window.currentQuestionIndex);
@@ -250,78 +365,9 @@ function displayCurrentQuestion() {
                                window.userAnswers.length === window.questions.length && 
                                window.userAnswers.every(answer => answer !== null);
 
-    // Create or update score summary if all questions are answered
+    // Show results popup if all questions are answered
     if (allQuestionsAnswered) {
-        let correctCount = 0;
-        window.userAnswers.forEach((answer, index) => {
-            if (answer === window.questions[index].answer) {
-                correctCount++;
-            }
-        });
-        const scorePercentage = (correctCount / window.questions.length) * 100;
-
-        // Create score summary container
-        let scoreSummaryContainer = document.getElementById('score-summary-container');
-        if (!scoreSummaryContainer) {
-            scoreSummaryContainer = document.createElement('div');
-            scoreSummaryContainer.id = 'score-summary-container';
-            const questionsContainer = document.getElementById('questions-display-container');
-            questionsContainer.insertBefore(scoreSummaryContainer, questionsContainer.firstChild);
-        }
-
-        scoreSummaryContainer.style.cssText = `
-            margin: 30px auto;
-            padding: 25px;
-            border-radius: 12px;
-            background-color: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            max-width: 800px;
-            width: calc(100% - 40px);
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-        `;
-
-        scoreSummaryContainer.innerHTML = `
-            <div style="
-                font-size: clamp(20px, 4vw, 24px);
-                font-weight: bold;
-                color: #2d3748;
-                margin-bottom: 15px;
-            ">测试完成！</div>
-            <div style="
-                font-size: clamp(16px, 3vw, 18px);
-                color: #4a5568;
-                margin-bottom: 20px;
-            ">
-                总题数: ${window.questions.length} | 
-                正确: ${correctCount} | 
-                正确率: ${scorePercentage.toFixed(1)}%
-            </div>
-            <button id="evaluate-button" style="
-                padding: 12px 25px;
-                font-size: clamp(14px, 2.5vw, 16px);
-                font-weight: 500;
-                background-color: #4299e1;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
-                width: auto;
-                min-width: 120px;
-            ">成绩评估</button>
-            <div id="evaluation-result" style="display: none; margin-top: 20px;"></div>
-        `;
-
-        // Add click handler for evaluate button
-        const evaluateButton = document.getElementById('evaluate-button');
-        if (evaluateButton && !evaluateButton.hasEventListener) {
-            evaluateButton.hasEventListener = true;
-            evaluateButton.addEventListener('click', handleEvaluateClick);
-        }
+        showResultsPopup();
     }
     
     // Update question counter with responsive styling
@@ -1786,20 +1832,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetchAIResponse(prompt);
             const evaluationContent = extractContentFromResponse(response);
 
-            // Display evaluation result with responsive styling
-            evaluationResult.style.cssText = `
-                display: block;
-                margin-top: 25px;
-                padding: clamp(15px, 3vw, 20px);
-                background: #f8f9fa;
-                border-radius: 8px;
-                text-align: left;
-                line-height: 1.6;
-                font-size: clamp(14px, 2.5vw, 16px);
-                max-height: 0;
-                overflow: hidden;
-                transition: max-height 0.5s ease-out;
-            `;
+            // Show evaluation result container
+            evaluationResult.style.display = 'block';
 
             // Format the evaluation content with sections
             const formattedEvaluation = evaluationContent
@@ -1812,8 +1846,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                 color: #2d3748;
                                 margin-bottom: 10px;
                                 font-size: clamp(16px, 3vw, 18px);
+                                font-weight: 600;
                             ">${title[0]}</h3>
-                            <div style="color: #4a5568;">${section.replace(title[0], '').trim()}</div>
+                            <div style="
+                                color: #4a5568;
+                                line-height: 1.6;
+                                font-size: clamp(14px, 2.5vw, 16px);
+                            ">${section.replace(title[0], '').trim()}</div>
                         </div>`;
                     }
                     return section;
@@ -1821,11 +1860,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 .join('');
 
             evaluationResult.innerHTML = formattedEvaluation;
-            
-            // Animate the evaluation result
-            requestAnimationFrame(() => {
-                evaluationResult.style.maxHeight = evaluationResult.scrollHeight + 'px';
-            });
+
+            // Smooth scroll to evaluation result
+            evaluationResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
         } catch (error) {
             console.error('Evaluation error:', error);
