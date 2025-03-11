@@ -325,6 +325,7 @@ D. [选项D内容]
     
     // Function to parse questions from API response
     function parseQuestionsFromResponse(response) {
+        // Extract content from the API response
         const content = extractContentFromResponse(response);
         const parsedQuestions = [];
         
@@ -555,22 +556,16 @@ D. [选项D内容]
             return;
         }
         
-        // Show loading indicator
-        loading.classList.remove('hidden');
-        output.innerHTML = '';
-        
         try {
-            // Call the AI API
-            const response = await fetchAIResponse(question);
+            // Call the AI API with the user's question
+            const prompt = question;
+            const response = await fetchAIResponse(prompt);
             
             // Handle the response
             handleSuccessfulResponse(response, question);
         } catch (error) {
             console.error('Error:', error);
             showSystemMessage(`Error: ${error.message}`, 'error');
-        } finally {
-            // Hide loading indicator
-            loading.classList.add('hidden');
         }
     }
     
@@ -625,18 +620,53 @@ D. [选项D内容]
     }
     
     // Function to fetch AI response
-    async function fetchAIResponse(question) {
-        // This is a placeholder function
-        // In a real application, this would make an API call to an AI service
-        
-        // Simulate API call with a delay
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                // Sample response for demonstration
-                const response = generateLocalResponse(question);
-                resolve(response);
-            }, 1500); // Simulate network delay
-        });
+    async function fetchAIResponse(prompt) {
+        try {
+            // Show loading indicator
+            loading.classList.remove('hidden');
+            
+            // API endpoint - replace with your actual API endpoint
+            const apiUrl = 'https://api.lkeap.cloud.tencent.com/v1/chat/completions';
+            
+            // API request configuration
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer YOUR_API_KEY' // Replace with your actual API key or use environment variables
+                },
+                body: JSON.stringify({
+                    model: 'deepseek-r1', // Or whatever model you're using
+                    messages: [
+                        {
+                            role: 'system',
+                            content: prompt
+                        }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 4000
+                })
+            };
+            
+            // Make the API call
+            const response = await fetch(apiUrl, requestOptions);
+            
+            // Check if the response is ok
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`API Error: ${errorData.error?.message || response.statusText}`);
+            }
+            
+            // Parse the response
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching AI response:', error);
+            throw error;
+        } finally {
+            // Hide loading indicator
+            loading.classList.add('hidden');
+        }
     }
     
     // Function to escape HTML special characters
@@ -826,42 +856,6 @@ D. [选项D内容]
                 messageElement.remove();
             }, 5000);
         }
-    }
-    
-    // Function to generate a local response for testing
-    function generateLocalResponse(question) {
-        // For testing the question generation functionality
-        if (question.includes('生成') && question.includes('选择题')) {
-            return `题目：下列哪个是二次函数的标准形式？
-A. y = ax + b
-B. y = ax² + bx + c (a ≠ 0)
-C. y = a/x + b
-D. y = a^x + b
-
-答案：B
-解析：本题主要考察二次函数的标准形式的识别。解题思路是回顾二次函数的定义和表达式形式。首先，二次函数是指自变量的最高次幂为2的函数，其标准形式为y = ax² + bx + c (a ≠ 0)，其中a、b、c是常数，且a不等于0。选项分析：A选项y = ax + b是一次函数的表达式，最高次幂为1；B选项y = ax² + bx + c (a ≠ 0)是二次函数的标准形式，最高次幂为2；C选项y = a/x + b是反比例函数与常数的和，不是多项式函数；D选项y = a^x + b是指数函数与常数的和。需要注意的是二次函数中a不能为0，否则就变成一次函数了。总的来说，二次函数是初中数学中的重要函数类型，它的图像是抛物线。同学们在解题时要特别注意区分不同类型的函数表达式，掌握各种基本函数的特征。
-
-题目：下列关于光的传播说法正确的是：
-A. 光在真空中传播速度约为3×10^8 m/s
-B. 光在介质中的传播速度总是大于真空中的速度
-C. 光在传播过程中不需要介质
-D. 光在均匀介质中沿曲线传播
-
-答案：A
-解析：本题主要考察光的传播特性。解题思路是回顾光的传播规律和特性。首先，光是一种电磁波，在真空中传播速度约为3×10^8 m/s，这是一个物理常数，通常用字母c表示。选项分析：A选项正确，光在真空中传播速度确实约为3×10^8 m/s；B选项错误，光在介质中的传播速度总是小于真空中的速度，介质的折射率n = c/v > 1，其中v是光在介质中的速度；C选项部分正确但表述不完整，光作为电磁波可以在真空中传播，但这不意味着它在传播过程中"不需要"介质，而是可以在没有介质的情况下传播；D选项错误，根据光的直线传播定律，光在均匀介质中沿直线传播，只有在介质不均匀或经过反射、折射等情况下才会改变传播方向。需要注意的是光的传播特性是物理学中的基础知识，与波动光学和几何光学密切相关。总的来说，光的传播遵循一定的规律，包括直线传播、反射、折射等。同学们在解题时要特别注意区分光在不同环境下的传播特性。
-
-题目：下列哪项不是细胞膜的功能？
-A. 控制物质进出细胞
-B. 保持细胞形态
-C. 进行细胞呼吸
-D. 感受外界信号
-
-答案：C
-解析：本题主要考察细胞膜的结构和功能。解题思路是回顾细胞膜的主要功能及其在细胞中的作用。首先，细胞膜是由脂质双分子层和蛋白质构成的，具有选择性通透性。选项分析：A选项正确，细胞膜具有选择性通透性，可以控制物质进出细胞，维持细胞内环境的稳定；B选项正确，细胞膜包围细胞，确定细胞边界，有助于保持细胞的形态；C选项错误，细胞呼吸主要在线粒体中进行，特别是有氧呼吸的电子传递链和ATP合成过程发生在线粒体内膜上，而不是细胞膜；D选项正确，细胞膜上有各种受体蛋白，可以感受外界信号并将信号传导到细胞内部。需要注意的是细胞膜与细胞器膜的功能是不同的，不要混淆。总的来说，细胞膜是细胞的重要组成部分，具有多种功能，但不负责细胞呼吸。同学们在解题时要特别注意区分不同细胞结构的功能。`;
-        }
-        
-        // Default response
-        return `I'm a simulated AI assistant. Your question was: "${question}". In a real application, this would be answered by connecting to an AI service API. For now, this is just a placeholder response to demonstrate the interface functionality.`;
     }
     
     // Function to optimize questions
