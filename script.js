@@ -449,6 +449,34 @@ window.parseQuestionsFromResponse = parseQuestionsFromResponse;
 window.showSystemMessage = showSystemMessage;
 window.extractContentFromResponse = extractContentFromResponse;
 
+// Function to show system messages
+function showSystemMessage(message, type = 'info') {
+    const messageElement = document.createElement('div');
+    messageElement.className = `system-message ${type}`;
+    messageElement.textContent = message;
+    
+    // Get the output element
+    const output = document.getElementById('output');
+    if (!output) {
+        console.error('Output element not found');
+        return;
+    }
+    
+    // Clear previous messages
+    const existingMessages = output.querySelectorAll('.system-message');
+    existingMessages.forEach(msg => msg.remove());
+    
+    // Add new message
+    output.prepend(messageElement);
+    
+    // Auto-remove after 5 seconds for non-error messages
+    if (type !== 'error') {
+        setTimeout(() => {
+            messageElement.remove();
+        }, 5000);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Debug all clicks
     document.addEventListener('click', (e) => {
@@ -1039,27 +1067,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/<\/ol>\s*<ol style="margin-left: (\d+)px;">/g, '');
         
         return formattedText;
-    }
-    
-    // Function to show system messages
-    function showSystemMessage(message, type = 'info') {
-        const messageElement = document.createElement('div');
-        messageElement.className = `system-message ${type}`;
-        messageElement.textContent = message;
-        
-        // Clear previous messages
-        const existingMessages = output.querySelectorAll('.system-message');
-        existingMessages.forEach(msg => msg.remove());
-        
-        // Add new message
-        output.prepend(messageElement);
-        
-        // Auto-remove after 5 seconds for non-error messages
-        if (type !== 'error') {
-            setTimeout(() => {
-                messageElement.remove();
-            }, 5000);
-        }
     }
     
     // Function to optimize questions
