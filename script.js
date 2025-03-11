@@ -265,7 +265,8 @@ function displayCurrentQuestion() {
         if (!scoreSummaryContainer) {
             scoreSummaryContainer = document.createElement('div');
             scoreSummaryContainer.id = 'score-summary-container';
-            document.getElementById('questions-display-container').appendChild(scoreSummaryContainer);
+            const questionsContainer = document.getElementById('questions-display-container');
+            questionsContainer.insertBefore(scoreSummaryContainer, questionsContainer.firstChild);
         }
 
         scoreSummaryContainer.style.cssText = `
@@ -276,7 +277,10 @@ function displayCurrentQuestion() {
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             text-align: center;
             max-width: 800px;
-            width: 100%;
+            width: calc(100% - 40px);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
         `;
 
         scoreSummaryContainer.innerHTML = `
@@ -314,7 +318,8 @@ function displayCurrentQuestion() {
 
         // Add click handler for evaluate button
         const evaluateButton = document.getElementById('evaluate-button');
-        if (evaluateButton) {
+        if (evaluateButton && !evaluateButton.hasEventListener) {
+            evaluateButton.hasEventListener = true;
             evaluateButton.addEventListener('click', handleEvaluateClick);
         }
     }
@@ -354,19 +359,19 @@ function displayCurrentQuestion() {
         questionText.innerHTML = formatMathExpressions(question.questionText);
     }
     
-    // Create responsive grid for choices
+    // Create responsive grid for choices with single selection
     const choicesContainer = document.getElementById('choices-container');
     if (choicesContainer) {
         choicesContainer.innerHTML = `
             <div class="choices-grid" style="
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
                 gap: clamp(10px, 2vw, 20px);
                 margin: 25px 0;
                 width: 100%;
             ">
                 ${['A', 'B', 'C', 'D'].map(letter => `
-                    <div class="choice-cell" style="
+                    <div class="choice-cell" data-value="${letter}" style="
                         padding: clamp(10px, 2vw, 15px);
                         border: 2px solid #e2e8f0;
                         border-radius: 12px;
@@ -376,8 +381,10 @@ function displayCurrentQuestion() {
                         gap: 12px;
                         cursor: pointer;
                         transition: all 0.2s ease;
+                        user-select: none;
+                        -webkit-tap-highlight-color: transparent;
                     ">
-                        <div style="
+                        <div class="choice-indicator" style="
                             width: 28px;
                             height: 28px;
                             border-radius: 50%;
@@ -389,14 +396,12 @@ function displayCurrentQuestion() {
                             color: #4a5568;
                             flex-shrink: 0;
                         ">${letter}</div>
-                        <input type="radio" name="choice" id="choice-${letter.toLowerCase()}" value="${letter}" style="display: none;">
-                        <label for="choice-${letter.toLowerCase()}" id="choice-${letter.toLowerCase()}-text" style="
+                        <div class="choice-text" style="
                             flex: 1;
-                            cursor: pointer;
                             font-size: clamp(14px, 2.5vw, 16px);
                             color: #2d3748;
                             line-height: 1.5;
-                        ">${formatMathExpressions(question.choices[letter])}</label>
+                        ">${formatMathExpressions(question.choices[letter])}</div>
                     </div>
                 `).join('')}
             </div>
@@ -404,35 +409,47 @@ function displayCurrentQuestion() {
 
         // Add enhanced interaction effects for choice cells
         const choiceCells = choicesContainer.querySelectorAll('.choice-cell');
+        let selectedCell = null;
+
         choiceCells.forEach(cell => {
-            const radio = cell.querySelector('input[type="radio"]');
-            const letter = cell.querySelector('div');
+            const indicator = cell.querySelector('.choice-indicator');
             
             // Function to update cell styles
-            const updateCellStyles = (isSelected) => {
+            const updateCellStyles = (cell, isSelected) => {
                 cell.style.borderColor = isSelected ? '#4299e1' : '#e2e8f0';
                 cell.style.backgroundColor = isSelected ? '#ebf8ff' : 'white';
-                letter.style.backgroundColor = isSelected ? '#4299e1' : '#edf2f7';
-                letter.style.color = isSelected ? 'white' : '#4a5568';
+                cell.querySelector('.choice-indicator').style.backgroundColor = isSelected ? '#4299e1' : '#edf2f7';
+                cell.querySelector('.choice-indicator').style.color = isSelected ? 'white' : '#4a5568';
             };
             
             // Click handling with single choice enforcement
             cell.addEventListener('click', () => {
-                // Uncheck all other radio buttons
-                choiceCells.forEach(otherCell => {
-                    const otherRadio = otherCell.querySelector('input[type="radio"]');
-                    otherRadio.checked = false;
-                    updateCellStyles(false);
-                });
+                if (selectedCell) {
+                    updateCellStyles(selectedCell, false);
+                }
+                selectedCell = cell;
+                updateCellStyles(cell, true);
                 
-                // Check the clicked radio button
-                radio.checked = true;
-                updateCellStyles(true);
+                // Save the answer
+                const value = cell.dataset.value;
+                window.userAnswers[window.currentQuestionIndex] = value;
             });
             
-            // Hover effects
+            // Touch and hover effects
+            cell.addEventListener('touchstart', () => {
+                if (cell !== selectedCell) {
+                    cell.style.backgroundColor = '#f7fafc';
+                }
+            }, { passive: true });
+            
+            cell.addEventListener('touchend', () => {
+                if (cell !== selectedCell) {
+                    cell.style.backgroundColor = 'white';
+                }
+            }, { passive: true });
+            
             cell.addEventListener('mouseover', () => {
-                if (!radio.checked) {
+                if (cell !== selectedCell) {
                     cell.style.borderColor = '#cbd5e0';
                     cell.style.backgroundColor = '#f7fafc';
                     cell.style.transform = 'translateY(-1px)';
@@ -440,12 +457,18 @@ function displayCurrentQuestion() {
             });
             
             cell.addEventListener('mouseout', () => {
-                if (!radio.checked) {
+                if (cell !== selectedCell) {
                     cell.style.borderColor = '#e2e8f0';
                     cell.style.backgroundColor = 'white';
                     cell.style.transform = 'none';
                 }
             });
+
+            // Set initial state if answer exists
+            if (window.userAnswers[window.currentQuestionIndex] === cell.dataset.value) {
+                selectedCell = cell;
+                updateCellStyles(cell, true);
+            }
         });
     }
     
@@ -1725,6 +1748,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         evaluateButton.disabled = true;
         evaluateButton.textContent = '评估中...';
+        evaluateButton.style.backgroundColor = '#90cdf4';
         
         try {
             // Calculate score
@@ -1772,6 +1796,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 text-align: left;
                 line-height: 1.6;
                 font-size: clamp(14px, 2.5vw, 16px);
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.5s ease-out;
             `;
 
             // Format the evaluation content with sections
@@ -1794,6 +1821,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 .join('');
 
             evaluationResult.innerHTML = formattedEvaluation;
+            
+            // Animate the evaluation result
+            requestAnimationFrame(() => {
+                evaluationResult.style.maxHeight = evaluationResult.scrollHeight + 'px';
+            });
 
         } catch (error) {
             console.error('Evaluation error:', error);
@@ -1801,6 +1833,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             evaluateButton.disabled = false;
             evaluateButton.textContent = '成绩评估';
+            evaluateButton.style.backgroundColor = '#4299e1';
         }
     }
     
