@@ -180,6 +180,11 @@ D. [选项D]
 
 // Make sure the function is available globally for the inline onclick handler
 window.handleGenerateQuestionsClick = handleGenerateQuestionsClick;
+window.fetchAIResponse = fetchAIResponse;
+window.createMockResponse = createMockResponse;
+window.parseQuestionsFromResponse = parseQuestionsFromResponse;
+window.showSystemMessage = showSystemMessage;
+window.extractContentFromResponse = extractContentFromResponse;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Debug all clicks
@@ -787,7 +792,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Function to fetch AI response for question generation
+    // Global function to fetch AI response for question generation
     async function fetchAIResponse(prompt) {
         console.log('Fetching AI response with prompt:', prompt);
         
