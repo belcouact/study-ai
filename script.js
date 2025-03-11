@@ -646,6 +646,14 @@ function initializeFormLayout() {
         // Insert dropdowns at the start
         form.insertBefore(dropdownContainer, form.firstChild);
         
+        // Create a spacer div
+        const spacer = document.createElement('div');
+        spacer.style.cssText = `
+            flex-grow: 1;
+            min-height: 20px;
+        `;
+        form.appendChild(spacer);
+        
         // Move API function radio buttons to the bottom
         const apiRadioContainer = document.querySelector('.api-function-container');
         if (apiRadioContainer) {
@@ -654,10 +662,13 @@ function initializeFormLayout() {
             
             // Style the container
             apiRadioContainer.style.cssText = `
-                margin-top: auto;
-                padding: 15px 0;
+                padding: 20px 0;
                 border-top: 1px solid #eee;
-                margin-top: 20px;
+                margin-top: auto;
+                background-color: #f8f9fa;
+                position: relative;
+                bottom: 0;
+                width: 100%;
             `;
             
             // Find the panel footer
