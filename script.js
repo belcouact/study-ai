@@ -12,6 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const qaContainer = document.getElementById('qa-container');
     const createContainer = document.getElementById('create-container');
     
+    // Question form elements
+    const askQuestionsButton = document.getElementById('ask-questions-button');
+    const questionFormContainer = document.getElementById('question-form-container');
+    const questionForm = document.getElementById('question-form');
+    const schoolSelect = document.getElementById('school-select');
+    const gradeSelect = document.getElementById('grade-select');
+    const subjectSelect = document.getElementById('subject-select');
+    const generateQuestionsButton = document.getElementById('generate-questions-button');
+    
     // Sidebar elements
     const leftPanel = document.querySelector('.left-panel');
     const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -81,10 +90,127 @@ document.addEventListener('DOMContentLoaded', () => {
         qaButton.classList.remove('active');
     });
     
-    // Removed Enter key event listener to prevent submitting when Enter is pressed
-
-    // Removed show diagnostics button event listener
-
+    // Question form functionality
+    if (askQuestionsButton) {
+        askQuestionsButton.addEventListener('click', () => {
+            // Toggle the visibility of the question form
+            questionFormContainer.classList.toggle('hidden');
+            
+            // If the form is now visible, populate the dropdowns
+            if (!questionFormContainer.classList.contains('hidden')) {
+                populateGradeOptions(schoolSelect.value);
+                populateSubjectOptions(schoolSelect.value);
+            }
+        });
+    }
+    
+    // School select change event
+    if (schoolSelect) {
+        schoolSelect.addEventListener('change', () => {
+            populateGradeOptions(schoolSelect.value);
+            populateSubjectOptions(schoolSelect.value);
+        });
+    }
+    
+    // Question form submit event
+    if (questionForm) {
+        questionForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get form values
+            const school = schoolSelect.value;
+            const grade = gradeSelect.value;
+            const semester = document.getElementById('semester-select').value;
+            const subject = subjectSelect.value;
+            const difficulty = document.getElementById('difficulty-select').value;
+            const questionCount = document.getElementById('question-count-select').value;
+            
+            // Here you would typically send these values to your backend
+            // For now, we'll just log them
+            console.log('Generating questions with:', {
+                school,
+                grade,
+                semester,
+                subject,
+                difficulty,
+                questionCount
+            });
+            
+            // Show a message to the user
+            showSystemMessage(`正在生成 ${questionCount} 道 ${school}${grade}${semester}${subject} ${difficulty}难度题目...`, 'info');
+            
+            // TODO: Implement the actual question generation logic
+        });
+    }
+    
+    // Function to populate grade options based on selected school
+    function populateGradeOptions(school) {
+        // Clear existing options
+        gradeSelect.innerHTML = '';
+        
+        let options = [];
+        
+        // Set options based on school
+        switch (school) {
+            case '小学':
+                options = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+                break;
+            case '初中':
+                options = ['初一', '初二', '初三'];
+                break;
+            case '高中':
+                options = ['高一', '高二', '高三'];
+                break;
+            case '大学':
+                options = ['大一', '大二', '大三', '大四'];
+                break;
+            default:
+                options = ['请先选择学校'];
+        }
+        
+        // Add options to select
+        options.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option;
+            optionElement.textContent = option;
+            gradeSelect.appendChild(optionElement);
+        });
+    }
+    
+    // Function to populate subject options based on selected school
+    function populateSubjectOptions(school) {
+        // Clear existing options
+        subjectSelect.innerHTML = '';
+        
+        let options = [];
+        
+        // Set options based on school
+        switch (school) {
+            case '小学':
+                options = ['语文', '数学', '英语', '科学', '道德与法治'];
+                break;
+            case '初中':
+                options = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+                break;
+            case '高中':
+                options = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+                break;
+            case '大学':
+                options = ['高等数学', '大学物理', '线性代数', '概率论', '英语', '计算机科学', '经济学', '管理学'];
+                break;
+            default:
+                options = ['请先选择学校'];
+        }
+        
+        // Add options to select
+        options.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option;
+            optionElement.textContent = option;
+            subjectSelect.appendChild(optionElement);
+        });
+    }
+    
     // Add event listener for the direct test button (if it exists)
     if (directTestButton) {
         directTestButton.addEventListener('click', async () => {

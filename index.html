@@ -65,7 +65,64 @@
                 <div class="create-content">
                     <h2>出题模式</h2>
                     <p>在这里您可以创建问题和练习。</p>
-                    <!-- Content for the create questions mode will go here -->
+                    <button id="ask-questions-button" class="primary-button">提问</button>
+                    
+                    <!-- Question form container (initially hidden) -->
+                    <div id="question-form-container" class="question-form-container hidden">
+                        <h3>设置问题参数</h3>
+                        <form id="question-form">
+                            <div class="form-group">
+                                <label for="school-select">学校</label>
+                                <select id="school-select" name="school">
+                                    <option value="小学">小学</option>
+                                    <option value="初中">初中</option>
+                                    <option value="高中">高中</option>
+                                    <option value="大学">大学</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="grade-select">年级</label>
+                                <select id="grade-select" name="grade">
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="semester-select">学期</label>
+                                <select id="semester-select" name="semester">
+                                    <option value="上学期">上学期</option>
+                                    <option value="下学期">下学期</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="subject-select">科目</label>
+                                <select id="subject-select" name="subject">
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="difficulty-select">难度</label>
+                                <select id="difficulty-select" name="difficulty">
+                                    <option value="容易">容易</option>
+                                    <option value="中等">中等</option>
+                                    <option value="偏难">偏难</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="question-count-select">题数</label>
+                                <select id="question-count-select" name="questionCount">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" id="generate-questions-button" class="primary-button">生成问题</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
