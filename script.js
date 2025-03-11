@@ -204,9 +204,14 @@ function extractContentFromResponse(data) {
     
     try {
         // Handle different API response formats
-        if (data.choices && data.choices[0] && data.choices[0].message) {
-            // OpenAI-like format
-            return data.choices[0].message.content;
+        if (data.choices && data.choices[0]) {
+            if (data.choices[0].message && data.choices[0].message.content) {
+                // OpenAI-like format
+                return data.choices[0].message.content;
+            } else if (data.choices[0].content) {
+                // Deepseek format
+                return data.choices[0].content;
+            }
         } else if (data.response) {
             // Simple API format
             return data.response;
