@@ -979,13 +979,18 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Add event listeners for panel navigation
     qaButton.addEventListener('click', () => {
+        console.log('QA button clicked');
         // Show Q&A container, hide Create container
-        qaContainer.classList.remove('hidden');
-        createContainer.classList.add('hidden');
+        qaContainer.style.display = 'block';
+        createContainer.style.display = 'none';
         
-        // Update active button
+        // Update active button styles
         qaButton.classList.add('active');
         createButton.classList.remove('active');
+        
+        // Remove hidden class if present
+        qaContainer.classList.remove('hidden');
+        createContainer.classList.add('hidden');
     });
     
     createButton.addEventListener('click', () => {
