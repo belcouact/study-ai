@@ -244,12 +244,86 @@ function displayCurrentQuestion() {
         console.error('No question found at index', window.currentQuestionIndex);
         return;
     }
+
+    // Check if all questions are answered
+    const allQuestionsAnswered = window.userAnswers && 
+                               window.userAnswers.length === window.questions.length && 
+                               window.userAnswers.every(answer => answer !== null);
+
+    // Create or update score summary if all questions are answered
+    if (allQuestionsAnswered) {
+        let correctCount = 0;
+        window.userAnswers.forEach((answer, index) => {
+            if (answer === window.questions[index].answer) {
+                correctCount++;
+            }
+        });
+        const scorePercentage = (correctCount / window.questions.length) * 100;
+
+        // Create score summary container
+        let scoreSummaryContainer = document.getElementById('score-summary-container');
+        if (!scoreSummaryContainer) {
+            scoreSummaryContainer = document.createElement('div');
+            scoreSummaryContainer.id = 'score-summary-container';
+            document.getElementById('questions-display-container').appendChild(scoreSummaryContainer);
+        }
+
+        scoreSummaryContainer.style.cssText = `
+            margin: 30px auto;
+            padding: 25px;
+            border-radius: 12px;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        `;
+
+        scoreSummaryContainer.innerHTML = `
+            <div style="
+                font-size: clamp(20px, 4vw, 24px);
+                font-weight: bold;
+                color: #2d3748;
+                margin-bottom: 15px;
+            ">测试完成！</div>
+            <div style="
+                font-size: clamp(16px, 3vw, 18px);
+                color: #4a5568;
+                margin-bottom: 20px;
+            ">
+                总题数: ${window.questions.length} | 
+                正确: ${correctCount} | 
+                正确率: ${scorePercentage.toFixed(1)}%
+            </div>
+            <button id="evaluate-button" style="
+                padding: 12px 25px;
+                font-size: clamp(14px, 2.5vw, 16px);
+                font-weight: 500;
+                background-color: #4299e1;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+                width: auto;
+                min-width: 120px;
+            ">成绩评估</button>
+            <div id="evaluation-result" style="display: none; margin-top: 20px;"></div>
+        `;
+
+        // Add click handler for evaluate button
+        const evaluateButton = document.getElementById('evaluate-button');
+        if (evaluateButton) {
+            evaluateButton.addEventListener('click', handleEvaluateClick);
+        }
+    }
     
-    // Update question counter with modern styling
+    // Update question counter with responsive styling
     const questionCounter = document.getElementById('question-counter');
     if (questionCounter) {
         questionCounter.style.cssText = `
-            font-size: 16px;
+            font-size: clamp(14px, 2.5vw, 16px);
             color: #4a5568;
             font-weight: 500;
             margin-bottom: 20px;
@@ -257,15 +331,16 @@ function displayCurrentQuestion() {
             background: #edf2f7;
             border-radius: 20px;
             display: inline-block;
+            width: fit-content;
         `;
         questionCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
     }
     
-    // Format and display question text with enhanced styling
+    // Format and display question text with responsive styling
     const questionText = document.getElementById('question-text');
     if (questionText) {
         questionText.style.cssText = `
-            font-size: 18px;
+            font-size: clamp(16px, 3vw, 18px);
             color: #2d3748;
             line-height: 1.6;
             margin-bottom: 25px;
@@ -273,24 +348,26 @@ function displayCurrentQuestion() {
             background: #f8f9fa;
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            box-sizing: border-box;
         `;
         questionText.innerHTML = formatMathExpressions(question.questionText);
     }
     
-    // Create modern 2x2 grid for choices
+    // Create responsive grid for choices
     const choicesContainer = document.getElementById('choices-container');
     if (choicesContainer) {
         choicesContainer.innerHTML = `
             <div class="choices-grid" style="
                 display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: clamp(10px, 2vw, 20px);
                 margin: 25px 0;
                 width: 100%;
             ">
                 ${['A', 'B', 'C', 'D'].map(letter => `
                     <div class="choice-cell" style="
-                        padding: 15px;
+                        padding: clamp(10px, 2vw, 15px);
                         border: 2px solid #e2e8f0;
                         border-radius: 12px;
                         background-color: white;
@@ -316,7 +393,7 @@ function displayCurrentQuestion() {
                         <label for="choice-${letter.toLowerCase()}" id="choice-${letter.toLowerCase()}-text" style="
                             flex: 1;
                             cursor: pointer;
-                            font-size: 16px;
+                            font-size: clamp(14px, 2.5vw, 16px);
                             color: #2d3748;
                             line-height: 1.5;
                         ">${formatMathExpressions(question.choices[letter])}</label>
@@ -339,13 +416,26 @@ function displayCurrentQuestion() {
                 letter.style.color = isSelected ? 'white' : '#4a5568';
             };
             
+            // Click handling with single choice enforcement
+            cell.addEventListener('click', () => {
+                // Uncheck all other radio buttons
+                choiceCells.forEach(otherCell => {
+                    const otherRadio = otherCell.querySelector('input[type="radio"]');
+                    otherRadio.checked = false;
+                    updateCellStyles(false);
+                });
+                
+                // Check the clicked radio button
+                radio.checked = true;
+                updateCellStyles(true);
+            });
+            
             // Hover effects
             cell.addEventListener('mouseover', () => {
                 if (!radio.checked) {
                     cell.style.borderColor = '#cbd5e0';
                     cell.style.backgroundColor = '#f7fafc';
                     cell.style.transform = 'translateY(-1px)';
-                    cell.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
                 }
             });
             
@@ -354,22 +444,8 @@ function displayCurrentQuestion() {
                     cell.style.borderColor = '#e2e8f0';
                     cell.style.backgroundColor = 'white';
                     cell.style.transform = 'none';
-                    cell.style.boxShadow = 'none';
                 }
             });
-            
-            // Click handling
-            cell.addEventListener('click', () => {
-                const allCells = choicesContainer.querySelectorAll('.choice-cell');
-                allCells.forEach(c => updateCellStyles(c.querySelector('input[type="radio"]').checked));
-                radio.checked = true;
-                updateCellStyles(true);
-            });
-            
-            // Initialize selected state if applicable
-            if (radio.checked) {
-                updateCellStyles(true);
-            }
         });
     }
     
@@ -1637,6 +1713,94 @@ document.addEventListener('DOMContentLoaded', () => {
             // Remove optimizing class from button
             optimizeButton.classList.remove('optimizing');
             optimizeButton.textContent = '优化问题';
+        }
+    }
+    
+    // Add the evaluation click handler function
+    async function handleEvaluateClick() {
+        const evaluateButton = document.getElementById('evaluate-button');
+        const evaluationResult = document.getElementById('evaluation-result');
+        
+        if (!evaluateButton || !evaluationResult) return;
+        
+        evaluateButton.disabled = true;
+        evaluateButton.textContent = '评估中...';
+        
+        try {
+            // Calculate score
+            let correctCount = 0;
+            window.userAnswers.forEach((answer, index) => {
+                if (answer === window.questions[index].answer) {
+                    correctCount++;
+                }
+            });
+            const scorePercentage = (correctCount / window.questions.length) * 100;
+
+            // Prepare test results data
+            const testResults = window.questions.map((question, index) => ({
+                questionText: question.questionText,
+                userAnswer: window.userAnswers[index],
+                correctAnswer: question.answer,
+                isCorrect: window.userAnswers[index] === question.answer,
+                explanation: question.explanation
+            }));
+
+            // Create evaluation prompt
+            const prompt = `请对以下测试结果进行全面评估。总题数：${window.questions.length}，正确题数：${correctCount}，正确率：${scorePercentage.toFixed(1)}%。
+            
+测试详情：${JSON.stringify(testResults, null, 2)}
+
+请从以下四个方面进行详细分析：
+1. 总体表现评价：根据正确率和答题情况给出整体评价
+2. 知识点掌握情况：分析各个知识点的掌握程度
+3. 易错点分析：总结做错题目的共同特点和原因
+4. 针对性改进建议：提供具体的学习建议和改进方向
+
+请按照以上四个标题分段输出评估结果。`;
+
+            // Call API for evaluation
+            const response = await fetchAIResponse(prompt);
+            const evaluationContent = extractContentFromResponse(response);
+
+            // Display evaluation result with responsive styling
+            evaluationResult.style.cssText = `
+                display: block;
+                margin-top: 25px;
+                padding: clamp(15px, 3vw, 20px);
+                background: #f8f9fa;
+                border-radius: 8px;
+                text-align: left;
+                line-height: 1.6;
+                font-size: clamp(14px, 2.5vw, 16px);
+            `;
+
+            // Format the evaluation content with sections
+            const formattedEvaluation = evaluationContent
+                .split(/(?=总体表现评价|知识点掌握情况|易错点分析|针对性改进建议)/)
+                .map(section => {
+                    const title = section.match(/^[^：\n]+/);
+                    if (title) {
+                        return `<div style="margin-bottom: 20px;">
+                            <h3 style="
+                                color: #2d3748;
+                                margin-bottom: 10px;
+                                font-size: clamp(16px, 3vw, 18px);
+                            ">${title[0]}</h3>
+                            <div style="color: #4a5568;">${section.replace(title[0], '').trim()}</div>
+                        </div>`;
+                    }
+                    return section;
+                })
+                .join('');
+
+            evaluationResult.innerHTML = formattedEvaluation;
+
+        } catch (error) {
+            console.error('Evaluation error:', error);
+            showSystemMessage('评估过程出错，请重试', 'error');
+        } finally {
+            evaluateButton.disabled = false;
+            evaluateButton.textContent = '成绩评估';
         }
     }
     
