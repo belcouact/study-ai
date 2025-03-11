@@ -1791,7 +1791,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Add the evaluation click handler function
+    // Function to handle evaluate button click
     async function handleEvaluateClick() {
         const evaluateButton = document.getElementById('evaluate-button');
         const evaluationResult = document.getElementById('evaluation-result');
