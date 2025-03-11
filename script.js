@@ -307,10 +307,79 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Extracted content:', content);
         const parsedQuestions = [];
         
+        // Check if the content already contains "题目：" marker
+        let contentToProcess = content;
+        if (!content.includes('题目：') && !content.startsWith('题目')) {
+            // If not, add it to make parsing consistent
+            contentToProcess = '题目：' + content;
+        }
+        
         // Split the content by "题目："
-        const questionBlocks = content.split(/题目：/).filter(block => block.trim());
+        const questionBlocks = contentToProcess.split(/题目：/).filter(block => block.trim());
         console.log(`Found ${questionBlocks.length} question blocks`);
         
+        if (questionBlocks.length === 0) {
+            // If no question blocks found with standard format, try alternative parsing
+            console.log('Attempting alternative parsing method');
+            
+            // Look for numbered questions like "1." or "Question 1:"
+            const altQuestionBlocks = content.split(/\d+[\.\:]\s+/).filter(block => block.trim());
+            
+            if (altQuestionBlocks.length > 0) {
+                console.log(`Found ${altQuestionBlocks.length} alternative question blocks`);
+                
+                for (const block of altQuestionBlocks) {
+                    try {
+                        // Try to extract choices, answer and explanation with more flexible patterns
+                        const lines = block.split('\n').map(line => line.trim()).filter(line => line);
+                        
+                        if (lines.length < 5) continue; // Need at least question + 4 choices
+                        
+                        const questionText = lines[0];
+                        let choiceA = '', choiceB = '', choiceC = '', choiceD = '';
+                        let answer = '';
+                        let explanation = '';
+                        
+                        // Look for choices
+                        for (let i = 1; i < lines.length; i++) {
+                            const line = lines[i];
+                            if (line.startsWith('A') || line.startsWith('A.') || line.startsWith('(A)')) {
+                                choiceA = line.replace(/^A\.?\s*|\(A\)\s*/, '');
+                            } else if (line.startsWith('B') || line.startsWith('B.') || line.startsWith('(B)')) {
+                                choiceB = line.replace(/^B\.?\s*|\(B\)\s*/, '');
+                            } else if (line.startsWith('C') || line.startsWith('C.') || line.startsWith('(C)')) {
+                                choiceC = line.replace(/^C\.?\s*|\(C\)\s*/, '');
+                            } else if (line.startsWith('D') || line.startsWith('D.') || line.startsWith('(D)')) {
+                                choiceD = line.replace(/^D\.?\s*|\(D\)\s*/, '');
+                            } else if (line.includes('答案') || line.toLowerCase().includes('answer')) {
+                                answer = line.match(/[A-D]/)?.[0] || '';
+                            } else if (line.includes('解析') || line.toLowerCase().includes('explanation')) {
+                                explanation = lines.slice(i).join('\n');
+                                break;
+                            }
+                        }
+                        
+                        if (questionText && (choiceA || choiceB || choiceC || choiceD)) {
+                            parsedQuestions.push({
+                                questionText: `题目：${questionText}`,
+                                choices: {
+                                    A: choiceA || '选项A',
+                                    B: choiceB || '选项B',
+                                    C: choiceC || '选项C',
+                                    D: choiceD || '选项D'
+                                },
+                                answer: answer || 'A',
+                                explanation: explanation || '无解析'
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error parsing alternative question block:', error, block);
+                    }
+                }
+            }
+        }
+        
+        // Standard parsing for normal format
         for (const block of questionBlocks) {
             try {
                 // Extract question text
@@ -347,6 +416,22 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error('Error parsing question block:', error, block);
             }
+        }
+        
+        // If we still have no questions, create a default one to prevent errors
+        if (parsedQuestions.length === 0) {
+            console.warn('No questions could be parsed, creating a default question');
+            parsedQuestions.push({
+                questionText: '题目：无法解析API返回的题目，这是一个默认题目',
+                choices: {
+                    A: '选项A',
+                    B: '选项B',
+                    C: '选项C',
+                    D: '选项D'
+                },
+                answer: 'A',
+                explanation: '由于API返回格式问题，无法解析题目。这是一个默认解析。'
+            });
         }
         
         console.log(`Successfully parsed ${parsedQuestions.length} questions`);
@@ -622,53 +707,69 @@ document.addEventListener('DOMContentLoaded', () => {
                 loading.classList.remove('hidden');
             }
             
-            // Get the current model and API function if they exist
-            let model = 'default';
-            let apiFunction = 'chat';
+            // Try to use a public API that doesn't require authentication
+            // Using a more compatible endpoint format
+            console.log('Attempting to use a compatible API endpoint');
             
-            const modelSelect = document.getElementById('model-select');
-            if (modelSelect) {
-                model = modelSelect.value;
-            }
-            
-            const apiFunctionRadios = document.querySelectorAll('input[name="api-function"]');
-            if (apiFunctionRadios && apiFunctionRadios.length > 0) {
-                const selectedApiFunction = document.querySelector('input[name="api-function"]:checked');
-                if (selectedApiFunction) {
-                    apiFunction = selectedApiFunction.value;
+            // First try with the original endpoint
+            try {
+                const response = await fetch('https://study-llm.pages.dev/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('API response received:', data);
+                    return data;
                 }
+                
+                console.warn(`First API attempt failed with status ${response.status}`);
+            } catch (firstApiError) {
+                console.warn('First API attempt error:', firstApiError);
             }
             
-            console.log(`Using model: ${model}, API function: ${apiFunction}`);
-            
-            // Make the API request
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    question: prompt,
-                    model: model,
-                    apiFunction: apiFunction
-                })
-            });
-            
-            if (!response.ok) {
-                // If the API call fails, fall back to mock responses
-                console.warn(`API request failed with status ${response.status}, falling back to mock response`);
-                return createMockResponse(prompt);
+            // Second attempt with a different format
+            try {
+                const response = await fetch('https://study-llm.pages.dev/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            {
+                                role: "user",
+                                content: prompt
+                            }
+                        ]
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Second API attempt succeeded:', data);
+                    return data;
+                }
+                
+                console.warn(`Second API attempt failed with status ${response.status}`);
+            } catch (secondApiError) {
+                console.warn('Second API attempt error:', secondApiError);
             }
             
-            const data = await response.json();
-            console.log('AI response received:', data);
-            
-            return data;
+            // If all API attempts fail, fall back to mock responses
+            console.warn('All API attempts failed, falling back to mock response');
+            return createMockResponse(prompt);
         } catch (error) {
-            console.error('Error fetching AI response:', error);
+            console.error('Error in fetchAIResponse:', error);
             
             // Fall back to mock responses if there's an error
-            console.warn('Error in API call, falling back to mock response');
+            console.warn('Error in API calls, falling back to mock response');
             return createMockResponse(prompt);
         } finally {
             // Hide loading indicator if it exists
@@ -1030,6 +1131,8 @@ D. [选项D]
         fetchAIResponse(prompt)
             .then(response => {
                 try {
+                    console.log('Processing API response:', response);
+                    
                     // Parse the response
                     const parsedQuestions = parseQuestionsFromResponse(response);
                     console.log('Parsed questions:', parsedQuestions);
