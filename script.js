@@ -633,10 +633,10 @@ function initializeFormLayout() {
     const formContainer = document.getElementById('question-form-container');
     if (!formContainer) return;
     
-    // Style the form container with a modern look
+    // Style the form container with a more compact look
     formContainer.style.cssText = `
-        padding: 20px;
-        margin-bottom: 15px;
+        padding: 15px;
+        margin-bottom: 10px;
         background: #ffffff;
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -647,17 +647,17 @@ function initializeFormLayout() {
         transition: all 0.3s ease;
     `;
     
-    // Create a flex container for the dropdowns
+    // Create a flex container for the dropdowns with reduced spacing
     const dropdownContainer = document.createElement('div');
     dropdownContainer.className = 'dropdown-container';
     dropdownContainer.style.cssText = `
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        gap: 15px;
-        margin-bottom: 20px;
+        gap: 12px;
+        margin-bottom: 15px;
         flex-wrap: nowrap;
-        padding: 10px;
+        padding: 8px;
         background: #f8f9fa;
         border-radius: 8px;
     `;
@@ -672,7 +672,7 @@ function initializeFormLayout() {
             min-width: 0;
             display: flex;
             flex-direction: column;
-            margin-bottom: 0;
+            margin: 0;
             position: relative;
         `;
         
@@ -680,8 +680,8 @@ function initializeFormLayout() {
         const label = formContainer.querySelector(`label[for="${select.id}"]`);
         if (label) {
             label.style.cssText = `
-                margin-bottom: 6px;
-                font-size: 14px;
+                margin-bottom: 4px;
+                font-size: 13px;
                 font-weight: 500;
                 color: #4a5568;
                 white-space: nowrap;
@@ -692,10 +692,10 @@ function initializeFormLayout() {
         // Style the select element
         select.style.cssText = `
             width: 100%;
-            padding: 8px 12px;
+            padding: 6px 10px;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
             color: #2d3748;
             background-color: white;
             transition: all 0.2s ease;
@@ -703,39 +703,22 @@ function initializeFormLayout() {
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234a5568' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 12px center;
+            background-position: right 8px center;
             background-size: 12px;
+            margin: 0;
         `;
-        
-        // Add hover and focus effects
-        select.addEventListener('mouseover', () => {
-            select.style.borderColor = '#cbd5e0';
-        });
-        select.addEventListener('mouseout', () => {
-            if (!select.matches(':focus')) {
-                select.style.borderColor = '#e2e8f0';
-            }
-        });
-        select.addEventListener('focus', () => {
-            select.style.borderColor = '#4299e1';
-            select.style.boxShadow = '0 0 0 3px rgba(66, 153, 225, 0.15)';
-        });
-        select.addEventListener('blur', () => {
-            select.style.borderColor = '#e2e8f0';
-            select.style.boxShadow = 'none';
-        });
         
         wrapper.appendChild(select);
         dropdownContainer.appendChild(wrapper);
     });
     
-    // Create a button container with modern styling
+    // Create a more compact button container
     const buttonContainer = document.createElement('div');
     buttonContainer.style.cssText = `
         display: flex;
         justify-content: center;
-        margin: 20px 0;
-        padding: 15px 0;
+        padding: 10px 0;
+        margin: 5px 0 10px 0;
         border-bottom: 1px solid #edf2f7;
     `;
     
@@ -743,53 +726,33 @@ function initializeFormLayout() {
     const generateButton = document.getElementById('generate-questions-button');
     if (generateButton) {
         generateButton.style.cssText = `
-            padding: 12px 30px;
-            font-size: 16px;
+            padding: 10px 25px;
+            font-size: 15px;
             font-weight: 500;
             background-color: #4299e1;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
         `;
         
-        // Add hover and active effects
-        generateButton.addEventListener('mouseover', () => {
-            generateButton.style.backgroundColor = '#3182ce';
-            generateButton.style.transform = 'translateY(-1px)';
-            generateButton.style.boxShadow = '0 4px 6px rgba(66, 153, 225, 0.3)';
-        });
-        generateButton.addEventListener('mouseout', () => {
-            generateButton.style.backgroundColor = '#4299e1';
-            generateButton.style.transform = 'translateY(0)';
-            generateButton.style.boxShadow = '0 2px 4px rgba(66, 153, 225, 0.2)';
-        });
-        generateButton.addEventListener('mousedown', () => {
-            generateButton.style.transform = 'translateY(1px)';
-            generateButton.style.boxShadow = '0 1px 2px rgba(66, 153, 225, 0.2)';
-        });
-        generateButton.addEventListener('mouseup', () => {
-            generateButton.style.transform = 'translateY(-1px)';
-            generateButton.style.boxShadow = '0 4px 6px rgba(66, 153, 225, 0.3)';
-        });
-        
         buttonContainer.appendChild(generateButton);
     }
     
-    // Style the API function container
+    // Style the API function container with reduced spacing
     const apiRadioContainer = document.querySelector('.api-function-container');
     if (apiRadioContainer) {
         apiRadioContainer.style.cssText = `
-            padding: 20px;
-            margin-top: auto;
+            padding: 12px;
+            margin-top: 5px;
             background-color: #f8f9fa;
             border-top: 1px solid #edf2f7;
             border-radius: 0 0 12px 12px;
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
         `;
         
         // Style radio buttons and labels
@@ -801,50 +764,44 @@ function initializeFormLayout() {
                 wrapper.style.cssText = `
                     display: flex;
                     align-items: center;
-                    gap: 8px;
-                    padding: 8px 16px;
+                    gap: 6px;
+                    padding: 6px 12px;
                     background: white;
-                    border-radius: 6px;
+                    border-radius: 4px;
                     cursor: pointer;
                     transition: all 0.2s ease;
                 `;
                 
                 radio.style.cssText = `
-                    width: 16px;
-                    height: 16px;
+                    width: 14px;
+                    height: 14px;
                     cursor: pointer;
                     accent-color: #4299e1;
+                    margin: 0;
                 `;
                 
                 label.style.cssText = `
-                    font-size: 14px;
+                    font-size: 13px;
                     color: #4a5568;
                     cursor: pointer;
+                    margin: 0;
                 `;
                 
                 // Move radio and label to the wrapper
                 radio.parentNode.insertBefore(wrapper, radio);
                 wrapper.appendChild(radio);
                 wrapper.appendChild(label);
-                
-                // Add hover effect
-                wrapper.addEventListener('mouseover', () => {
-                    wrapper.style.backgroundColor = '#edf2f7';
-                });
-                wrapper.addEventListener('mouseout', () => {
-                    wrapper.style.backgroundColor = 'white';
-                });
             }
         });
     }
     
-    // Insert elements in the correct order
+    // Insert elements in the correct order with minimal spacing
     const form = document.getElementById('question-form');
     if (form) {
         form.style.cssText = `
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
             padding: 0;
             margin: 0;
         `;
