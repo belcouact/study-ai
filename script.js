@@ -245,159 +245,212 @@ function displayCurrentQuestion() {
         return;
     }
     
-    // Update question counter
+    // Update question counter with modern styling
     const questionCounter = document.getElementById('question-counter');
     if (questionCounter) {
+        questionCounter.style.cssText = `
+            font-size: 16px;
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: #edf2f7;
+            border-radius: 20px;
+            display: inline-block;
+        `;
         questionCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
     }
     
-    // Format and display question text with MathJax
+    // Format and display question text with enhanced styling
     const questionText = document.getElementById('question-text');
     if (questionText) {
+        questionText.style.cssText = `
+            font-size: 18px;
+            color: #2d3748;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        `;
         questionText.innerHTML = formatMathExpressions(question.questionText);
     }
     
-    // Create 2x2 grid for choices
+    // Create modern 2x2 grid for choices
     const choicesContainer = document.getElementById('choices-container');
     if (choicesContainer) {
         choicesContainer.innerHTML = `
             <div class="choices-grid" style="
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-                margin: 20px 0;
+                gap: 20px;
+                margin: 25px 0;
                 width: 100%;
             ">
-                <div class="choice-cell" style="
-                    padding: 10px;
-                    border: 1px solid #ddd;
-                    border-radius: 8px;
-                    background-color: #f8f9fa;
-                    display: flex;
-                    align-items: center;
-                ">
-                    <input type="radio" name="choice" id="choice-a" value="A" style="margin-right: 10px;">
-                    <label for="choice-a" id="choice-a-text" style="flex: 1; cursor: pointer;">${formatMathExpressions(question.choices.A)}</label>
-                </div>
-                <div class="choice-cell" style="
-                    padding: 10px;
-                    border: 1px solid #ddd;
-                    border-radius: 8px;
-                    background-color: #f8f9fa;
-                    display: flex;
-                    align-items: center;
-                ">
-                    <input type="radio" name="choice" id="choice-b" value="B" style="margin-right: 10px;">
-                    <label for="choice-b" id="choice-b-text" style="flex: 1; cursor: pointer;">${formatMathExpressions(question.choices.B)}</label>
-                </div>
-                <div class="choice-cell" style="
-                    padding: 10px;
-                    border: 1px solid #ddd;
-                    border-radius: 8px;
-                    background-color: #f8f9fa;
-                    display: flex;
-                    align-items: center;
-                ">
-                    <input type="radio" name="choice" id="choice-c" value="C" style="margin-right: 10px;">
-                    <label for="choice-c" id="choice-c-text" style="flex: 1; cursor: pointer;">${formatMathExpressions(question.choices.C)}</label>
-                </div>
-                <div class="choice-cell" style="
-                    padding: 10px;
-                    border: 1px solid #ddd;
-                    border-radius: 8px;
-                    background-color: #f8f9fa;
-                    display: flex;
-                    align-items: center;
-                ">
-                    <input type="radio" name="choice" id="choice-d" value="D" style="margin-right: 10px;">
-                    <label for="choice-d" id="choice-d-text" style="flex: 1; cursor: pointer;">${formatMathExpressions(question.choices.D)}</label>
-                </div>
+                ${['A', 'B', 'C', 'D'].map(letter => `
+                    <div class="choice-cell" style="
+                        padding: 15px;
+                        border: 2px solid #e2e8f0;
+                        border-radius: 12px;
+                        background-color: white;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    ">
+                        <div style="
+                            width: 28px;
+                            height: 28px;
+                            border-radius: 50%;
+                            background: #edf2f7;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: 500;
+                            color: #4a5568;
+                            flex-shrink: 0;
+                        ">${letter}</div>
+                        <input type="radio" name="choice" id="choice-${letter.toLowerCase()}" value="${letter}" style="display: none;">
+                        <label for="choice-${letter.toLowerCase()}" id="choice-${letter.toLowerCase()}-text" style="
+                            flex: 1;
+                            cursor: pointer;
+                            font-size: 16px;
+                            color: #2d3748;
+                            line-height: 1.5;
+                        ">${formatMathExpressions(question.choices[letter])}</label>
+                    </div>
+                `).join('')}
             </div>
         `;
 
-        // Add hover effect for choice cells
+        // Add enhanced interaction effects for choice cells
         const choiceCells = choicesContainer.querySelectorAll('.choice-cell');
         choiceCells.forEach(cell => {
-            cell.addEventListener('mouseover', function() {
-                this.style.backgroundColor = '#f0f0f0';
-                this.style.transition = 'background-color 0.2s';
-            });
-            cell.addEventListener('mouseout', function() {
-                this.style.backgroundColor = '#f8f9fa';
-            });
-            // Make the whole cell clickable
-            cell.addEventListener('click', function() {
-                const radio = this.querySelector('input[type="radio"]');
-                if (radio) {
-                    radio.checked = true;
+            const radio = cell.querySelector('input[type="radio"]');
+            const letter = cell.querySelector('div');
+            
+            // Function to update cell styles
+            const updateCellStyles = (isSelected) => {
+                cell.style.borderColor = isSelected ? '#4299e1' : '#e2e8f0';
+                cell.style.backgroundColor = isSelected ? '#ebf8ff' : 'white';
+                letter.style.backgroundColor = isSelected ? '#4299e1' : '#edf2f7';
+                letter.style.color = isSelected ? 'white' : '#4a5568';
+            };
+            
+            // Hover effects
+            cell.addEventListener('mouseover', () => {
+                if (!radio.checked) {
+                    cell.style.borderColor = '#cbd5e0';
+                    cell.style.backgroundColor = '#f7fafc';
+                    cell.style.transform = 'translateY(-1px)';
+                    cell.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
                 }
             });
+            
+            cell.addEventListener('mouseout', () => {
+                if (!radio.checked) {
+                    cell.style.borderColor = '#e2e8f0';
+                    cell.style.backgroundColor = 'white';
+                    cell.style.transform = 'none';
+                    cell.style.boxShadow = 'none';
+                }
+            });
+            
+            // Click handling
+            cell.addEventListener('click', () => {
+                const allCells = choicesContainer.querySelectorAll('.choice-cell');
+                allCells.forEach(c => updateCellStyles(c.querySelector('input[type="radio"]').checked));
+                radio.checked = true;
+                updateCellStyles(true);
+            });
+            
+            // Initialize selected state if applicable
+            if (radio.checked) {
+                updateCellStyles(true);
+            }
         });
     }
     
-    // If user has already answered this question, select their answer and show result
+    // Style the answer container when showing results
     if (window.userAnswers && window.userAnswers[window.currentQuestionIndex]) {
-        const answerRadio = document.getElementById(`choice-${window.userAnswers[window.currentQuestionIndex].toLowerCase()}`);
-        if (answerRadio) {
-            answerRadio.checked = true;
-        }
-        
-        // Show the answer container
         const answerContainer = document.getElementById('answer-container');
         if (answerContainer) {
             answerContainer.classList.remove('hidden');
             answerContainer.style.cssText = `
-                margin-top: 20px;
-                padding: 15px;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                background-color: #f9f9f9;
+                margin-top: 30px;
+                padding: 25px;
+                border-radius: 12px;
+                background-color: white;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
                 width: 100%;
                 box-sizing: border-box;
+                animation: fadeIn 0.3s ease;
             `;
             
-            // Display result with math formatting
             const selectedAnswer = window.userAnswers[window.currentQuestionIndex];
             const correctAnswer = question.answer;
-            const answerResult = document.getElementById('answer-result');
+            const isCorrect = selectedAnswer === correctAnswer;
             
+            // Style the result section
+            const answerResult = document.getElementById('answer-result');
             if (answerResult) {
-                const resultText = selectedAnswer === correctAnswer 
-                    ? `✓ 正确！答案是：${correctAnswer}`
-                    : `✗ 错误。正确答案是：${correctAnswer}`;
+                answerResult.style.cssText = `
+                    font-size: 18px;
+                    font-weight: 500;
+                    color: ${isCorrect ? '#48bb78' : '#e53e3e'};
+                    margin-bottom: 20px;
+                    padding: 15px;
+                    background: ${isCorrect ? '#f0fff4' : '#fff5f5'};
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                `;
+                
+                const resultText = isCorrect 
+                    ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 正确！答案是：${correctAnswer}`
+                    : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> 错误。正确答案是：${correctAnswer}`;
                 
                 answerResult.innerHTML = formatMathExpressions(resultText);
-                answerResult.style.color = selectedAnswer === correctAnswer ? '#28a745' : '#dc3545';
-                answerResult.style.marginBottom = '10px';
             }
             
-            // Display explanation with math formatting
+            // Style the explanation section
             const answerExplanation = document.getElementById('answer-explanation');
             if (answerExplanation) {
-                answerExplanation.innerHTML = formatMathExpressions(question.explanation);
                 answerExplanation.style.cssText = `
-                    line-height: 1.6;
-                    margin-top: 10px;
+                    font-size: 16px;
+                    color: #4a5568;
+                    line-height: 1.8;
+                    margin-top: 20px;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 8px;
                     white-space: pre-wrap;
                 `;
+                answerExplanation.innerHTML = formatMathExpressions(question.explanation);
             }
         }
     } else {
-        // Hide the answer container if not answered
         const answerContainer = document.getElementById('answer-container');
         if (answerContainer) {
             answerContainer.classList.add('hidden');
         }
     }
     
-    // Ensure create container has enough space
+    // Ensure create container has enough space and smooth scrolling
     const createContainer = document.getElementById('create-container');
     if (createContainer) {
         createContainer.style.cssText = `
             min-height: 600px;
             height: auto;
-            padding-bottom: 40px;
+            padding: 30px;
             overflow-y: auto;
+            scroll-behavior: smooth;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         `;
     }
     
@@ -580,14 +633,18 @@ function initializeFormLayout() {
     const formContainer = document.getElementById('question-form-container');
     if (!formContainer) return;
     
-    // Style the form container to be more compact
+    // Style the form container with a modern look
     formContainer.style.cssText = `
-        padding: 15px;
-        margin-bottom: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         min-height: auto;
         height: auto;
         display: flex;
         flex-direction: column;
+        transition: all 0.3s ease;
     `;
     
     // Create a flex container for the dropdowns
@@ -597,9 +654,12 @@ function initializeFormLayout() {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 10px;
+        gap: 15px;
+        margin-bottom: 20px;
         flex-wrap: nowrap;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 8px;
     `;
     
     // Move all select elements into the dropdown container
@@ -613,14 +673,17 @@ function initializeFormLayout() {
             display: flex;
             flex-direction: column;
             margin-bottom: 0;
+            position: relative;
         `;
         
         // Get the label for this select
         const label = formContainer.querySelector(`label[for="${select.id}"]`);
         if (label) {
             label.style.cssText = `
-                margin-bottom: 3px;
+                margin-bottom: 6px;
                 font-size: 14px;
+                font-weight: 500;
+                color: #4a5568;
                 white-space: nowrap;
             `;
             wrapper.appendChild(label);
@@ -629,32 +692,167 @@ function initializeFormLayout() {
         // Style the select element
         select.style.cssText = `
             width: 100%;
-            padding: 6px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
             font-size: 14px;
+            color: #2d3748;
+            background-color: white;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234a5568' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px;
         `;
+        
+        // Add hover and focus effects
+        select.addEventListener('mouseover', () => {
+            select.style.borderColor = '#cbd5e0';
+        });
+        select.addEventListener('mouseout', () => {
+            if (!select.matches(':focus')) {
+                select.style.borderColor = '#e2e8f0';
+            }
+        });
+        select.addEventListener('focus', () => {
+            select.style.borderColor = '#4299e1';
+            select.style.boxShadow = '0 0 0 3px rgba(66, 153, 225, 0.15)';
+        });
+        select.addEventListener('blur', () => {
+            select.style.borderColor = '#e2e8f0';
+            select.style.boxShadow = 'none';
+        });
         
         wrapper.appendChild(select);
         dropdownContainer.appendChild(wrapper);
     });
     
-    // Insert the dropdown container at the start of the form
+    // Create a button container with modern styling
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = `
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+        padding: 15px 0;
+        border-bottom: 1px solid #edf2f7;
+    `;
+    
+    // Style the generate questions button
+    const generateButton = document.getElementById('generate-questions-button');
+    if (generateButton) {
+        generateButton.style.cssText = `
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 500;
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+        `;
+        
+        // Add hover and active effects
+        generateButton.addEventListener('mouseover', () => {
+            generateButton.style.backgroundColor = '#3182ce';
+            generateButton.style.transform = 'translateY(-1px)';
+            generateButton.style.boxShadow = '0 4px 6px rgba(66, 153, 225, 0.3)';
+        });
+        generateButton.addEventListener('mouseout', () => {
+            generateButton.style.backgroundColor = '#4299e1';
+            generateButton.style.transform = 'translateY(0)';
+            generateButton.style.boxShadow = '0 2px 4px rgba(66, 153, 225, 0.2)';
+        });
+        generateButton.addEventListener('mousedown', () => {
+            generateButton.style.transform = 'translateY(1px)';
+            generateButton.style.boxShadow = '0 1px 2px rgba(66, 153, 225, 0.2)';
+        });
+        generateButton.addEventListener('mouseup', () => {
+            generateButton.style.transform = 'translateY(-1px)';
+            generateButton.style.boxShadow = '0 4px 6px rgba(66, 153, 225, 0.3)';
+        });
+        
+        buttonContainer.appendChild(generateButton);
+    }
+    
+    // Style the API function container
+    const apiRadioContainer = document.querySelector('.api-function-container');
+    if (apiRadioContainer) {
+        apiRadioContainer.style.cssText = `
+            padding: 20px;
+            margin-top: auto;
+            background-color: #f8f9fa;
+            border-top: 1px solid #edf2f7;
+            border-radius: 0 0 12px 12px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        `;
+        
+        // Style radio buttons and labels
+        const radioButtons = apiRadioContainer.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach(radio => {
+            const label = radio.nextElementSibling;
+            if (label) {
+                const wrapper = document.createElement('div');
+                wrapper.style.cssText = `
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 8px 16px;
+                    background: white;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                `;
+                
+                radio.style.cssText = `
+                    width: 16px;
+                    height: 16px;
+                    cursor: pointer;
+                    accent-color: #4299e1;
+                `;
+                
+                label.style.cssText = `
+                    font-size: 14px;
+                    color: #4a5568;
+                    cursor: pointer;
+                `;
+                
+                // Move radio and label to the wrapper
+                radio.parentNode.insertBefore(wrapper, radio);
+                wrapper.appendChild(radio);
+                wrapper.appendChild(label);
+                
+                // Add hover effect
+                wrapper.addEventListener('mouseover', () => {
+                    wrapper.style.backgroundColor = '#edf2f7';
+                });
+                wrapper.addEventListener('mouseout', () => {
+                    wrapper.style.backgroundColor = 'white';
+                });
+            }
+        });
+    }
+    
+    // Insert elements in the correct order
     const form = document.getElementById('question-form');
     if (form) {
-        // Style the form to be more compact
         form.style.cssText = `
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
             padding: 0;
             margin: 0;
         `;
         
-        // Remove any existing dropdown container
-        const existingContainer = form.querySelector('.dropdown-container');
-        if (existingContainer) {
-            existingContainer.remove();
+        // Remove any existing containers
+        const existingDropdownContainer = form.querySelector('.dropdown-container');
+        if (existingDropdownContainer) {
+            existingDropdownContainer.remove();
         }
         
         // Remove the header if it exists
@@ -663,65 +861,9 @@ function initializeFormLayout() {
             header.remove();
         }
         
-        // Insert dropdowns at the start
+        // Insert containers in the correct order
         form.insertBefore(dropdownContainer, form.firstChild);
-        
-        // Create a button container
-        const buttonContainer = document.createElement('div');
-        buttonContainer.style.cssText = `
-            display: flex;
-            justify-content: center;
-            margin: 10px 0;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        `;
-        
-        // Move the generate questions button
-        const generateButton = document.getElementById('generate-questions-button');
-        if (generateButton) {
-            generateButton.style.cssText = `
-                padding: 8px 25px;
-                font-size: 16px;
-                background-color: #007bff;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                transition: background-color 0.2s;
-            `;
-            buttonContainer.appendChild(generateButton);
-        }
-        
-        // Insert button container after the form container
         formContainer.parentNode.insertBefore(buttonContainer, formContainer.nextSibling);
-        
-        // Move API function radio buttons to the bottom
-        const apiRadioContainer = document.querySelector('.api-function-container');
-        if (apiRadioContainer) {
-            // Remove it from current position
-            apiRadioContainer.remove();
-            
-            // Style the container
-            apiRadioContainer.style.cssText = `
-                padding: 15px 0;
-                border-top: 1px solid #eee;
-                margin-top: auto;
-                background-color: #f8f9fa;
-                position: relative;
-                bottom: 0;
-                width: 100%;
-            `;
-            
-            // Find the panel footer
-            const panelFooter = form.querySelector('.panel-footer');
-            if (panelFooter) {
-                // Insert before the panel footer
-                form.insertBefore(apiRadioContainer, panelFooter);
-            } else {
-                // If no footer, append to the end of the form
-                form.appendChild(apiRadioContainer);
-            }
-        }
     }
 }
 
