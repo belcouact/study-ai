@@ -13,13 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const createContainer = document.getElementById('create-container');
     
     // Question form elements
-    const askQuestionsButton = document.getElementById('ask-questions-button');
     const questionFormContainer = document.getElementById('question-form-container');
     const questionForm = document.getElementById('question-form');
     const schoolSelect = document.getElementById('school-select');
     const gradeSelect = document.getElementById('grade-select');
     const subjectSelect = document.getElementById('subject-select');
-    const generateQuestionsButton = document.getElementById('generate-questions-button');
     
     // Sidebar elements
     const leftPanel = document.querySelector('.left-panel');
@@ -88,21 +86,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update active button
         createButton.classList.add('active');
         qaButton.classList.remove('active');
+        
+        // Initialize the dropdowns when switching to create mode
+        populateGradeOptions(schoolSelect.value);
+        populateSubjectOptions(schoolSelect.value);
     });
-    
-    // Question form functionality
-    if (askQuestionsButton) {
-        askQuestionsButton.addEventListener('click', () => {
-            // Toggle the visibility of the question form
-            questionFormContainer.classList.toggle('hidden');
-            
-            // If the form is now visible, populate the dropdowns
-            if (!questionFormContainer.classList.contains('hidden')) {
-                populateGradeOptions(schoolSelect.value);
-                populateSubjectOptions(schoolSelect.value);
-            }
-        });
-    }
     
     // School select change event
     if (schoolSelect) {
