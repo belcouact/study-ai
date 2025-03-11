@@ -832,10 +832,10 @@ function handleGenerateQuestionsClick() {
 4. "C."后接选项C的内容
 5. "D."后接选项D的内容
 6. "答案："后接正确选项（必须是A、B、C、D其中之一）
-7. "解析："后必须包含完整的解析（至少100字）
+7. "解析："后必须包含完整的解析（至少50字）
 
 解析部分必须包含以下内容（缺一不可）：
-1. 解题思路和方法
+1. 解题思路和方法，不能超纲
 2. 关键知识点解释
 3. 正确答案的推导过程
 4. 为什么其他选项是错误的
@@ -1799,7 +1799,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Make handleEvaluateClick available globally
     window.handleEvaluateClick = async function() {
         const evaluateButton = document.getElementById('evaluate-button');
-        const evaluationResult = document.getElementById('evaluation-result');
+        const evaluationResult = document.querySelector('#results-modal #evaluation-result');
         
         if (!evaluateButton || !evaluationResult) {
             console.error('Evaluation button or result container not found');
@@ -1834,11 +1834,35 @@ document.addEventListener('DOMContentLoaded', () => {
             
 测试详情：${JSON.stringify(testResults, null, 2)}
 
-请从以下四个方面进行详细分析：
-1. 总体表现评价：根据正确率和答题情况给出整体评价
-2. 知识点掌握情况：分析各个知识点的掌握程度
-3. 易错点分析：总结做错题目的共同特点和原因
-4. 针对性改进建议：提供具体的学习建议和改进方向
+请按照以下四个方面进行分析，每个部分至少提供3-4点具体内容：
+
+总体表现评价
+• 整体答题表现分析
+• 知识掌握程度评估
+• 解题思路和方法评价
+
+知识点掌握情况
+• 已掌握的知识点（请具体指出）
+• 需要加强的知识点（请具体指出）
+• 知识运用能力分析
+
+易错点分析
+• 错误原因分析（针对具体题目）
+• 典型错误模式总结
+• 易混淆知识点辨析
+
+针对性改进建议
+• 具体的学习方法建议
+• 练习重点推荐
+• 时间分配建议
+
+回复要求：
+1. 保持鼓励性的语气
+2. 每个分析点要具体明确
+3. 建议要可操作可执行
+4. 适当使用表情符号增加亲和力
+
+请确保分析内容具体且有针对性，避免模糊的表述。
 
 请按照以上四个标题分段输出评估结果。`;
 
@@ -1890,7 +1914,7 @@ document.addEventListener('DOMContentLoaded', () => {
             evaluationResult.offsetHeight;
 
             // Scroll the modal to show the evaluation
-            const modalContent = evaluationResult.closest('.modal-content') || evaluationResult.parentElement;
+            const modalContent = evaluationResult.closest('.modal-content');
             if (modalContent) {
                 modalContent.scrollTo({
                     top: evaluationResult.offsetTop,
@@ -1898,7 +1922,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            console.log('Evaluation content loaded and displayed');
+            console.log('Evaluation content loaded and displayed in popup');
 
         } catch (error) {
             console.error('Evaluation error:', error);
