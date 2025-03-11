@@ -166,8 +166,13 @@ async function fetchAIResponse(prompt) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                messages: [
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ],
                 model: currentModel,
-                prompt: prompt,
                 temperature: 0.7,
                 max_tokens: 2000
             })
