@@ -402,14 +402,13 @@ function displayCurrentQuestion() {
     const questionText = document.getElementById('question-text');
     if (questionText) {
         questionText.style.cssText = `
-            font-size: clamp(16px, 3vw, 18px);
+            font-size: clamp(16px, 4vw, 18px);
             color: #2d3748;
             line-height: 1.6;
-            margin-bottom: 25px;
-            padding: 20px;
+            margin-bottom: clamp(15px, 4vw, 25px);
+            padding: clamp(15px, 4vw, 20px);
             background: #f8f9fa;
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             width: 100%;
             box-sizing: border-box;
         `;
@@ -422,9 +421,8 @@ function displayCurrentQuestion() {
         choicesContainer.innerHTML = `
             <div class="choices-grid" style="
                 display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                grid-template-rows: repeat(2, auto);
-                gap: clamp(10px, 2vw, 20px);
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: clamp(8px, 2vw, 20px);
                 margin: 25px 0;
                 width: 100%;
             ">
@@ -536,8 +534,8 @@ function displayCurrentQuestion() {
         if (answerContainer) {
             answerContainer.classList.remove('hidden');
             answerContainer.style.cssText = `
-                margin-top: 30px;
-                padding: 25px;
+                margin-top: clamp(20px, 5vw, 30px);
+                padding: clamp(15px, 4vw, 25px);
                 border-radius: 12px;
                 background-color: white;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -609,14 +607,18 @@ function displayCurrentQuestion() {
     const createContainer = document.getElementById('create-container');
     if (createContainer) {
         createContainer.style.cssText = `
-            min-height: 600px;
+            min-height: 100vh;
             height: auto;
-            padding: 30px;
+            padding: clamp(15px, 4vw, 30px);
             overflow-y: auto;
             scroll-behavior: smooth;
-            background: #ffffff;
+            background: transparent;
             border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: none;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            margin: 0 auto;
         `;
     }
     
@@ -662,6 +664,18 @@ function updateNavigationButtons() {
     
     if (nextButton) {
         nextButton.disabled = !window.questions || window.currentQuestionIndex >= window.questions.length - 1;
+    }
+
+    // Update navigation buttons for mobile
+    if (prevButton && nextButton) {
+        const buttonStyle = `
+            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            border-radius: 8px;
+            margin: clamp(5px, 2vw, 10px);
+        `;
+        prevButton.style.cssText += buttonStyle;
+        nextButton.style.cssText += buttonStyle;
     }
 }
 
@@ -1925,5 +1939,46 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Generate questions button clicked via event listener');
             handleGenerateQuestionsClick();
         });
+    }
+
+    // Update output container styles
+    if (output) {
+        output.style.cssText = `
+            width: 100%;
+            max-width: 100%;
+            padding: clamp(10px, 3vw, 20px);
+            margin: 0;
+            background: transparent;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: clamp(14px, 4vw, 16px);
+            line-height: 1.6;
+        `;
+    }
+
+    // Update choices grid for better mobile display
+    const choicesGrid = document.querySelector('.choices-grid');
+    if (choicesGrid) {
+        choicesGrid.style.cssText = `
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: clamp(8px, 2vw, 20px);
+            margin: 25px 0;
+            width: 100%;
+        `;
+    }
+
+    // Make answer container more responsive
+    if (answerContainer) {
+        answerContainer.style.cssText = `
+            margin-top: clamp(20px, 5vw, 30px);
+            padding: clamp(15px, 4vw, 25px);
+            border-radius: 12px;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            box-sizing: border-box;
+            animation: fadeIn 0.3s ease;
+        `;
     }
 }); 
