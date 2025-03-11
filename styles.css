@@ -43,7 +43,6 @@ body {
     transition: transform 0.3s ease;
     display: flex;
     flex-direction: column;
-    position: relative;
 }
 
 /* When sidebar is hidden */
@@ -122,43 +121,32 @@ body {
     overflow-y: auto;
     transition: margin-left 0.3s ease;
     flex: 1;
-    max-width: none;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: center;
 }
 
 .content-area.full-width {
     margin-left: 0;
     width: 100%;
-    flex: 1;
 }
 
 /* Container for both modes */
 .container {
-    max-width: 100%;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0;
     padding: 1rem;
     background-color: white;
     border-radius: 8px;
     box-shadow: var(--shadow);
     min-height: 80vh;
-    width: 100%;
-    max-width: 1200px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 /* Create content */
 .create-content {
     padding: 1rem;
     width: 100%;
-    max-width: 1100px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    height: 100%;
 }
 
 .create-content h2 {
@@ -169,10 +157,9 @@ body {
 /* Chat container */
 .chat-container {
     width: 100%;
-    max-width: 1000px;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
 }
 
 .input-container {
@@ -555,7 +542,6 @@ button:active {
     box-shadow: var(--shadow);
     transition: all 0.3s ease;
     width: 100%;
-    max-width: 1000px;
 }
 
 .question-form-container h3 {
@@ -637,6 +623,14 @@ button:active {
         margin-right: 0;
         margin-bottom: 1rem;
     }
+    
+    .content-area {
+        padding: 1rem;
+    }
+    
+    .container {
+        padding: 0.8rem;
+    }
 }
 
 /* Questions display container */
@@ -648,7 +642,6 @@ button:active {
     box-shadow: var(--shadow);
     transition: all 0.3s ease;
     width: 100%;
-    max-width: 1000px;
 }
 
 #question-navigation {
