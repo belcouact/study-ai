@@ -268,7 +268,7 @@ function showResultsPopup() {
 
     // Create modal content
     modalContainer.innerHTML = `
-        <div style="
+        <div class="modal-content" style="
             background: white;
             padding: 30px;
             border-radius: 12px;
@@ -289,6 +289,7 @@ function showResultsPopup() {
                 cursor: pointer;
                 color: #4a5568;
                 padding: 5px;
+                z-index: 1;
             ">×</button>
             
             <div style="
@@ -331,16 +332,21 @@ function showResultsPopup() {
                 padding: 20px;
                 background: #f8f9fa;
                 border-radius: 8px;
+                opacity: 0;
+                transition: opacity 0.3s ease;
             "></div>
         </div>
     `;
 
     // Add event listeners
-    document.getElementById('close-modal').addEventListener('click', () => {
+    const closeButton = document.getElementById('close-modal');
+    const evaluateButton = document.getElementById('evaluate-button');
+
+    closeButton.addEventListener('click', () => {
         modalContainer.remove();
     });
 
-    document.getElementById('evaluate-button').addEventListener('click', handleEvaluateClick);
+    evaluateButton.addEventListener('click', handleEvaluateClick);
 
     // Close modal when clicking outside
     modalContainer.addEventListener('click', (e) => {
@@ -1790,7 +1796,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const evaluateButton = document.getElementById('evaluate-button');
         const evaluationResult = document.getElementById('evaluation-result');
         
-        if (!evaluateButton || !evaluationResult) return;
+        if (!evaluateButton || !evaluationResult) {
+            console.error('Evaluation button or result container not found');
+            return;
+        }
         
         evaluateButton.disabled = true;
         evaluateButton.textContent = '评估中...';
@@ -1832,8 +1841,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetchAIResponse(prompt);
             const evaluationContent = extractContentFromResponse(response);
 
-            // Show evaluation result container
-            evaluationResult.style.display = 'block';
+            // Show evaluation result container and ensure it's visible
+            evaluationResult.style.cssText = `
+                display: block;
+                margin-top: 25px;
+                padding: 20px;
+                background: #f8f9fa;
+                border-radius: 8px;
+                text-align: left;
+                line-height: 1.6;
+                max-height: none;
+                opacity: 1;
+                transition: all 0.3s ease;
+            `;
 
             // Format the evaluation content with sections
             const formattedEvaluation = evaluationContent
@@ -1861,12 +1881,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             evaluationResult.innerHTML = formattedEvaluation;
 
-            // Smooth scroll to evaluation result
-            evaluationResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            // Force a reflow to ensure the content is displayed
+            evaluationResult.offsetHeight;
+
+            // Scroll the modal to show the evaluation
+            const modalContent = evaluationResult.closest('.modal-content') || evaluationResult.parentElement;
+            if (modalContent) {
+                modalContent.scrollTo({
+                    top: evaluationResult.offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+
+            console.log('Evaluation content loaded and displayed');
 
         } catch (error) {
             console.error('Evaluation error:', error);
-            showSystemMessage('评估过程出错，请重试', 'error');
+            evaluationResult.innerHTML = '<div style="color: #e53e3e; padding: 10px;">评估过程出错，请重试</div>';
+            evaluationResult.style.display = 'block';
         } finally {
             evaluateButton.disabled = false;
             evaluateButton.textContent = '成绩评估';
