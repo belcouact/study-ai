@@ -18,6 +18,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const schoolSelect = document.getElementById('school-select');
     const gradeSelect = document.getElementById('grade-select');
     const subjectSelect = document.getElementById('subject-select');
+    const generateQuestionsButton = document.getElementById('generate-questions-button');
+    
+    // Question display elements
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    const questionCounter = document.getElementById('question-counter');
+    const questionText = document.getElementById('question-text');
+    const choiceAText = document.getElementById('choice-a-text');
+    const choiceBText = document.getElementById('choice-b-text');
+    const choiceCText = document.getElementById('choice-c-text');
+    const choiceDText = document.getElementById('choice-d-text');
+    const submitAnswerButton = document.getElementById('submit-answer-button');
+    const answerContainer = document.getElementById('answer-container');
+    const answerResult = document.getElementById('answer-result');
+    const answerExplanation = document.getElementById('answer-explanation');
+    const prevQuestionButton = document.getElementById('prev-question-button');
+    const nextQuestionButton = document.getElementById('next-question-button');
+    const choiceRadios = document.querySelectorAll('input[name="choice"]');
     
     // Sidebar elements
     const leftPanel = document.querySelector('.left-panel');
@@ -35,6 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentApiFunction = 'chat'; // Updated to use the Cloudflare Pages function
     let lastQuestion = null;
     let currentModel = 'deepseek-r1';
+    
+    // Question set variables
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let userAnswers = [];
 
     // API configuration
     // Note: These values are now for reference only and not actually used for API calls
@@ -100,35 +122,249 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Question form submit event
-    if (questionForm) {
-        questionForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+    // Generate Questions button click event
+    if (generateQuestionsButton) {
+        generateQuestionsButton.addEventListener('click', async () => {
+            // Show loading state
+            loading.classList.remove('hidden');
             
-            // Get form values
-            const school = schoolSelect.value;
+            // Collect form data
+            const schoolType = schoolSelect.value;
             const grade = gradeSelect.value;
             const semester = document.getElementById('semester-select').value;
             const subject = subjectSelect.value;
             const difficulty = document.getElementById('difficulty-select').value;
             const questionCount = document.getElementById('question-count-select').value;
             
-            // Here you would typically send these values to your backend
-            // For now, we'll just log them
-            console.log('Generating questions with:', {
-                school,
-                grade,
-                semester,
-                subject,
-                difficulty,
-                questionCount
-            });
+            // Create system prompt
+            const systemPrompt = `作为一位经验丰富的${schoolType}${subject}老师，请严格按照以下格式生成${questionCount}道${grade}年级${semester}的选择题，难度要求为${difficulty}级。
+
+严格的格式要求：
+每道题必须包含以下六个部分，缺一不可：
+1. "题目："后接具体题目
+2. "A."后接选项A的内容
+3. "B."后接选项B的内容
+4. "C."后接选项C的内容
+5. "D."后接选项D的内容
+6. "答案："后接正确选项（必须是A、B、C、D其中之一）
+7. "解析："后必须包含完整的解析（至少100字）
+
+解析部分必须包含以下内容（缺一不可）：
+1. 解题思路和方法
+2. 关键知识点解释
+3. 正确答案的推导过程
+4. 为什么其他选项是错误的
+5. 相关知识点的总结
+6. 易错点提醒
+
+示例格式：
+题目：[题目内容]
+A. [选项A内容]
+B. [选项B内容]
+C. [选项C内容]
+D. [选项D内容]
+答案：[A或B或C或D]
+解析：本题主要考察[知识点]。解题思路是[详细说明]。首先，[推导过程]。选项分析：A选项[分析]，B选项[分析]，C选项[分析]，D选项[分析]。需要注意的是[易错点]。总的来说，[知识点总结]。同学们在解题时要特别注意[关键提醒]。
+
+题目质量要求：
+1. 题目表述必须清晰、准确，无歧义
+2. 选项内容必须完整，符合逻辑
+3. 所有选项必须有实际意义，不能有无意义的干扰项
+4. 难度必须符合年级水平
+5. 解析必须详尽，有教育意义`;
             
-            // Show a message to the user
-            showSystemMessage(`正在生成 ${questionCount} 道 ${school}${grade}${semester}${subject} ${difficulty}难度题目...`, 'info');
-            
-            // TODO: Implement the actual question generation logic
+            try {
+                // Call API to generate questions
+                const response = await fetchAIResponse(systemPrompt);
+                
+                // Parse the response to extract questions
+                questions = parseQuestionsFromResponse(response);
+                
+                // Reset user answers and current question index
+                userAnswers = Array(questions.length).fill(null);
+                currentQuestionIndex = 0;
+                
+                // Hide the form and show the questions display
+                questionFormContainer.classList.add('hidden');
+                questionsDisplayContainer.classList.remove('hidden');
+                
+                // Display the first question
+                displayCurrentQuestion();
+                
+                // Update navigation buttons
+                updateNavigationButtons();
+                
+                // Show success message
+                showSystemMessage(`已生成 ${questions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`, 'success');
+            } catch (error) {
+                console.error('Error generating questions:', error);
+                showSystemMessage('生成题目时出错，请重试', 'error');
+            } finally {
+                // Hide loading state
+                loading.classList.add('hidden');
+            }
         });
+    }
+    
+    // Submit Answer button click event
+    if (submitAnswerButton) {
+        submitAnswerButton.addEventListener('click', () => {
+            // Get the selected answer
+            const selectedAnswer = getSelectedAnswer();
+            
+            if (!selectedAnswer) {
+                showSystemMessage('请选择一个答案', 'warning');
+                return;
+            }
+            
+            // Save the user's answer
+            userAnswers[currentQuestionIndex] = selectedAnswer;
+            
+            // Get the correct answer
+            const correctAnswer = questions[currentQuestionIndex].answer;
+            
+            // Show the answer container
+            answerContainer.classList.remove('hidden');
+            
+            // Display result
+            if (selectedAnswer === correctAnswer) {
+                answerResult.textContent = `✓ 正确！答案是：${correctAnswer}`;
+                answerResult.style.color = '#28a745';
+            } else {
+                answerResult.textContent = `✗ 错误。正确答案是：${correctAnswer}`;
+                answerResult.style.color = '#dc3545';
+            }
+            
+            // Display explanation
+            answerExplanation.textContent = questions[currentQuestionIndex].explanation;
+            
+            // Enable navigation buttons
+            nextQuestionButton.disabled = currentQuestionIndex >= questions.length - 1;
+            prevQuestionButton.disabled = currentQuestionIndex <= 0;
+        });
+    }
+    
+    // Navigation button click events
+    if (prevQuestionButton) {
+        prevQuestionButton.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+    }
+    
+    if (nextQuestionButton) {
+        nextQuestionButton.addEventListener('click', () => {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+    }
+    
+    // Function to display the current question
+    function displayCurrentQuestion() {
+        const question = questions[currentQuestionIndex];
+        
+        // Update question counter
+        questionCounter.textContent = `题目 ${currentQuestionIndex + 1} / ${questions.length}`;
+        
+        // Display question text and choices
+        questionText.textContent = question.questionText;
+        choiceAText.textContent = question.choices.A;
+        choiceBText.textContent = question.choices.B;
+        choiceCText.textContent = question.choices.C;
+        choiceDText.textContent = question.choices.D;
+        
+        // Clear any selected radio buttons
+        choiceRadios.forEach(radio => {
+            radio.checked = false;
+        });
+        
+        // If user has already answered this question, select their answer
+        if (userAnswers[currentQuestionIndex]) {
+            document.getElementById(`choice-${userAnswers[currentQuestionIndex].toLowerCase()}`).checked = true;
+            
+            // Show the answer container if already answered
+            answerContainer.classList.remove('hidden');
+            
+            // Display result
+            const selectedAnswer = userAnswers[currentQuestionIndex];
+            const correctAnswer = question.answer;
+            
+            if (selectedAnswer === correctAnswer) {
+                answerResult.textContent = `✓ 正确！答案是：${correctAnswer}`;
+                answerResult.style.color = '#28a745';
+            } else {
+                answerResult.textContent = `✗ 错误。正确答案是：${correctAnswer}`;
+                answerResult.style.color = '#dc3545';
+            }
+            
+            // Display explanation
+            answerExplanation.textContent = question.explanation;
+        } else {
+            // Hide the answer container if not answered
+            answerContainer.classList.add('hidden');
+        }
+    }
+    
+    // Function to update navigation buttons
+    function updateNavigationButtons() {
+        prevQuestionButton.disabled = currentQuestionIndex <= 0;
+        nextQuestionButton.disabled = currentQuestionIndex >= questions.length - 1;
+    }
+    
+    // Function to get the selected answer
+    function getSelectedAnswer() {
+        const selectedRadio = document.querySelector('input[name="choice"]:checked');
+        return selectedRadio ? selectedRadio.value : null;
+    }
+    
+    // Function to parse questions from API response
+    function parseQuestionsFromResponse(response) {
+        const content = extractContentFromResponse(response);
+        const parsedQuestions = [];
+        
+        // Split the content by "题目："
+        const questionBlocks = content.split(/题目：/).filter(block => block.trim());
+        
+        for (const block of questionBlocks) {
+            try {
+                // Extract question text
+                const questionText = block.split(/[A-D]\.|\n答案：|\n解析：/)[0].trim();
+                
+                // Extract choices
+                const choiceA = block.match(/A\.(.*?)(?=B\.|$)/s)?.[1]?.trim() || '';
+                const choiceB = block.match(/B\.(.*?)(?=C\.|$)/s)?.[1]?.trim() || '';
+                const choiceC = block.match(/C\.(.*?)(?=D\.|$)/s)?.[1]?.trim() || '';
+                const choiceD = block.match(/D\.(.*?)(?=\n答案：|$)/s)?.[1]?.trim() || '';
+                
+                // Extract answer
+                const answer = block.match(/答案：([A-D])/)?.[1] || '';
+                
+                // Extract explanation
+                const explanation = block.match(/解析：([\s\S]*?)(?=题目：|$)/)?.[1]?.trim() || '';
+                
+                parsedQuestions.push({
+                    questionText,
+                    choices: {
+                        A: choiceA,
+                        B: choiceB,
+                        C: choiceC,
+                        D: choiceD
+                    },
+                    answer,
+                    explanation
+                });
+            } catch (error) {
+                console.error('Error parsing question:', error);
+            }
+        }
+        
+        return parsedQuestions;
     }
     
     // Function to populate grade options based on selected school
@@ -592,45 +828,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Function to generate a local response for demonstration
+    // Function to generate a local response for testing
     function generateLocalResponse(question) {
-        // Convert question to lowercase for easier matching
-        const lowerQuestion = question.toLowerCase();
-        
-        // Sample responses for different types of questions
-        if (lowerQuestion.includes('hello') || lowerQuestion.includes('hi')) {
-            return "Hello! How can I help you today?";
+        // For testing the question generation functionality
+        if (question.includes('生成') && question.includes('选择题')) {
+            return `题目：下列哪个是二次函数的标准形式？
+A. y = ax + b
+B. y = ax² + bx + c (a ≠ 0)
+C. y = a/x + b
+D. y = a^x + b
+
+答案：B
+解析：本题主要考察二次函数的标准形式的识别。解题思路是回顾二次函数的定义和表达式形式。首先，二次函数是指自变量的最高次幂为2的函数，其标准形式为y = ax² + bx + c (a ≠ 0)，其中a、b、c是常数，且a不等于0。选项分析：A选项y = ax + b是一次函数的表达式，最高次幂为1；B选项y = ax² + bx + c (a ≠ 0)是二次函数的标准形式，最高次幂为2；C选项y = a/x + b是反比例函数与常数的和，不是多项式函数；D选项y = a^x + b是指数函数与常数的和。需要注意的是二次函数中a不能为0，否则就变成一次函数了。总的来说，二次函数是初中数学中的重要函数类型，它的图像是抛物线。同学们在解题时要特别注意区分不同类型的函数表达式，掌握各种基本函数的特征。
+
+题目：下列关于光的传播说法正确的是：
+A. 光在真空中传播速度约为3×10^8 m/s
+B. 光在介质中的传播速度总是大于真空中的速度
+C. 光在传播过程中不需要介质
+D. 光在均匀介质中沿曲线传播
+
+答案：A
+解析：本题主要考察光的传播特性。解题思路是回顾光的传播规律和特性。首先，光是一种电磁波，在真空中传播速度约为3×10^8 m/s，这是一个物理常数，通常用字母c表示。选项分析：A选项正确，光在真空中传播速度确实约为3×10^8 m/s；B选项错误，光在介质中的传播速度总是小于真空中的速度，介质的折射率n = c/v > 1，其中v是光在介质中的速度；C选项部分正确但表述不完整，光作为电磁波可以在真空中传播，但这不意味着它在传播过程中"不需要"介质，而是可以在没有介质的情况下传播；D选项错误，根据光的直线传播定律，光在均匀介质中沿直线传播，只有在介质不均匀或经过反射、折射等情况下才会改变传播方向。需要注意的是光的传播特性是物理学中的基础知识，与波动光学和几何光学密切相关。总的来说，光的传播遵循一定的规律，包括直线传播、反射、折射等。同学们在解题时要特别注意区分光在不同环境下的传播特性。
+
+题目：下列哪项不是细胞膜的功能？
+A. 控制物质进出细胞
+B. 保持细胞形态
+C. 进行细胞呼吸
+D. 感受外界信号
+
+答案：C
+解析：本题主要考察细胞膜的结构和功能。解题思路是回顾细胞膜的主要功能及其在细胞中的作用。首先，细胞膜是由脂质双分子层和蛋白质构成的，具有选择性通透性。选项分析：A选项正确，细胞膜具有选择性通透性，可以控制物质进出细胞，维持细胞内环境的稳定；B选项正确，细胞膜包围细胞，确定细胞边界，有助于保持细胞的形态；C选项错误，细胞呼吸主要在线粒体中进行，特别是有氧呼吸的电子传递链和ATP合成过程发生在线粒体内膜上，而不是细胞膜；D选项正确，细胞膜上有各种受体蛋白，可以感受外界信号并将信号传导到细胞内部。需要注意的是细胞膜与细胞器膜的功能是不同的，不要混淆。总的来说，细胞膜是细胞的重要组成部分，具有多种功能，但不负责细胞呼吸。同学们在解题时要特别注意区分不同细胞结构的功能。`;
         }
         
-        if (lowerQuestion.includes('who are you') || lowerQuestion.includes('what are you')) {
-            return "I'm an AI assistant designed to help with your questions. I can provide information, explain concepts, and assist with various topics.";
-        }
-        
-        if (lowerQuestion.includes('math') || lowerQuestion.includes('equation')) {
-            return "Here's a simple math equation: $E = mc^2$\n\nAnd here's a more complex one:\n\n$$\\int_{0}^{\\infty} e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}$$\n\nMathematical formulas can be rendered inline like $f(x) = x^2$ or as display equations.";
-        }
-        
-        if (lowerQuestion.includes('code') || lowerQuestion.includes('programming')) {
-            return "Here's a simple Python function:\n\n```python\ndef fibonacci(n):\n    if n <= 1:\n        return n\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)\n\n# Print the first 10 Fibonacci numbers\nfor i in range(10):\n    print(fibonacci(i))\n```\n\nThis code calculates and prints the first 10 numbers in the Fibonacci sequence.";
-        }
-        
-        if (lowerQuestion.includes('table') || lowerQuestion.includes('data')) {
-            return "Here's a simple data table:\n\n| Name | Age | Occupation |\n|------|-----|------------|\n| John | 28  | Developer  |\n| Lisa | 32  | Designer   |\n| Mark | 45  | Manager    |\n| Sara | 39  | Analyst    |\n\nTables are useful for organizing structured data.";
-        }
-        
-        if (lowerQuestion.includes('list') || lowerQuestion.includes('steps')) {
-            return "Here are some steps to follow:\n\n1. First, identify the problem\n2. Research possible solutions\n3. Choose the best approach\n4. Implement your solution\n5. Test and evaluate results\n\nAlternatively, here's a bullet point list:\n\n- Main point one\n- Main point two\n  - Sub-point A\n  - Sub-point B\n- Main point three";
-        }
-        
-        if (lowerQuestion.includes('poem') || lowerQuestion.includes('poetry') || lowerQuestion.includes('唐诗')) {
-            return "《静夜思》\n床前明月光，\n疑是地上霜。\n举头望明月，\n低头思故乡。\n\n这是唐代诗人李白的著名诗作，表达了诗人思乡之情。";
-        }
-        
-        // Default response for other questions
-        return "Thank you for your question. I'm a demonstration AI without access to real-time data or the internet. In a fully implemented version, I would connect to an AI service like DeepSeek to provide accurate and helpful responses to your queries.\n\nYou can try asking me about:\n- Math equations\n- Code examples\n- Data tables\n- Lists and steps\n- Chinese poetry\n\nOr just say hello!";
+        // Default response
+        return `I'm a simulated AI assistant. Your question was: "${question}". In a real application, this would be answered by connecting to an AI service API. For now, this is just a placeholder response to demonstrate the interface functionality.`;
     }
     
-    // Function to optimize the question
+    // Function to optimize questions
     async function optimizeQuestion() {
         const question = userInput.value.trim();
         
@@ -639,30 +873,34 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // Show optimizing state
+        // Add optimizing class to button
         optimizeButton.classList.add('optimizing');
-        optimizeButton.textContent = 'Optimizing...';
+        optimizeButton.textContent = '优化中...';
         
         try {
-            // In a real implementation, this would call an API
-            // For demonstration, we'll just simulate optimization
+            // In a real application, this would call an API to optimize the question
+            // For now, we'll just simulate it
             await new Promise(resolve => setTimeout(resolve, 1500));
             
             // Simulate an optimized question
-            const optimizedQuestion = `${question} (Please provide a detailed explanation with examples)`;
+            const optimizedQuestion = `${question} (请提供详细解释和例子)`;
             
-            // Update the input with the optimized question
+            // Update the textarea
             userInput.value = optimizedQuestion;
             
             // Show success message
-            showSystemMessage('Question optimized successfully!', 'success');
+            showSystemMessage('问题已优化！', 'success');
         } catch (error) {
             console.error('Error optimizing question:', error);
-            showSystemMessage(`Error optimizing question: ${error.message}`, 'error');
+            showSystemMessage('优化问题时出错，请重试', 'error');
         } finally {
-            // Reset button state
+            // Remove optimizing class from button
             optimizeButton.classList.remove('optimizing');
             optimizeButton.textContent = '优化问题';
         }
     }
+    
+    // Initialize the page
+    populateGradeOptions(schoolSelect.value);
+    populateSubjectOptions(schoolSelect.value);
 }); 
