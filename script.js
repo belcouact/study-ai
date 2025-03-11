@@ -1834,7 +1834,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
 测试详情：${JSON.stringify(testResults, null, 2)}
 
-请按照以下四个方面进行分析，每个部分至少提供3-4点具体内容：
+请按照以下五个方面进行分析，每个部分至少提供3-4点具体内容：
 
 总体表现评价
 • 整体答题表现分析
@@ -1856,15 +1856,18 @@ document.addEventListener('DOMContentLoaded', () => {
 • 练习重点推荐
 • 时间分配建议
 
+推荐复习重点
+• 需要重点关注的知识点
+• 推荐的练习题型
+• 建议的学习资源
+
 回复要求：
 1. 保持鼓励性的语气
 2. 每个分析点要具体明确
 3. 建议要可操作可执行
 4. 适当使用表情符号增加亲和力
 
-请确保分析内容具体且有针对性，避免模糊的表述。
-
-请按照以上四个标题分段输出评估结果。`;
+请确保分析内容具体且有针对性，避免模糊的表述。`;
 
             // Call API for evaluation
             const response = await fetchAIResponse(prompt);
