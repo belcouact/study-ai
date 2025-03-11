@@ -6,7 +6,7 @@
 }
 
 :root {
-    --sidebar-width: 200px;
+    --sidebar-width: 180px;
     --primary-color: #2c3e50;
     --secondary-color: #3498db;
     --text-color: #333;
@@ -114,50 +114,36 @@ body {
 
 /* Content area */
 .content-area {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: var(--sidebar-width);
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+    height: 100vh;
     overflow-y: auto;
-    transition: left 0.3s ease;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 20px;
+    transition: margin-left 0.3s ease;
+    width: calc(100% - var(--sidebar-width));
+    max-width: 1200px;
+    margin-right: auto;
 }
 
-/* When sidebar is hidden */
 .content-area.full-width {
-    left: 0;
+    margin-left: 0;
+    width: 100%;
 }
 
 /* Container for both modes */
 .container {
-    width: 800px;
     max-width: 100%;
-    height: auto;
-    min-height: calc(100% - 40px);
-    display: flex;
-    flex-direction: column;
+    margin: 0 auto;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: var(--shadow);
-    padding: 1rem;
+    padding: 1.5rem;
+    min-height: calc(100vh - 4rem);
 }
 
 /* Create content */
 .create-content {
-    padding: 1rem;
-    height: 100%;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.create-content h2 {
-    margin-bottom: 1rem;
-    color: var(--primary-color);
+    height: 100%;
 }
 
 /* Chat container */
@@ -165,8 +151,8 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
-    width: 100%;
-    overflow: hidden;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 .input-container {
@@ -545,9 +531,11 @@ button:active {
     background-color: #fff;
     border-radius: 8px;
     padding: 1.5rem;
-    margin-top: 1.5rem;
+    margin-top: 0;
     box-shadow: var(--shadow);
     transition: all 0.3s ease;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 .question-form-container h3 {
@@ -559,15 +547,12 @@ button:active {
 .form-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
+    gap: 1.5rem;
 }
 
 .form-group {
     flex: 1;
-    margin-right: 1rem;
-}
-
-.form-group:last-child {
     margin-right: 0;
 }
 
@@ -576,6 +561,7 @@ button:active {
     margin-bottom: 0.5rem;
     font-weight: 500;
     color: var(--text-color);
+    font-size: 0.95rem;
 }
 
 .form-group select {
@@ -615,6 +601,7 @@ button:active {
 #generate-questions-button {
     margin-top: 1rem;
     width: 100%;
+    max-width: 200px;
 }
 
 /* Responsive adjustments for small screens */
@@ -637,6 +624,8 @@ button:active {
     margin-top: 1.5rem;
     box-shadow: var(--shadow);
     transition: all 0.3s ease;
+    max-width: 900px;
+    margin: 1.5rem auto 0;
 }
 
 #question-navigation {
