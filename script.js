@@ -523,18 +523,18 @@ function handleGenerateQuestionsClick() {
     generateQuestionsButton.textContent = '生成中...';
     generateQuestionsButton.disabled = true;
     
-    // Store current selections
-    const currentSelections = {
-        school: schoolSelect.value,
-        grade: gradeSelect.value,
-        semester: semesterSelect.value,
-        subject: subjectSelect.value,
-        difficulty: difficultySelect.value,
-        questionCount: questionCountSelect.value
-    };
+    // Collect form data
+    const schoolType = schoolSelect.value;
+    const grade = gradeSelect.value;
+    const semester = semesterSelect.value;
+    const subject = subjectSelect.value;
+    const difficulty = difficultySelect.value;
+    const questionCount = questionCountSelect.value;
+    
+    console.log('Form data collected:', { schoolType, grade, semester, subject, difficulty, questionCount });
     
     // Create prompt for API
-    const prompt = `请生成${currentSelections.questionCount}道${currentSelections.school}${currentSelections.grade}${currentSelections.semester}${currentSelections.subject}的${currentSelections.difficulty}难度选择题，每道题包括题目、四个选项(A、B、C、D)、答案和详细解析。格式如下：
+    const prompt = `请生成${questionCount}道${schoolType}${grade}${semester}${subject}的${difficulty}难度选择题，每道题包括题目、四个选项(A、B、C、D)、答案和详细解析。格式如下：
 题目：[题目内容]
 A. [选项A]
 B. [选项B]
@@ -570,38 +570,22 @@ D. [选项D]
                 updateNavigationButtons();
                 
                 // Show success message
-                showSystemMessage(`已生成 ${parsedQuestions.length} 道 ${currentSelections.school}${currentSelections.grade}${currentSelections.semester}${currentSelections.subject} ${currentSelections.difficulty}难度题目`, 'success');
+                showSystemMessage(`已生成 ${parsedQuestions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`, 'success');
             } catch (error) {
                 console.error('Error processing questions:', error);
                 showSystemMessage('生成题目时出错，请重试', 'error');
             } finally {
-                // Reset button state but keep the dropdown selections
+                // Reset button state
                 generateQuestionsButton.textContent = '出题';
                 generateQuestionsButton.disabled = false;
-                
-                // Ensure dropdowns maintain their values
-                schoolSelect.value = currentSelections.school;
-                gradeSelect.value = currentSelections.grade;
-                semesterSelect.value = currentSelections.semester;
-                subjectSelect.value = currentSelections.subject;
-                difficultySelect.value = currentSelections.difficulty;
-                questionCountSelect.value = currentSelections.questionCount;
             }
         })
         .catch(error => {
             console.error('API error:', error);
             showSystemMessage('API调用失败，请重试', 'error');
-            // Reset button state but keep the dropdown selections
+            // Reset button state
             generateQuestionsButton.textContent = '出题';
             generateQuestionsButton.disabled = false;
-            
-            // Ensure dropdowns maintain their values
-            schoolSelect.value = currentSelections.school;
-            gradeSelect.value = currentSelections.grade;
-            semesterSelect.value = currentSelections.semester;
-            subjectSelect.value = currentSelections.subject;
-            difficultySelect.value = currentSelections.difficulty;
-            questionCountSelect.value = currentSelections.questionCount;
         });
 }
 
@@ -649,13 +633,13 @@ function initializeFormLayout() {
     const formContainer = document.getElementById('question-form-container');
     if (!formContainer) return;
     
-    // Style the form container to be more compact
+    // Style the form container with a modern look
     formContainer.style.cssText = `
-        padding: 12px;
-        margin-bottom: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
         background: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         min-height: auto;
         height: auto;
         display: flex;
@@ -663,19 +647,19 @@ function initializeFormLayout() {
         transition: all 0.3s ease;
     `;
     
-    // Create a more compact flex container for the dropdowns
+    // Create a flex container for the dropdowns
     const dropdownContainer = document.createElement('div');
     dropdownContainer.className = 'dropdown-container';
     dropdownContainer.style.cssText = `
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        gap: 8px;
-        margin-bottom: 12px;
+        gap: 15px;
+        margin-bottom: 20px;
         flex-wrap: nowrap;
-        padding: 8px;
+        padding: 10px;
         background: #f8f9fa;
-        border-radius: 6px;
+        border-radius: 8px;
     `;
     
     // Move all select elements into the dropdown container
@@ -696,8 +680,8 @@ function initializeFormLayout() {
         const label = formContainer.querySelector(`label[for="${select.id}"]`);
         if (label) {
             label.style.cssText = `
-                margin-bottom: 4px;
-                font-size: 13px;
+                margin-bottom: 6px;
+                font-size: 14px;
                 font-weight: 500;
                 color: #4a5568;
                 white-space: nowrap;
@@ -705,13 +689,13 @@ function initializeFormLayout() {
             wrapper.appendChild(label);
         }
         
-        // Style the select element to be more compact
+        // Style the select element
         select.style.cssText = `
             width: 100%;
-            padding: 6px 24px 6px 8px;
+            padding: 8px 12px;
             border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            font-size: 13px;
+            border-radius: 6px;
+            font-size: 14px;
             color: #2d3748;
             background-color: white;
             transition: all 0.2s ease;
@@ -719,8 +703,8 @@ function initializeFormLayout() {
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234a5568' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 8px center;
-            background-size: 10px;
+            background-position: right 12px center;
+            background-size: 12px;
         `;
         
         // Add hover and focus effects
@@ -734,7 +718,7 @@ function initializeFormLayout() {
         });
         select.addEventListener('focus', () => {
             select.style.borderColor = '#4299e1';
-            select.style.boxShadow = '0 0 0 2px rgba(66, 153, 225, 0.15)';
+            select.style.boxShadow = '0 0 0 3px rgba(66, 153, 225, 0.15)';
         });
         select.addEventListener('blur', () => {
             select.style.borderColor = '#e2e8f0';
@@ -745,42 +729,42 @@ function initializeFormLayout() {
         dropdownContainer.appendChild(wrapper);
     });
     
-    // Create a more compact button container
+    // Create a button container with modern styling
     const buttonContainer = document.createElement('div');
     buttonContainer.style.cssText = `
         display: flex;
         justify-content: center;
-        margin: 10px 0;
-        padding: 8px 0;
+        margin: 20px 0;
+        padding: 15px 0;
         border-bottom: 1px solid #edf2f7;
     `;
     
-    // Style the generate questions button to be more compact
+    // Style the generate questions button
     const generateButton = document.getElementById('generate-questions-button');
     if (generateButton) {
         generateButton.style.cssText = `
-            padding: 8px 24px;
-            font-size: 14px;
+            padding: 12px 30px;
+            font-size: 16px;
             font-weight: 500;
             background-color: #4299e1;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(66, 153, 225, 0.2);
+            box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
         `;
         
         // Add hover and active effects
         generateButton.addEventListener('mouseover', () => {
             generateButton.style.backgroundColor = '#3182ce';
             generateButton.style.transform = 'translateY(-1px)';
-            generateButton.style.boxShadow = '0 2px 4px rgba(66, 153, 225, 0.3)';
+            generateButton.style.boxShadow = '0 4px 6px rgba(66, 153, 225, 0.3)';
         });
         generateButton.addEventListener('mouseout', () => {
             generateButton.style.backgroundColor = '#4299e1';
             generateButton.style.transform = 'translateY(0)';
-            generateButton.style.boxShadow = '0 1px 3px rgba(66, 153, 225, 0.2)';
+            generateButton.style.boxShadow = '0 2px 4px rgba(66, 153, 225, 0.2)';
         });
         generateButton.addEventListener('mousedown', () => {
             generateButton.style.transform = 'translateY(1px)';
@@ -788,24 +772,24 @@ function initializeFormLayout() {
         });
         generateButton.addEventListener('mouseup', () => {
             generateButton.style.transform = 'translateY(-1px)';
-            generateButton.style.boxShadow = '0 2px 4px rgba(66, 153, 225, 0.3)';
+            generateButton.style.boxShadow = '0 4px 6px rgba(66, 153, 225, 0.3)';
         });
         
         buttonContainer.appendChild(generateButton);
     }
     
-    // Style the API function container to be more compact
+    // Style the API function container
     const apiRadioContainer = document.querySelector('.api-function-container');
     if (apiRadioContainer) {
         apiRadioContainer.style.cssText = `
-            padding: 12px;
+            padding: 20px;
             margin-top: auto;
             background-color: #f8f9fa;
             border-top: 1px solid #edf2f7;
-            border-radius: 0 0 8px 8px;
+            border-radius: 0 0 12px 12px;
             display: flex;
             justify-content: center;
-            gap: 16px;
+            gap: 20px;
         `;
         
         // Style radio buttons and labels
@@ -817,23 +801,23 @@ function initializeFormLayout() {
                 wrapper.style.cssText = `
                     display: flex;
                     align-items: center;
-                    gap: 6px;
-                    padding: 6px 12px;
+                    gap: 8px;
+                    padding: 8px 16px;
                     background: white;
-                    border-radius: 4px;
+                    border-radius: 6px;
                     cursor: pointer;
                     transition: all 0.2s ease;
                 `;
                 
                 radio.style.cssText = `
-                    width: 14px;
-                    height: 14px;
+                    width: 16px;
+                    height: 16px;
                     cursor: pointer;
                     accent-color: #4299e1;
                 `;
                 
                 label.style.cssText = `
-                    font-size: 13px;
+                    font-size: 14px;
                     color: #4a5568;
                     cursor: pointer;
                 `;
@@ -860,7 +844,7 @@ function initializeFormLayout() {
         form.style.cssText = `
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
             padding: 0;
             margin: 0;
         `;
@@ -979,18 +963,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Add event listeners for panel navigation
     qaButton.addEventListener('click', () => {
-        console.log('QA button clicked');
         // Show Q&A container, hide Create container
-        qaContainer.style.display = 'block';
-        createContainer.style.display = 'none';
-        
-        // Update active button styles
-        qaButton.classList.add('active');
-        createButton.classList.remove('active');
-        
-        // Remove hidden class if present
         qaContainer.classList.remove('hidden');
         createContainer.classList.add('hidden');
+        
+        // Update active button
+        qaButton.classList.add('active');
+        createButton.classList.remove('active');
     });
     
     createButton.addEventListener('click', () => {
@@ -1375,4 +1354,187 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // If it's a title line (contains 《》)
                 if (line.includes('《') && line.includes('》')) {
-                    formattedPoem += `<h3 class="poem-title">${line}</h3>`
+                    formattedPoem += `<h3 class="poem-title">${line}</h3>`;
+                } else {
+                    // Regular poem line
+                    formattedPoem += `<div class="poem-line">${line}</div>`;
+                }
+            }
+            
+            // Add poetry class for styling
+            return `<div class="poetry">${formattedPoem}</div>`;
+        }
+        
+        // Process math formulas
+        escapedText = processMathFormulas(escapedText);
+        
+        // Detect and format code blocks
+        const codeBlockRegex = /```([a-z]*)\n([\s\S]*?)```/g;
+        escapedText = escapedText.replace(codeBlockRegex, function(match, language, code) {
+            // Check if this is a math block
+            if (language === 'math') {
+                return `<div class="math-code">${code}</div>`;
+            }
+            return `<pre><code class="language-${language}">${code}</code></pre>`;
+        });
+        
+        // Format tables
+        escapedText = formatTables(escapedText);
+        
+        // Format lists with proper indentation
+        escapedText = formatLists(escapedText);
+        
+        // Regular formatting for non-poetry text
+        return escapedText
+            // Handle literal '\n' characters that might still be in the text
+            .replace(/\\n/g, '\n')
+            // Replace double newlines with paragraph breaks
+            .replace(/\n\n/g, '</p><p>')
+            // Replace single newlines with line breaks
+            .replace(/\n/g, '<br>')
+            // Wrap in paragraphs if not already
+            .replace(/^(.+)$/gm, function(match) {
+                if (!match.startsWith('<p>') && !match.startsWith('<h') && 
+                    !match.startsWith('<ul') && !match.startsWith('<ol') && 
+                    !match.startsWith('<pre') && !match.startsWith('<blockquote') &&
+                    !match.startsWith('<div class="math')) {
+                    return `<p>${match}</p>`;
+                }
+                return match;
+            })
+            // Format markdown
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+            .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+            .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+            .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+            .replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>')
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+            // Highlight important information
+            .replace(/!!(.*?)!!/g, '<span class="highlight">$1</span>');
+    }
+    
+    // Function to process math formulas
+    function processMathFormulas(text) {
+        // Process inline math: $formula$
+        text = text.replace(/\$([^\$\n]+?)\$/g, function(match, formula) {
+            return `<span class="math-inline">\\(${formula}\\)</span>`;
+        });
+        
+        // Process display math: $$formula$$
+        text = text.replace(/\$\$([\s\S]+?)\$\$/g, function(match, formula) {
+            return `<div class="math-display">\\[${formula}\\]</div>`;
+        });
+        
+        return text;
+    }
+    
+    // Function to format tables in markdown
+    function formatTables(text) {
+        const tableRegex = /\|(.+)\|\n\|(?:[-:]+\|)+\n((?:\|.+\|\n)+)/g;
+        
+        return text.replace(tableRegex, function(match, headerRow, bodyRows) {
+            // Process header
+            const headers = headerRow.split('|').map(cell => cell.trim()).filter(cell => cell);
+            
+            // Process body rows
+            const rows = bodyRows.trim().split('\n');
+            
+            let tableHTML = '<table><thead><tr>';
+            
+            // Add headers
+            headers.forEach(header => {
+                tableHTML += `<th>${header}</th>`;
+            });
+            
+            tableHTML += '</tr></thead><tbody>';
+            
+            // Add rows
+            rows.forEach(row => {
+                const cells = row.split('|').map(cell => cell.trim()).filter(cell => cell);
+                tableHTML += '<tr>';
+                cells.forEach(cell => {
+                    tableHTML += `<td>${cell}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+            
+            tableHTML += '</tbody></table>';
+            return tableHTML;
+        });
+    }
+    
+    // Function to format lists
+    function formatLists(text) {
+        // Process unordered lists
+        let formattedText = text.replace(/^(\s*)-\s+(.+)$/gm, function(match, indent, content) {
+            const indentLevel = indent.length;
+            return `<ul style="margin-left: ${indentLevel * 20}px;"><li>${content}</li></ul>`;
+        });
+        
+        // Process ordered lists
+        formattedText = formattedText.replace(/^(\s*)\d+\.\s+(.+)$/gm, function(match, indent, content) {
+            const indentLevel = indent.length;
+            return `<ol style="margin-left: ${indentLevel * 20}px;"><li>${content}</li></ol>`;
+        });
+        
+        // Combine adjacent list items of the same type and level
+        formattedText = formattedText
+            .replace(/<\/ul>\s*<ul style="margin-left: (\d+)px;">/g, '')
+            .replace(/<\/ol>\s*<ol style="margin-left: (\d+)px;">/g, '');
+        
+        return formattedText;
+    }
+    
+    // Function to optimize questions
+    async function optimizeQuestion() {
+        const question = userInput.value.trim();
+        
+        if (!question) {
+            showSystemMessage('Please enter a question to optimize.', 'warning');
+            return;
+        }
+        
+        // Add optimizing class to button
+        optimizeButton.classList.add('optimizing');
+        optimizeButton.textContent = '优化中...';
+        
+        try {
+            // In a real application, this would call an API to optimize the question
+            // For now, we'll just simulate it
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Simulate an optimized question
+            const optimizedQuestion = `${question} (请提供详细解释和例子)`;
+            
+            // Update the textarea
+            userInput.value = optimizedQuestion;
+            
+            // Show success message
+            showSystemMessage('问题已优化！', 'success');
+        } catch (error) {
+            console.error('Error optimizing question:', error);
+            showSystemMessage('优化问题时出错，请重试', 'error');
+        } finally {
+            // Remove optimizing class from button
+            optimizeButton.classList.remove('optimizing');
+            optimizeButton.textContent = '优化问题';
+        }
+    }
+    
+    // Initialize the page
+    populateGradeOptions(schoolSelect.value);
+    populateSubjectOptions(schoolSelect.value);
+
+    // Initialize form layout
+    initializeFormLayout();
+
+    // Add event listener for generate questions button
+    if (generateQuestionsButton) {
+        generateQuestionsButton.addEventListener('click', function() {
+            console.log('Generate questions button clicked via event listener');
+            handleGenerateQuestionsClick();
+        });
+    }
+}); 
