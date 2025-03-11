@@ -829,20 +829,53 @@ document.addEventListener('DOMContentLoaded', () => {
             const correctAnswer = window.questions[window.currentQuestionIndex].answer;
             
             // Show the answer container
-            document.getElementById('answer-container').classList.remove('hidden');
+            const answerContainer = document.getElementById('answer-container');
+            answerContainer.classList.remove('hidden');
+            answerContainer.style.cssText = `
+                margin-top: 20px;
+                padding: 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                background-color: #f9f9f9;
+                width: 100%;
+                box-sizing: border-box;
+            `;
             
-            // Display result
+            // Display result with math formatting
             const answerResult = document.getElementById('answer-result');
-            if (selectedAnswer.value === correctAnswer) {
-                answerResult.textContent = `✓ 正确！答案是：${correctAnswer}`;
-                answerResult.style.color = '#28a745';
-            } else {
-                answerResult.textContent = `✗ 错误。正确答案是：${correctAnswer}`;
-                answerResult.style.color = '#dc3545';
+            if (answerResult) {
+                const resultText = selectedAnswer.value === correctAnswer 
+                    ? `✓ 正确！答案是：${correctAnswer}`
+                    : `✗ 错误。正确答案是：${correctAnswer}`;
+                
+                answerResult.innerHTML = formatMathExpressions(resultText);
+                answerResult.style.cssText = `
+                    color: ${selectedAnswer.value === correctAnswer ? '#28a745' : '#dc3545'};
+                    margin-bottom: 10px;
+                    font-weight: bold;
+                    font-size: 16px;
+                `;
             }
             
-            // Display explanation
-            document.getElementById('answer-explanation').textContent = window.questions[window.currentQuestionIndex].explanation;
+            // Display explanation with math formatting
+            const answerExplanation = document.getElementById('answer-explanation');
+            if (answerExplanation) {
+                const explanation = window.questions[window.currentQuestionIndex].explanation;
+                answerExplanation.innerHTML = formatMathExpressions(explanation);
+                answerExplanation.style.cssText = `
+                    line-height: 1.6;
+                    margin-top: 10px;
+                    white-space: pre-wrap;
+                    font-size: 15px;
+                `;
+            }
+            
+            // Render math expressions
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise([answerContainer]).catch((err) => {
+                    console.error('MathJax typesetting failed:', err);
+                });
+            }
             
             // Enable navigation buttons
             updateNavigationButtons();
