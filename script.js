@@ -1224,16 +1224,13 @@ document.addEventListener('DOMContentLoaded', () => {
         submitAnswerButton.addEventListener('click', function() {
             console.log('Submit answer button clicked');
             
-            // Get the selected answer
-            const selectedAnswer = document.querySelector('input[name="choice"]:checked');
+            // Get the selected answer from our custom choice system
+            const selectedAnswer = window.userAnswers[window.currentQuestionIndex];
             
             if (!selectedAnswer) {
                 alert('请选择一个答案');
                 return;
             }
-            
-            // Save the user's answer
-            window.userAnswers[window.currentQuestionIndex] = selectedAnswer.value;
             
             // Get the correct answer
             const correctAnswer = window.questions[window.currentQuestionIndex].answer;
@@ -1254,13 +1251,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Display result with math formatting
             const answerResult = document.getElementById('answer-result');
             if (answerResult) {
-                const resultText = selectedAnswer.value === correctAnswer 
+                const resultText = selectedAnswer === correctAnswer 
                     ? `✓ 正确！答案是：${correctAnswer}`
                     : `✗ 错误。正确答案是：${correctAnswer}`;
                 
                 answerResult.innerHTML = formatMathExpressions(resultText);
                 answerResult.style.cssText = `
-                    color: ${selectedAnswer.value === correctAnswer ? '#28a745' : '#dc3545'};
+                    color: ${selectedAnswer === correctAnswer ? '#28a745' : '#dc3545'};
                     margin-bottom: 10px;
                     font-weight: bold;
                     font-size: 16px;
@@ -1289,6 +1286,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Enable navigation buttons
             updateNavigationButtons();
+            
+            // Check if all questions are answered and display score summary if needed
+            displayCurrentQuestion();
         });
     }
     
