@@ -1,3 +1,7 @@
+// API configuration variables
+let currentApiFunction = 'chat';
+let currentModel = 'deepseek-r1';
+
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
     console.log('Parsing questions from response:', response);
@@ -502,11 +506,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const fallbackButton = document.getElementById('fallback-button');
     const modelSelect = document.getElementById('model-select');
 
-    let currentApiFunction = 'chat'; // Updated to use the Cloudflare Pages function
-    let lastQuestion = null;
-    let currentModel = 'deepseek-r1';
-    
-    // Question set variables
     let questions = [];
     let currentQuestionIndex = 0;
     let userAnswers = [];
