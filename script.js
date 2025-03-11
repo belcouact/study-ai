@@ -580,6 +580,16 @@ function initializeFormLayout() {
     const formContainer = document.getElementById('question-form-container');
     if (!formContainer) return;
     
+    // Style the form container to be more compact
+    formContainer.style.cssText = `
+        padding: 15px;
+        margin-bottom: 10px;
+        min-height: auto;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+    `;
+    
     // Create a flex container for the dropdowns
     const dropdownContainer = document.createElement('div');
     dropdownContainer.className = 'dropdown-container';
@@ -588,7 +598,7 @@ function initializeFormLayout() {
         flex-direction: row;
         justify-content: space-between;
         gap: 10px;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         flex-wrap: nowrap;
     `;
     
@@ -602,13 +612,14 @@ function initializeFormLayout() {
             min-width: 0;
             display: flex;
             flex-direction: column;
+            margin-bottom: 0;
         `;
         
         // Get the label for this select
         const label = formContainer.querySelector(`label[for="${select.id}"]`);
         if (label) {
             label.style.cssText = `
-                margin-bottom: 5px;
+                margin-bottom: 3px;
                 font-size: 14px;
                 white-space: nowrap;
             `;
@@ -618,7 +629,7 @@ function initializeFormLayout() {
         // Style the select element
         select.style.cssText = `
             width: 100%;
-            padding: 8px;
+            padding: 6px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
@@ -631,6 +642,15 @@ function initializeFormLayout() {
     // Insert the dropdown container at the start of the form
     const form = document.getElementById('question-form');
     if (form) {
+        // Style the form to be more compact
+        form.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 0;
+            margin: 0;
+        `;
+        
         // Remove any existing dropdown container
         const existingContainer = form.querySelector('.dropdown-container');
         if (existingContainer) {
@@ -651,8 +671,8 @@ function initializeFormLayout() {
         buttonContainer.style.cssText = `
             display: flex;
             justify-content: center;
-            margin: 20px 0;
-            padding: 15px 0;
+            margin: 10px 0;
+            padding: 10px 0;
             border-bottom: 1px solid #eee;
         `;
         
@@ -660,7 +680,7 @@ function initializeFormLayout() {
         const generateButton = document.getElementById('generate-questions-button');
         if (generateButton) {
             generateButton.style.cssText = `
-                padding: 10px 30px;
+                padding: 8px 25px;
                 font-size: 16px;
                 background-color: #007bff;
                 color: white;
@@ -675,14 +695,6 @@ function initializeFormLayout() {
         // Insert button container after the form container
         formContainer.parentNode.insertBefore(buttonContainer, formContainer.nextSibling);
         
-        // Create a spacer div
-        const spacer = document.createElement('div');
-        spacer.style.cssText = `
-            flex-grow: 1;
-            min-height: 20px;
-        `;
-        form.appendChild(spacer);
-        
         // Move API function radio buttons to the bottom
         const apiRadioContainer = document.querySelector('.api-function-container');
         if (apiRadioContainer) {
@@ -691,7 +703,7 @@ function initializeFormLayout() {
             
             // Style the container
             apiRadioContainer.style.cssText = `
-                padding: 20px 0;
+                padding: 15px 0;
                 border-top: 1px solid #eee;
                 margin-top: auto;
                 background-color: #f8f9fa;
