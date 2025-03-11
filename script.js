@@ -416,13 +416,14 @@ function displayCurrentQuestion() {
         questionText.innerHTML = formatMathExpressions(question.questionText);
     }
     
-    // Create responsive grid for choices with single selection
+    // Create responsive grid for choices with 2x2 layout
     const choicesContainer = document.getElementById('choices-container');
     if (choicesContainer) {
         choicesContainer.innerHTML = `
             <div class="choices-grid" style="
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(2, auto);
                 gap: clamp(10px, 2vw, 20px);
                 margin: 25px 0;
                 width: 100%;
@@ -593,133 +594,8 @@ function displayCurrentQuestion() {
                                        window.userAnswers.every(answer => answer !== null);
             
             if (allQuestionsAnswered) {
-                // Calculate score
-                let correctCount = 0;
-                window.userAnswers.forEach((answer, index) => {
-                    if (answer === window.questions[index].answer) {
-                        correctCount++;
-                    }
-                });
-                const scorePercentage = (correctCount / window.questions.length) * 100;
-
-                // Create or update score summary container
-                let scoreSummaryContainer = document.getElementById('score-summary-container');
-                if (!scoreSummaryContainer) {
-                    scoreSummaryContainer = document.createElement('div');
-                    scoreSummaryContainer.id = 'score-summary-container';
-                    answerContainer.parentNode.insertBefore(scoreSummaryContainer, answerContainer.nextSibling);
-                }
-
-                scoreSummaryContainer.style.cssText = `
-                    margin-top: 30px;
-                    padding: 25px;
-                    border-radius: 12px;
-                    background-color: white;
-                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-                    text-align: center;
-                `;
-
-                scoreSummaryContainer.innerHTML = `
-                    <div style="
-                        font-size: 24px;
-                        font-weight: bold;
-                        color: #2d3748;
-                        margin-bottom: 15px;
-                    ">测试完成！</div>
-                    <div style="
-                        font-size: 18px;
-                        color: #4a5568;
-                        margin-bottom: 20px;
-                    ">
-                        总题数: ${window.questions.length} | 
-                        正确: ${correctCount} | 
-                        正确率: ${scorePercentage.toFixed(1)}%
-                    </div>
-                    <button id="evaluate-button" style="
-                        padding: 12px 25px;
-                        font-size: 16px;
-                        font-weight: 500;
-                        background-color: #4299e1;
-                        color: white;
-                        border: none;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        transition: all 0.2s ease;
-                        box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
-                    ">成绩评估</button>
-                    <div id="evaluation-result" style="display: none; margin-top: 20px;"></div>
-                `;
-
-                // Add click handler for evaluate button
-                const evaluateButton = document.getElementById('evaluate-button');
-                evaluateButton.addEventListener('click', async () => {
-                    evaluateButton.disabled = true;
-                    evaluateButton.textContent = '评估中...';
-
-                    try {
-                        // Prepare test results data
-                        const testResults = window.questions.map((question, index) => ({
-                            questionText: question.questionText,
-                            userAnswer: window.userAnswers[index],
-                            correctAnswer: question.answer,
-                            isCorrect: window.userAnswers[index] === question.answer,
-                            explanation: question.explanation
-                        }));
-
-                        // Create evaluation prompt
-                        const prompt = `请对以下测试结果进行全面评估。总题数：${window.questions.length}，正确题数：${correctCount}，正确率：${scorePercentage.toFixed(1)}%。
-                        
-测试详情：${JSON.stringify(testResults, null, 2)}
-
-请从以下四个方面进行详细分析：
-1. 总体表现评价：根据正确率和答题情况给出整体评价
-2. 知识点掌握情况：分析各个知识点的掌握程度
-3. 易错点分析：总结做错题目的共同特点和原因
-4. 针对性改进建议：提供具体的学习建议和改进方向
-
-请按照以上四个标题分段输出评估结果。`;
-
-                        // Call API for evaluation
-                        const response = await fetchAIResponse(prompt);
-                        const evaluationContent = extractContentFromResponse(response);
-
-                        // Display evaluation result
-                        const evaluationResult = document.getElementById('evaluation-result');
-                        evaluationResult.style.cssText = `
-                            display: block;
-                            margin-top: 25px;
-                            padding: 20px;
-                            background: #f8f9fa;
-                            border-radius: 8px;
-                            text-align: left;
-                            line-height: 1.6;
-                        `;
-
-                        // Format the evaluation content with sections
-                        const formattedEvaluation = evaluationContent
-                            .split(/(?=总体表现评价|知识点掌握情况|易错点分析|针对性改进建议)/)
-                            .map(section => {
-                                const title = section.match(/^[^：\n]+/);
-                                if (title) {
-                                    return `<div style="margin-bottom: 20px;">
-                                        <h3 style="color: #2d3748; margin-bottom: 10px;">${title[0]}</h3>
-                                        <div style="color: #4a5568;">${section.replace(title[0], '').trim()}</div>
-                                    </div>`;
-                                }
-                                return section;
-                            })
-                            .join('');
-
-                        evaluationResult.innerHTML = formattedEvaluation;
-
-                    } catch (error) {
-                        console.error('Evaluation error:', error);
-                        showSystemMessage('评估过程出错，请重试', 'error');
-                    } finally {
-                        evaluateButton.disabled = false;
-                        evaluateButton.textContent = '成绩评估';
-                    }
-                });
+                // Only show the popup, don't create score-summary-container
+                showResultsPopup();
             }
         }
     } else {
@@ -1805,6 +1681,26 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Evaluation button or result container not found');
             return;
         }
+        
+        // Show evaluation status
+        evaluationResult.style.display = 'block';
+        evaluationResult.innerHTML = `
+            <div style="
+                text-align: center;
+                padding: 20px;
+                color: #4a5568;
+                font-size: 16px;
+            ">
+                <div style="margin-bottom: 15px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle;">
+                        <circle cx="12" cy="12" r="10" stroke-dasharray="30" stroke-dashoffset="0">
+                            <animateTransform attributeName="transform" type="rotate" dur="1s" from="0 12 12" to="360 12 12" repeatCount="indefinite"/>
+                        </circle>
+                    </svg>
+                </div>
+                正在生成评估报告，请稍候...
+            </div>
+        `;
         
         evaluateButton.disabled = true;
         evaluateButton.textContent = '评估中...';
