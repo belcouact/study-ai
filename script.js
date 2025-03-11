@@ -1682,23 +1682,34 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // Show evaluation status
+        // Show loading state with improved animation
         evaluationResult.style.display = 'block';
         evaluationResult.innerHTML = `
-            <div style="
+            <div class="evaluation-loading" style="
                 text-align: center;
-                padding: 20px;
+                padding: 30px;
                 color: #4a5568;
                 font-size: 16px;
+                background: #f8fafc;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             ">
-                <div style="margin-bottom: 15px;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle;">
-                        <circle cx="12" cy="12" r="10" stroke-dasharray="30" stroke-dashoffset="0">
-                            <animateTransform attributeName="transform" type="rotate" dur="1s" from="0 12 12" to="360 12 12" repeatCount="indefinite"/>
-                        </circle>
-                    </svg>
-                </div>
-                正在生成评估报告，请稍候...
+                <div class="loading-spinner" style="
+                    margin-bottom: 15px;
+                    display: inline-block;
+                    width: 40px;
+                    height: 40px;
+                    border: 3px solid #e2e8f0;
+                    border-radius: 50%;
+                    border-top-color: #4299e1;
+                    animation: spin 1s linear infinite;
+                "></div>
+                <div style="font-weight: 500;">正在生成评估报告，请稍候...</div>
+                <style>
+                    @keyframes spin {
+                        to { transform: rotate(360deg); }
+                    }
+                </style>
             </div>
         `;
         
@@ -1707,7 +1718,7 @@ document.addEventListener('DOMContentLoaded', () => {
         evaluateButton.style.backgroundColor = '#90cdf4';
         
         try {
-            // Calculate score
+            // Calculate score and prepare data
             let correctCount = 0;
             window.userAnswers.forEach((answer, index) => {
                 if (answer === window.questions[index].answer) {
@@ -1769,54 +1780,108 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetchAIResponse(prompt);
             const evaluationContent = extractContentFromResponse(response);
 
-            // Show evaluation result container and ensure it's visible
+            // Enhanced evaluation result container styling
             evaluationResult.style.cssText = `
                 display: block;
-                margin-top: 25px;
-                padding: 20px;
-                background: #f8f9fa;
-                border-radius: 8px;
+                margin-top: 30px;
+                padding: 25px;
+                background: #ffffff;
+                border-radius: 12px;
                 text-align: left;
                 line-height: 1.6;
                 max-height: none;
                 opacity: 1;
                 transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             `;
 
-            // Format the evaluation content with sections
+            // Format the evaluation content with enhanced sections
             const formattedEvaluation = evaluationContent
-                .split(/(?=总体表现评价|知识点掌握情况|易错点分析|针对性改进建议)/)
-                .map(section => {
+                .split(/(?=总体表现评价|知识点掌握情况|易错点分析|针对性改进建议|推荐复习重点)/)
+                .map((section, index) => {
                     const title = section.match(/^[^：\n]+/);
                     if (title) {
-                        return `<div style="margin-bottom: 20px;">
-                            <h3 style="
-                                color: #2d3748;
-                                margin-bottom: 10px;
-                                font-size: clamp(16px, 3vw, 18px);
-                                font-weight: 600;
-                            ">${title[0]}</h3>
-                            <div style="
-                                color: #4a5568;
-                                line-height: 1.6;
-                                font-size: clamp(14px, 2.5vw, 16px);
-                            ">${section.replace(title[0], '').trim()}</div>
-                        </div>`;
+                        // Define section-specific icons and colors
+                        const sectionStyles = {
+                            '总体表现评价': { icon: '📊', color: '#4299e1', bgColor: '#ebf8ff' },
+                            '知识点掌握情况': { icon: '📚', color: '#48bb78', bgColor: '#f0fff4' },
+                            '易错点分析': { icon: '⚠️', color: '#ed8936', bgColor: '#fffaf0' },
+                            '针对性改进建议': { icon: '💡', color: '#667eea', bgColor: '#ebf4ff' },
+                            '推荐复习重点': { icon: '🎯', color: '#9f7aea', bgColor: '#faf5ff' }
+                        };
+                        
+                        const style = sectionStyles[title[0]] || { icon: '📝', color: '#4a5568', bgColor: '#f7fafc' };
+                        
+                        return `
+                            <div class="evaluation-section" style="
+                                margin-bottom: 25px;
+                                padding: 20px;
+                                background: ${style.bgColor};
+                                border-radius: 12px;
+                                border: 1px solid ${style.color}20;
+                                animation: fadeIn 0.5s ease ${index * 0.1}s both;
+                            ">
+                                <h3 style="
+                                    color: ${style.color};
+                                    margin-bottom: 15px;
+                                    font-size: 1.25rem;
+                                    font-weight: 600;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                ">
+                                    <span style="font-size: 1.5rem;">${style.icon}</span>
+                                    ${title[0]}
+                                </h3>
+                                <div style="
+                                    color: #4a5568;
+                                    line-height: 1.8;
+                                    font-size: 1rem;
+                                ">
+                                    ${section.replace(title[0], '').trim()
+                                        .split('•').map(point => point.trim())
+                                        .filter(point => point)
+                                        .map(point => `
+                                            <div class="evaluation-point" style="
+                                                margin: 12px 0;
+                                                padding-left: 20px;
+                                                position: relative;
+                                            ">
+                                                <span style="
+                                                    position: absolute;
+                                                    left: 0;
+                                                    color: ${style.color};
+                                                ">•</span>
+                                                ${point}
+                                            </div>
+                                        `).join('')}
+                                </div>
+                            </div>
+                        `;
                     }
                     return section;
                 })
                 .join('');
 
-            evaluationResult.innerHTML = formattedEvaluation;
+            // Add styles for animations
+            evaluationResult.innerHTML = `
+                <style>
+                    @keyframes fadeIn {
+                        from { opacity: 0; transform: translateY(10px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                </style>
+                ${formattedEvaluation}
+            `;
 
             // Force a reflow to ensure the content is displayed
             evaluationResult.offsetHeight;
 
-            // Scroll the modal to show the evaluation
+            // Smooth scroll to show the evaluation
             const modalContent = evaluationResult.closest('.modal-content');
             if (modalContent) {
                 modalContent.scrollTo({
-                    top: evaluationResult.offsetTop,
+                    top: evaluationResult.offsetTop - 20,
                     behavior: 'smooth'
                 });
             }
@@ -1825,7 +1890,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Evaluation error:', error);
-            evaluationResult.innerHTML = '<div style="color: #e53e3e; padding: 10px;">评估过程出错，请重试</div>';
+            evaluationResult.innerHTML = `
+                <div style="
+                    color: #e53e3e;
+                    padding: 20px;
+                    background: #fff5f5;
+                    border-radius: 12px;
+                    border: 1px solid #feb2b2;
+                    text-align: center;
+                    font-weight: 500;
+                ">
+                    <span style="font-size: 24px; margin-bottom: 10px; display: block;">❌</span>
+                    评估过程出错，请重试
+                </div>
+            `;
             evaluationResult.style.display = 'block';
         } finally {
             evaluateButton.disabled = false;
