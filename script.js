@@ -154,16 +154,32 @@ async function fetchAIResponse(prompt) {
             loading.classList.remove('hidden');
         }
         
-        // Since we're having issues with the API endpoints, let's directly use mock responses
-        // This ensures the application works reliably without depending on external APIs
-        console.log('Using mock response for reliable operation');
-        return createMockResponse(prompt);
+        // Make the actual API call using the current API function and model
+        const apiEndpoint = `/api/${currentApiFunction}`;
+        const response = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: currentModel,
+                prompt: prompt,
+                temperature: 0.7,
+                max_tokens: 2000
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API call failed with status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('API response:', data);
+        return data;
+        
     } catch (error) {
         console.error('Error in fetchAIResponse:', error);
-        
-        // Fall back to mock responses if there's an error
-        console.warn('Error in API calls, falling back to mock response');
-        return createMockResponse(prompt);
+        throw error; // Re-throw the error to be handled by the caller
     } finally {
         // Hide loading indicator if it exists
         const loading = document.getElementById('loading');
@@ -171,55 +187,6 @@ async function fetchAIResponse(prompt) {
             loading.classList.add('hidden');
         }
     }
-}
-
-// Helper function to create mock responses when API fails
-function createMockResponse(prompt) {
-    // Extract parameters from the prompt to customize the mock response
-    const schoolType = prompt.match(/(\d+)道(小学|初中|高中|大学)/)?.[2] || '高中';
-    const grade = prompt.match(/(小学|初中|高中|大学)(一年级|二年级|三年级|四年级|五年级|六年级|初一|初二|初三|高一|高二|高三|大一|大二|大三|大四)/)?.[2] || '高一';
-    const subject = prompt.match(/(语文|数学|英语|物理|化学|生物|历史|地理|政治)/)?.[1] || '数学';
-    
-    // Create a mock response based on the subject
-    let mockContent = '';
-    
-    if (subject === '数学') {
-        mockContent = `题目：下列哪个是二次函数的标准形式？
-A. y = ax + b
-B. y = ax² + bx + c (a ≠ 0)
-C. y = a/x + b
-D. y = a^x + b
-
-答案：B
-解析：本题主要考察二次函数的标准形式的识别。解题思路是回顾二次函数的定义和表达式形式。首先，二次函数是指自变量的最高次幂为2的函数，其标准形式为y = ax² + bx + c (a ≠ 0)，其中a、b、c是常数，且a不等于0。选项分析：A选项y = ax + b是一次函数的表达式，最高次幂为1；B选项y = ax² + bx + c (a ≠ 0)是二次函数的标准形式，最高次幂为2；C选项y = a/x + b是反比例函数与常数的和，不是多项式函数；D选项y = a^x + b是指数函数与常数的和。需要注意的是二次函数中a不能为0，否则就变成一次函数了。总的来说，二次函数是初中数学中的重要函数类型，它的图像是抛物线。同学们在解题时要特别注意区分不同类型的函数表达式，掌握各种基本函数的特征。`;
-    } else if (subject === '物理') {
-        mockContent = `题目：下列关于光的传播说法正确的是：
-A. 光在真空中传播速度约为3×10^8 m/s
-B. 光在介质中的传播速度总是大于真空中的速度
-C. 光在传播过程中不需要介质
-D. 光在均匀介质中沿曲线传播
-
-答案：A
-解析：本题主要考察光的传播特性。解题思路是回顾光的传播规律和特性。首先，光是一种电磁波，在真空中传播速度约为3×10^8 m/s，这是一个物理常数，通常用字母c表示。选项分析：A选项正确，光在真空中传播速度确实约为3×10^8 m/s；B选项错误，光在介质中的传播速度总是小于真空中的速度，介质的折射率n = c/v < 1，其中v是光在介质中的速度；C选项部分正确但表述不完整，光作为电磁波可以在真空中传播，但这不意味着它在传播过程中"不需要"介质，而是可以在没有介质的情况下传播；D选项错误，根据光的直线传播定律，光在均匀介质中沿直线传播，只有在介质不均匀或经过反射、折射等情况下才会改变传播方向。需要注意的是光的传播特性是物理学中的基础知识，与波动光学和几何光学密切相关。总的来说，光的传播遵循一定的规律，包括直线传播、反射、折射等。同学们在解题时要特别注意区分光在不同环境下的传播特性。`;
-    } else {
-        mockContent = `题目：关于${subject}的基本概念，下列说法错误的是：
-A. 第一个概念的描述
-B. 第二个概念的描述
-C. 第三个概念的描述
-D. 第四个概念的描述
-
-答案：C
-解析：本题考察${subject}的基本概念。A选项正确；B选项正确；C选项错误，因为它与${subject}的基本原理相矛盾；D选项正确。因此，错误的选项是C。`;
-    }
-    
-    // Create a mock API response object
-    return {
-        choices: [{
-            message: {
-                content: mockContent
-            }
-        }]
-    };
 }
 
 // Function to extract content from API response
