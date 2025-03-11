@@ -120,8 +120,52 @@
                                 </div>
                             </div>
                             
-                            <button type="submit" id="generate-questions-button" class="primary-button">生成问题</button>
+                            <button type="button" id="generate-questions-button" class="primary-button">出题</button>
                         </form>
+                    </div>
+                    
+                    <!-- Questions display container (initially hidden) -->
+                    <div id="questions-display-container" class="questions-display-container hidden">
+                        <div id="question-navigation">
+                            <span id="question-counter">题目 1 / 5</span>
+                        </div>
+                        
+                        <div id="current-question" class="question-content">
+                            <div id="question-text" class="question-text"></div>
+                            
+                            <div id="choices-container" class="choices-container">
+                                <div class="choice-item">
+                                    <input type="radio" name="choice" id="choice-a" value="A">
+                                    <label for="choice-a" id="choice-a-text"></label>
+                                </div>
+                                <div class="choice-item">
+                                    <input type="radio" name="choice" id="choice-b" value="B">
+                                    <label for="choice-b" id="choice-b-text"></label>
+                                </div>
+                                <div class="choice-item">
+                                    <input type="radio" name="choice" id="choice-c" value="C">
+                                    <label for="choice-c" id="choice-c-text"></label>
+                                </div>
+                                <div class="choice-item">
+                                    <input type="radio" name="choice" id="choice-d" value="D">
+                                    <label for="choice-d" id="choice-d-text"></label>
+                                </div>
+                            </div>
+                            
+                            <button id="submit-answer-button" class="secondary-button">提交答案</button>
+                            
+                            <div id="answer-container" class="answer-container hidden">
+                                <div class="answer-header">
+                                    <span id="answer-result"></span>
+                                </div>
+                                <div id="answer-explanation" class="answer-explanation"></div>
+                            </div>
+                            
+                            <div class="navigation-buttons">
+                                <button id="prev-question-button" class="nav-button" disabled>上一题</button>
+                                <button id="next-question-button" class="nav-button" disabled>下一题</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
