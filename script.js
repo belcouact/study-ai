@@ -261,29 +261,78 @@ function displayCurrentQuestion() {
     const choicesContainer = document.getElementById('choices-container');
     if (choicesContainer) {
         choicesContainer.innerHTML = `
-            <div class="choices-grid">
-                <div class="choice-row">
-                    <div class="choice-cell">
-                        <input type="radio" name="choice" id="choice-a" value="A">
-                        <label for="choice-a" id="choice-a-text">${formatMathExpressions(question.choices.A)}</label>
-                    </div>
-                    <div class="choice-cell">
-                        <input type="radio" name="choice" id="choice-b" value="B">
-                        <label for="choice-b" id="choice-b-text">${formatMathExpressions(question.choices.B)}</label>
-                    </div>
+            <div class="choices-grid" style="
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                margin: 20px 0;
+                width: 100%;
+            ">
+                <div class="choice-cell" style="
+                    padding: 10px;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    background-color: #f8f9fa;
+                    display: flex;
+                    align-items: center;
+                ">
+                    <input type="radio" name="choice" id="choice-a" value="A" style="margin-right: 10px;">
+                    <label for="choice-a" id="choice-a-text" style="flex: 1; cursor: pointer;">${formatMathExpressions(question.choices.A)}</label>
                 </div>
-                <div class="choice-row">
-                    <div class="choice-cell">
-                        <input type="radio" name="choice" id="choice-c" value="C">
-                        <label for="choice-c" id="choice-c-text">${formatMathExpressions(question.choices.C)}</label>
-                    </div>
-                    <div class="choice-cell">
-                        <input type="radio" name="choice" id="choice-d" value="D">
-                        <label for="choice-d" id="choice-d-text">${formatMathExpressions(question.choices.D)}</label>
-                    </div>
+                <div class="choice-cell" style="
+                    padding: 10px;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    background-color: #f8f9fa;
+                    display: flex;
+                    align-items: center;
+                ">
+                    <input type="radio" name="choice" id="choice-b" value="B" style="margin-right: 10px;">
+                    <label for="choice-b" id="choice-b-text" style="flex: 1; cursor: pointer;">${formatMathExpressions(question.choices.B)}</label>
+                </div>
+                <div class="choice-cell" style="
+                    padding: 10px;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    background-color: #f8f9fa;
+                    display: flex;
+                    align-items: center;
+                ">
+                    <input type="radio" name="choice" id="choice-c" value="C" style="margin-right: 10px;">
+                    <label for="choice-c" id="choice-c-text" style="flex: 1; cursor: pointer;">${formatMathExpressions(question.choices.C)}</label>
+                </div>
+                <div class="choice-cell" style="
+                    padding: 10px;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    background-color: #f8f9fa;
+                    display: flex;
+                    align-items: center;
+                ">
+                    <input type="radio" name="choice" id="choice-d" value="D" style="margin-right: 10px;">
+                    <label for="choice-d" id="choice-d-text" style="flex: 1; cursor: pointer;">${formatMathExpressions(question.choices.D)}</label>
                 </div>
             </div>
         `;
+
+        // Add hover effect for choice cells
+        const choiceCells = choicesContainer.querySelectorAll('.choice-cell');
+        choiceCells.forEach(cell => {
+            cell.addEventListener('mouseover', function() {
+                this.style.backgroundColor = '#f0f0f0';
+                this.style.transition = 'background-color 0.2s';
+            });
+            cell.addEventListener('mouseout', function() {
+                this.style.backgroundColor = '#f8f9fa';
+            });
+            // Make the whole cell clickable
+            cell.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.checked = true;
+                }
+            });
+        });
     }
     
     // If user has already answered this question, select their answer and show result
