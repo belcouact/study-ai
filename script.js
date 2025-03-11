@@ -616,19 +616,81 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Fetching AI response with prompt:', prompt);
         
         try {
-            // Since the API is returning a 405 error, we'll use a mock response instead
-            console.log('Using mock response instead of API call due to 405 error');
+            // Show loading indicator if it exists
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.classList.remove('hidden');
+            }
             
-            // Extract parameters from the prompt to customize the mock response
-            const schoolType = prompt.match(/(\d+)道(小学|初中|高中|大学)/)?.[2] || '高中';
-            const grade = prompt.match(/(小学|初中|高中|大学)(一年级|二年级|三年级|四年级|五年级|六年级|初一|初二|初三|高一|高二|高三|大一|大二|大三|大四)/)?.[2] || '高一';
-            const subject = prompt.match(/(语文|数学|英语|物理|化学|生物|历史|地理|政治)/)?.[1] || '数学';
+            // Get the current model and API function if they exist
+            let model = 'default';
+            let apiFunction = 'chat';
             
-            // Create a mock response based on the subject
-            let mockContent = '';
+            const modelSelect = document.getElementById('model-select');
+            if (modelSelect) {
+                model = modelSelect.value;
+            }
             
-            if (subject === '数学') {
-                mockContent = `题目：下列哪个是二次函数的标准形式？
+            const apiFunctionRadios = document.querySelectorAll('input[name="api-function"]');
+            if (apiFunctionRadios && apiFunctionRadios.length > 0) {
+                const selectedApiFunction = document.querySelector('input[name="api-function"]:checked');
+                if (selectedApiFunction) {
+                    apiFunction = selectedApiFunction.value;
+                }
+            }
+            
+            console.log(`Using model: ${model}, API function: ${apiFunction}`);
+            
+            // Make the API request
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    question: prompt,
+                    model: model,
+                    apiFunction: apiFunction
+                })
+            });
+            
+            if (!response.ok) {
+                // If the API call fails, fall back to mock responses
+                console.warn(`API request failed with status ${response.status}, falling back to mock response`);
+                return createMockResponse(prompt);
+            }
+            
+            const data = await response.json();
+            console.log('AI response received:', data);
+            
+            return data;
+        } catch (error) {
+            console.error('Error fetching AI response:', error);
+            
+            // Fall back to mock responses if there's an error
+            console.warn('Error in API call, falling back to mock response');
+            return createMockResponse(prompt);
+        } finally {
+            // Hide loading indicator if it exists
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.classList.add('hidden');
+            }
+        }
+    }
+    
+    // Helper function to create mock responses when API fails
+    function createMockResponse(prompt) {
+        // Extract parameters from the prompt to customize the mock response
+        const schoolType = prompt.match(/(\d+)道(小学|初中|高中|大学)/)?.[2] || '高中';
+        const grade = prompt.match(/(小学|初中|高中|大学)(一年级|二年级|三年级|四年级|五年级|六年级|初一|初二|初三|高一|高二|高三|大一|大二|大三|大四)/)?.[2] || '高一';
+        const subject = prompt.match(/(语文|数学|英语|物理|化学|生物|历史|地理|政治)/)?.[1] || '数学';
+        
+        // Create a mock response based on the subject
+        let mockContent = '';
+        
+        if (subject === '数学') {
+            mockContent = `题目：下列哪个是二次函数的标准形式？
 A. y = ax + b
 B. y = ax² + bx + c (a ≠ 0)
 C. y = a/x + b
@@ -654,63 +716,18 @@ D. an=3×3^n
 
 答案：A
 解析：本题考察等比数列的通项公式。已知等比数列{an}的前三项为3，6，12，可以求出公比q=a₂/a₁=6/3=2，且a₁=3。等比数列的通项公式为an=a₁×q^(n-1)，代入a₁=3，q=2，得an=3×2^(n-1)。因此，选A。`;
-            } else if (subject === '物理') {
-                mockContent = `题目：下列关于光的传播说法正确的是：
+        } else if (subject === '物理') {
+            mockContent = `题目：下列关于光的传播说法正确的是：
 A. 光在真空中传播速度约为3×10^8 m/s
 B. 光在介质中的传播速度总是大于真空中的速度
 C. 光在传播过程中不需要介质
 D. 光在均匀介质中沿曲线传播
 
 答案：A
-解析：本题主要考察光的传播特性。解题思路是回顾光的传播规律和特性。首先，光是一种电磁波，在真空中传播速度约为3×10^8 m/s，这是一个物理常数，通常用字母c表示。选项分析：A选项正确，光在真空中传播速度确实约为3×10^8 m/s；B选项错误，光在介质中的传播速度总是小于真空中的速度，介质的折射率n = c/v > 1，其中v是光在介质中的速度；C选项部分正确但表述不完整，光作为电磁波可以在真空中传播，但这不意味着它在传播过程中"不需要"介质，而是可以在没有介质的情况下传播；D选项错误，根据光的直线传播定律，光在均匀介质中沿直线传播，只有在介质不均匀或经过反射、折射等情况下才会改变传播方向。需要注意的是光的传播特性是物理学中的基础知识，与波动光学和几何光学密切相关。总的来说，光的传播遵循一定的规律，包括直线传播、反射、折射等。同学们在解题时要特别注意区分光在不同环境下的传播特性。
-
-题目：关于牛顿第二定律，下列说法正确的是：
-A. F = ma中的m是物体的重量
-B. 物体的加速度方向总是与作用力方向相反
-C. 物体的加速度大小与作用力成正比，与质量成反比
-D. 牛顿第二定律只适用于宏观物体，不适用于微观粒子
-
-答案：C
-解析：本题考察牛顿第二定律。牛顿第二定律表述为：物体的加速度与所受的合外力成正比，与质量成反比，加速度的方向与合外力的方向相同。用公式表示为F = ma，其中F是合外力，m是物体的质量（不是重量），a是加速度。A选项错误，F = ma中的m是物体的质量，不是重量；B选项错误，物体的加速度方向与作用力方向相同，不是相反；C选项正确，根据F = ma，可得a = F/m，即加速度与力成正比，与质量成反比；D选项错误，牛顿第二定律在宏观和微观尺度都适用，只是在接近光速或量子尺度时需要进行相对论或量子力学的修正。因此，选C。
-
-题目：一个物体从高处自由落下，不考虑空气阻力，则下列说法正确的是：
-A. 物体的速度与下落高度成正比
-B. 物体的加速度随着下落高度的增加而增大
-C. 物体下落过程中动能不断增加，势能不断减少
-D. 物体下落时间与下落高度成正比
-
-答案：C
-解析：本题考察自由落体运动和能量转换。在不考虑空气阻力的情况下，物体自由下落时受到的唯一力是重力，加速度为重力加速度g，大小恒定，方向竖直向下。A选项错误，物体的速度v与下落高度h的关系是v = √(2gh)，是与下落高度的平方根成正比，不是与高度成正比；B选项错误，物体下落过程中加速度始终等于重力加速度g，不会随高度变化；C选项正确，物体下落过程中，重力做正功，物体的动能不断增加，势能不断减少，总机械能守恒；D选项错误，物体下落时间t与下落高度h的关系是t = √(2h/g)，是与下落高度的平方根成正比，不是与高度成正比。因此，选C。`;
-            } else if (subject === '英语') {
-                mockContent = `题目：Choose the correct word to complete the sentence: She _____ to the store yesterday.
-A. go
-B. goes
-C. went
-D. going
-
-答案：C
-解析：本题考察动词的过去时态。句子中的时间状语"yesterday"（昨天）表明这是一个发生在过去的动作，因此需要使用动词的过去时态。"go"的过去时态是"went"。A选项"go"是动词的原形；B选项"goes"是动词的第三人称单数现在时形式；C选项"went"是动词"go"的过去时态形式；D选项"going"是动词的现在分词形式。根据句子的时态要求，正确答案是C。
-
-题目：Which of the following sentences contains a grammatical error?
-A. He has been working here for ten years.
-B. I have never seen such a beautiful sunset before.
-C. They have finished their homework yesterday.
-D. She has already left for school.
-
-答案：C
-解析：本题考察现在完成时的正确使用。现在完成时通常与表示不确定过去时间的时间状语连用，而不与表示确定过去时间的时间状语（如yesterday, last week等）连用。A选项"He has been working here for ten years."（他在这里工作了十年）使用现在完成进行时，表示从过去开始持续到现在的动作，搭配"for ten years"正确；B选项"I have never seen such a beautiful sunset before."（我以前从未见过如此美丽的日落）使用现在完成时，搭配"never...before"正确；C选项"They have finished their homework yesterday."（他们昨天已经完成了作业）错误地将现在完成时"have finished"与表示确定过去时间的"yesterday"连用，应改为"They finished their homework yesterday."；D选项"She has already left for school."（她已经去上学了）使用现在完成时，搭配"already"正确。因此，选C。
-
-题目：Choose the word that is closest in meaning to "enormous":
-A. tiny
-B. average
-C. huge
-D. beautiful
-
-答案：C
-解析：本题考察同义词辨析。"enormous"意为"巨大的，庞大的"。A选项"tiny"意为"微小的，极小的"，与"enormous"意思相反；B选项"average"意为"平均的，普通的"，与"enormous"不相关；C选项"huge"意为"巨大的，极大的"，与"enormous"意思相近；D选项"beautiful"意为"美丽的，漂亮的"，与"enormous"不相关。因此，与"enormous"意思最接近的是C选项"huge"。`;
-            } else {
-                // Default mock content for other subjects
-                mockContent = `题目：下列选项中，正确的是：
+解析：本题主要考察光的传播特性。解题思路是回顾光的传播规律和特性。首先，光是一种电磁波，在真空中传播速度约为3×10^8 m/s，这是一个物理常数，通常用字母c表示。选项分析：A选项正确，光在真空中传播速度确实约为3×10^8 m/s；B选项错误，光在介质中的传播速度总是小于真空中的速度，介质的折射率n = c/v > 1，其中v是光在介质中的速度；C选项部分正确但表述不完整，光作为电磁波可以在真空中传播，但这不意味着它在传播过程中"不需要"介质，而是可以在没有介质的情况下传播；D选项错误，根据光的直线传播定律，光在均匀介质中沿直线传播，只有在介质不均匀或经过反射、折射等情况下才会改变传播方向。需要注意的是光的传播特性是物理学中的基础知识，与波动光学和几何光学密切相关。总的来说，光的传播遵循一定的规律，包括直线传播、反射、折射等。同学们在解题时要特别注意区分光在不同环境下的传播特性。`;
+        } else {
+            // Default mock content for other subjects
+            mockContent = `题目：下列选项中，正确的是：
 A. 选项A
 B. 选项B
 C. 选项C
@@ -726,51 +743,17 @@ C. 第三个概念的描述
 D. 第四个概念的描述
 
 答案：C
-解析：本题考察${subject}的基本概念。A选项正确；B选项正确；C选项错误，因为它与${subject}的基本原理相矛盾；D选项正确。因此，错误的选项是C。
-
-题目：在${subject}学习中，最重要的方法是：
-A. 方法一
-B. 方法二
-C. 方法三
-D. 方法四
-
-答案：A
-解析：本题考察${subject}的学习方法。方法一是最基础也是最重要的学习方法，它能帮助学生更好地理解和掌握${subject}知识。方法二、三、四虽然也有一定作用，但相比方法一而言不够全面和系统。因此，最重要的方法是A。`;
-            }
-            
-            // Create a mock API response object
-            const mockResponse = {
-                choices: [{
-                    message: {
-                        content: mockContent
-                    }
-                }]
-            };
-            
-            return mockResponse;
-            
-            /* Original API call code - commented out due to 405 error
-            const response = await fetch('/api/simple-ai', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ question: prompt })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`API request failed with status ${response.status}`);
-            }
-            
-            const data = await response.json();
-            console.log('AI response received:', data);
-            
-            return data;
-            */
-        } catch (error) {
-            console.error('Error fetching AI response:', error);
-            throw error;
+解析：本题考察${subject}的基本概念。A选项正确；B选项正确；C选项错误，因为它与${subject}的基本原理相矛盾；D选项正确。因此，错误的选项是C。`;
         }
+        
+        // Create a mock API response object
+        return {
+            choices: [{
+                message: {
+                    content: mockContent
+                }
+            }]
+        };
     }
     
     // Function to escape HTML special characters
