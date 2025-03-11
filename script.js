@@ -534,14 +534,40 @@ function handleGenerateQuestionsClick() {
     console.log('Form data collected:', { schoolType, grade, semester, subject, difficulty, questionCount });
     
     // Create prompt for API
-    const prompt = `请生成${questionCount}道${schoolType}${grade}${semester}${subject}的${difficulty}难度选择题，每道题包括题目、四个选项(A、B、C、D)、答案和详细解析。格式如下：
+    const prompt = `请生成${questionCount}道${schoolType}${grade}${semester}${subject}的${difficulty}难度选择题，每道题包括题目、四个选项(A、B、C、D)、答案和详细解析。严格的格式要求：
+每道题必须包含以下六个部分，缺一不可：
+1. "题目："后接具体题目
+2. "A."后接选项A的内容
+3. "B."后接选项B的内容
+4. "C."后接选项C的内容
+5. "D."后接选项D的内容
+6. "答案："后接正确选项（必须是A、B、C、D其中之一）
+7. "解析："后必须包含完整的解析（至少100字）
+
+解析部分必须包含以下内容（缺一不可）：
+1. 解题思路和方法
+2. 关键知识点解释
+3. 正确答案的推导过程
+4. 为什么其他选项是错误的
+5. 相关知识点的总结
+6. 易错点提醒
+
+示例格式：
 题目：[题目内容]
-A. [选项A]
-B. [选项B]
-C. [选项C]
-D. [选项D]
-答案：[正确选项字母]
-解析：[详细解析]`;
+A. [选项A内容]
+B. [选项B内容]
+C. [选项C内容]
+D. [选项D内容]
+答案：[A或B或C或D]
+解析：本题主要考察[知识点]。解题思路是[详细说明]。首先，[推导过程]。选项分析：A选项[分析]，B选项[分析]，C选项[分析]，D选项[分析]。需要注意的是[易错点]。总的来说，[知识点总结]。同学们在解题时要特别注意[关键提醒]。
+
+题目质量要求：
+1. 题目表述必须清晰、准确，无歧义
+2. 选项内容必须完整，符合逻辑
+3. 所有选项必须有实际意义，不能有无意义的干扰项
+4. 难度必须符合年级水平
+5. 解析必须详尽，有教育意义
+`;
 
     // Call API to generate questions
     fetchAIResponse(prompt)
