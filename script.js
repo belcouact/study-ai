@@ -1,3 +1,95 @@
+// Global function to display the current question
+function displayCurrentQuestion() {
+    console.log('displayCurrentQuestion called', window.currentQuestionIndex);
+    const question = window.questions[window.currentQuestionIndex];
+    
+    if (!question) {
+        console.error('No question found at index', window.currentQuestionIndex);
+        return;
+    }
+    
+    // Update question counter
+    const questionCounter = document.getElementById('question-counter');
+    if (questionCounter) {
+        questionCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
+    }
+    
+    // Display question text and choices
+    const questionText = document.getElementById('question-text');
+    const choiceAText = document.getElementById('choice-a-text');
+    const choiceBText = document.getElementById('choice-b-text');
+    const choiceCText = document.getElementById('choice-c-text');
+    const choiceDText = document.getElementById('choice-d-text');
+    
+    if (questionText) questionText.textContent = question.questionText;
+    if (choiceAText) choiceAText.textContent = question.choices.A;
+    if (choiceBText) choiceBText.textContent = question.choices.B;
+    if (choiceCText) choiceCText.textContent = question.choices.C;
+    if (choiceDText) choiceDText.textContent = question.choices.D;
+    
+    // Clear any selected radio buttons
+    document.querySelectorAll('input[name="choice"]').forEach(radio => {
+        radio.checked = false;
+    });
+    
+    // If user has already answered this question, select their answer
+    if (window.userAnswers && window.userAnswers[window.currentQuestionIndex]) {
+        const answerRadio = document.getElementById(`choice-${window.userAnswers[window.currentQuestionIndex].toLowerCase()}`);
+        if (answerRadio) {
+            answerRadio.checked = true;
+        }
+        
+        // Show the answer container if already answered
+        const answerContainer = document.getElementById('answer-container');
+        if (answerContainer) {
+            answerContainer.classList.remove('hidden');
+        }
+        
+        // Display result
+        const selectedAnswer = window.userAnswers[window.currentQuestionIndex];
+        const correctAnswer = question.answer;
+        const answerResult = document.getElementById('answer-result');
+        
+        if (answerResult) {
+            if (selectedAnswer === correctAnswer) {
+                answerResult.textContent = `✓ 正确！答案是：${correctAnswer}`;
+                answerResult.style.color = '#28a745';
+            } else {
+                answerResult.textContent = `✗ 错误。正确答案是：${correctAnswer}`;
+                answerResult.style.color = '#dc3545';
+            }
+        }
+        
+        // Display explanation
+        const answerExplanation = document.getElementById('answer-explanation');
+        if (answerExplanation) {
+            answerExplanation.textContent = question.explanation;
+        }
+    } else {
+        // Hide the answer container if not answered
+        const answerContainer = document.getElementById('answer-container');
+        if (answerContainer) {
+            answerContainer.classList.add('hidden');
+        }
+    }
+}
+
+// Global function to update navigation buttons
+function updateNavigationButtons() {
+    console.log('updateNavigationButtons called', window.currentQuestionIndex, window.questions ? window.questions.length : 0);
+    
+    const prevButton = document.getElementById('prev-question-button');
+    const nextButton = document.getElementById('next-question-button');
+    
+    if (prevButton) {
+        prevButton.disabled = !window.questions || window.currentQuestionIndex <= 0;
+    }
+    
+    if (nextButton) {
+        nextButton.disabled = !window.questions || window.currentQuestionIndex >= window.questions.length - 1;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Debug all clicks
     document.addEventListener('click', (e) => {
@@ -139,28 +231,31 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Generate questions button not found');
     }
     
-    // Submit Answer button click event
+    // Add event listeners for navigation and submit buttons
     if (submitAnswerButton) {
-        submitAnswerButton.addEventListener('click', () => {
+        submitAnswerButton.addEventListener('click', function() {
+            console.log('Submit answer button clicked');
+            
             // Get the selected answer
-            const selectedAnswer = getSelectedAnswer();
+            const selectedAnswer = document.querySelector('input[name="choice"]:checked');
             
             if (!selectedAnswer) {
-                showSystemMessage('请选择一个答案', 'warning');
+                alert('请选择一个答案');
                 return;
             }
             
             // Save the user's answer
-            userAnswers[currentQuestionIndex] = selectedAnswer;
+            window.userAnswers[window.currentQuestionIndex] = selectedAnswer.value;
             
             // Get the correct answer
-            const correctAnswer = questions[currentQuestionIndex].answer;
+            const correctAnswer = window.questions[window.currentQuestionIndex].answer;
             
             // Show the answer container
-            answerContainer.classList.remove('hidden');
+            document.getElementById('answer-container').classList.remove('hidden');
             
             // Display result
-            if (selectedAnswer === correctAnswer) {
+            const answerResult = document.getElementById('answer-result');
+            if (selectedAnswer.value === correctAnswer) {
                 answerResult.textContent = `✓ 正确！答案是：${correctAnswer}`;
                 answerResult.style.color = '#28a745';
             } else {
@@ -169,19 +264,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             // Display explanation
-            answerExplanation.textContent = questions[currentQuestionIndex].explanation;
+            document.getElementById('answer-explanation').textContent = window.questions[window.currentQuestionIndex].explanation;
             
             // Enable navigation buttons
-            nextQuestionButton.disabled = currentQuestionIndex >= questions.length - 1;
-            prevQuestionButton.disabled = currentQuestionIndex <= 0;
+            updateNavigationButtons();
         });
     }
     
-    // Navigation button click events
     if (prevQuestionButton) {
-        prevQuestionButton.addEventListener('click', () => {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
+        prevQuestionButton.addEventListener('click', function() {
+            console.log('Previous question button clicked');
+            if (window.currentQuestionIndex > 0) {
+                window.currentQuestionIndex--;
                 displayCurrentQuestion();
                 updateNavigationButtons();
             }
@@ -189,81 +283,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     if (nextQuestionButton) {
-        nextQuestionButton.addEventListener('click', () => {
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
+        nextQuestionButton.addEventListener('click', function() {
+            console.log('Next question button clicked');
+            if (window.currentQuestionIndex < window.questions.length - 1) {
+                window.currentQuestionIndex++;
                 displayCurrentQuestion();
                 updateNavigationButtons();
             }
         });
     }
     
-    // Function to display the current question
-    function displayCurrentQuestion() {
-        const question = questions[currentQuestionIndex];
-        
-        // Update question counter
-        questionCounter.textContent = `题目 ${currentQuestionIndex + 1} / ${questions.length}`;
-        
-        // Display question text and choices
-        questionText.textContent = question.questionText;
-        choiceAText.textContent = question.choices.A;
-        choiceBText.textContent = question.choices.B;
-        choiceCText.textContent = question.choices.C;
-        choiceDText.textContent = question.choices.D;
-        
-        // Clear any selected radio buttons
-        choiceRadios.forEach(radio => {
-            radio.checked = false;
-        });
-        
-        // If user has already answered this question, select their answer
-        if (userAnswers[currentQuestionIndex]) {
-            document.getElementById(`choice-${userAnswers[currentQuestionIndex].toLowerCase()}`).checked = true;
-            
-            // Show the answer container if already answered
-            answerContainer.classList.remove('hidden');
-            
-            // Display result
-            const selectedAnswer = userAnswers[currentQuestionIndex];
-            const correctAnswer = question.answer;
-            
-            if (selectedAnswer === correctAnswer) {
-                answerResult.textContent = `✓ 正确！答案是：${correctAnswer}`;
-                answerResult.style.color = '#28a745';
-            } else {
-                answerResult.textContent = `✗ 错误。正确答案是：${correctAnswer}`;
-                answerResult.style.color = '#dc3545';
-            }
-            
-            // Display explanation
-            answerExplanation.textContent = question.explanation;
-        } else {
-            // Hide the answer container if not answered
-            answerContainer.classList.add('hidden');
-        }
-    }
-    
-    // Function to update navigation buttons
-    function updateNavigationButtons() {
-        prevQuestionButton.disabled = currentQuestionIndex <= 0;
-        nextQuestionButton.disabled = currentQuestionIndex >= questions.length - 1;
-    }
-    
-    // Function to get the selected answer
-    function getSelectedAnswer() {
-        const selectedRadio = document.querySelector('input[name="choice"]:checked');
-        return selectedRadio ? selectedRadio.value : null;
-    }
-    
     // Function to parse questions from API response
     function parseQuestionsFromResponse(response) {
+        console.log('Parsing questions from response:', response);
+        
         // Extract content from the API response
         const content = extractContentFromResponse(response);
+        if (!content) {
+            console.error('No content found in response');
+            return [];
+        }
+        
+        console.log('Extracted content:', content);
         const parsedQuestions = [];
         
         // Split the content by "题目："
         const questionBlocks = content.split(/题目：/).filter(block => block.trim());
+        console.log(`Found ${questionBlocks.length} question blocks`);
         
         for (const block of questionBlocks) {
             try {
@@ -282,8 +328,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Extract explanation
                 const explanation = block.match(/解析：([\s\S]*?)(?=题目：|$)/)?.[1]?.trim() || '';
                 
+                if (!questionText || !answer) {
+                    console.warn('Skipping question with missing text or answer');
+                    continue;
+                }
+                
                 parsedQuestions.push({
-                    questionText,
+                    questionText: `题目：${questionText}`,
                     choices: {
                         A: choiceA,
                         B: choiceB,
@@ -294,10 +345,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     explanation
                 });
             } catch (error) {
-                console.error('Error parsing question:', error);
+                console.error('Error parsing question block:', error, block);
             }
         }
         
+        console.log(`Successfully parsed ${parsedQuestions.length} questions`);
         return parsedQuestions;
     }
     
@@ -522,83 +574,68 @@ document.addEventListener('DOMContentLoaded', () => {
         lastQuestion = question;
     }
     
-    // Function to extract content from the API response
+    // Function to extract content from API response
     function extractContentFromResponse(data) {
-        if (!data) return 'No response received.';
+        console.log('Extracting content from response:', data);
         
-        // Handle different response formats
-        if (typeof data === 'string') {
-            return data;
-        }
-        
-        if (data.choices && data.choices.length > 0) {
-            const choice = data.choices[0];
-            if (choice.message && choice.message.content) {
-                return choice.message.content;
+        try {
+            // Handle different API response formats
+            if (data.choices && data.choices[0] && data.choices[0].message) {
+                // OpenAI-like format
+                return data.choices[0].message.content;
+            } else if (data.response) {
+                // Simple API format
+                return data.response;
+            } else if (data.content) {
+                // Direct content format
+                return data.content;
+            } else if (typeof data === 'string') {
+                // Already a string
+                return data;
+            } else {
+                // Try to find content in the response
+                const possibleContentFields = ['text', 'answer', 'result', 'output', 'generated_text'];
+                for (const field of possibleContentFields) {
+                    if (data[field]) {
+                        return data[field];
+                    }
+                }
+                
+                // If all else fails, stringify the entire response
+                console.warn('Could not extract content from response, using stringified response');
+                return JSON.stringify(data);
             }
-            if (choice.text) {
-                return choice.text;
-            }
+        } catch (error) {
+            console.error('Error extracting content from response:', error);
+            return '';
         }
-        
-        if (data.content) {
-            return data.content;
-        }
-        
-        if (data.message) {
-            return data.message;
-        }
-        
-        return JSON.stringify(data);
     }
     
-    // Function to fetch AI response
+    // Function to fetch AI response for question generation
     async function fetchAIResponse(prompt) {
+        console.log('Fetching AI response with prompt:', prompt);
+        
         try {
-            // Show loading indicator
-            loading.classList.remove('hidden');
-            
-            // API endpoint - replace with your actual API endpoint
-            const apiUrl = 'https://api.lkeap.cloud.tencent.com/v1/chat/completions';
-            
-            // API request configuration
-            const requestOptions = {
+            // Make API call to generate questions
+            const response = await fetch('/api/simple-ai', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer YOUR_API_KEY' // Replace with your actual API key or use environment variables
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    model: 'deepseek-r1', // Or whatever model you're using
-                    messages: [
-                        {
-                            role: 'system',
-                            content: prompt
-                        }
-                    ],
-                    temperature: 0.7,
-                    max_tokens: 4000
-                })
-            };
+                body: JSON.stringify({ question: prompt })
+            });
             
-            // Make the API call
-            const response = await fetch(apiUrl, requestOptions);
-            
-            // Check if the response is ok
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`API Error: ${errorData.error?.message || response.statusText}`);
+                throw new Error(`API request failed with status ${response.status}`);
             }
             
-            // Parse the response
             const data = await response.json();
+            console.log('AI response received:', data);
+            
             return data;
         } catch (error) {
             console.error('Error fetching AI response:', error);
             throw error;
-        } finally {
-            // Hide loading indicator
-            loading.classList.add('hidden');
         }
     }
     
@@ -862,179 +899,58 @@ document.addEventListener('DOMContentLoaded', () => {
         
         console.log('Form data collected:', { schoolType, grade, semester, subject, difficulty, questionCount });
         
-        // Simulate API response
-        const simulatedResponse = {
-            choices: [{
-                message: {
-                    content: `题目：下列哪个是二次函数的标准形式？
-A. y = ax + b
-B. y = ax² + bx + c (a ≠ 0)
-C. y = a/x + b
-D. y = a^x + b
+        // Create prompt for API
+        const prompt = `请生成${questionCount}道${schoolType}${grade}${semester}${subject}的${difficulty}难度选择题，每道题包括题目、四个选项(A、B、C、D)、答案和详细解析。格式如下：
+题目：[题目内容]
+A. [选项A]
+B. [选项B]
+C. [选项C]
+D. [选项D]
+答案：[正确选项字母]
+解析：[详细解析]`;
 
-答案：B
-解析：本题主要考察二次函数的标准形式的识别。解题思路是回顾二次函数的定义和表达式形式。首先，二次函数是指自变量的最高次幂为2的函数，其标准形式为y = ax² + bx + c (a ≠ 0)，其中a、b、c是常数，且a不等于0。选项分析：A选项y = ax + b是一次函数的表达式，最高次幂为1；B选项y = ax² + bx + c (a ≠ 0)是二次函数的标准形式，最高次幂为2；C选项y = a/x + b是反比例函数与常数的和，不是多项式函数；D选项y = a^x + b是指数函数与常数的和。需要注意的是二次函数中a不能为0，否则就变成一次函数了。总的来说，二次函数是初中数学中的重要函数类型，它的图像是抛物线。同学们在解题时要特别注意区分不同类型的函数表达式，掌握各种基本函数的特征。
-
-题目：下列关于光的传播说法正确的是：
-A. 光在真空中传播速度约为3×10^8 m/s
-B. 光在介质中的传播速度总是大于真空中的速度
-C. 光在传播过程中不需要介质
-D. 光在均匀介质中沿曲线传播
-
-答案：A
-解析：本题主要考察光的传播特性。解题思路是回顾光的传播规律和特性。首先，光是一种电磁波，在真空中传播速度约为3×10^8 m/s，这是一个物理常数，通常用字母c表示。选项分析：A选项正确，光在真空中传播速度确实约为3×10^8 m/s；B选项错误，光在介质中的传播速度总是小于真空中的速度，介质的折射率n = c/v > 1，其中v是光在介质中的速度；C选项部分正确但表述不完整，光作为电磁波可以在真空中传播，但这不意味着它在传播过程中"不需要"介质，而是可以在没有介质的情况下传播；D选项错误，根据光的直线传播定律，光在均匀介质中沿直线传播，只有在介质不均匀或经过反射、折射等情况下才会改变传播方向。需要注意的是光的传播特性是物理学中的基础知识，与波动光学和几何光学密切相关。总的来说，光的传播遵循一定的规律，包括直线传播、反射、折射等。同学们在解题时要特别注意区分光在不同环境下的传播特性。`
-                }
-            }]
-        };
-        
-        try {
-            // Parse the response
-            const parsedQuestions = parseQuestionsFromResponse(simulatedResponse);
-            console.log('Parsed questions:', parsedQuestions);
-            
-            // Make variables globally available
-            window.questions = parsedQuestions;
-            window.userAnswers = Array(parsedQuestions.length).fill(null);
-            window.currentQuestionIndex = 0;
-            
-            // Hide the form and show the questions display
-            questionFormContainer.classList.add('hidden');
-            questionsDisplayContainer.classList.remove('hidden');
-            
-            // Display the first question
-            window.displayCurrentQuestion = function() {
-                const question = window.questions[window.currentQuestionIndex];
-                
-                // Update question counter
-                document.getElementById('question-counter').textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
-                
-                // Display question text and choices
-                document.getElementById('question-text').textContent = question.questionText;
-                document.getElementById('choice-a-text').textContent = question.choices.A;
-                document.getElementById('choice-b-text').textContent = question.choices.B;
-                document.getElementById('choice-c-text').textContent = question.choices.C;
-                document.getElementById('choice-d-text').textContent = question.choices.D;
-                
-                // Clear any selected radio buttons
-                document.querySelectorAll('input[name="choice"]').forEach(radio => {
-                    radio.checked = false;
-                });
-                
-                // If user has already answered this question, select their answer
-                if (window.userAnswers[window.currentQuestionIndex]) {
-                    document.getElementById(`choice-${window.userAnswers[window.currentQuestionIndex].toLowerCase()}`).checked = true;
+        // Call API to generate questions
+        fetchAIResponse(prompt)
+            .then(response => {
+                try {
+                    // Parse the response
+                    const parsedQuestions = parseQuestionsFromResponse(response);
+                    console.log('Parsed questions:', parsedQuestions);
                     
-                    // Show the answer container if already answered
-                    document.getElementById('answer-container').classList.remove('hidden');
-                    
-                    // Display result
-                    const selectedAnswer = window.userAnswers[window.currentQuestionIndex];
-                    const correctAnswer = question.answer;
-                    const answerResult = document.getElementById('answer-result');
-                    
-                    if (selectedAnswer === correctAnswer) {
-                        answerResult.textContent = `✓ 正确！答案是：${correctAnswer}`;
-                        answerResult.style.color = '#28a745';
-                    } else {
-                        answerResult.textContent = `✗ 错误。正确答案是：${correctAnswer}`;
-                        answerResult.style.color = '#dc3545';
+                    if (parsedQuestions.length === 0) {
+                        throw new Error('No questions could be parsed from the response');
                     }
                     
-                    // Display explanation
-                    document.getElementById('answer-explanation').textContent = question.explanation;
-                } else {
-                    // Hide the answer container if not answered
-                    document.getElementById('answer-container').classList.add('hidden');
+                    // Make variables globally available
+                    window.questions = parsedQuestions;
+                    window.userAnswers = Array(parsedQuestions.length).fill(null);
+                    window.currentQuestionIndex = 0;
+                    
+                    // Show the questions display without hiding the form
+                    questionsDisplayContainer.classList.remove('hidden');
+                    
+                    // Display the first question
+                    displayCurrentQuestion();
+                    updateNavigationButtons();
+                    
+                    // Show success message
+                    showSystemMessage(`已生成 ${parsedQuestions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`, 'success');
+                } catch (error) {
+                    console.error('Error processing questions:', error);
+                    showSystemMessage('生成题目时出错，请重试', 'error');
+                } finally {
+                    // Hide loading state
+                    loading.classList.add('hidden');
                 }
-            };
-            
-            // Update navigation buttons
-            window.updateNavigationButtons = function() {
-                document.getElementById('prev-question-button').disabled = window.currentQuestionIndex <= 0;
-                document.getElementById('next-question-button').disabled = window.currentQuestionIndex >= window.questions.length - 1;
-            };
-            
-            // Call the functions
-            window.displayCurrentQuestion();
-            window.updateNavigationButtons();
-            
-            // Show success message
-            const messageElement = document.createElement('div');
-            messageElement.className = 'system-message success';
-            messageElement.textContent = `已生成 ${parsedQuestions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`;
-            document.body.appendChild(messageElement);
-            setTimeout(() => messageElement.remove(), 5000);
-        } catch (error) {
-            console.error('Error processing questions:', error);
-            const messageElement = document.createElement('div');
-            messageElement.className = 'system-message error';
-            messageElement.textContent = '生成题目时出错，请重试';
-            document.body.appendChild(messageElement);
-            setTimeout(() => messageElement.remove(), 5000);
-        } finally {
-            // Hide loading state
-            loading.classList.add('hidden');
-        }
+            })
+            .catch(error => {
+                console.error('API error:', error);
+                showSystemMessage('API调用失败，请重试', 'error');
+                loading.classList.add('hidden');
+            });
     }
     
     // Initialize the page
     populateGradeOptions(schoolSelect.value);
     populateSubjectOptions(schoolSelect.value);
-
-    // Add event listeners for navigation and submit buttons
-    document.addEventListener('DOMContentLoaded', function() {
-        // Submit Answer button click event
-        document.getElementById('submit-answer-button').addEventListener('click', function() {
-            // Get the selected answer
-            const selectedAnswer = document.querySelector('input[name="choice"]:checked');
-            
-            if (!selectedAnswer) {
-                alert('请选择一个答案');
-                return;
-            }
-            
-            // Save the user's answer
-            window.userAnswers[window.currentQuestionIndex] = selectedAnswer.value;
-            
-            // Get the correct answer
-            const correctAnswer = window.questions[window.currentQuestionIndex].answer;
-            
-            // Show the answer container
-            document.getElementById('answer-container').classList.remove('hidden');
-            
-            // Display result
-            const answerResult = document.getElementById('answer-result');
-            if (selectedAnswer.value === correctAnswer) {
-                answerResult.textContent = `✓ 正确！答案是：${correctAnswer}`;
-                answerResult.style.color = '#28a745';
-            } else {
-                answerResult.textContent = `✗ 错误。正确答案是：${correctAnswer}`;
-                answerResult.style.color = '#dc3545';
-            }
-            
-            // Display explanation
-            document.getElementById('answer-explanation').textContent = window.questions[window.currentQuestionIndex].explanation;
-            
-            // Enable navigation buttons
-            document.getElementById('next-question-button').disabled = window.currentQuestionIndex >= window.questions.length - 1;
-            document.getElementById('prev-question-button').disabled = window.currentQuestionIndex <= 0;
-        });
-        
-        // Navigation button click events
-        document.getElementById('prev-question-button').addEventListener('click', function() {
-            if (window.currentQuestionIndex > 0) {
-                window.currentQuestionIndex--;
-                window.displayCurrentQuestion();
-                window.updateNavigationButtons();
-            }
-        });
-        
-        document.getElementById('next-question-button').addEventListener('click', function() {
-            if (window.currentQuestionIndex < window.questions.length - 1) {
-                window.currentQuestionIndex++;
-                window.displayCurrentQuestion();
-                window.updateNavigationButtons();
-            }
-        });
-    });
 }); 
