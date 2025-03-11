@@ -411,7 +411,6 @@ D. [选项D]
 // Make sure the function is available globally for the inline onclick handler
 window.handleGenerateQuestionsClick = handleGenerateQuestionsClick;
 window.fetchAIResponse = fetchAIResponse;
-window.createMockResponse = createMockResponse;
 window.parseQuestionsFromResponse = parseQuestionsFromResponse;
 window.showSystemMessage = showSystemMessage;
 window.extractContentFromResponse = extractContentFromResponse;
