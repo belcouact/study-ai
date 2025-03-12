@@ -18,6 +18,70 @@
                 <button id="qa-button" class="panel-button active">问答</button>
                 <button id="create-button" class="panel-button">测验</button>
                 
+                <!-- Dropdown Frames -->
+                <div class="dropdown-frames">
+                    <!-- User Identity Frame -->
+                    <div class="sidebar-frame">
+                        <h3 class="frame-title">我是：</h3>
+                        <div class="frame-content">
+                            <div class="dropdown-container">
+                                <label for="school-select-sidebar">学校</label>
+                                <select id="school-select-sidebar" name="school">
+                                    <option value="小学">小学</option>
+                                    <option value="初中">初中</option>
+                                    <option value="高中">高中</option>
+                                    <option value="大学">大学</option>
+                                </select>
+                            </div>
+                            
+                            <div class="dropdown-container">
+                                <label for="grade-select-sidebar">年级</label>
+                                <select id="grade-select-sidebar" name="grade">
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Test Configuration Frame -->
+                    <div class="sidebar-frame">
+                        <h3 class="frame-title">测验：</h3>
+                        <div class="frame-content">
+                            <div class="dropdown-container">
+                                <label for="subject-select-sidebar">科目</label>
+                                <select id="subject-select-sidebar" name="subject">
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                            </div>
+                            
+                            <div class="dropdown-container">
+                                <label for="semester-select-sidebar">学期</label>
+                                <select id="semester-select-sidebar" name="semester">
+                                    <option value="上学期">上学期</option>
+                                    <option value="下学期">下学期</option>
+                                </select>
+                            </div>
+                            
+                            <div class="dropdown-container">
+                                <label for="difficulty-select-sidebar">难度</label>
+                                <select id="difficulty-select-sidebar" name="difficulty">
+                                    <option value="容易">容易</option>
+                                    <option value="中等">中等</option>
+                                    <option value="偏难">偏难</option>
+                                </select>
+                            </div>
+                            
+                            <div class="dropdown-container">
+                                <label for="question-count-select-sidebar">题数</label>
+                                <select id="question-count-select-sidebar" name="questionCount">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- External AI Services -->
                 <div class="external-services">
                     <a href="https://yuanbao.tencent.com/chat/naQivTmsDa" target="_blank" class="external-button">

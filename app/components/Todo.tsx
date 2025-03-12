@@ -3,112 +3,25 @@ import { useLocation } from 'react-router-dom';
 
 const Todo: React.FC = () => {
   const location = useLocation();
-  const [school, setSchool] = useState('');
-  const [grade, setGrade] = useState('');
-  const [subject, setSubject] = useState('');
-  const [chapter, setChapter] = useState('');
-  const [difficulty, setDifficulty] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleGenerateQuestions = async () => {
-    // Any logic needed without setting loading state
-    console.log('Generate questions clicked on path:', location.pathname);
-    // ... existing code ...
+    console.log('Current pathname:', location.pathname);
+    setLoading(false); // Reset loading state by default
+    if (location.pathname === '/test') {
+      setLoading(true);
+      // ... existing code ...
+    }
   }
 
-  // Sample data for dropdowns
-  const schools = ['北京大学', '清华大学', '复旦大学', '上海交通大学'];
-  const grades = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-  const subjects = ['数学', '语文', '英语', '物理', '化学', '生物'];
-  const chapters = ['第一章', '第二章', '第三章', '第四章', '第五章'];
-  const difficulties = ['简单', '中等', '困难'];
-
   return (
-    <div className="sidebar-section">
-      {/* User Identity Frame */}
-      <div className="frame mb-4">
-        <h3 className="frame-title">我是：</h3>
-        <div className="frame-content">
-          <div className="dropdown-container mb-2">
-            <label htmlFor="school">学校</label>
-            <select 
-              id="school" 
-              className="dropdown"
-              value={school}
-              onChange={(e) => setSchool(e.target.value)}
-            >
-              <option value="">选择学校</option>
-              {schools.map((s, index) => (
-                <option key={index} value={s}>{s}</option>
-              ))}
-            </select>
-          </div>
-          <div className="dropdown-container">
-            <label htmlFor="grade">年级</label>
-            <select 
-              id="grade" 
-              className="dropdown"
-              value={grade}
-              onChange={(e) => setGrade(e.target.value)}
-            >
-              <option value="">选择年级</option>
-              {grades.map((g, index) => (
-                <option key={index} value={g}>{g}</option>
-              ))}
-            </select>
-          </div>
+    <div>
+      {loading && (
+        <div className="flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900 mr-2"></div>
+          <span>Thinking...</span>
         </div>
-      </div>
-
-      {/* Test Configuration Frame */}
-      <div className="frame">
-        <h3 className="frame-title">测验：</h3>
-        <div className="frame-content">
-          <div className="dropdown-container mb-2">
-            <label htmlFor="subject">科目</label>
-            <select 
-              id="subject" 
-              className="dropdown"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-            >
-              <option value="">选择科目</option>
-              {subjects.map((s, index) => (
-                <option key={index} value={s}>{s}</option>
-              ))}
-            </select>
-          </div>
-          <div className="dropdown-container mb-2">
-            <label htmlFor="chapter">章节</label>
-            <select 
-              id="chapter" 
-              className="dropdown"
-              value={chapter}
-              onChange={(e) => setChapter(e.target.value)}
-            >
-              <option value="">选择章节</option>
-              {chapters.map((c, index) => (
-                <option key={index} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-          <div className="dropdown-container">
-            <label htmlFor="difficulty">难度</label>
-            <select 
-              id="difficulty" 
-              className="dropdown"
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-            >
-              <option value="">选择难度</option>
-              {difficulties.map((d, index) => (
-                <option key={index} value={d}>{d}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-      
-      {/* External services section would be below this */}
+      )}
     </div>
   );
 };

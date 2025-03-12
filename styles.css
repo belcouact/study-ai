@@ -792,4 +792,79 @@ button:active {
 .nav-button[disabled] {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* Dropdown Frames in Sidebar */
+.dropdown-frames {
+    margin-bottom: 1rem;
+}
+
+.sidebar-frame {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.frame-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    color: #ecf0f1;
+}
+
+.frame-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.dropdown-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.dropdown-container label {
+    font-size: 0.8rem;
+    color: #bdc3c7;
+}
+
+.dropdown-container select {
+    padding: 0.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 0.8rem;
+    width: 100%;
+}
+
+.dropdown-container select:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+}
+
+/* Sidebar Generate Button */
+.sidebar-generate-button {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+.sidebar-generate-button:hover {
+    background-color: #2980b9;
+}
+
+.sidebar-generate-button:active {
+    background-color: #1f6aa5;
 } 

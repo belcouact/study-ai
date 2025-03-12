@@ -699,9 +699,15 @@ function handleGenerateQuestionsClick() {
         return;
     }
     
-    // Show loading state on button
-    generateQuestionsButton.textContent = '生成中...';
-    generateQuestionsButton.disabled = true;
+    // Only show loading state if we're on the test page
+    const isTestPage = document.getElementById('create-container').classList.contains('active') || 
+                      !document.getElementById('create-container').classList.contains('hidden');
+    
+    if (isTestPage) {
+        // Show loading state on button
+        generateQuestionsButton.textContent = '生成中...';
+        generateQuestionsButton.disabled = true;
+    }
     
     // Collect form data
     const schoolType = schoolSelect.value;
@@ -783,16 +789,20 @@ D. [选项D内容]
                 showSystemMessage('生成题目时出错，请重试', 'error');
             } finally {
                 // Reset button state
-                generateQuestionsButton.textContent = '出题';
-                generateQuestionsButton.disabled = false;
+                if (isTestPage) {
+                    generateQuestionsButton.textContent = '出题';
+                    generateQuestionsButton.disabled = false;
+                }
             }
         })
         .catch(error => {
             console.error('API error:', error);
             showSystemMessage('API调用失败，请重试', 'error');
             // Reset button state
-            generateQuestionsButton.textContent = '出题';
-            generateQuestionsButton.disabled = false;
+            if (isTestPage) {
+                generateQuestionsButton.textContent = '出题';
+                generateQuestionsButton.disabled = false;
+            }
         });
 }
 
@@ -1981,5 +1991,143 @@ document.addEventListener('DOMContentLoaded', () => {
             box-sizing: border-box;
             animation: fadeIn 0.3s ease;
         `;
+    }
+
+    // Sync sidebar dropdowns with form dropdowns
+    function syncDropdowns() {
+        // School dropdown sync
+        const schoolSelect = document.getElementById('school-select');
+        const schoolSelectSidebar = document.getElementById('school-select-sidebar');
+        if (schoolSelect && schoolSelectSidebar) {
+            // Initial sync
+            schoolSelectSidebar.value = schoolSelect.value;
+            
+            // Two-way binding
+            schoolSelect.addEventListener('change', function() {
+                schoolSelectSidebar.value = this.value;
+                // Trigger change event to update dependent dropdowns
+                const event = new Event('change');
+                schoolSelectSidebar.dispatchEvent(event);
+            });
+            
+            schoolSelectSidebar.addEventListener('change', function() {
+                schoolSelect.value = this.value;
+                // Trigger change event to update dependent dropdowns
+                const event = new Event('change');
+                schoolSelect.dispatchEvent(event);
+            });
+        }
+        
+        // Grade dropdown sync
+        const gradeSelect = document.getElementById('grade-select');
+        const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
+        if (gradeSelect && gradeSelectSidebar) {
+            // Two-way binding
+            gradeSelect.addEventListener('change', function() {
+                // First ensure options are the same
+                while (gradeSelectSidebar.options.length > 0) {
+                    gradeSelectSidebar.options.remove(0);
+                }
+                
+                Array.from(gradeSelect.options).forEach(option => {
+                    gradeSelectSidebar.options.add(new Option(option.text, option.value));
+                });
+                
+                gradeSelectSidebar.value = this.value;
+            });
+            
+            gradeSelectSidebar.addEventListener('change', function() {
+                gradeSelect.value = this.value;
+            });
+        }
+        
+        // Subject dropdown sync
+        const subjectSelect = document.getElementById('subject-select');
+        const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
+        if (subjectSelect && subjectSelectSidebar) {
+            // Two-way binding
+            subjectSelect.addEventListener('change', function() {
+                // First ensure options are the same
+                while (subjectSelectSidebar.options.length > 0) {
+                    subjectSelectSidebar.options.remove(0);
+                }
+                
+                Array.from(subjectSelect.options).forEach(option => {
+                    subjectSelectSidebar.options.add(new Option(option.text, option.value));
+                });
+                
+                subjectSelectSidebar.value = this.value;
+            });
+            
+            subjectSelectSidebar.addEventListener('change', function() {
+                subjectSelect.value = this.value;
+            });
+        }
+        
+        // Semester dropdown sync
+        const semesterSelect = document.getElementById('semester-select');
+        const semesterSelectSidebar = document.getElementById('semester-select-sidebar');
+        if (semesterSelect && semesterSelectSidebar) {
+            // Initial sync
+            semesterSelectSidebar.value = semesterSelect.value;
+            
+            // Two-way binding
+            semesterSelect.addEventListener('change', function() {
+                semesterSelectSidebar.value = this.value;
+            });
+            
+            semesterSelectSidebar.addEventListener('change', function() {
+                semesterSelect.value = this.value;
+            });
+        }
+        
+        // Difficulty dropdown sync
+        const difficultySelect = document.getElementById('difficulty-select');
+        const difficultySelectSidebar = document.getElementById('difficulty-select-sidebar');
+        if (difficultySelect && difficultySelectSidebar) {
+            // Initial sync
+            difficultySelectSidebar.value = difficultySelect.value;
+            
+            // Two-way binding
+            difficultySelect.addEventListener('change', function() {
+                difficultySelectSidebar.value = this.value;
+            });
+            
+            difficultySelectSidebar.addEventListener('change', function() {
+                difficultySelect.value = this.value;
+            });
+        }
+        
+        // Question count dropdown sync
+        const questionCountSelect = document.getElementById('question-count-select');
+        const questionCountSelectSidebar = document.getElementById('question-count-select-sidebar');
+        if (questionCountSelect && questionCountSelectSidebar) {
+            // Initial sync
+            questionCountSelectSidebar.value = questionCountSelect.value;
+            
+            // Two-way binding
+            questionCountSelect.addEventListener('change', function() {
+                questionCountSelectSidebar.value = this.value;
+            });
+            
+            questionCountSelectSidebar.addEventListener('change', function() {
+                questionCountSelect.value = this.value;
+            });
+        }
+    }
+    
+    // Initialize dropdown sync
+    syncDropdowns();
+    
+    // Add click handler for sidebar generate button
+    const sidebarGenerateButton = document.createElement('button');
+    sidebarGenerateButton.textContent = '出题';
+    sidebarGenerateButton.className = 'sidebar-generate-button';
+    sidebarGenerateButton.addEventListener('click', handleGenerateQuestionsClick);
+    
+    // Add the button to the second frame
+    const testFrame = document.querySelector('.sidebar-frame:nth-child(2) .frame-content');
+    if (testFrame) {
+        testFrame.appendChild(sidebarGenerateButton);
     }
 }); 
