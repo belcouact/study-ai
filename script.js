@@ -1722,13 +1722,25 @@ function formatParagraph(paragraph) {
 
 // Function to handle generating questions
 function handleGenerateQuestionsClick() {
-    // Get form elements from sidebar
-    const schoolSelect = document.getElementById('sidebar-school-select');
-    const gradeSelect = document.getElementById('sidebar-grade-select');
-    const semesterSelect = document.getElementById('sidebar-semester-select');
-    const subjectSelect = document.getElementById('sidebar-subject-select');
-    const difficultySelect = document.getElementById('sidebar-difficulty-select');
-    const questionCountSelect = document.getElementById('sidebar-question-count-select');
+    console.log('Generate questions button clicked');
+    
+    // Get form elements from sidebar - fix the IDs to match what's actually in the HTML
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    const gradeSelect = document.getElementById('grade-select-sidebar');
+    const semesterSelect = document.getElementById('semester-select-sidebar');
+    const subjectSelect = document.getElementById('subject-select-sidebar');
+    const difficultySelect = document.getElementById('difficulty-select-sidebar');
+    const questionCountSelect = document.getElementById('question-count-select-sidebar');
+    
+    // Log the elements to help with debugging
+    console.log('Form elements:', {
+        schoolSelect,
+        gradeSelect,
+        semesterSelect,
+        subjectSelect,
+        difficultySelect,
+        questionCountSelect
+    });
     
     // Check if all required elements exist
     if (!schoolSelect || !gradeSelect || !semesterSelect || !subjectSelect || 
@@ -1774,6 +1786,15 @@ function handleGenerateQuestionsClick() {
     const subject = subjectSelect.value;
     const difficulty = difficultySelect.value;
     const questionCount = questionCountSelect.value;
+    
+    console.log('Form values:', {
+        school,
+        grade,
+        semester,
+        subject,
+        difficulty,
+        questionCount
+    });
     
     // Create prompt for API
     const prompt = `请根据以下条件生成${questionCount}道选择题：
@@ -1848,6 +1869,109 @@ D. [选项D]
                 sidebarGenerateButton.innerHTML = '出题';
             }
         });
+}
+
+// Add a helper function to create the questions container if it doesn't exist
+function createQuestionsContainer() {
+    const createContainer = document.getElementById('create-container');
+    if (!createContainer) return;
+    
+    // Remove empty state if it exists
+    const emptyState = createContainer.querySelector('.empty-state');
+    if (emptyState) {
+        emptyState.style.display = 'none';
+    }
+    
+    // Check if questions container already exists
+    let questionsContainer = createContainer.querySelector('.questions-display-container');
+    
+    if (!questionsContainer) {
+        // Create questions container
+        questionsContainer = document.createElement('div');
+        questionsContainer.className = 'questions-display-container';
+        questionsContainer.style.cssText = 'background-color: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);';
+        
+        // Create question counter
+        const questionCounter = document.createElement('div');
+        questionCounter.className = 'question-counter';
+        questionCounter.style.cssText = 'font-size: 14px; color: #718096; margin-bottom: 10px;';
+        questionsContainer.appendChild(questionCounter);
+        
+        // Create question text
+        const questionText = document.createElement('div');
+        questionText.className = 'question-text';
+        questionText.style.cssText = 'font-size: 18px; font-weight: 600; margin-bottom: 20px; line-height: 1.5;';
+        questionsContainer.appendChild(questionText);
+        
+        // Create choices container
+        const choicesContainer = document.createElement('div');
+        choicesContainer.className = 'choices-container';
+        choicesContainer.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;';
+        questionsContainer.appendChild(choicesContainer);
+        
+        // Create answer container
+        const answerContainer = document.createElement('div');
+        answerContainer.className = 'answer-container';
+        answerContainer.style.cssText = 'background-color: #f7fafc; border-radius: 8px; padding: 15px; margin-top: 20px; display: none;';
+        questionsContainer.appendChild(answerContainer);
+        
+        // Create navigation controls
+        const navigationControls = document.createElement('div');
+        navigationControls.className = 'navigation-controls';
+        navigationControls.style.cssText = 'display: flex; justify-content: space-between; margin-top: 20px;';
+        
+        // Create previous button
+        const prevButton = document.createElement('button');
+        prevButton.id = 'prev-button';
+        prevButton.className = 'nav-button';
+        prevButton.innerHTML = '<i class="fas fa-arrow-left"></i> 上一题';
+        prevButton.style.cssText = 'padding: 8px 16px; background-color: #e2e8f0; color: #4a5568; border: none; border-radius: 4px; cursor: pointer;';
+        navigationControls.appendChild(prevButton);
+        
+        // Create action buttons container
+        const actionButtons = document.createElement('div');
+        actionButtons.className = 'action-buttons';
+        actionButtons.style.cssText = 'display: flex; gap: 10px;';
+        
+        // Create optimize button
+        const optimizeButton = document.createElement('button');
+        optimizeButton.id = 'optimize-button';
+        optimizeButton.className = 'action-button';
+        optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+        optimizeButton.style.cssText = 'padding: 8px 16px; background-color: #4299e1; color: white; border: none; border-radius: 4px; cursor: pointer;';
+        actionButtons.appendChild(optimizeButton);
+        
+        // Create submit button
+        const submitButton = document.createElement('button');
+        submitButton.id = 'submit-button';
+        submitButton.className = 'action-button';
+        submitButton.innerHTML = '<i class="fas fa-check"></i> 提交答案';
+        submitButton.style.cssText = 'padding: 8px 16px; background-color: #48bb78; color: white; border: none; border-radius: 4px; cursor: pointer;';
+        actionButtons.appendChild(submitButton);
+        
+        navigationControls.appendChild(actionButtons);
+        
+        // Create next button
+        const nextButton = document.createElement('button');
+        nextButton.id = 'next-button';
+        nextButton.className = 'nav-button';
+        nextButton.innerHTML = '下一题 <i class="fas fa-arrow-right"></i>';
+        nextButton.style.cssText = 'padding: 8px 16px; background-color: #4299e1; color: white; border: none; border-radius: 4px; cursor: pointer;';
+        navigationControls.appendChild(nextButton);
+        
+        questionsContainer.appendChild(navigationControls);
+        
+        // Add to create container
+        createContainer.appendChild(questionsContainer);
+        
+        // Set up option buttons
+        setupOptionButtons();
+        
+        // Set up navigation buttons
+        setupNavigationButtons();
+    }
+    
+    return questionsContainer;
 }
 
 // Add a new function to reset the test page
