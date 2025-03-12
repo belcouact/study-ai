@@ -413,9 +413,9 @@ function displayCurrentQuestion() {
                                window.userAnswers.length === window.questions.length && 
                                window.userAnswers.every(answer => answer !== null);
 
-    // Show results popup if all questions are answered
+    // Update navigation buttons and show completion status if all questions are answered
     if (allQuestionsAnswered) {
-        showResultsPopup();
+        updateNavigationButtons();
     }
     
     // Update question counter with responsive styling
@@ -971,6 +971,145 @@ function updateNavigationButtons() {
         prevButton.style.cssText += buttonStyle;
         nextButton.style.cssText += buttonStyle;
     }
+    
+    // Check if all questions are answered and display completion status
+    if (window.userAnswers && window.questions) {
+        const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
+                                   window.userAnswers.every(answer => answer !== null);
+        
+        if (allQuestionsAnswered) {
+            displayCompletionStatus();
+        }
+    }
+}
+
+// Function to display completion status and score in navigation section
+function displayCompletionStatus() {
+    // Calculate score
+    let correctCount = 0;
+    window.userAnswers.forEach((answer, index) => {
+        if (answer === window.questions[index].answer) {
+            correctCount++;
+        }
+    });
+    const scorePercentage = (correctCount / window.questions.length) * 100;
+    
+    // Get or create navigation controls
+    let navigationControls = document.querySelector('.navigation-controls');
+    if (!navigationControls) {
+        navigationControls = document.createElement('div');
+        navigationControls.className = 'navigation-controls';
+        navigationControls.style.cssText = `
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            width: 100%;
+            flex-wrap: wrap;
+        `;
+        
+        const questionsDisplayContainer = document.getElementById('questions-display-container');
+        if (questionsDisplayContainer) {
+            questionsDisplayContainer.appendChild(navigationControls);
+        }
+    }
+    
+    // Check if completion status already exists
+    let completionStatus = document.getElementById('completion-status');
+    if (!completionStatus) {
+        // Create completion status element
+        completionStatus = document.createElement('div');
+        completionStatus.id = 'completion-status';
+        completionStatus.style.cssText = `
+            background-color: #ebf8ff;
+            border: 1px solid #4299e1;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin: 0 15px 15px 15px;
+            text-align: center;
+            color: #2b6cb0;
+            font-weight: 500;
+            font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+            animation: fadeIn 0.5s ease;
+        `;
+        
+        // Add completion message
+        const completionMessage = document.createElement('div');
+        completionMessage.style.cssText = `
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c5282;
+            margin-bottom: 5px;
+        `;
+        completionMessage.textContent = '测试完成！';
+        completionStatus.appendChild(completionMessage);
+        
+        // Add score information
+        const scoreInfo = document.createElement('div');
+        scoreInfo.style.cssText = `
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        `;
+        
+        const totalQuestions = document.createElement('span');
+        totalQuestions.textContent = `总题数: ${window.questions.length}`;
+        
+        const correctAnswers = document.createElement('span');
+        correctAnswers.textContent = `正确: ${correctCount}`;
+        
+        const scorePercent = document.createElement('span');
+        scorePercent.textContent = `正确率: ${scorePercentage.toFixed(1)}%`;
+        
+        scoreInfo.appendChild(totalQuestions);
+        scoreInfo.appendChild(correctAnswers);
+        scoreInfo.appendChild(scorePercent);
+        completionStatus.appendChild(scoreInfo);
+        
+        // Add view details button
+        const viewDetailsButton = document.createElement('button');
+        viewDetailsButton.textContent = '查看详细结果';
+        viewDetailsButton.style.cssText = `
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        `;
+        viewDetailsButton.addEventListener('click', showResultsPopup);
+        completionStatus.appendChild(viewDetailsButton);
+        
+        // Insert completion status between navigation buttons
+        const prevButton = document.getElementById('prev-question-button');
+        if (prevButton && prevButton.parentNode === navigationControls) {
+            navigationControls.insertBefore(completionStatus, prevButton.nextSibling);
+        } else {
+            navigationControls.appendChild(completionStatus);
+        }
+        
+        // Add fadeIn animation
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(styleElement);
+    }
 }
 
 // Function to handle generating questions
@@ -1296,7 +1435,55 @@ function setupNavigationButtons() {
     const prevButton = document.getElementById('prev-question-button');
     const nextButton = document.getElementById('next-question-button');
     
-    if (prevButton) {
+    // Create navigation controls if they don't exist
+    let navigationControls = document.querySelector('.navigation-controls');
+    if (!navigationControls) {
+        navigationControls = document.createElement('div');
+        navigationControls.className = 'navigation-controls';
+        navigationControls.style.cssText = `
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 10px;
+        `;
+        
+        const questionsDisplayContainer = document.getElementById('questions-display-container');
+        if (questionsDisplayContainer) {
+            questionsDisplayContainer.appendChild(navigationControls);
+        }
+    }
+    
+    // Create prev button if it doesn't exist
+    if (!prevButton) {
+        const newPrevButton = document.createElement('button');
+        newPrevButton.id = 'prev-question-button';
+        newPrevButton.className = 'nav-button';
+        newPrevButton.innerHTML = '&larr; 上一题';
+        newPrevButton.style.cssText = `
+            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            border-radius: 8px;
+            margin: clamp(5px, 2vw, 10px);
+            background-color: #edf2f7;
+            color: #4a5568;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        `;
+        
+        newPrevButton.addEventListener('click', function() {
+            if (window.currentQuestionIndex > 0) {
+                window.currentQuestionIndex--;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+        
+        navigationControls.appendChild(newPrevButton);
+    } else {
         // Remove any existing event listeners
         const newPrevButton = prevButton.cloneNode(true);
         prevButton.parentNode.replaceChild(newPrevButton, prevButton);
@@ -1311,7 +1498,34 @@ function setupNavigationButtons() {
         });
     }
     
-    if (nextButton) {
+    // Create next button if it doesn't exist
+    if (!nextButton) {
+        const newNextButton = document.createElement('button');
+        newNextButton.id = 'next-question-button';
+        newNextButton.className = 'nav-button';
+        newNextButton.innerHTML = '下一题 &rarr;';
+        newNextButton.style.cssText = `
+            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            border-radius: 8px;
+            margin: clamp(5px, 2vw, 10px);
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        `;
+        
+        newNextButton.addEventListener('click', function() {
+            if (window.questions && window.currentQuestionIndex < window.questions.length - 1) {
+                window.currentQuestionIndex++;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+        
+        navigationControls.appendChild(newNextButton);
+    } else {
         // Remove any existing event listeners
         const newNextButton = nextButton.cloneNode(true);
         nextButton.parentNode.replaceChild(newNextButton, nextButton);
@@ -1325,6 +1539,9 @@ function setupNavigationButtons() {
             }
         });
     }
+    
+    // Update button states
+    updateNavigationButtons();
 }
 
 // Function to set up option selection buttons
@@ -1376,7 +1593,7 @@ function setupOptionButtons() {
                 }
             }
         });
-        });
+    });
 }
 
 // Make sure the function is available globally for the inline onclick handler
