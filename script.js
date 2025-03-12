@@ -258,114 +258,69 @@ function showResultsPopup() {
     });
     const scorePercentage = (correctCount / window.questions.length) * 100;
 
-    // Create modal container
-    let modalContainer = document.getElementById('results-modal');
-    if (!modalContainer) {
-        modalContainer = document.createElement('div');
-        modalContainer.id = 'results-modal';
-        modalContainer.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        `;
-        document.body.appendChild(modalContainer);
+    // Instead of showing a modal, update the navigation section
+    const navigationControls = document.querySelector('.navigation-controls');
+    if (!navigationControls) {
+        console.error('Navigation controls not found');
+        return;
     }
 
-    // Create modal content
-    modalContainer.innerHTML = `
-        <div class="modal-content" style="
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            max-width: 800px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    // Create or update the score summary in the navigation section
+    let scoreSummary = document.getElementById('score-summary');
+    if (!scoreSummary) {
+        scoreSummary = document.createElement('div');
+        scoreSummary.id = 'score-summary';
+        scoreSummary.className = 'score-summary';
+        scoreSummary.style.cssText = `
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.3s ease;
+        `;
+        navigationControls.appendChild(scoreSummary);
+    }
+
+    // Update the score summary content
+    scoreSummary.innerHTML = `
+        <div style="
+            font-size: clamp(16px, 3vw, 18px);
+            color: #2d3748;
+            font-weight: 500;
+            margin-bottom: 10px;
+        ">测试完成！</div>
+        
+        <div style="
+            font-size: clamp(14px, 2.5vw, 16px);
+            color: #4a5568;
+            margin-bottom: 15px;
         ">
-            <button id="close-modal" style="
-                position: absolute;
-                top: 15px;
-                right: 15px;
-                background: none;
-                border: none;
-                font-size: 24px;
-                cursor: pointer;
-                color: #4a5568;
-                padding: 5px;
-                z-index: 1;
-            ">×</button>
-            
-            <div style="
-                text-align: center;
-                margin-bottom: 25px;
-            ">
-                <h2 style="
-                    font-size: clamp(24px, 4vw, 28px);
-                    color: #2d3748;
-                    margin-bottom: 20px;
-                ">测试完成！</h2>
-                
-                <div style="
-                    font-size: clamp(16px, 3vw, 18px);
-                    color: #4a5568;
-                    margin-bottom: 25px;
-                ">
-                    总题数: ${window.questions.length} | 
-                    正确: ${correctCount} | 
-                    正确率: ${scorePercentage.toFixed(1)}%
-                </div>
-                
-                <button id="evaluate-button" style="
-                    padding: 12px 25px;
-                    font-size: clamp(14px, 2.5vw, 16px);
-                    font-weight: 500;
-                    background-color: #4299e1;
-                    color: white;
-                    border: none;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
-                ">成绩评估</button>
-            </div>
-            
-            <div id="evaluation-result" style="
-                display: none;
-                margin-top: 20px;
-                padding: 20px;
-                background: #f8f9fa;
-                border-radius: 8px;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-            "></div>
+            总题数: ${window.questions.length} | 
+            正确: ${correctCount} | 
+            正确率: ${scorePercentage.toFixed(1)}%
         </div>
+        
+        <button id="evaluate-button" style="
+            padding: 10px 20px;
+            font-size: clamp(14px, 2.5vw, 16px);
+            font-weight: 500;
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+        ">成绩评估</button>
     `;
 
-    // Add event listeners
-    const closeButton = document.getElementById('close-modal');
+    // Add event listener to the evaluate button
     const evaluateButton = document.getElementById('evaluate-button');
-
-    closeButton.addEventListener('click', () => {
-        modalContainer.remove();
-    });
-
-    evaluateButton.addEventListener('click', handleEvaluateClick);
-
-    // Close modal when clicking outside
-    modalContainer.addEventListener('click', (e) => {
-        if (e.target === modalContainer) {
-            modalContainer.remove();
-        }
-    });
+    if (evaluateButton) {
+        evaluateButton.addEventListener('click', handleEvaluateClick);
+    }
 }
 
 // Function to display the current question
@@ -413,7 +368,7 @@ function displayCurrentQuestion() {
                                window.userAnswers.length === window.questions.length && 
                                window.userAnswers.every(answer => answer !== null);
 
-    // Show results popup if all questions are answered
+    // Show results in navigation section if all questions are answered
     if (allQuestionsAnswered) {
         showResultsPopup();
     }
@@ -949,28 +904,283 @@ function formatMathExpressions(text) {
 function updateNavigationButtons() {
     console.log('updateNavigationButtons called', window.currentQuestionIndex, window.questions ? window.questions.length : 0);
     
+    // Ensure navigation controls container exists
+    let navigationControls = document.querySelector('.navigation-controls');
+    if (!navigationControls) {
+        console.log('Creating navigation controls container');
+        navigationControls = document.createElement('div');
+        navigationControls.className = 'navigation-controls';
+        navigationControls.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        `;
+        
+        // Create button container
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.cssText = `
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        `;
+        
+        // Create prev button if it doesn't exist
+        let prevButton = document.getElementById('prev-question-button');
+        if (!prevButton) {
+            prevButton = document.createElement('button');
+            prevButton.id = 'prev-question-button';
+            prevButton.className = 'nav-button';
+            prevButton.textContent = '上一题';
+            prevButton.style.cssText = `
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: #edf2f7;
+                color: #4a5568;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            `;
+            buttonContainer.appendChild(prevButton);
+        }
+        
+        // Create next button if it doesn't exist
+        let nextButton = document.getElementById('next-question-button');
+        if (!nextButton) {
+            nextButton = document.createElement('button');
+            nextButton.id = 'next-question-button';
+            nextButton.className = 'nav-button';
+            nextButton.textContent = '下一题';
+            nextButton.style.cssText = `
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: #4299e1;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+            `;
+            buttonContainer.appendChild(nextButton);
+        }
+        
+        navigationControls.appendChild(buttonContainer);
+        
+        // Add to the create container
+        const createContainer = document.getElementById('create-container');
+        if (createContainer) {
+            createContainer.appendChild(navigationControls);
+        }
+    } else {
+        // Get existing buttons
+        const prevButton = document.getElementById('prev-question-button');
+        const nextButton = document.getElementById('next-question-button');
+        
+        // If buttons don't exist, create them
+        if (!prevButton || !nextButton) {
+            // Clear navigation controls
+            navigationControls.innerHTML = '';
+            
+            // Create button container
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = `
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+                width: 100%;
+            `;
+            
+            // Create prev button
+            const newPrevButton = document.createElement('button');
+            newPrevButton.id = 'prev-question-button';
+            newPrevButton.className = 'nav-button';
+            newPrevButton.textContent = '上一题';
+            newPrevButton.style.cssText = `
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: #edf2f7;
+                color: #4a5568;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            `;
+            buttonContainer.appendChild(newPrevButton);
+            
+            // Create next button
+            const newNextButton = document.createElement('button');
+            newNextButton.id = 'next-question-button';
+            newNextButton.className = 'nav-button';
+            newNextButton.textContent = '下一题';
+            newNextButton.style.cssText = `
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: #4299e1;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+            `;
+            buttonContainer.appendChild(newNextButton);
+            
+            navigationControls.appendChild(buttonContainer);
+        }
+    }
+    
+    // Get fresh references to the buttons
     const prevButton = document.getElementById('prev-question-button');
     const nextButton = document.getElementById('next-question-button');
     
     if (prevButton) {
-        prevButton.disabled = !window.questions || window.currentQuestionIndex <= 0;
+        // Remove any existing event listeners
+        const newPrevButton = prevButton.cloneNode(true);
+        prevButton.parentNode.replaceChild(newPrevButton, prevButton);
+        
+        // Add new event listener
+        newPrevButton.addEventListener('click', function() {
+            if (window.currentQuestionIndex > 0) {
+                window.currentQuestionIndex--;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
     }
     
     if (nextButton) {
-        nextButton.disabled = !window.questions || window.currentQuestionIndex >= window.questions.length - 1;
+        // Remove any existing event listeners
+        const newNextButton = nextButton.cloneNode(true);
+        nextButton.parentNode.replaceChild(newNextButton, nextButton);
+        
+        // Add new event listener
+        newNextButton.addEventListener('click', function() {
+            if (window.questions && window.currentQuestionIndex < window.questions.length - 1) {
+                window.currentQuestionIndex++;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
     }
+    
+    // Update button states
+    updateNavigationButtons();
+}
 
-    // Update navigation buttons for mobile
-    if (prevButton && nextButton) {
-        const buttonStyle = `
-            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
-            font-size: clamp(14px, 3.5vw, 16px);
-            border-radius: 8px;
-            margin: clamp(5px, 2vw, 10px);
-        `;
-        prevButton.style.cssText += buttonStyle;
-        nextButton.style.cssText += buttonStyle;
+// Function to handle evaluate click
+function handleEvaluateClick() {
+    console.log('Evaluate button clicked');
+    
+    // Get all questions and answers
+    const questions = window.questions;
+    const userAnswers = window.userAnswers;
+    
+    if (!questions || !userAnswers || questions.length === 0) {
+        console.error('No questions or answers available for evaluation');
+        return;
     }
+    
+    // Calculate score
+    let correctCount = 0;
+    userAnswers.forEach((answer, index) => {
+        if (answer === questions[index].answer) {
+            correctCount++;
+        }
+    });
+    const scorePercentage = (correctCount / questions.length) * 100;
+    
+    // Create evaluation prompt
+    const prompt = `我刚刚完成了一个${questions.length}道题的测验，正确率为${scorePercentage.toFixed(1)}%（${correctCount}/${questions.length}）。
+请根据我的表现给出一个简短的评估和建议，包括：
+1. 对我表现的总体评价
+2. 我可能存在的知识盲点
+3. 针对性的学习建议
+
+以下是题目和我的答案：
+${questions.map((q, i) => {
+    const isCorrect = userAnswers[i] === q.answer;
+    let questionText = q.questionText;
+    if (questionText.startsWith('题目：')) {
+        questionText = questionText.substring(3);
+    }
+    return `题目${i+1}：${questionText}
+我的答案：${userAnswers[i] || '未作答'}
+正确答案：${q.answer}
+${isCorrect ? '✓ 正确' : '✗ 错误'}
+`;
+}).join('\n')}`;
+
+    // Show loading state in the evaluation result
+    const evaluationResult = document.getElementById('evaluation-result') || document.createElement('div');
+    evaluationResult.id = 'evaluation-result';
+    evaluationResult.style.cssText = `
+        margin-top: 15px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        opacity: 1;
+        transition: opacity 0.3s ease;
+    `;
+    evaluationResult.innerHTML = `
+        <div style="display: flex; justify-content: center; align-items: center; padding: 20px;">
+            <div class="spinner-icon" style="
+                width: 30px;
+                height: 30px;
+                border: 3px solid #e2e8f0;
+                border-top: 3px solid #4299e1;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin-right: 15px;
+            "></div>
+            <div style="font-size: 16px; color: #4a5568;">正在评估您的表现...</div>
+        </div>
+    `;
+    
+    // Add to score summary if not already there
+    const scoreSummary = document.getElementById('score-summary');
+    if (scoreSummary && !document.getElementById('evaluation-result')) {
+        scoreSummary.appendChild(evaluationResult);
+    }
+    
+    // Call API to get evaluation
+    fetchAIResponse(prompt)
+        .then(response => {
+            const content = extractContentFromResponse(response);
+            
+            if (evaluationResult) {
+                evaluationResult.innerHTML = `
+                    <div style="
+                        font-size: 16px;
+                        color: #2d3748;
+                        line-height: 1.6;
+                        white-space: pre-wrap;
+                    ">${content}</div>
+                `;
+                evaluationResult.style.display = 'block';
+                evaluationResult.style.opacity = '1';
+            }
+        })
+        .catch(error => {
+            console.error('Error getting evaluation:', error);
+            
+            if (evaluationResult) {
+                evaluationResult.innerHTML = `
+                    <div style="
+                        font-size: 16px;
+                        color: #e53e3e;
+                        text-align: center;
+                        padding: 15px;
+                    ">获取评估时出错，请重试</div>
+                `;
+            }
+        });
 }
 
 // Function to handle generating questions
@@ -1293,6 +1503,139 @@ function hideLoadingIndicator() {
 function setupNavigationButtons() {
     console.log('Setting up navigation buttons');
     
+    // Ensure navigation controls container exists
+    let navigationControls = document.querySelector('.navigation-controls');
+    if (!navigationControls) {
+        console.log('Creating navigation controls container');
+        navigationControls = document.createElement('div');
+        navigationControls.className = 'navigation-controls';
+        navigationControls.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        `;
+        
+        // Create button container
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.cssText = `
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        `;
+        
+        // Create prev button if it doesn't exist
+        let prevButton = document.getElementById('prev-question-button');
+        if (!prevButton) {
+            prevButton = document.createElement('button');
+            prevButton.id = 'prev-question-button';
+            prevButton.className = 'nav-button';
+            prevButton.textContent = '上一题';
+            prevButton.style.cssText = `
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: #edf2f7;
+                color: #4a5568;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            `;
+            buttonContainer.appendChild(prevButton);
+        }
+        
+        // Create next button if it doesn't exist
+        let nextButton = document.getElementById('next-question-button');
+        if (!nextButton) {
+            nextButton = document.createElement('button');
+            nextButton.id = 'next-question-button';
+            nextButton.className = 'nav-button';
+            nextButton.textContent = '下一题';
+            nextButton.style.cssText = `
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: #4299e1;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+            `;
+            buttonContainer.appendChild(nextButton);
+        }
+        
+        navigationControls.appendChild(buttonContainer);
+        
+        // Add to the create container
+        const createContainer = document.getElementById('create-container');
+        if (createContainer) {
+            createContainer.appendChild(navigationControls);
+        }
+    } else {
+        // Get existing buttons
+        const prevButton = document.getElementById('prev-question-button');
+        const nextButton = document.getElementById('next-question-button');
+        
+        // If buttons don't exist, create them
+        if (!prevButton || !nextButton) {
+            // Clear navigation controls
+            navigationControls.innerHTML = '';
+            
+            // Create button container
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = `
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+                width: 100%;
+            `;
+            
+            // Create prev button
+            const newPrevButton = document.createElement('button');
+            newPrevButton.id = 'prev-question-button';
+            newPrevButton.className = 'nav-button';
+            newPrevButton.textContent = '上一题';
+            newPrevButton.style.cssText = `
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: #edf2f7;
+                color: #4a5568;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            `;
+            buttonContainer.appendChild(newPrevButton);
+            
+            // Create next button
+            const newNextButton = document.createElement('button');
+            newNextButton.id = 'next-question-button';
+            newNextButton.className = 'nav-button';
+            newNextButton.textContent = '下一题';
+            newNextButton.style.cssText = `
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: #4299e1;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+            `;
+            buttonContainer.appendChild(newNextButton);
+            
+            navigationControls.appendChild(buttonContainer);
+        }
+    }
+    
+    // Get fresh references to the buttons
     const prevButton = document.getElementById('prev-question-button');
     const nextButton = document.getElementById('next-question-button');
     
@@ -1325,6 +1668,9 @@ function setupNavigationButtons() {
             }
         });
     }
+    
+    // Update button states
+    updateNavigationButtons();
 }
 
 // Function to set up option selection buttons
