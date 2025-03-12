@@ -1138,10 +1138,10 @@ function displayCompletionStatus() {
         scoreInfo.appendChild(scorePercent);
         completionStatus.appendChild(scoreInfo);
         
-        // Add view details button
-        const viewDetailsButton = document.createElement('button');
-        viewDetailsButton.textContent = '查看详细结果';
-        viewDetailsButton.style.cssText = `
+        // Add evaluation button
+        const evaluateButton = document.createElement('button');
+        evaluateButton.textContent = '成绩评估';
+        evaluateButton.style.cssText = `
             margin-top: 10px;
             padding: 8px 16px;
             background-color: #4299e1;
@@ -1153,8 +1153,8 @@ function displayCompletionStatus() {
             font-weight: 500;
             transition: all 0.2s ease;
         `;
-        viewDetailsButton.addEventListener('click', showResultsPopup);
-        completionStatus.appendChild(viewDetailsButton);
+        evaluateButton.addEventListener('click', handleEvaluateClick);
+        completionStatus.appendChild(evaluateButton);
         
         // Insert completion status between navigation buttons
         const prevButton = document.getElementById('prev-question-button');
@@ -1173,6 +1173,214 @@ function displayCompletionStatus() {
             }
         `;
         document.head.appendChild(styleElement);
+    }
+}
+
+// Function to handle evaluation button click
+function handleEvaluateClick() {
+    // Create a summary of the test results
+    let correctCount = 0;
+    const questionResults = [];
+    
+    window.userAnswers.forEach((answer, index) => {
+        const question = window.questions[index];
+        const isCorrect = answer === question.answer;
+        if (isCorrect) correctCount++;
+        
+        // Extract question text without "题目：" prefix
+        let questionText = question.questionText;
+        if (questionText.startsWith('题目：')) {
+            questionText = questionText.substring(3);
+        }
+        
+        questionResults.push({
+            questionNumber: index + 1,
+            questionText: questionText.substring(0, 50) + (questionText.length > 50 ? '...' : ''),
+            userAnswer: answer,
+            correctAnswer: question.answer,
+            isCorrect: isCorrect
+        });
+    });
+    
+    const scorePercentage = (correctCount / window.questions.length) * 100;
+    
+    // Create prompt for API
+    const prompt = `
+我刚完成了一个测试，请根据我的表现给出评估和建议。
+
+测试信息：
+- 总题数: ${window.questions.length}
+- 正确数: ${correctCount}
+- 正确率: ${scorePercentage.toFixed(1)}%
+
+题目详情：
+${questionResults.map(result => 
+    `${result.questionNumber}. ${result.questionText} - ${result.isCorrect ? '正确' : '错误'} (我的答案: ${result.userAnswer}, 正确答案: ${result.correctAnswer})`
+).join('\n')}
+
+请提供以下内容：
+1. 对我的表现的总体评价
+2. 我的优势和不足
+3. 针对性的学习建议
+4. 如何提高我的弱项
+5. 下一步学习计划建议
+
+请用鼓励的语气，并给出具体、实用的建议。
+`;
+
+    // Show loading state in the modal
+    showEvaluationModal('加载中...');
+    
+    // Call API to get evaluation
+    fetchAIResponse(prompt)
+        .then(response => {
+            const content = extractContentFromResponse(response);
+            showEvaluationModal(content);
+        })
+        .catch(error => {
+            console.error('Error fetching evaluation:', error);
+            showEvaluationModal('获取评估时出错，请重试。');
+        });
+}
+
+// Function to show evaluation modal
+function showEvaluationModal(content) {
+    // Create or get modal container
+    let modalContainer = document.getElementById('evaluation-modal');
+    if (!modalContainer) {
+        modalContainer = document.createElement('div');
+        modalContainer.id = 'evaluation-modal';
+        modalContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        `;
+        document.body.appendChild(modalContainer);
+    }
+    
+    // Create modal content
+    let modalContent = '';
+    
+    if (content === '加载中...') {
+        // Show loading spinner
+        modalContent = `
+            <div class="modal-content" style="
+                background: white;
+                padding: 30px;
+                border-radius: 12px;
+                max-width: 800px;
+                width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
+                position: relative;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+                text-align: center;
+            ">
+                <h2 style="
+                    font-size: 24px;
+                    color: #2d3748;
+                    margin-bottom: 20px;
+                ">正在生成评估结果</h2>
+                
+                <div class="spinner" style="
+                    width: 50px;
+                    height: 50px;
+                    border: 5px solid #e2e8f0;
+                    border-top: 5px solid #4299e1;
+                    border-radius: 50%;
+                    margin: 20px auto;
+                    animation: spin 1s linear infinite;
+                "></div>
+                
+                <p style="
+                    font-size: 16px;
+                    color: #4a5568;
+                ">请稍候，我们正在分析您的测试结果...</p>
+                
+                <style>
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                </style>
+            </div>
+        `;
+    } else {
+        // Format the evaluation content
+        const formattedContent = content
+            .replace(/\n\n/g, '</p><p>')
+            .replace(/\n/g, '<br>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/# (.*?)(\n|$)/g, '<h3>$1</h3>')
+            .replace(/## (.*?)(\n|$)/g, '<h4>$1</h4>')
+            .replace(/### (.*?)(\n|$)/g, '<h5>$1</h5>');
+        
+        modalContent = `
+            <div class="modal-content" style="
+                background: white;
+                padding: 30px;
+                border-radius: 12px;
+                max-width: 800px;
+                width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
+                position: relative;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            ">
+                <button id="close-modal" style="
+                    position: absolute;
+                    top: 15px;
+                    right: 15px;
+                    background: none;
+                    border: none;
+                    font-size: 24px;
+                    cursor: pointer;
+                    color: #4a5568;
+                    padding: 5px;
+                    z-index: 1;
+                ">×</button>
+                
+                <h2 style="
+                    font-size: 24px;
+                    color: #2d3748;
+                    margin-bottom: 20px;
+                    text-align: center;
+                ">成绩评估结果</h2>
+                
+                <div class="evaluation-content" style="
+                    font-size: 16px;
+                    color: #4a5568;
+                    line-height: 1.6;
+                ">
+                    <p>${formattedContent}</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    modalContainer.innerHTML = modalContent;
+    
+    // Add close button event listener
+    const closeButton = document.getElementById('close-modal');
+    if (closeButton) {
+        closeButton.addEventListener('click', () => {
+            modalContainer.remove();
+        });
+        
+        // Close modal when clicking outside
+        modalContainer.addEventListener('click', (e) => {
+            if (e.target === modalContainer) {
+                modalContainer.remove();
+            }
+        });
     }
 }
 
@@ -2040,7 +2248,18 @@ document.addEventListener('DOMContentLoaded', function() {
             qaButton.classList.remove('active');
             createContainer.classList.remove('hidden');
             qaContainer.classList.add('hidden');
+            
+            // Initialize empty state if no questions are loaded
+            initializeEmptyState();
         });
+        
+        // Initialize empty state on the test page if it's active
+        if (createButton.classList.contains('active')) {
+            initializeEmptyState();
+        }
+    } else {
+        // If tab buttons don't exist, initialize empty state anyway
+        initializeEmptyState();
     }
     
     // Set up initial navigation buttons
@@ -2196,8 +2415,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Then generate questions
-            handleGenerateQuestionsClick();
-        });
+        handleGenerateQuestionsClick();
+    });
     
     // Add the button to the second frame
     const testFrame = document.querySelector('.sidebar-frame:nth-child(2) .frame-content');
@@ -2232,6 +2451,98 @@ function moveContentCreationToTop() {
         const navigationControls = document.querySelector('.navigation-controls');
         if (navigationControls && navigationControls.parentNode === createContainer) {
             createContainer.appendChild(navigationControls);
+        }
+    }
+}
+
+// Function to initialize empty state on the test page
+function initializeEmptyState() {
+    const createContainer = document.getElementById('create-container');
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    
+    // Only initialize empty state if no questions are loaded
+    if (!window.questions || window.questions.length === 0) {
+        // Create or get the empty state element
+        let emptyState = document.getElementById('empty-state');
+        
+        if (!emptyState) {
+            emptyState = document.createElement('div');
+            emptyState.id = 'empty-state';
+            emptyState.className = 'empty-state';
+            emptyState.style.cssText = `
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 40px 20px;
+                text-align: center;
+                background-color: white;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                margin: 20px auto;
+                max-width: 600px;
+            `;
+            
+            // Create icon
+            const icon = document.createElement('div');
+            icon.innerHTML = `
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#4299e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+            `;
+            icon.style.cssText = `
+                margin-bottom: 20px;
+                color: #4299e1;
+            `;
+            
+            // Create heading
+            const heading = document.createElement('h3');
+            heading.textContent = '准备好开始测验了吗？';
+            heading.style.cssText = `
+                font-size: 24px;
+                color: #2d3748;
+                margin-bottom: 15px;
+            `;
+            
+            // Create description
+            const description = document.createElement('p');
+            description.textContent = '使用左侧边栏选择学校类型、年级、学期、科目、难度和题目数量，然后点击"出题"按钮生成测验题目。';
+            description.style.cssText = `
+                font-size: 16px;
+                color: #4a5568;
+                line-height: 1.6;
+                max-width: 500px;
+            `;
+            
+            // Assemble empty state
+            emptyState.appendChild(icon);
+            emptyState.appendChild(heading);
+            emptyState.appendChild(description);
+            
+            // Add to container
+            if (questionsDisplayContainer) {
+                questionsDisplayContainer.innerHTML = '';
+                questionsDisplayContainer.appendChild(emptyState);
+                questionsDisplayContainer.classList.remove('hidden');
+            } else if (createContainer) {
+                // Create questions display container if it doesn't exist
+                const newQuestionsContainer = document.createElement('div');
+                newQuestionsContainer.id = 'questions-display-container';
+                newQuestionsContainer.className = 'questions-display-container';
+                newQuestionsContainer.appendChild(emptyState);
+                
+                createContainer.innerHTML = '';
+                createContainer.appendChild(newQuestionsContainer);
+            }
+        } else {
+            // Make sure the empty state is visible
+            emptyState.classList.remove('hidden');
+            
+            // Make sure the questions display container is visible
+            if (questionsDisplayContainer) {
+                questionsDisplayContainer.classList.remove('hidden');
+            }
         }
     }
 } 
