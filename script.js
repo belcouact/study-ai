@@ -3982,3 +3982,150 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(setupChatButtons, 1000);
     }, 300);
 });
+
+// Add the missing setupButtonEventListeners function
+function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, submitButton) {
+    console.log('Setting up button event listeners');
+    
+    // Set up optimize button
+    if (optimizeButton) {
+        // Remove any existing event listeners
+        const newOptimizeButton = optimizeButton.cloneNode(true);
+        optimizeButton.parentNode.replaceChild(newOptimizeButton, optimizeButton);
+        optimizeButton = newOptimizeButton;
+        
+        optimizeButton.addEventListener('click', function() {
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+                return;
+            }
+            
+            // Get educational context from sidebar
+            const educationalContext = getEducationalContext();
+            
+            // Show loading state
+            optimizeButton.disabled = true;
+            optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
+            
+            // Prepare the prompt for optimization with educational context
+            const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值：
+
+教育背景：
+${educationalContext}
+
+原始问题：${questionText}
+
+请返回优化后的问题，使其更适合上述教育背景的学生，保持原始意图但使其更加清晰、准确和有教育意义。
+优化时请考虑学生的认知水平、课程要求和教育阶段，使问题更有针对性。`;
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the optimized question
+                    const optimizedContent = extractContentFromResponse(response);
+                    
+                    // Update the chat input with the optimized question
+                    chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
+                    
+                    // Focus the input and move cursor to end
+                    chatInput.focus();
+                    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+                    
+                    // Show success message
+                    showSystemMessage('问题已根据教育背景成功优化！', 'success');
+                })
+                .catch(error => {
+                    console.error('Error optimizing question:', error);
+                    showSystemMessage('优化问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    optimizeButton.disabled = false;
+                    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+                });
+        });
+    }
+    
+    // Set up submit button
+    if (submitButton) {
+        // Remove any existing event listeners
+        const newSubmitButton = submitButton.cloneNode(true);
+        submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
+        submitButton = newSubmitButton;
+        
+        submitButton.addEventListener('click', function() {
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+                return;
+            }
+            
+            // Get educational context from sidebar
+            const educationalContext = getEducationalContext();
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+            chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
+            
+            // Prepare the prompt for the AI with educational context
+            const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
+
+教育背景：
+${educationalContext}
+
+问题：${questionText}
+
+请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
+如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平和课程要求。
+如果可能，请提供一些例子或应用场景来帮助理解。`;
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the AI response
+                    const aiResponse = extractContentFromResponse(response);
+                    
+                    // Format the response with MathJax
+                    const formattedResponse = formatMathExpressions(aiResponse);
+                    
+                    // Get context summary for display
+                    const contextSummary = getContextSummary();
+                    
+                    // Display the response with educational context
+                    chatResponse.innerHTML = `
+                        <div class="response-header">
+                            <i class="fas fa-robot"></i> AI 助手回答
+                            ${contextSummary ? `<span class="context-badge">${contextSummary}</span>` : ''}
+                        </div>
+                        <div class="response-content">
+                            ${formattedResponse}
+                        </div>
+                    `;
+                    
+                    // Render MathJax in the response
+                    if (window.MathJax) {
+                        MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting question:', error);
+                    chatResponse.innerHTML = `
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            抱歉，处理您的问题时出现了错误。请重试。
+                        </div>
+                    `;
+                    showSystemMessage('提交问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
+                });
+        });
+    }
+}
