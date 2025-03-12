@@ -1274,13 +1274,13 @@ function populateSubjectOptions(school) {
             subjectOptions = ['语文', '数学', '英语', '科学', '道德与法治'];
             break;
         case '初中':
-            subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+            subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'];
             break;
         case '高中':
             subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
             break;
         case '大学':
-            subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
+            subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学', '哲学', '医学', '高分子化学'];
             break;
         default:
             subjectOptions = ['语文', '数学', '英语'];
