@@ -413,9 +413,9 @@ function displayCurrentQuestion() {
                                window.userAnswers.length === window.questions.length && 
                                window.userAnswers.every(answer => answer !== null);
 
-    // Update navigation buttons and show completion status if all questions are answered
+    // Show completion status if all questions are answered
     if (allQuestionsAnswered) {
-        updateNavigationButtons();
+        displayCompletionStatus();
     }
     
     // Update question counter with responsive styling
@@ -549,11 +549,34 @@ function displayCurrentQuestion() {
                     </div>
                 `).join('')}
             </div>
+            <div class="submit-button-container" style="
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+                width: 100%;
+            ">
+                <button id="submit-answer-button" style="
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    font-weight: 500;
+                    background-color: #4299e1;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+                    opacity: 0.7;
+                    pointer-events: none;
+                ">提交答案</button>
+            </div>
         `;
 
         // Add enhanced interaction effects for choice cells
         const choiceCells = choicesContainer.querySelectorAll('.choice-cell');
+        const submitButton = document.getElementById('submit-answer-button');
         let selectedCell = null;
+        let selectedValue = null;
 
         choiceCells.forEach(cell => {
             const indicator = cell.querySelector('.choice-indicator');
@@ -572,58 +595,13 @@ function displayCurrentQuestion() {
                     updateCellStyles(selectedCell, false);
                 }
                 selectedCell = cell;
+                selectedValue = cell.dataset.value;
                 updateCellStyles(cell, true);
                 
-                // Save the answer
-                const value = cell.dataset.value;
-                window.userAnswers[window.currentQuestionIndex] = value;
-                
-                // Show the answer container after selecting an option
-                const answerContainer = document.getElementById('answer-container');
-                if (answerContainer) {
-                    answerContainer.classList.remove('hidden');
-                    
-                    // Update answer result
-                    const answerResult = document.getElementById('answer-result');
-                    const correctAnswer = question.answer;
-                    const isCorrect = value === correctAnswer;
-                    
-                    if (answerResult) {
-                        answerResult.style.cssText = `
-                            font-size: 18px;
-                            font-weight: 500;
-                            color: ${isCorrect ? '#48bb78' : '#e53e3e'};
-                            margin-bottom: 20px;
-                            padding: 15px;
-                            background: ${isCorrect ? '#f0fff4' : '#fff5f5'};
-                            border-radius: 8px;
-                            display: flex;
-                            align-items: center;
-                            gap: 10px;
-                        `;
-                        
-                        const resultText = isCorrect 
-                            ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 正确！答案是：${correctAnswer}`
-                            : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> 错误。正确答案是：${correctAnswer}`;
-                        
-                        answerResult.innerHTML = formatMathExpressions(resultText);
-                    }
-                    
-                    // Update explanation
-                    const answerExplanation = document.getElementById('answer-explanation');
-                    if (answerExplanation) {
-                        answerExplanation.style.cssText = `
-                            font-size: 16px;
-                            color: #4a5568;
-                            line-height: 1.8;
-                            margin-top: 20px;
-                            padding: 20px;
-                            background: #f8f9fa;
-                            border-radius: 8px;
-                            white-space: pre-wrap;
-                        `;
-                        answerExplanation.innerHTML = formatMathExpressions(question.explanation);
-                    }
+                // Enable submit button
+                if (submitButton) {
+                    submitButton.style.opacity = '1';
+                    submitButton.style.pointerEvents = 'auto';
                 }
             });
             
@@ -659,9 +637,38 @@ function displayCurrentQuestion() {
             // Set initial state if answer exists
             if (window.userAnswers && window.userAnswers[window.currentQuestionIndex] === cell.dataset.value) {
                 selectedCell = cell;
+                selectedValue = cell.dataset.value;
                 updateCellStyles(cell, true);
+                
+                // Enable submit button if answer already selected
+                if (submitButton) {
+                    submitButton.style.opacity = '1';
+                    submitButton.style.pointerEvents = 'auto';
+                }
             }
         });
+        
+        // Add submit button functionality
+        if (submitButton) {
+            submitButton.addEventListener('click', () => {
+                if (selectedValue) {
+                    // Save the answer
+                    window.userAnswers[window.currentQuestionIndex] = selectedValue;
+                    
+                    // Show the answer container
+                    displayAnswer(selectedValue);
+                    
+                    // Check if all questions are answered
+                    const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
+                                               window.userAnswers.every(answer => answer !== null);
+                    
+                    // Show completion status if all questions are answered
+                    if (allQuestionsAnswered) {
+                        displayCompletionStatus();
+                    }
+                }
+            });
+        }
         
         console.log('Choice cells set up:', choiceCells.length);
     } else {
@@ -713,17 +720,37 @@ function displayCurrentQuestion() {
                     </div>
                 `).join('')}
             </div>
+            <div class="submit-button-container" style="
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+                width: 100%;
+            ">
+                <button id="submit-answer-button" style="
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    font-weight: 500;
+                    background-color: #4299e1;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+                    opacity: 0.7;
+                    pointer-events: none;
+                ">提交答案</button>
+            </div>
         `;
         questionsDisplayContainer.appendChild(newChoices);
         
         // Add event listeners to the newly created choice cells
         const choiceCells = newChoices.querySelectorAll('.choice-cell');
+        const submitButton = document.getElementById('submit-answer-button');
+        let selectedValue = null;
+        
         choiceCells.forEach(cell => {
             cell.addEventListener('click', function() {
-                // Save the answer
-                const value = this.dataset.value;
-                window.userAnswers[window.currentQuestionIndex] = value;
-                
                 // Update UI to show this cell as selected
                 choiceCells.forEach(c => {
                     c.style.borderColor = '#e2e8f0';
@@ -737,10 +764,38 @@ function displayCurrentQuestion() {
                 this.querySelector('.choice-indicator').style.backgroundColor = '#4299e1';
                 this.querySelector('.choice-indicator').style.color = 'white';
                 
-                // Show answer and explanation
-                displayAnswer(value);
+                // Store selected value
+                selectedValue = this.dataset.value;
+                
+                // Enable submit button
+                if (submitButton) {
+                    submitButton.style.opacity = '1';
+                    submitButton.style.pointerEvents = 'auto';
+                }
             });
         });
+        
+        // Add submit button functionality
+        if (submitButton) {
+            submitButton.addEventListener('click', function() {
+                if (selectedValue) {
+                    // Save the answer
+                    window.userAnswers[window.currentQuestionIndex] = selectedValue;
+                    
+                    // Show answer and explanation
+                    displayAnswer(selectedValue);
+                    
+                    // Check if all questions are answered
+                    const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
+                                               window.userAnswers.every(answer => answer !== null);
+                    
+                    // Show completion status if all questions are answered
+                    if (allQuestionsAnswered) {
+                        displayCompletionStatus();
+                    }
+                }
+            });
+        }
     }
     
     // Function to display answer and explanation
@@ -818,6 +873,15 @@ function displayCurrentQuestion() {
             white-space: pre-wrap;
         `;
         answerExplanation.innerHTML = formatMathExpressions(question.explanation);
+        
+        // Disable the submit button after submission
+        const submitButton = document.getElementById('submit-answer-button');
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.style.opacity = '0.5';
+            submitButton.style.pointerEvents = 'none';
+            submitButton.textContent = '已提交';
+        }
     }
     
     // Style the answer container when showing results
@@ -879,13 +943,13 @@ function displayCurrentQuestion() {
                 answerExplanation.innerHTML = formatMathExpressions(question.explanation);
             }
             
-            // Check if all questions are answered after showing the current answer
-            const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
-                                       window.userAnswers.every(answer => answer !== null);
-            
-            if (allQuestionsAnswered) {
-                // Only show the popup, don't create score-summary-container
-                showResultsPopup();
+            // Disable the submit button if already submitted
+            const submitButton = document.getElementById('submit-answer-button');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.style.opacity = '0.5';
+                submitButton.style.pointerEvents = 'none';
+                submitButton.textContent = '已提交';
             }
         }
     } else {
