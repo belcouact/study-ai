@@ -3695,7 +3695,7 @@ function setupChatButtons() {
 // First, let's fix the createChatInterface function definition issue by ensuring it's defined only once
 // and placed before setupChatButtons
 
-// Function to create the chat interface with improved styling
+// Function to create the chat interface
 function createChatInterface() {
     console.log('Creating chat interface');
     
@@ -3733,12 +3733,6 @@ function createChatInterface() {
     chatInterface.className = 'chat-interface';
     chatInterface.style.cssText = 'display: flex; flex-direction: column; height: 100%; padding: 20px; gap: 20px;';
     
-    // Add the AI service provider info (centered)
-    const aiProviderInfo = document.createElement('div');
-    aiProviderInfo.className = 'ai-provider-info';
-    aiProviderInfo.style.cssText = 'text-align: center; margin-bottom: 15px; color: #4a5568; font-size: 14px; font-weight: 500;';
-    aiProviderInfo.innerHTML = '腾讯元宝，通义千问';
-    
     // Create the chat input area
     const chatInputArea = document.createElement('div');
     chatInputArea.className = 'chat-input-area';
@@ -3756,45 +3750,19 @@ function createChatInterface() {
     buttonsContainer.className = 'chat-buttons';
     buttonsContainer.style.cssText = 'display: flex; gap: 10px; justify-content: flex-end;';
     
-    // Create the optimize button with enhanced styling
+    // Create the optimize button
     const optimizeButton = document.createElement('button');
     optimizeButton.id = 'optimize-button';
     optimizeButton.className = 'chat-button optimize-button';
     optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
-    optimizeButton.style.cssText = `
-        padding: 8px 16px; 
-        background-color: #6366f1; 
-        color: white; 
-        border: none; 
-        border-radius: 4px; 
-        cursor: pointer; 
-        display: flex; 
-        align-items: center; 
-        gap: 5px;
-        font-weight: 500;
-        box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
-        transition: all 0.2s ease;
-    `;
+    optimizeButton.style.cssText = 'padding: 8px 16px; background-color: #4299e1; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
     
-    // Create the submit button with enhanced styling
+    // Create the submit button
     const submitButton = document.createElement('button');
     submitButton.id = 'submit-button';
     submitButton.className = 'chat-button submit-button';
     submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
-    submitButton.style.cssText = `
-        padding: 8px 16px; 
-        background-color: #10b981; 
-        color: white; 
-        border: none; 
-        border-radius: 4px; 
-        cursor: pointer; 
-        display: flex; 
-        align-items: center; 
-        gap: 5px;
-        font-weight: 500;
-        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
-        transition: all 0.2s ease;
-    `;
+    submitButton.style.cssText = 'padding: 8px 16px; background-color: #48bb78; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
     
     // Add buttons to container
     buttonsContainer.appendChild(optimizeButton);
@@ -3819,8 +3787,7 @@ function createChatInterface() {
         </div>
     `;
     
-    // Add provider info, input area and response area to chat interface
-    chatInterface.appendChild(aiProviderInfo);
+    // Add input area and response area to chat interface
     chatInterface.appendChild(chatInputArea);
     chatInterface.appendChild(chatResponse);
     
@@ -3833,24 +3800,13 @@ function createChatInterface() {
     style.textContent = `
         .chat-button:hover {
             opacity: 0.9;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .chat-button:active {
             transform: translateY(1px);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
         .chat-button:disabled {
             opacity: 0.7;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        .optimize-button {
-            background-color: #6366f1 !important; /* Indigo */
-        }
-        .submit-button {
-            background-color: #10b981 !important; /* Emerald */
         }
         .loading-indicator {
             display: flex;
@@ -3859,12 +3815,12 @@ function createChatInterface() {
             gap: 10px;
             color: #718096;
             font-size: 16px;
-            padding: 20px;
+                                padding: 20px;
         }
         .response-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
             font-weight: 600;
             color: #2d3748;
             margin-bottom: 10px;
@@ -3881,7 +3837,7 @@ function createChatInterface() {
         }
         .response-content {
             line-height: 1.6;
-            color: #4a5568;
+                                    color: #4a5568;
             white-space: pre-wrap;
         }
         .error-message {
@@ -3890,13 +3846,6 @@ function createChatInterface() {
             align-items: center;
             gap: 8px;
             font-size: 16px;
-        }
-        .ai-provider-info {
-            text-align: center;
-            margin-bottom: 15px;
-            color: #4a5568;
-            font-size: 14px;
-            font-weight: 500;
         }
     `;
     document.head.appendChild(style);
