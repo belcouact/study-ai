@@ -4129,3 +4129,72 @@ ${educationalContext}
         });
     }
 }
+
+// Function to get curriculum information based on school, grade and subject
+function getCurriculumInfo(school, grade, subject) {
+    // Default curriculum info
+    let curriculumInfo = '根据中国教育大纲标准提供适合的回答。';
+    
+    // Primary school curriculum info
+    if (school.includes('小学')) {
+        curriculumInfo = '根据小学教育大纲，注重基础知识的讲解，使用简单易懂的语言，多用具体例子，避免抽象概念。';
+        
+        if (subject.includes('数学')) {
+            if (grade.includes('一年级') || grade.includes('二年级')) {
+                curriculumInfo += '一二年级数学主要包括20以内的加减法、100以内的加减法、认识图形、认识时间等基础内容。';
+            } else if (grade.includes('三年级') || grade.includes('四年级')) {
+                curriculumInfo += '三四年级数学主要包括乘除法、分数初步、小数初步、面积、周长等内容。';
+            } else if (grade.includes('五年级') || grade.includes('六年级')) {
+                curriculumInfo += '五六年级数学主要包括分数四则运算、小数四则运算、比例、百分数、统计等内容。';
+            }
+        } else if (subject.includes('语文')) {
+            curriculumInfo += '小学语文注重汉字识记、阅读理解、写作基础等能力培养。';
+        } else if (subject.includes('英语')) {
+            curriculumInfo += '小学英语注重基础词汇、简单句型和日常交流用语的学习。';
+        } else if (subject.includes('科学')) {
+            curriculumInfo += '小学科学注重培养观察能力和好奇心，了解自然现象和简单科学原理。';
+        }
+    }
+    // Middle school curriculum info
+    else if (school.includes('初中')) {
+        curriculumInfo = '根据初中教育大纲，注重系统性知识的讲解，可以引入一定的抽象概念，但需要配合例子说明。';
+        
+        if (subject.includes('数学')) {
+            if (grade.includes('初一')) {
+                curriculumInfo += '初一数学主要包括有理数、整式、一元一次方程、几何初步等内容。';
+            } else if (grade.includes('初二')) {
+                curriculumInfo += '初二数学主要包括二元一次方程组、不等式、相似三角形、勾股定理等内容。';
+            } else if (grade.includes('初三')) {
+                curriculumInfo += '初三数学主要包括一元二次方程、二次函数、圆、概率初步等内容。';
+            }
+        } else if (subject.includes('物理')) {
+            curriculumInfo += '初中物理注重基本概念、基本规律的理解和简单应用，包括力学、热学、光学、电学等基础内容。';
+        } else if (subject.includes('化学')) {
+            curriculumInfo += '初中化学注重基本概念、元素性质、化学反应等基础内容的学习。';
+        } else if (subject.includes('生物')) {
+            curriculumInfo += '初中生物注重生物的基本结构、功能和分类，以及生态系统的基本概念。';
+        }
+    }
+    // High school curriculum info
+    else if (school.includes('高中')) {
+        curriculumInfo = '根据高中教育大纲，可以使用较为抽象的概念和复杂的理论，注重知识的系统性和应用能力的培养。';
+        
+        if (subject.includes('数学')) {
+            if (grade.includes('高一')) {
+                curriculumInfo += '高一数学主要包括集合、函数、三角函数、平面向量等内容。';
+            } else if (grade.includes('高二')) {
+                curriculumInfo += '高二数学主要包括立体几何、概率统计、数列、导数等内容。';
+            } else if (grade.includes('高三')) {
+                curriculumInfo += '高三数学主要是对高中数学知识的综合复习和应用，注重解题技巧和方法。';
+            }
+        } else if (subject.includes('物理')) {
+            curriculumInfo += '高中物理包括力学、热学、电磁学、原子物理等内容，注重理论与实验的结合。';
+        } else if (subject.includes('化学')) {
+            curriculumInfo += '高中化学包括化学反应原理、元素化学、有机化学等内容，注重微观结构与宏观性质的联系。';
+        } else if (subject.includes('生物')) {
+            curriculumInfo += '高中生物包括分子与细胞、遗传与进化、稳态与环境等内容，注重生命活动的分子基础。';
+        }
+    }
+    
+    return curriculumInfo;
+}
