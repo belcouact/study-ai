@@ -3232,3 +3232,190 @@ ${questionText}
             });
     });
 }
+
+// Add this function after initializeFormLayout()
+function setupChatButtons() {
+    console.log('Setting up chat buttons');
+    
+    // Get the chat input and response area
+    const chatInput = document.getElementById('chat-input');
+    const chatResponse = document.getElementById('chat-response');
+    
+    if (!chatInput || !chatResponse) {
+        console.error('Chat input or response area not found');
+        return;
+    }
+    
+    // Set up optimize button
+    const optimizeButton = document.getElementById('optimize-button');
+    if (optimizeButton) {
+        optimizeButton.addEventListener('click', function() {
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+                return;
+            }
+            
+            // Show loading state
+            optimizeButton.disabled = true;
+            optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
+            
+            // Prepare the prompt for optimization
+            const prompt = `请优化以下问题，使其更清晰、更有教育价值：
+            
+问题：${questionText}
+
+请返回优化后的问题，保持原始意图但使其更加清晰、准确和有教育意义。`;
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the optimized question
+                    const optimizedContent = extractContentFromResponse(response);
+                    
+                    // Update the chat input with the optimized question
+                    chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
+                    
+                    // Focus the input and move cursor to end
+                    chatInput.focus();
+                    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+                    
+                    // Show success message
+                    showSystemMessage('问题已成功优化！', 'success');
+                })
+                .catch(error => {
+                    console.error('Error optimizing question:', error);
+                    showSystemMessage('优化问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    optimizeButton.disabled = false;
+                    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+                });
+        });
+    }
+    
+    // Set up submit button
+    const submitButton = document.getElementById('submit-button');
+    if (submitButton) {
+        submitButton.addEventListener('click', function() {
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+                return;
+            }
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+            chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
+            
+            // Prepare the prompt for the AI
+            const prompt = `请回答以下问题，提供详细且教育性的解答：
+            
+${questionText}
+
+请提供清晰、准确、有教育意义的回答，如果涉及数学或科学概念，请确保解释清楚。`;
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the AI response
+                    const aiResponse = extractContentFromResponse(response);
+                    
+                    // Format the response with MathJax
+                    const formattedResponse = formatMathExpressions(aiResponse);
+                    
+                    // Display the response
+                    chatResponse.innerHTML = `
+                        <div class="response-header">
+                            <i class="fas fa-robot"></i> AI 助手回答
+                        </div>
+                        <div class="response-content">
+                            ${formattedResponse}
+                        </div>
+                    `;
+                    
+                    // Render MathJax in the response
+                    if (window.MathJax) {
+                        MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting question:', error);
+                    chatResponse.innerHTML = `
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            抱歉，处理您的问题时出现了错误。请重试。
+                        </div>
+                    `;
+                    showSystemMessage('提交问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
+                });
+        });
+    }
+}
+
+// Modify initializeFormLayout to call setupChatButtons
+function initializeFormLayout() {
+    // ... existing code ...
+    
+    // Setup tab switching functionality
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    
+    if (qaButton && createButton && qaContainer && createContainer) {
+        qaButton.addEventListener('click', function() {
+            qaButton.classList.add('active');
+            createButton.classList.remove('active');
+            qaContainer.classList.remove('hidden');
+            createContainer.classList.add('hidden');
+            
+            // Set up chat buttons when switching to QA tab
+            setTimeout(setupChatButtons, 100);
+        });
+        
+        createButton.addEventListener('click', function() {
+            createButton.classList.add('active');
+            qaButton.classList.remove('active');
+            createContainer.classList.remove('hidden');
+            qaContainer.classList.add('hidden');
+            
+            // Initialize empty state if no questions are loaded
+            initializeEmptyState();
+        });
+        
+        // Initialize empty state on the test page if it's active
+        if (createButton.classList.contains('active')) {
+            initializeEmptyState();
+        } else if (qaButton.classList.contains('active')) {
+            // Set up chat buttons if QA tab is active
+            setTimeout(setupChatButtons, 100);
+        }
+    } else {
+        // If tab buttons don't exist, initialize empty state anyway
+        initializeEmptyState();
+    }
+    
+    // Set up initial navigation buttons
+    setupNavigationButtons();
+    
+    // Set up chat buttons on page load
+    setupChatButtons();
+    
+    // ... existing code ...
+}
+
+// Add this at the end of the file to ensure buttons are set up when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up chat buttons when the page loads
+    setTimeout(setupChatButtons, 300);
+});
