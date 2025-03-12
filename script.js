@@ -3605,167 +3605,355 @@ function setupChatButtons() {
     optimizeButton.parentNode.replaceChild(newOptimizeButton, optimizeButton);
     submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
     
+    // Helper function to check if we're on the chat page
+    function isOnChatPage() {
+        const activeTab = document.querySelector('.tab-button.active');
+        return activeTab && activeTab.getAttribute('data-tab') === 'qa';
+    }
+    
+    // Helper function to get the appropriate input based on active tab
+    function getActiveInput() {
+        if (isOnChatPage()) {
+            return document.getElementById('chat-input');
+        } else {
+            // On test page, we don't need to check for input
+            return { value: "dummy text", disabled: false };
+        }
+    }
+    
     // Add event listener to the optimize button
     newOptimizeButton.addEventListener('click', function() {
-        const chatInput = document.getElementById('chat-input');
-        if (!chatInput || !chatInput.value.trim()) {
-            showSystemMessage('请先输入问题', 'warning');
-            return;
-        }
-        
         // Get dropdown values from sidebar
         const dropdownValues = getSidebarDropdownValues();
         const { school, grade, subject } = dropdownValues;
         
-        // Check if school and grade are selected
-        if (!school || !grade) {
-            showSystemMessage('请先在侧边栏选择学校和年级', 'warning');
-            return;
-        }
-        
-        const userQuestion = chatInput.value.trim();
-        const chatResponseArea = document.getElementById('chat-response-area');
-        
-        // Show loading state
-        chatResponseArea.innerHTML += `<div class="system-message info">正在优化问题，请稍候...</div>`;
-        chatInput.disabled = true;
-        newOptimizeButton.disabled = true;
-        newSubmitButton.disabled = true;
-        
-        // Create prompt with school and grade context
-        let prompt = `请优化以下${school}${grade}${subject || ''}的问题，使其更清晰、更有教育价值：\n\n${userQuestion}`;
-        
-        // Add specific educational guidance based on school level
-        if (school === '小学') {
-            prompt += `\n\n请特别注意：
+        // Check if we're on the chat page
+        if (isOnChatPage()) {
+            const chatInput = document.getElementById('chat-input');
+            if (!chatInput || !chatInput.value.trim()) {
+                showSystemMessage('请先输入问题', 'warning');
+                return;
+            }
+            
+            // Check if school and grade are selected
+            if (!school || !grade) {
+                showSystemMessage('请先在侧边栏选择学校和年级', 'warning');
+                return;
+            }
+            
+            const userQuestion = chatInput.value.trim();
+            const chatResponseArea = document.getElementById('chat-response-area');
+            
+            // Show loading state
+            chatResponseArea.innerHTML += `<div class="system-message info">正在优化问题，请稍候...</div>`;
+            chatInput.disabled = true;
+            newOptimizeButton.disabled = true;
+            newSubmitButton.disabled = true;
+            
+            // Create prompt with school and grade context
+            let prompt = `请优化以下${school}${grade}${subject || ''}的问题，使其更清晰、更有教育价值：\n\n${userQuestion}`;
+            
+            // Add specific educational guidance based on school level
+            if (school === '小学') {
+                prompt += `\n\n请特别注意：
 1. 使用简单、直观的语言，适合${grade}学生的理解水平
 2. 确保问题符合${grade}${subject || ''}教学大纲
 3. 使用具体例子帮助理解
 4. 避免使用过于抽象的概念
 5. 增加趣味性和生活化的元素`;
-        } else if (school === '初中') {
-            prompt += `\n\n请特别注意：
+            } else if (school === '初中') {
+                prompt += `\n\n请特别注意：
 1. 使用清晰但稍有挑战性的语言，适合${grade}学生
 2. 确保问题符合${grade}${subject || ''}教学大纲
 3. 既有基础知识点，也有思维方法指导
 4. 可以适当引入抽象概念，但需要配合具体例子
 5. 增加与实际应用相关的内容`;
-        } else if (school === '高中') {
-            prompt += `\n\n请特别注意：
+            } else if (school === '高中') {
+                prompt += `\n\n请特别注意：
 1. 使用准确、规范的学科语言，适合${grade}学生
 2. 确保问题符合${grade}${subject || ''}教学大纲和考试要求
 3. 深入分析问题本质，强调知识点间的联系
 4. 可以使用较为抽象的概念和复杂的推理
 5. 增加与升学考试相关的思考方向`;
+            }
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    const optimizedQuestion = extractContentFromResponse(response);
+                    
+                    // Display the optimized question
+                    chatResponseArea.innerHTML += `
+                    <div class="ai-message">
+                        <div class="message-header">优化后的问题：</div>
+                        <div class="message-content">${formatMathExpressions(optimizedQuestion)}</div>
+                    </div>`;
+                    
+                    // Scroll to the bottom of the chat
+                    chatResponseArea.scrollTop = chatResponseArea.scrollHeight;
+                    
+                    // Reset the input field and buttons
+                    chatInput.value = optimizedQuestion;
+                    chatInput.disabled = false;
+                    newOptimizeButton.disabled = false;
+                    newSubmitButton.disabled = false;
+                    
+                    // Render math expressions
+                    if (window.MathJax) {
+                        MathJax.typesetPromise();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error optimizing question:', error);
+                    chatResponseArea.innerHTML += `<div class="system-message error">优化问题时出错：${error.message}</div>`;
+                    chatInput.disabled = false;
+                    newOptimizeButton.disabled = false;
+                    newSubmitButton.disabled = false;
+                });
+        } else {
+            // On test page, just check for school and grade
+            if (!school || !grade) {
+                showSystemMessage('请先在侧边栏选择学校和年级', 'warning');
+                return;
+            }
+            
+            // Handle optimize on test page - get the current question
+            const currentQuestion = window.questions[window.currentQuestionIndex];
+            if (!currentQuestion) {
+                showSystemMessage('没有可优化的问题', 'warning');
+                return;
+            }
+            
+            // Show loading indicator
+            showLoadingIndicator();
+            
+            // Create prompt with the current question
+            let prompt = `请优化以下${school}${grade}${subject || ''}的问题，使其更清晰、更有教育价值：\n\n问题：${currentQuestion.question}\n选项：\nA. ${currentQuestion.options[0]}\nB. ${currentQuestion.options[1]}\nC. ${currentQuestion.options[2]}\nD. ${currentQuestion.options[3]}\n答案：${currentQuestion.answer}\n解析：${currentQuestion.explanation}`;
+            
+            // Add specific educational guidance based on school level
+            if (school === '小学') {
+                prompt += `\n\n请特别注意：
+1. 使用简单、直观的语言，适合${grade}学生的理解水平
+2. 确保题目内容符合${grade}${subject || ''}教学大纲
+3. 解析应该循序渐进，使用具体例子帮助理解
+4. 避免使用过于抽象的概念
+5. 增加趣味性和生活化的元素`;
+            } else if (school === '初中') {
+                prompt += `\n\n请特别注意：
+1. 使用清晰但稍有挑战性的语言，适合${grade}学生
+2. 确保题目内容符合${grade}${subject || ''}教学大纲
+3. 解析应该既有基础知识点讲解，也有思维方法指导
+4. 可以适当引入抽象概念，但需要配合具体例子
+5. 增加与实际应用相关的内容`;
+            } else if (school === '高中') {
+                prompt += `\n\n请特别注意：
+1. 使用准确、规范的学科语言，适合${grade}学生
+2. 确保题目内容符合${grade}${subject || ''}教学大纲和考试要求
+3. 解析应该深入分析解题思路和方法，强调知识点间的联系
+4. 可以使用较为抽象的概念和复杂的推理
+5. 增加与升学考试相关的解题技巧和方法`;
+            }
+            
+            prompt += `\n\n请返回优化后的问题、选项、答案和解析，格式如下：
+问题：[优化后的问题]
+选项：
+A. [选项A]
+B. [选项B]
+C. [选项C]
+D. [选项D]
+答案：[答案]
+解析：[解析]`;
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    hideLoadingIndicator();
+                    const optimizedQuestionData = parseOptimizedQuestion(extractContentFromResponse(response));
+                    
+                    if (optimizedQuestionData) {
+                        // Update the current question with optimized content
+                        window.questions[window.currentQuestionIndex] = {
+                            ...window.questions[window.currentQuestionIndex],
+                            ...optimizedQuestionData
+                        };
+                        
+                        // Display the updated question
+                        displayCurrentQuestion();
+                        
+                        showSystemMessage('问题已优化', 'success');
+                    } else {
+                        showSystemMessage('无法解析优化后的问题', 'error');
+                    }
+                })
+                .catch(error => {
+                    hideLoadingIndicator();
+                    console.error('Error optimizing question:', error);
+                    showSystemMessage(`优化问题时出错：${error.message}`, 'error');
+                });
         }
-        
-        // Call the API
-        fetchAIResponse(prompt)
-            .then(response => {
-                const optimizedQuestion = extractContentFromResponse(response);
-                
-                // Display the optimized question
-                chatResponseArea.innerHTML += `
-                <div class="ai-message">
-                    <div class="message-header">优化后的问题：</div>
-                    <div class="message-content">${formatMathExpressions(optimizedQuestion)}</div>
-                </div>`;
-                
-                // Scroll to the bottom of the chat
-                chatResponseArea.scrollTop = chatResponseArea.scrollHeight;
-                
-                // Reset the input field and buttons
-                chatInput.value = optimizedQuestion;
-                chatInput.disabled = false;
-                newOptimizeButton.disabled = false;
-                newSubmitButton.disabled = false;
-                
-                // Render math expressions
-                if (window.MathJax) {
-                    MathJax.typesetPromise();
-                }
-            })
-            .catch(error => {
-                console.error('Error optimizing question:', error);
-                chatResponseArea.innerHTML += `<div class="system-message error">优化问题时出错：${error.message}</div>`;
-                chatInput.disabled = false;
-                newOptimizeButton.disabled = false;
-                newSubmitButton.disabled = false;
-            });
     });
     
     // Add event listener to the submit button
     newSubmitButton.addEventListener('click', function() {
-        const chatInput = document.getElementById('chat-input');
-        if (!chatInput || !chatInput.value.trim()) {
-            showSystemMessage('请先输入问题', 'warning');
-            return;
-        }
-        
         // Get dropdown values from sidebar
         const dropdownValues = getSidebarDropdownValues();
         const { school, grade, subject } = dropdownValues;
         
-        // Check if school and grade are selected
-        if (!school || !grade) {
-            showSystemMessage('请先在侧边栏选择学校和年级', 'warning');
-            return;
+        // Check if we're on the chat page
+        if (isOnChatPage()) {
+            const chatInput = document.getElementById('chat-input');
+            if (!chatInput || !chatInput.value.trim()) {
+                showSystemMessage('请先输入问题', 'warning');
+                return;
+            }
+            
+            // Check if school and grade are selected
+            if (!school || !grade) {
+                showSystemMessage('请先在侧边栏选择学校和年级', 'warning');
+                return;
+            }
+            
+            const userQuestion = chatInput.value.trim();
+            const chatResponseArea = document.getElementById('chat-response-area');
+            
+            // Show loading state
+            chatResponseArea.innerHTML += `<div class="system-message info">正在生成答案，请稍候...</div>`;
+            chatInput.disabled = true;
+            newOptimizeButton.disabled = true;
+            newSubmitButton.disabled = true;
+            
+            // Create prompt with school and grade context
+            let prompt = `请回答以下${school}${grade}${subject || ''}的问题：\n\n${userQuestion}\n\n`;
+            
+            // Add specific educational guidance based on school level
+            if (school === '小学') {
+                prompt += `请以${school}${grade}${subject || ''}老师的身份回答，使用简单易懂的语言，提供具体例子，避免抽象概念，确保符合教学大纲。`;
+            } else if (school === '初中') {
+                prompt += `请以${school}${grade}${subject || ''}老师的身份回答，使用清晰的语言，既有基础知识讲解，也有思维方法指导，适当使用抽象概念但配合具体例子，确保符合教学大纲。`;
+            } else if (school === '高中') {
+                prompt += `请以${school}${grade}${subject || ''}老师的身份回答，使用准确规范的学科语言，深入分析问题本质，强调知识点间的联系，可使用抽象概念和复杂推理，确保符合教学大纲和考试要求。`;
+            }
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    const answer = extractContentFromResponse(response);
+                    
+                    // Display the answer
+                    chatResponseArea.innerHTML += `
+                    <div class="ai-message">
+                        <div class="message-header">答案：</div>
+                        <div class="message-content">${formatMathExpressions(answer)}</div>
+                    </div>`;
+                    
+                    // Scroll to the bottom of the chat
+                    chatResponseArea.scrollTop = chatResponseArea.scrollHeight;
+                    
+                    // Reset the input field and buttons
+                    chatInput.value = '';
+                    chatInput.disabled = false;
+                    newOptimizeButton.disabled = false;
+                    newSubmitButton.disabled = false;
+                    
+                    // Render math expressions
+                    if (window.MathJax) {
+                        MathJax.typesetPromise();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error generating answer:', error);
+                    chatResponseArea.innerHTML += `<div class="system-message error">生成答案时出错：${error.message}</div>`;
+                    chatInput.disabled = false;
+                    newOptimizeButton.disabled = false;
+                    newSubmitButton.disabled = false;
+                });
+        } else {
+            // On test page, just check for school and grade
+            if (!school || !grade) {
+                showSystemMessage('请先在侧边栏选择学校和年级', 'warning');
+                return;
+            }
+            
+            // Handle submit on test page - get the current question
+            const currentQuestion = window.questions[window.currentQuestionIndex];
+            if (!currentQuestion) {
+                showSystemMessage('没有可提交的问题', 'warning');
+                return;
+            }
+            
+            // Show loading indicator
+            showLoadingIndicator();
+            
+            // Create prompt with the current question
+            let prompt = `请为以下${school}${grade}${subject || ''}的问题提供详细解答：\n\n问题：${currentQuestion.question}\n选项：\nA. ${currentQuestion.options[0]}\nB. ${currentQuestion.options[1]}\nC. ${currentQuestion.options[2]}\nD. ${currentQuestion.options[3]}\n答案：${currentQuestion.answer}\n解析：${currentQuestion.explanation}`;
+            
+            // Add specific educational guidance based on school level
+            if (school === '小学') {
+                prompt += `\n\n请以${school}${grade}${subject || ''}老师的身份提供更详细的解析，使用简单易懂的语言，提供具体例子，避免抽象概念，确保符合教学大纲。`;
+            } else if (school === '初中') {
+                prompt += `\n\n请以${school}${grade}${subject || ''}老师的身份提供更详细的解析，使用清晰的语言，既有基础知识讲解，也有思维方法指导，适当使用抽象概念但配合具体例子，确保符合教学大纲。`;
+            } else if (school === '高中') {
+                prompt += `\n\n请以${school}${grade}${subject || ''}老师的身份提供更详细的解析，使用准确规范的学科语言，深入分析问题本质，强调知识点间的联系，可使用抽象概念和复杂推理，确保符合教学大纲和考试要求。`;
+            }
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    hideLoadingIndicator();
+                    const detailedExplanation = extractContentFromResponse(response);
+                    
+                    // Show the detailed explanation in a modal
+                    const modalContent = `
+                    <h3>详细解析</h3>
+                    <div class="question-text">${formatMathExpressions(currentQuestion.question)}</div>
+                    <div class="options-container">
+                        <div class="option-cell ${currentQuestion.answer === 'A' ? 'correct-answer' : ''}">${formatMathExpressions(currentQuestion.options[0])}</div>
+                        <div class="option-cell ${currentQuestion.answer === 'B' ? 'correct-answer' : ''}">${formatMathExpressions(currentQuestion.options[1])}</div>
+                        <div class="option-cell ${currentQuestion.answer === 'C' ? 'correct-answer' : ''}">${formatMathExpressions(currentQuestion.options[2])}</div>
+                        <div class="option-cell ${currentQuestion.answer === 'D' ? 'correct-answer' : ''}">${formatMathExpressions(currentQuestion.options[3])}</div>
+                    </div>
+                    <div class="answer-container">
+                        <div class="answer-label">正确答案：${currentQuestion.answer}</div>
+                        <div class="explanation-content">${formatMathExpressions(detailedExplanation)}</div>
+                    </div>`;
+                    
+                    // Create and show modal
+                    const modal = document.createElement('div');
+                    modal.className = 'modal';
+                    modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close-button">&times;</span>
+                        ${modalContent}
+                    </div>`;
+                    
+                    document.body.appendChild(modal);
+                    modal.style.display = 'block';
+                    
+                    // Close modal when clicking the close button
+                    modal.querySelector('.close-button').addEventListener('click', function() {
+                        modal.style.display = 'none';
+                        document.body.removeChild(modal);
+                    });
+                    
+                    // Close modal when clicking outside the content
+                    modal.addEventListener('click', function(event) {
+                        if (event.target === modal) {
+                            modal.style.display = 'none';
+                            document.body.removeChild(modal);
+                        }
+                    });
+                    
+                    // Render math expressions
+                    if (window.MathJax) {
+                        MathJax.typesetPromise();
+                    }
+                })
+                .catch(error => {
+                    hideLoadingIndicator();
+                    console.error('Error generating detailed explanation:', error);
+                    showSystemMessage(`生成详细解析时出错：${error.message}`, 'error');
+                });
         }
-        
-        const userQuestion = chatInput.value.trim();
-        const chatResponseArea = document.getElementById('chat-response-area');
-        
-        // Show loading state
-        chatResponseArea.innerHTML += `<div class="system-message info">正在生成答案，请稍候...</div>`;
-        chatInput.disabled = true;
-        newOptimizeButton.disabled = true;
-        newSubmitButton.disabled = true;
-        
-        // Create prompt with school and grade context
-        let prompt = `请回答以下${school}${grade}${subject || ''}的问题：\n\n${userQuestion}\n\n`;
-        
-        // Add specific educational guidance based on school level
-        if (school === '小学') {
-            prompt += `请以${school}${grade}${subject || ''}老师的身份回答，使用简单易懂的语言，提供具体例子，避免抽象概念，确保符合教学大纲。`;
-        } else if (school === '初中') {
-            prompt += `请以${school}${grade}${subject || ''}老师的身份回答，使用清晰的语言，既有基础知识讲解，也有思维方法指导，适当使用抽象概念但配合具体例子，确保符合教学大纲。`;
-        } else if (school === '高中') {
-            prompt += `请以${school}${grade}${subject || ''}老师的身份回答，使用准确规范的学科语言，深入分析问题本质，强调知识点间的联系，可使用抽象概念和复杂推理，确保符合教学大纲和考试要求。`;
-        }
-        
-        // Call the API
-        fetchAIResponse(prompt)
-            .then(response => {
-                const answer = extractContentFromResponse(response);
-                
-                // Display the answer
-                chatResponseArea.innerHTML += `
-                <div class="ai-message">
-                    <div class="message-header">答案：</div>
-                    <div class="message-content">${formatMathExpressions(answer)}</div>
-                </div>`;
-                
-                // Scroll to the bottom of the chat
-                chatResponseArea.scrollTop = chatResponseArea.scrollHeight;
-                
-                // Reset the input field and buttons
-                chatInput.value = '';
-                chatInput.disabled = false;
-                newOptimizeButton.disabled = false;
-                newSubmitButton.disabled = false;
-                
-                // Render math expressions
-                if (window.MathJax) {
-                    MathJax.typesetPromise();
-                }
-            })
-            .catch(error => {
-                console.error('Error generating answer:', error);
-                chatResponseArea.innerHTML += `<div class="system-message error">生成答案时出错：${error.message}</div>`;
-                chatInput.disabled = false;
-                newOptimizeButton.disabled = false;
-                newSubmitButton.disabled = false;
-            });
     });
     
     console.log('Chat buttons setup complete');
