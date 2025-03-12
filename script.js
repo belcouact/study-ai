@@ -4002,23 +4002,24 @@ function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, subm
                 return;
             }
             
-            // Get educational context from sidebar
-            const educationalContext = getEducationalContext();
+            // Get simplified educational context (school and grade only)
+            const { school, grade } = getSimplifiedEducationalContext();
             
             // Show loading state
             optimizeButton.disabled = true;
             optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
             
-            // Prepare the prompt for optimization with educational context
+            // Prepare the prompt for optimization with simplified educational context
             const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值：
 
 教育背景：
-${educationalContext}
+学校类型：${school}
+年级：${grade}
 
 原始问题：${questionText}
 
 请返回优化后的问题，使其更适合上述教育背景的学生，保持原始意图但使其更加清晰、准确和有教育意义。
-优化时请考虑学生的认知水平、课程要求和教育阶段，使问题更有针对性。`;
+优化时请考虑学生的认知水平和教育阶段，使问题更有针对性。`;
             
             // Call the API
             fetchAIResponse(prompt)
@@ -4063,24 +4064,25 @@ ${educationalContext}
                 return;
             }
             
-            // Get educational context from sidebar
-            const educationalContext = getEducationalContext();
+            // Get simplified educational context (school and grade only)
+            const { school, grade } = getSimplifiedEducationalContext();
             
             // Show loading state
             submitButton.disabled = true;
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
             chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
             
-            // Prepare the prompt for the AI with educational context
+            // Prepare the prompt for the AI with simplified educational context
             const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
 
 教育背景：
-${educationalContext}
+学校类型：${school}
+年级：${grade}
 
 问题：${questionText}
 
 请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
-如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平和课程要求。
+如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平。
 如果可能，请提供一些例子或应用场景来帮助理解。`;
             
             // Call the API
@@ -4092,8 +4094,8 @@ ${educationalContext}
                     // Format the response with MathJax
                     const formattedResponse = formatMathExpressions(aiResponse);
                     
-                    // Get context summary for display
-                    const contextSummary = getContextSummary();
+                    // Get simplified context summary for display
+                    const contextSummary = getSimplifiedContextSummary();
                     
                     // Display the response with educational context
                     chatResponse.innerHTML = `
@@ -4197,4 +4199,119 @@ function getCurriculumInfo(school, grade, subject) {
     }
     
     return curriculumInfo;
+}
+
+// Add a new function to get simplified educational context (school and grade only)
+function getSimplifiedEducationalContext() {
+    console.log('Getting simplified educational context');
+    
+    // Initialize with default values
+    let school = '未指定学校类型';
+    let grade = '未指定年级';
+    
+    // Get all select elements in the document
+    const allSelects = document.querySelectorAll('select');
+    
+    // Scan through all selects to find our dropdowns
+    allSelects.forEach(select => {
+        const id = select.id || '';
+        const name = select.name || '';
+        const value = select.value;
+        
+        // Check if this is a school dropdown
+        if (id.includes('school') || name.includes('school')) {
+            if (value && value !== 'none') {
+                try {
+                    school = select.options[select.selectedIndex].text;
+                } catch (e) {
+                    // Map values to text
+                    const schoolMap = {
+                        'primary': '小学',
+                        'middle': '初中',
+                        'high': '高中'
+                    };
+                    school = schoolMap[value] || value;
+                }
+            }
+        }
+        
+        // Check if this is a grade dropdown
+        if (id.includes('grade') || name.includes('grade')) {
+            if (value && value !== 'none') {
+                try {
+                    grade = select.options[select.selectedIndex].text;
+                } catch (e) {
+                    grade = value;
+                }
+            }
+        }
+    });
+    
+    console.log('Simplified educational context:', { school, grade });
+    return { school, grade };
+}
+
+// Add a new function to get simplified context summary (school and grade only)
+function getSimplifiedContextSummary() {
+    // Initialize with default values
+    let school = '';
+    let grade = '';
+    let hasValues = false;
+    
+    // Get all select elements in the document
+    const allSelects = document.querySelectorAll('select');
+    
+    // Scan through all selects to find our dropdowns
+    allSelects.forEach(select => {
+        const id = select.id || '';
+        const name = select.name || '';
+        const value = select.value;
+        
+        // Check if this is a school dropdown
+        if (id.includes('school') || name.includes('school')) {
+            if (value && value !== 'none') {
+                try {
+                    school = select.options[select.selectedIndex].text;
+                } catch (e) {
+                    // Map values to text
+                    const schoolMap = {
+                        'primary': '小学',
+                        'middle': '初中',
+                        'high': '高中'
+                    };
+                    school = schoolMap[value] || value;
+                }
+                hasValues = true;
+            }
+        }
+        
+        // Check if this is a grade dropdown
+        if (id.includes('grade') || name.includes('grade')) {
+            if (value && value !== 'none') {
+                try {
+                    grade = select.options[select.selectedIndex].text;
+                } catch (e) {
+                    grade = value;
+                }
+                hasValues = true;
+            }
+        }
+    });
+    
+    if (!hasValues) {
+        return '';
+    }
+    
+    let summary = '';
+    
+    if (school) {
+        summary += school;
+    }
+    
+    if (grade) {
+        if (summary) summary += ' · ';
+        summary += grade;
+    }
+    
+    return summary;
 }
