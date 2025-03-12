@@ -1460,11 +1460,59 @@ function handleGenerateQuestionsClick() {
         return; // Stop execution if school is not selected
     }
     
-                dropdown.element.focus();
-            }
+    if (!gradeDropdown || !gradeDropdown.value) {
+        showSystemMessage('请选择年级', 'warning');
+        
+        // Highlight the empty dropdown
+        if (gradeDropdown) {
+            // Add a red border to highlight the empty dropdown
+            gradeDropdown.style.border = '2px solid #e53e3e';
             
-            return; // Stop execution if any dropdown is empty
+            // Remove the highlight after 3 seconds
+            setTimeout(() => {
+                gradeDropdown.style.border = '';
+            }, 3000);
+            
+            // Focus on the empty dropdown
+            gradeDropdown.focus();
         }
+        
+        return; // Stop execution if grade is not selected
+    }
+    
+    // Check if any of the other dropdowns are not selected
+    const otherDropdowns = [
+        { element: semesterDropdown, name: '学期' },
+        { element: subjectDropdown, name: '科目' },
+        { element: difficultyDropdown, name: '难度' },
+        { element: countDropdown, name: '题目数量' }
+    ];
+    
+    const emptyDropdowns = otherDropdowns.filter(dropdown => !dropdown.element || !dropdown.element.value);
+    
+    if (emptyDropdowns.length > 0) {
+        // Show a combined warning message
+        showSystemMessage('请选择科目，学期，难度和题数！', 'warning');
+        
+        // Highlight all empty dropdowns
+        emptyDropdowns.forEach(dropdown => {
+            if (dropdown.element) {
+                // Add a red border to highlight the empty dropdown
+                dropdown.element.style.border = '2px solid #e53e3e';
+                
+                // Remove the highlight after 3 seconds
+                setTimeout(() => {
+                    dropdown.element.style.border = '';
+                }, 3000);
+            }
+        });
+        
+        // Focus on the first empty dropdown
+        if (emptyDropdowns[0].element) {
+            emptyDropdowns[0].element.focus();
+        }
+        
+        return; // Stop execution if any dropdown is empty
     }
     
     // If we get here, all dropdowns are filled
