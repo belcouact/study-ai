@@ -3643,3 +3643,371 @@ function createChatInterface() {
     
     // ... existing code ...
 }
+
+// Modify the createChatInterface function to be more robust
+function createChatInterface() {
+    console.log('Creating chat interface');
+    
+    // Get or create the QA container
+    let qaContainer = document.getElementById('qa-container');
+    if (!qaContainer) {
+        console.log('QA container not found, creating it');
+        // Create the QA container if it doesn't exist
+        qaContainer = document.createElement('div');
+        qaContainer.id = 'qa-container';
+        qaContainer.className = 'qa-container';
+        qaContainer.style.cssText = 'display: block; height: 100%; padding: 20px;';
+        
+        // Find a suitable parent to append it to
+        const contentArea = document.querySelector('.content-area');
+        if (contentArea) {
+            contentArea.appendChild(qaContainer);
+        } else {
+            // If content area not found, append to body
+            document.body.appendChild(qaContainer);
+        }
+    }
+    
+    // Check if the chat interface already exists
+    if (document.getElementById('chat-interface')) {
+        console.log('Chat interface already exists');
+        return; // Already exists, no need to create it
+    }
+    
+    console.log('Creating new chat interface elements');
+    
+    // Create the chat interface
+    const chatInterface = document.createElement('div');
+    chatInterface.id = 'chat-interface';
+    chatInterface.className = 'chat-interface';
+    chatInterface.style.cssText = 'display: flex; flex-direction: column; height: 100%; padding: 20px; gap: 20px;';
+    
+    // Create the chat input area
+    const chatInputArea = document.createElement('div');
+    chatInputArea.className = 'chat-input-area';
+    chatInputArea.style.cssText = 'display: flex; flex-direction: column; gap: 10px;';
+    
+    // Create the textarea
+    const chatInput = document.createElement('textarea');
+    chatInput.id = 'chat-input';
+    chatInput.className = 'chat-input';
+    chatInput.placeholder = '输入您的问题...';
+    chatInput.style.cssText = 'width: 100%; min-height: 100px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 16px; resize: vertical;';
+    
+    // Create the buttons container
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.className = 'chat-buttons';
+    buttonsContainer.style.cssText = 'display: flex; gap: 10px; justify-content: flex-end;';
+    
+    // Create the optimize button
+    const optimizeButton = document.createElement('button');
+    optimizeButton.id = 'optimize-button';
+    optimizeButton.className = 'chat-button optimize-button';
+    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+    optimizeButton.style.cssText = 'padding: 8px 16px; background-color: #4299e1; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
+    
+    // Create the submit button
+    const submitButton = document.createElement('button');
+    submitButton.id = 'submit-button';
+    submitButton.className = 'chat-button submit-button';
+    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
+    submitButton.style.cssText = 'padding: 8px 16px; background-color: #48bb78; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
+    
+    // Add buttons to container
+    buttonsContainer.appendChild(optimizeButton);
+    buttonsContainer.appendChild(submitButton);
+    
+    // Add textarea and buttons to input area
+    chatInputArea.appendChild(chatInput);
+    chatInputArea.appendChild(buttonsContainer);
+    
+    // Create the response area
+    const chatResponse = document.createElement('div');
+    chatResponse.id = 'chat-response';
+    chatResponse.className = 'chat-response';
+    chatResponse.style.cssText = 'background-color: #f8fafc; border-radius: 8px; padding: 20px; min-height: 100px; max-height: 500px; overflow-y: auto;';
+    
+    // Add a welcome message
+    chatResponse.innerHTML = `
+        <div class="welcome-message" style="text-align: center; color: #718096;">
+            <i class="fas fa-comment-dots" style="font-size: 24px; margin-bottom: 10px;"></i>
+            <h3 style="margin: 0 0 10px 0; font-size: 18px;">欢迎使用AI学习助手</h3>
+            <p style="margin: 0; font-size: 14px;">在上方输入您的问题，点击"提交问题"获取回答</p>
+        </div>
+    `;
+    
+    // Add input area and response area to chat interface
+    chatInterface.appendChild(chatInputArea);
+    chatInterface.appendChild(chatResponse);
+    
+    // Add the chat interface to the QA container
+    qaContainer.innerHTML = ''; // Clear any existing content
+    qaContainer.appendChild(chatInterface);
+    
+    // Add CSS for the chat interface
+    const style = document.createElement('style');
+    style.textContent = `
+        .chat-button:hover {
+            opacity: 0.9;
+        }
+        .chat-button:active {
+            transform: translateY(1px);
+        }
+        .chat-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .loading-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #718096;
+            font-size: 16px;
+            padding: 20px;
+        }
+        .response-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .context-badge {
+            font-size: 12px;
+            background-color: #ebf8ff;
+            color: #3182ce;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+        .response-content {
+            line-height: 1.6;
+            color: #4a5568;
+            white-space: pre-wrap;
+        }
+        .error-message {
+            color: #e53e3e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Add event listener for Ctrl+Enter to submit
+    chatInput.addEventListener('keydown', function(event) {
+        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+            event.preventDefault();
+            submitButton.click();
+        }
+    });
+    
+    console.log('Chat interface created successfully');
+    return { chatInput, chatResponse, optimizeButton, submitButton };
+}
+
+// Modify the setupChatButtons function to be more robust
+function setupChatButtons() {
+    console.log('Setting up chat buttons');
+    
+    // First, ensure the chat interface exists and get references to its elements
+    const chatElements = createChatInterface();
+    
+    // If createChatInterface didn't return elements, try to get them directly
+    let chatInput = chatElements?.chatInput || document.getElementById('chat-input');
+    let chatResponse = chatElements?.chatResponse || document.getElementById('chat-response');
+    let optimizeButton = chatElements?.optimizeButton || document.getElementById('optimize-button');
+    let submitButton = chatElements?.submitButton || document.getElementById('submit-button');
+    
+    // If we still don't have the elements, try one more time with a delay
+    if (!chatInput || !chatResponse || !optimizeButton || !submitButton) {
+        console.log('Elements not found, trying again with delay');
+        setTimeout(() => {
+            // Create the interface again
+            createChatInterface();
+            
+            // Get references to the elements
+            chatInput = document.getElementById('chat-input');
+            chatResponse = document.getElementById('chat-response');
+            optimizeButton = document.getElementById('optimize-button');
+            submitButton = document.getElementById('submit-button');
+            
+            if (!chatInput || !chatResponse) {
+                console.error('Chat input or response area not found even after retry');
+                return;
+            }
+            
+            // Set up the event listeners
+            setupButtonEventListeners(chatInput, chatResponse, optimizeButton, submitButton);
+        }, 500);
+        return;
+    }
+    
+    // Set up the event listeners
+    setupButtonEventListeners(chatInput, chatResponse, optimizeButton, submitButton);
+}
+
+// Extract the event listener setup to a separate function
+function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, submitButton) {
+    console.log('Setting up button event listeners');
+    
+    // Set up optimize button
+    if (optimizeButton) {
+        // Remove any existing event listeners
+        const newOptimizeButton = optimizeButton.cloneNode(true);
+        optimizeButton.parentNode.replaceChild(newOptimizeButton, optimizeButton);
+        optimizeButton = newOptimizeButton;
+        
+        optimizeButton.addEventListener('click', function() {
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+                return;
+            }
+            
+            // Get educational context from sidebar
+            const educationalContext = getEducationalContext();
+            
+            // Show loading state
+            optimizeButton.disabled = true;
+            optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
+            
+            // Prepare the prompt for optimization with educational context
+            const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值：
+
+教育背景：
+${educationalContext}
+
+原始问题：${questionText}
+
+请返回优化后的问题，使其更适合上述教育背景的学生，保持原始意图但使其更加清晰、准确和有教育意义。
+优化时请考虑学生的认知水平、课程要求和教育阶段，使问题更有针对性。`;
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the optimized question
+                    const optimizedContent = extractContentFromResponse(response);
+                    
+                    // Update the chat input with the optimized question
+                    chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
+                    
+                    // Focus the input and move cursor to end
+                    chatInput.focus();
+                    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+                    
+                    // Show success message
+                    showSystemMessage('问题已根据教育背景成功优化！', 'success');
+                })
+                .catch(error => {
+                    console.error('Error optimizing question:', error);
+                    showSystemMessage('优化问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    optimizeButton.disabled = false;
+                    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+                });
+        });
+    }
+    
+    // Set up submit button
+    if (submitButton) {
+        // Remove any existing event listeners
+        const newSubmitButton = submitButton.cloneNode(true);
+        submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
+        submitButton = newSubmitButton;
+        
+        submitButton.addEventListener('click', function() {
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+                return;
+            }
+            
+            // Get educational context from sidebar
+            const educationalContext = getEducationalContext();
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+            chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
+            
+            // Prepare the prompt for the AI with educational context
+            const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
+
+教育背景：
+${educationalContext}
+
+问题：${questionText}
+
+请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
+如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平和课程要求。
+如果可能，请提供一些例子或应用场景来帮助理解。`;
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the AI response
+                    const aiResponse = extractContentFromResponse(response);
+                    
+                    // Format the response with MathJax
+                    const formattedResponse = formatMathExpressions(aiResponse);
+                    
+                    // Get context summary for display
+                    const contextSummary = getContextSummary();
+                    
+                    // Display the response with educational context
+                    chatResponse.innerHTML = `
+                        <div class="response-header">
+                            <i class="fas fa-robot"></i> AI 助手回答
+                            ${contextSummary ? `<span class="context-badge">${contextSummary}</span>` : ''}
+                        </div>
+                        <div class="response-content">
+                            ${formattedResponse}
+                        </div>
+                    `;
+                    
+                    // Render MathJax in the response
+                    if (window.MathJax) {
+                        MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting question:', error);
+                    chatResponse.innerHTML = `
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            抱歉，处理您的问题时出现了错误。请重试。
+                        </div>
+                    `;
+                    showSystemMessage('提交问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
+                });
+        });
+    }
+}
+
+// Add this at the end of the file to ensure buttons are set up when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded');
+    
+    // Set up chat buttons when the page loads with multiple retries
+    setTimeout(() => {
+        setupChatButtons();
+        
+        // Try again after a longer delay to ensure everything is loaded
+        setTimeout(setupChatButtons, 1000);
+    }, 300);
+});
