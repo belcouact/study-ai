@@ -1439,32 +1439,27 @@ function handleGenerateQuestionsClick() {
     const difficultyDropdown = document.getElementById('sidebar-difficulty');
     const countDropdown = document.getElementById('sidebar-count');
     
-    // Validate all dropdowns are filled
-    const dropdowns = [
-        { element: schoolDropdown, name: '学校类型' },
-        { element: gradeDropdown, name: '年级' },
-        { element: semesterDropdown, name: '学期' },
-        { element: subjectDropdown, name: '科目' },
-        { element: difficultyDropdown, name: '难度' },
-        { element: countDropdown, name: '题目数量' }
-    ];
-    
-    // Check each dropdown
-    for (const dropdown of dropdowns) {
-        if (!dropdown.element || !dropdown.element.value) {
-            showSystemMessage(`请选择${dropdown.name}`, 'warning');
+    // First check if school and grade are selected
+    if (!schoolDropdown || !schoolDropdown.value) {
+        showSystemMessage('请选择学校类型', 'warning');
+        
+        // Highlight the empty dropdown
+        if (schoolDropdown) {
+            // Add a red border to highlight the empty dropdown
+            schoolDropdown.style.border = '2px solid #e53e3e';
             
-            // Highlight the empty dropdown
-            if (dropdown.element) {
-                // Add a red border to highlight the empty dropdown
-                dropdown.element.style.border = '2px solid #e53e3e';
-                
-                // Remove the highlight after 3 seconds
-                setTimeout(() => {
-                    dropdown.element.style.border = '';
-                }, 3000);
-                
-                // Focus on the empty dropdown
+            // Remove the highlight after 3 seconds
+            setTimeout(() => {
+                schoolDropdown.style.border = '';
+            }, 3000);
+            
+            // Focus on the empty dropdown
+            schoolDropdown.focus();
+        }
+        
+        return; // Stop execution if school is not selected
+    }
+    
                 dropdown.element.focus();
             }
             
@@ -3967,3 +3962,310 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Add a helper function to get dropdown values more reliably
+function getSidebarDropdownValues() {
+    console.log('Getting sidebar dropdown values');
+    
+    // Try multiple methods to get the dropdown values
+    const schoolDropdown = document.getElementById('sidebar-school');
+    const gradeDropdown = document.getElementById('sidebar-grade');
+    
+    // Log all dropdowns in the document for debugging
+    console.log('All dropdowns in document:');
+    document.querySelectorAll('select').forEach(select => {
+        console.log(`- ${select.id}: ${select.value}`);
+    });
+    
+    // Method 1: Direct access
+    let school = schoolDropdown ? schoolDropdown.value : '';
+    let grade = gradeDropdown ? gradeDropdown.value : '';
+    
+    console.log('Method 1 values - School:', school, 'Grade:', grade);
+    
+    // Method 2: Try querySelector with more specific selector
+    if (!school || school === '') {
+        const altSchoolDropdown = document.querySelector('.left-panel select[id="sidebar-school"]');
+        if (altSchoolDropdown) {
+            school = altSchoolDropdown.value;
+            console.log('Method 2 found school:', school);
+        }
+    }
+    
+    if (!grade || grade === '') {
+        const altGradeDropdown = document.querySelector('.left-panel select[id="sidebar-grade"]');
+        if (altGradeDropdown) {
+            grade = altGradeDropdown.value;
+            console.log('Method 2 found grade:', grade);
+        }
+    }
+    
+    // Method 3: Try to find by name attribute
+    if (!school || school === '') {
+        const nameSchoolDropdown = document.querySelector('select[name="school"]');
+        if (nameSchoolDropdown) {
+            school = nameSchoolDropdown.value;
+            console.log('Method 3 found school:', school);
+        }
+    }
+    
+    if (!grade || grade === '') {
+        const nameGradeDropdown = document.querySelector('select[name="grade"]');
+        if (nameGradeDropdown) {
+            grade = nameGradeDropdown.value;
+            console.log('Method 3 found grade:', grade);
+        }
+    }
+    
+    // Method 4: Try any school/grade dropdown
+    if (!school || school === '') {
+        const anySchoolDropdown = document.querySelector('select[id*="school"]');
+        if (anySchoolDropdown) {
+            school = anySchoolDropdown.value;
+            console.log('Method 4 found school:', school);
+        }
+    }
+    
+    if (!grade || grade === '') {
+        const anyGradeDropdown = document.querySelector('select[id*="grade"]');
+        if (anyGradeDropdown) {
+            grade = anyGradeDropdown.value;
+            console.log('Method 4 found grade:', grade);
+        }
+    }
+    
+    return { school, grade };
+}
+
+// Modify the setupChatButtons function to use the helper function
+function setupChatButtons() {
+    console.log('Setting up chat buttons');
+    
+    // First, ensure the chat interface exists
+    createChatInterface();
+    
+    // Now get the chat input and response area
+    const chatInput = document.getElementById('chat-input');
+    const chatResponse = document.getElementById('chat-response');
+    
+    if (!chatInput || !chatResponse) {
+        console.error('Chat input or response area not found even after creation');
+        return;
+    }
+    
+    // Set up optimize button
+    const optimizeButton = document.getElementById('optimize-button');
+    if (optimizeButton) {
+        optimizeButton.addEventListener('click', function() {
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+                return;
+            }
+            
+            // Get selected school and grade using the helper function
+            const { school: selectedSchool, grade: selectedGrade } = getSidebarDropdownValues();
+            
+            console.log('Optimize button clicked with school:', selectedSchool, 'and grade:', selectedGrade);
+            
+            // Show loading state
+            optimizeButton.disabled = true;
+            optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
+            
+            // Prepare the prompt for optimization with educational context
+            let prompt = `请优化以下问题，使其更清晰、更有教育价值：
+            
+问题：${questionText}`;
+
+            // Add educational context if available - with explicit check for non-empty values
+            if (selectedSchool !== '' || selectedGrade !== '') {
+                console.log('Adding educational context to optimize prompt');
+                
+                prompt += `\n\n教育背景：`;
+                
+                if (selectedSchool !== '') {
+                    prompt += `\n- 学校类型：${selectedSchool}`;
+                }
+                
+                if (selectedGrade !== '') {
+                    prompt += `\n- 年级：${selectedGrade}`;
+                }
+                
+                // Add specific guidance based on school level
+                if (selectedSchool === '小学') {
+                    prompt += `\n\n请根据上述教育背景，优化问题使其更适合${selectedGrade}学生的理解水平。使用简单、直观的语言，避免抽象概念，增加趣味性和生活化的元素。`;
+                } else if (selectedSchool === '初中') {
+                    prompt += `\n\n请根据上述教育背景，优化问题使其更适合${selectedGrade}学生的理解水平。使用清晰但稍有挑战性的语言，可以适当引入抽象概念，但需要配合具体例子。`;
+                } else if (selectedSchool === '高中') {
+                    prompt += `\n\n请根据上述教育背景，优化问题使其更适合${selectedGrade}学生的理解水平。使用准确、规范的学科语言，可以使用较为抽象的概念和复杂的推理。`;
+                } else {
+                    prompt += `\n\n请根据上述教育背景，优化问题使其更适合该年级学生的理解水平和学习需求。`;
+                }
+            } else {
+                console.log('No educational context available for optimize prompt');
+                prompt += `\n\n请保持原始意图但使其更加清晰、准确和有教育意义。`;
+            }
+            
+            console.log('Fetching AI response with prompt:', prompt);
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the optimized question
+                    const optimizedContent = extractContentFromResponse(response);
+                    
+                    // Update the chat input with the optimized question
+                    chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
+                    
+                    // Focus the input and move cursor to end
+                    chatInput.focus();
+                    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+                    
+                    // Show success message with educational context if available
+                    if (selectedSchool && selectedGrade) {
+                        showSystemMessage(`问题已根据${selectedSchool}${selectedGrade}教学要求成功优化！`, 'success');
+                    } else {
+                        showSystemMessage('问题已成功优化！', 'success');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error optimizing question:', error);
+                    showSystemMessage('优化问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    optimizeButton.disabled = false;
+                    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+                });
+        });
+    }
+    
+    // Set up submit button
+    const submitButton = document.getElementById('submit-button');
+    if (submitButton) {
+        submitButton.addEventListener('click', function() {
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+                return;
+            }
+            
+            // Get selected school and grade using the helper function
+            const { school: selectedSchool, grade: selectedGrade } = getSidebarDropdownValues();
+            
+            console.log('Submit button clicked with school:', selectedSchool, 'and grade:', selectedGrade);
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+            chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
+            
+            // Prepare the prompt for the AI with educational context
+            let prompt = `请回答以下问题，提供详细且教育性的解答：
+            
+${questionText}`;
+
+            // Add educational context if available - with explicit check for non-empty values
+            if (selectedSchool !== '' || selectedGrade !== '') {
+                console.log('Adding educational context to submit prompt');
+                
+                prompt += `\n\n教育背景：`;
+                
+                if (selectedSchool !== '') {
+                    prompt += `\n- 学校类型：${selectedSchool}`;
+                }
+                
+                if (selectedGrade !== '') {
+                    prompt += `\n- 年级：${selectedGrade}`;
+                }
+                
+                // Add specific guidance based on school level
+                if (selectedSchool === '小学') {
+                    prompt += `\n\n请根据上述教育背景，提供适合${selectedGrade}学生理解水平的回答。解释应该：
+1. 使用简单、直观的语言
+2. 避免复杂的术语和抽象概念
+3. 使用具体的例子和生活化的比喻
+4. 分步骤解释，每一步都要清晰明了
+5. 增加趣味性和鼓励性的内容`;
+                } else if (selectedSchool === '初中') {
+                    prompt += `\n\n请根据上述教育背景，提供适合${selectedGrade}学生理解水平的回答。解释应该：
+1. 使用清晰但稍有挑战性的语言
+2. 可以引入基础学科术语，但需要解释
+3. 结合具体例子和适当的抽象概念
+4. 强调思维方法和解题思路
+5. 鼓励批判性思考和自主探索`;
+                } else if (selectedSchool === '高中') {
+                    prompt += `\n\n请根据上述教育背景，提供适合${selectedGrade}学生理解水平的回答。解释应该：
+1. 使用准确、规范的学科语言
+2. 可以使用专业术语和抽象概念
+3. 深入分析问题的本质和解决方法
+4. 强调知识点之间的联系和系统性
+5. 提供与升学考试相关的解题技巧和方法`;
+                } else {
+                    prompt += `\n\n请根据上述教育背景，提供适合该年级学生理解水平的回答。解释应该清晰易懂，使用适合该年级学生的语言和概念。`;
+                }
+            } else {
+                console.log('No educational context available for submit prompt');
+                prompt += `\n\n请提供清晰、准确、有教育意义的回答，如果涉及数学或科学概念，请确保解释清楚。`;
+            }
+            
+            console.log('Fetching AI response with prompt:', prompt);
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the AI response
+                    const aiResponse = extractContentFromResponse(response);
+                    
+                    // Format the response with MathJax
+                    const formattedResponse = formatMathExpressions(aiResponse);
+                    
+                    // Display the response with educational context
+                    let contextHeader = '';
+                    if (selectedSchool !== '' || selectedGrade !== '') {
+                        const contextParts = [];
+                        if (selectedSchool !== '') contextParts.push(selectedSchool);
+                        if (selectedGrade !== '') contextParts.push(selectedGrade);
+                        
+                        contextHeader = `
+                            <div class="context-header">
+                                <span class="context-badge">${contextParts.join(' · ')}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    chatResponse.innerHTML = `
+                        <div class="response-header">
+                            <i class="fas fa-robot"></i> AI 助手回答
+                        </div>
+                        ${contextHeader}
+                        <div class="response-content">
+                            ${formattedResponse}
+                        </div>
+                    `;
+                    
+                    // Render MathJax in the response
+                    if (window.MathJax) {
+                        MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting question:', error);
+                    chatResponse.innerHTML = `
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            抱歉，处理您的问题时出错。请重试。
+                        </div>
+                    `;
+                    showSystemMessage('提交问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
+                });
+        });
+    }
+}
