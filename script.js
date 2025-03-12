@@ -705,9 +705,12 @@ function handleGenerateQuestionsClick() {
                       !document.getElementById('create-container').classList.contains('hidden');
     
     if (isTestPage) {
-    // Show loading state on button
-    generateQuestionsButton.textContent = '生成中...';
-    generateQuestionsButton.disabled = true;
+        // Show loading state on button
+        generateQuestionsButton.textContent = '生成中...';
+        generateQuestionsButton.disabled = true;
+        
+        // Show loading indicator on the test page
+        showLoadingIndicator();
     }
     
     // Collect form data from sidebar
@@ -763,6 +766,9 @@ D. [选项D内容]
             try {
                 console.log('Processing API response:', response);
                 
+                // Hide loading indicator
+                hideLoadingIndicator();
+                
                 // Parse the response
                 const parsedQuestions = parseQuestionsFromResponse(response);
                 console.log('Parsed questions:', parsedQuestions);
@@ -783,7 +789,7 @@ D. [选项D内容]
                 
                 // Show the questions display container
                 if (questionsDisplayContainer) {
-                questionsDisplayContainer.classList.remove('hidden');
+                    questionsDisplayContainer.classList.remove('hidden');
                 }
                 
                 // Display the first question
@@ -801,23 +807,109 @@ D. [选项D内容]
             } catch (error) {
                 console.error('Error processing questions:', error);
                 showSystemMessage('生成题目时出错，请重试', 'error');
+                hideLoadingIndicator();
             } finally {
                 // Reset button state
                 if (isTestPage) {
-                generateQuestionsButton.textContent = '出题';
-                generateQuestionsButton.disabled = false;
+                    generateQuestionsButton.textContent = '出题';
+                    generateQuestionsButton.disabled = false;
                 }
             }
         })
         .catch(error => {
             console.error('API error:', error);
             showSystemMessage('API调用失败，请重试', 'error');
+            hideLoadingIndicator();
             // Reset button state
             if (isTestPage) {
-            generateQuestionsButton.textContent = '出题';
-            generateQuestionsButton.disabled = false;
+                generateQuestionsButton.textContent = '出题';
+                generateQuestionsButton.disabled = false;
             }
         });
+}
+
+// Function to show loading indicator with spinning icon
+function showLoadingIndicator() {
+    // Get the questions display container
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    if (!questionsDisplayContainer) return;
+    
+    // Create loading indicator if it doesn't exist
+    let loadingIndicator = document.getElementById('test-loading-indicator');
+    if (!loadingIndicator) {
+        loadingIndicator = document.createElement('div');
+        loadingIndicator.id = 'test-loading-indicator';
+        loadingIndicator.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin: 20px auto;
+            width: 80%;
+            max-width: 500px;
+        `;
+        
+        // Create spinning icon
+        const spinnerIcon = document.createElement('div');
+        spinnerIcon.className = 'spinner-icon';
+        spinnerIcon.style.cssText = `
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #4299e1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        `;
+        
+        // Create loading text
+        const loadingText = document.createElement('div');
+        loadingText.textContent = 'Thinking...';
+        loadingText.style.cssText = `
+            font-size: 18px;
+            color: #4a5568;
+            font-weight: 500;
+        `;
+        
+        // Add spinner animation
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(styleElement);
+        
+        // Assemble loading indicator
+        loadingIndicator.appendChild(spinnerIcon);
+        loadingIndicator.appendChild(loadingText);
+        
+        // Add to container
+        questionsDisplayContainer.innerHTML = '';
+        questionsDisplayContainer.appendChild(loadingIndicator);
+        questionsDisplayContainer.classList.remove('hidden');
+    } else {
+        loadingIndicator.style.display = 'flex';
+    }
+    
+    // Hide empty state if it exists
+    const emptyState = document.getElementById('empty-state');
+    if (emptyState) {
+        emptyState.classList.add('hidden');
+    }
+}
+
+// Function to hide loading indicator
+function hideLoadingIndicator() {
+    const loadingIndicator = document.getElementById('test-loading-indicator');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = 'none';
+    }
 }
 
 // Function to set up navigation button event listeners
@@ -907,7 +999,7 @@ function setupOptionButtons() {
                 }
             }
         });
-        });
+    });
 }
 
 // Make sure the function is available globally for the inline onclick handler
@@ -1255,6 +1347,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize form layout
     initializeFormLayout();
     
+    // Move content creation area to the top for better screen utilization
+    moveContentCreationToTop();
+    
     // Setup sidebar toggle functionality
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const leftPanel = document.querySelector('.left-panel');
@@ -1451,4 +1546,34 @@ document.addEventListener('DOMContentLoaded', function() {
     if (testFrame) {
         testFrame.appendChild(sidebarGenerateButton);
     }
-}); 
+});
+
+// Function to move content creation area to the top
+function moveContentCreationToTop() {
+    const createContainer = document.getElementById('create-container');
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    
+    if (createContainer && questionsDisplayContainer) {
+        // Ensure the questions display container is at the top
+        createContainer.style.display = 'flex';
+        createContainer.style.flexDirection = 'column';
+        
+        // Move questions display to the top
+        if (questionsDisplayContainer.parentNode === createContainer) {
+            createContainer.insertBefore(questionsDisplayContainer, createContainer.firstChild);
+        }
+        
+        // Style the questions display container for better visibility
+        questionsDisplayContainer.style.cssText = `
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        `;
+        
+        // Ensure navigation controls are below the questions
+        const navigationControls = document.querySelector('.navigation-controls');
+        if (navigationControls && navigationControls.parentNode === createContainer) {
+            createContainer.appendChild(navigationControls);
+        }
+    }
+} 

@@ -928,4 +928,116 @@ button:active {
     font-size: 0.9rem;
     max-width: 400px;
     margin: 0 auto;
+}
+
+/* Loading indicator styles */
+#test-loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin: 20px auto;
+    width: 80%;
+    max-width: 500px;
+}
+
+.spinner-icon {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e2e8f0;
+    border-top: 4px solid #4299e1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Improved content area layout */
+#create-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    height: auto;
+    min-height: calc(100vh - 60px);
+}
+
+.questions-display-container {
+    margin-bottom: 20px;
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    flex: 1;
+}
+
+.navigation-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.nav-button {
+    padding: 10px 20px;
+    background-color: #4299e1;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.nav-button:disabled {
+    background-color: #cbd5e0;
+    cursor: not-allowed;
+}
+
+.nav-button:not(:disabled):hover {
+    background-color: #3182ce;
+    transform: translateY(-1px);
+}
+
+/* Empty state styling */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f8fafc;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.empty-state-icon {
+    font-size: 48px;
+    color: #a0aec0;
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    font-size: 24px;
+    color: #4a5568;
+    margin-bottom: 15px;
+}
+
+.empty-state p {
+    font-size: 16px;
+    color: #718096;
+    max-width: 500px;
+    line-height: 1.6;
 } 

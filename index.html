@@ -98,7 +98,6 @@
                 <p>代码：Claude-3.7-sonnet</p>
                 <p>编译器：Cursor</p>
                 <p>网页部署：Cloudflare</p>
-                <p>更新：Alex Luo @ 2025/3</p>
             </div>
         </div>
         
@@ -137,57 +136,54 @@
             
             <!-- Create Questions Container (initially hidden) -->
             <div id="create-container" class="container hidden">
-                <div class="create-content">
-                    <!-- Empty state message (initially visible) -->
+                <!-- Questions display container moved to the top -->
+                <div id="questions-display-container" class="questions-display-container hidden">
+                    <!-- Empty state message -->
                     <div id="empty-state" class="empty-state">
-                        <i class="fas fa-book"></i>
+                        <i class="fas fa-book-open empty-state-icon"></i>
                         <h3>准备好开始测验了吗？</h3>
-                        <p>请使用左侧边栏选择学校、年级、科目和难度，然后点击"出题"按钮生成题目。</p>
+                        <p>使用左侧边栏选择学校类型、年级、学期、科目、难度和题目数量，然后点击"出题"按钮生成题目。</p>
                     </div>
                     
-                    <!-- Questions display container (initially hidden) -->
-                    <div id="questions-display-container" class="questions-display-container hidden">
-                        <div id="question-navigation">
-                            <span id="question-counter">题目 1 / 5</span>
-                        </div>
-                        
-                        <div id="current-question" class="question-content">
-                            <div id="question-text" class="question-text"></div>
-                            
-                            <div id="choices-container" class="choices-container">
-                                <div class="choice-item">
-                                    <input type="radio" name="choice" id="choice-a" value="A">
-                                    <label for="choice-a" id="choice-a-text"></label>
-                                </div>
-                                <div class="choice-item">
-                                    <input type="radio" name="choice" id="choice-b" value="B">
-                                    <label for="choice-b" id="choice-b-text"></label>
-                                </div>
-                                <div class="choice-item">
-                                    <input type="radio" name="choice" id="choice-c" value="C">
-                                    <label for="choice-c" id="choice-c-text"></label>
-                                </div>
-                                <div class="choice-item">
-                                    <input type="radio" name="choice" id="choice-d" value="D">
-                                    <label for="choice-d" id="choice-d-text"></label>
-                                </div>
-                            </div>
-                            
-                            <button id="submit-answer-button" class="secondary-button">提交答案</button>
-                            
-                            <div id="answer-container" class="answer-container hidden">
-                                <div class="answer-header">
-                                    <span id="answer-result"></span>
-                                </div>
-                                <div id="answer-explanation" class="answer-explanation"></div>
-                            </div>
-                            
-                            <div class="navigation-buttons">
-                                <button id="prev-question-button" class="nav-button" disabled>上一题</button>
-                                <button id="next-question-button" class="nav-button" disabled>下一题</button>
-                            </div>
-                        </div>
+                    <!-- Question content will be dynamically inserted here -->
+                    <div id="question-counter" class="question-counter"></div>
+                    <div id="question-text" class="question-text"></div>
+                    <div id="choices-container" class="choices-container"></div>
+                    
+                    <!-- Answer container -->
+                    <div id="answer-container" class="answer-container hidden">
+                        <div id="answer-result" class="answer-result"></div>
+                        <div id="answer-explanation" class="answer-explanation"></div>
                     </div>
+                </div>
+                
+                <!-- Navigation controls moved to the bottom -->
+                <div class="navigation-controls" style="
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 20px;
+                    padding: 15px;
+                    background: white;
+                    border-radius: 12px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                ">
+                    <button id="prev-question-button" class="nav-button" disabled style="
+                        background-color: #4299e1;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    ">上一题</button>
+                    
+                    <button id="next-question-button" class="nav-button" disabled style="
+                        background-color: #4299e1;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    ">下一题</button>
                 </div>
             </div>
         </div>
