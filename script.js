@@ -2438,12 +2438,28 @@ function setupChatButtons() {
 
     console.log('Setting up chat buttons');
 
-    // Use unique variable names for chat buttons to avoid conflicts
-    const chatOptimizeBtn = document.querySelector('.chat-optimize-btn');
-    const chatSubmitBtn = document.querySelector('.chat-submit-btn');
+    // Use more specific and alternative selectors to find the chat buttons
+    const chatOptimizeBtn = document.querySelector('.optimize-question-btn') || 
+                           document.querySelector('[data-action="optimize"]') ||
+                           document.querySelector('button:contains("优化问题")');
+                           
+    const chatSubmitBtn = document.querySelector('.submit-question-btn') || 
+                         document.querySelector('[data-action="submit"]') ||
+                         document.querySelector('button:contains("提交问题")');
+
+    // Log what we found for debugging
+    console.log('Found chat optimize button:', chatOptimizeBtn);
+    console.log('Found chat submit button:', chatSubmitBtn);
 
     if (!chatOptimizeBtn || !chatSubmitBtn) {
         console.error('Could not find chat optimize or submit buttons');
+        // Try to find all buttons in the chat container to help debug
+        const qaContainer = document.getElementById('qa-container');
+        if (qaContainer) {
+            const allButtons = qaContainer.querySelectorAll('button');
+            console.log('All buttons in QA container:', allButtons);
+            console.log('Button classes:', Array.from(allButtons).map(btn => btn.className));
+        }
         return;
     }
 
