@@ -3611,16 +3611,6 @@ function setupChatButtons() {
         return activeTab && activeTab.getAttribute('data-tab') === 'qa';
     }
     
-    // Helper function to get the appropriate input based on active tab
-    function getActiveInput() {
-        if (isOnChatPage()) {
-            return document.getElementById('chat-input');
-        } else {
-            // On test page, we don't need to check for input
-            return { value: "dummy text", disabled: false };
-        }
-    }
-    
     // Add event listener to the optimize button
     newOptimizeButton.addEventListener('click', function() {
         // Get dropdown values from sidebar
@@ -3635,12 +3625,6 @@ function setupChatButtons() {
                 return;
             }
             
-            // Check if school and grade are selected
-            if (!school || !grade) {
-                showSystemMessage('请先在侧边栏选择学校和年级', 'warning');
-                return;
-            }
-            
             const userQuestion = chatInput.value.trim();
             const chatResponseArea = document.getElementById('chat-response-area');
             
@@ -3650,31 +3634,38 @@ function setupChatButtons() {
             newOptimizeButton.disabled = true;
             newSubmitButton.disabled = true;
             
-            // Create prompt with school and grade context
-            let prompt = `请优化以下${school}${grade}${subject || ''}的问题，使其更清晰、更有教育价值：\n\n${userQuestion}`;
+            // Create prompt with school and grade context if available
+            let contextPrefix = '';
+            if (school && grade) {
+                contextPrefix = `${school}${grade}${subject ? subject : ''}的`;
+            }
             
-            // Add specific educational guidance based on school level
-            if (school === '小学') {
-                prompt += `\n\n请特别注意：
+            let prompt = `请优化以下${contextPrefix}问题，使其更清晰、更有教育价值：\n\n${userQuestion}`;
+            
+            // Add specific educational guidance based on school level if available
+            if (school && grade) {
+                if (school === '小学') {
+                    prompt += `\n\n请特别注意：
 1. 使用简单、直观的语言，适合${grade}学生的理解水平
-2. 确保问题符合${grade}${subject || ''}教学大纲
+2. 确保问题符合${grade}${subject ? subject : ''}教学大纲
 3. 使用具体例子帮助理解
 4. 避免使用过于抽象的概念
 5. 增加趣味性和生活化的元素`;
-            } else if (school === '初中') {
-                prompt += `\n\n请特别注意：
+                } else if (school === '初中') {
+                    prompt += `\n\n请特别注意：
 1. 使用清晰但稍有挑战性的语言，适合${grade}学生
-2. 确保问题符合${grade}${subject || ''}教学大纲
+2. 确保问题符合${grade}${subject ? subject : ''}教学大纲
 3. 既有基础知识点，也有思维方法指导
 4. 可以适当引入抽象概念，但需要配合具体例子
 5. 增加与实际应用相关的内容`;
-            } else if (school === '高中') {
-                prompt += `\n\n请特别注意：
+                } else if (school === '高中') {
+                    prompt += `\n\n请特别注意：
 1. 使用准确、规范的学科语言，适合${grade}学生
-2. 确保问题符合${grade}${subject || ''}教学大纲和考试要求
+2. 确保问题符合${grade}${subject ? subject : ''}教学大纲和考试要求
 3. 深入分析问题本质，强调知识点间的联系
 4. 可以使用较为抽象的概念和复杂的推理
 5. 增加与升学考试相关的思考方向`;
+                }
             }
             
             // Call the API
@@ -3711,12 +3702,6 @@ function setupChatButtons() {
                     newSubmitButton.disabled = false;
                 });
         } else {
-            // On test page, just check for school and grade
-            if (!school || !grade) {
-                showSystemMessage('请先在侧边栏选择学校和年级', 'warning');
-                return;
-            }
-            
             // Handle optimize on test page - get the current question
             const currentQuestion = window.questions[window.currentQuestionIndex];
             if (!currentQuestion) {
@@ -3727,31 +3712,38 @@ function setupChatButtons() {
             // Show loading indicator
             showLoadingIndicator();
             
-            // Create prompt with the current question
-            let prompt = `请优化以下${school}${grade}${subject || ''}的问题，使其更清晰、更有教育价值：\n\n问题：${currentQuestion.question}\n选项：\nA. ${currentQuestion.options[0]}\nB. ${currentQuestion.options[1]}\nC. ${currentQuestion.options[2]}\nD. ${currentQuestion.options[3]}\n答案：${currentQuestion.answer}\n解析：${currentQuestion.explanation}`;
+            // Create prompt with the current question, including school and grade context if available
+            let contextPrefix = '';
+            if (school && grade) {
+                contextPrefix = `${school}${grade}${subject ? subject : ''}的`;
+            }
             
-            // Add specific educational guidance based on school level
-            if (school === '小学') {
-                prompt += `\n\n请特别注意：
+            let prompt = `请优化以下${contextPrefix}问题，使其更清晰、更有教育价值：\n\n问题：${currentQuestion.question}\n选项：\nA. ${currentQuestion.options[0]}\nB. ${currentQuestion.options[1]}\nC. ${currentQuestion.options[2]}\nD. ${currentQuestion.options[3]}\n答案：${currentQuestion.answer}\n解析：${currentQuestion.explanation}`;
+            
+            // Add specific educational guidance based on school level if available
+            if (school && grade) {
+                if (school === '小学') {
+                    prompt += `\n\n请特别注意：
 1. 使用简单、直观的语言，适合${grade}学生的理解水平
-2. 确保题目内容符合${grade}${subject || ''}教学大纲
+2. 确保题目内容符合${grade}${subject ? subject : ''}教学大纲
 3. 解析应该循序渐进，使用具体例子帮助理解
 4. 避免使用过于抽象的概念
 5. 增加趣味性和生活化的元素`;
-            } else if (school === '初中') {
-                prompt += `\n\n请特别注意：
+                } else if (school === '初中') {
+                    prompt += `\n\n请特别注意：
 1. 使用清晰但稍有挑战性的语言，适合${grade}学生
-2. 确保题目内容符合${grade}${subject || ''}教学大纲
+2. 确保题目内容符合${grade}${subject ? subject : ''}教学大纲
 3. 解析应该既有基础知识点讲解，也有思维方法指导
 4. 可以适当引入抽象概念，但需要配合具体例子
 5. 增加与实际应用相关的内容`;
-            } else if (school === '高中') {
-                prompt += `\n\n请特别注意：
+                } else if (school === '高中') {
+                    prompt += `\n\n请特别注意：
 1. 使用准确、规范的学科语言，适合${grade}学生
-2. 确保题目内容符合${grade}${subject || ''}教学大纲和考试要求
+2. 确保题目内容符合${grade}${subject ? subject : ''}教学大纲和考试要求
 3. 解析应该深入分析解题思路和方法，强调知识点间的联系
 4. 可以使用较为抽象的概念和复杂的推理
 5. 增加与升学考试相关的解题技巧和方法`;
+                }
             }
             
             prompt += `\n\n请返回优化后的问题、选项、答案和解析，格式如下：
@@ -3807,12 +3799,6 @@ D. [选项D]
                 return;
             }
             
-            // Check if school and grade are selected
-            if (!school || !grade) {
-                showSystemMessage('请先在侧边栏选择学校和年级', 'warning');
-                return;
-            }
-            
             const userQuestion = chatInput.value.trim();
             const chatResponseArea = document.getElementById('chat-response-area');
             
@@ -3822,16 +3808,25 @@ D. [选项D]
             newOptimizeButton.disabled = true;
             newSubmitButton.disabled = true;
             
-            // Create prompt with school and grade context
-            let prompt = `请回答以下${school}${grade}${subject || ''}的问题：\n\n${userQuestion}\n\n`;
+            // Create prompt with school and grade context if available
+            let contextPrefix = '';
+            if (school && grade) {
+                contextPrefix = `${school}${grade}${subject ? subject : ''}的`;
+            }
             
-            // Add specific educational guidance based on school level
-            if (school === '小学') {
-                prompt += `请以${school}${grade}${subject || ''}老师的身份回答，使用简单易懂的语言，提供具体例子，避免抽象概念，确保符合教学大纲。`;
-            } else if (school === '初中') {
-                prompt += `请以${school}${grade}${subject || ''}老师的身份回答，使用清晰的语言，既有基础知识讲解，也有思维方法指导，适当使用抽象概念但配合具体例子，确保符合教学大纲。`;
-            } else if (school === '高中') {
-                prompt += `请以${school}${grade}${subject || ''}老师的身份回答，使用准确规范的学科语言，深入分析问题本质，强调知识点间的联系，可使用抽象概念和复杂推理，确保符合教学大纲和考试要求。`;
+            let prompt = `请回答以下${contextPrefix}问题：\n\n${userQuestion}\n\n`;
+            
+            // Add specific educational guidance based on school level if available
+            if (school && grade) {
+                if (school === '小学') {
+                    prompt += `请以${school}${grade}${subject ? subject : ''}老师的身份回答，使用简单易懂的语言，提供具体例子，避免抽象概念，确保符合教学大纲。`;
+                } else if (school === '初中') {
+                    prompt += `请以${school}${grade}${subject ? subject : ''}老师的身份回答，使用清晰的语言，既有基础知识讲解，也有思维方法指导，适当使用抽象概念但配合具体例子，确保符合教学大纲。`;
+                } else if (school === '高中') {
+                    prompt += `请以${school}${grade}${subject ? subject : ''}老师的身份回答，使用准确规范的学科语言，深入分析问题本质，强调知识点间的联系，可使用抽象概念和复杂推理，确保符合教学大纲和考试要求。`;
+                }
+            } else {
+                prompt += `请以教师的身份回答，提供清晰、准确的解答。`;
             }
             
             // Call the API
@@ -3868,12 +3863,6 @@ D. [选项D]
                     newSubmitButton.disabled = false;
                 });
         } else {
-            // On test page, just check for school and grade
-            if (!school || !grade) {
-                showSystemMessage('请先在侧边栏选择学校和年级', 'warning');
-                return;
-            }
-            
             // Handle submit on test page - get the current question
             const currentQuestion = window.questions[window.currentQuestionIndex];
             if (!currentQuestion) {
@@ -3884,16 +3873,25 @@ D. [选项D]
             // Show loading indicator
             showLoadingIndicator();
             
-            // Create prompt with the current question
-            let prompt = `请为以下${school}${grade}${subject || ''}的问题提供详细解答：\n\n问题：${currentQuestion.question}\n选项：\nA. ${currentQuestion.options[0]}\nB. ${currentQuestion.options[1]}\nC. ${currentQuestion.options[2]}\nD. ${currentQuestion.options[3]}\n答案：${currentQuestion.answer}\n解析：${currentQuestion.explanation}`;
+            // Create prompt with the current question, including school and grade context if available
+            let contextPrefix = '';
+            if (school && grade) {
+                contextPrefix = `${school}${grade}${subject ? subject : ''}的`;
+            }
             
-            // Add specific educational guidance based on school level
-            if (school === '小学') {
-                prompt += `\n\n请以${school}${grade}${subject || ''}老师的身份提供更详细的解析，使用简单易懂的语言，提供具体例子，避免抽象概念，确保符合教学大纲。`;
-            } else if (school === '初中') {
-                prompt += `\n\n请以${school}${grade}${subject || ''}老师的身份提供更详细的解析，使用清晰的语言，既有基础知识讲解，也有思维方法指导，适当使用抽象概念但配合具体例子，确保符合教学大纲。`;
-            } else if (school === '高中') {
-                prompt += `\n\n请以${school}${grade}${subject || ''}老师的身份提供更详细的解析，使用准确规范的学科语言，深入分析问题本质，强调知识点间的联系，可使用抽象概念和复杂推理，确保符合教学大纲和考试要求。`;
+            let prompt = `请为以下${contextPrefix}问题提供详细解答：\n\n问题：${currentQuestion.question}\n选项：\nA. ${currentQuestion.options[0]}\nB. ${currentQuestion.options[1]}\nC. ${currentQuestion.options[2]}\nD. ${currentQuestion.options[3]}\n答案：${currentQuestion.answer}\n解析：${currentQuestion.explanation}`;
+            
+            // Add specific educational guidance based on school level if available
+            if (school && grade) {
+                if (school === '小学') {
+                    prompt += `\n\n请以${school}${grade}${subject ? subject : ''}老师的身份提供更详细的解析，使用简单易懂的语言，提供具体例子，避免抽象概念，确保符合教学大纲。`;
+                } else if (school === '初中') {
+                    prompt += `\n\n请以${school}${grade}${subject ? subject : ''}老师的身份提供更详细的解析，使用清晰的语言，既有基础知识讲解，也有思维方法指导，适当使用抽象概念但配合具体例子，确保符合教学大纲。`;
+                } else if (school === '高中') {
+                    prompt += `\n\n请以${school}${grade}${subject ? subject : ''}老师的身份提供更详细的解析，使用准确规范的学科语言，深入分析问题本质，强调知识点间的联系，可使用抽象概念和复杂推理，确保符合教学大纲和考试要求。`;
+                }
+            } else {
+                prompt += `\n\n请以教师的身份提供更详细的解析，解释解题思路和关键知识点。`;
             }
             
             // Call the API
