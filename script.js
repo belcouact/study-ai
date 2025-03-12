@@ -1,3 +1,143 @@
+// Add this code at the very beginning of the file, right after any initial comments
+
+// Immediately executing function to initialize dropdowns with empty values
+(function() {
+    // Create a function that will run as soon as the DOM is ready
+    function initializeEmptyDropdowns() {
+        console.log('EARLY INITIALIZATION: Setting empty values for all dropdowns');
+        
+        // Get all select elements in the document
+        const allDropdowns = document.querySelectorAll('select');
+        
+        // For each dropdown, add an empty option and set it as selected
+        allDropdowns.forEach(dropdown => {
+            // Skip if this is not a form dropdown we care about
+            if (!dropdown.id || 
+                (!dropdown.id.includes('school') && 
+                 !dropdown.id.includes('grade') && 
+                 !dropdown.id.includes('subject') && 
+                 !dropdown.id.includes('semester') && 
+                 !dropdown.id.includes('difficulty') && 
+                 !dropdown.id.includes('count'))) {
+                return;
+            }
+            
+            console.log(`EARLY INITIALIZATION: Setting empty value for ${dropdown.id}`);
+            
+            // Check if an empty option already exists
+            let emptyOption = Array.from(dropdown.options).find(option => option.value === '');
+            
+            // If no empty option exists, create one
+            if (!emptyOption) {
+                emptyOption = document.createElement('option');
+                emptyOption.value = '';
+                
+                // Set appropriate text based on dropdown type
+                if (dropdown.id.includes('school')) {
+                    emptyOption.textContent = '请选择学校类型';
+                } else if (dropdown.id.includes('grade')) {
+                    emptyOption.textContent = '请选择年级';
+                } else if (dropdown.id.includes('subject')) {
+                    emptyOption.textContent = '请选择科目';
+                } else if (dropdown.id.includes('semester')) {
+                    emptyOption.textContent = '请选择学期';
+                } else if (dropdown.id.includes('difficulty')) {
+                    emptyOption.textContent = '请选择难度';
+                } else if (dropdown.id.includes('count')) {
+                    emptyOption.textContent = '请选择题目数量';
+                }
+                
+                // Insert at the beginning
+                dropdown.insertBefore(emptyOption, dropdown.firstChild);
+            }
+            
+            // Force select the empty option
+            dropdown.value = '';
+            
+            // Dispatch a change event to ensure any listeners are notified
+            const event = new Event('change', { bubbles: true });
+            dropdown.dispatchEvent(event);
+        });
+    }
+    
+    // Run immediately if DOM is already loaded
+    if (document.readyState === 'interactive' || document.readyState === 'complete') {
+        initializeEmptyDropdowns();
+    } else {
+        // Otherwise wait for DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', initializeEmptyDropdowns);
+    }
+    
+    // Also run after a short delay to catch any dynamically created dropdowns
+    setTimeout(initializeEmptyDropdowns, 100);
+    setTimeout(initializeEmptyDropdowns, 500);
+    setTimeout(initializeEmptyDropdowns, 1000);
+})();
+
+// Override the populateGradeOptions and populateSubjectOptions functions
+// to ensure they always include an empty option
+const originalPopulateGradeOptions = window.populateGradeOptions || function() {};
+window.populateGradeOptions = function(school) {
+    // Call the original function
+    originalPopulateGradeOptions(school);
+    
+    // Get both the form and sidebar grade dropdowns
+    const gradeDropdown = document.getElementById('grade');
+    const sidebarGradeDropdown = document.getElementById('sidebar-grade');
+    
+    // Ensure empty option exists and is selected for both dropdowns
+    [gradeDropdown, sidebarGradeDropdown].forEach(dropdown => {
+        if (!dropdown) return;
+        
+        // Check if an empty option already exists
+        let emptyOption = Array.from(dropdown.options).find(option => option.value === '');
+        
+        // If no empty option exists, create one
+        if (!emptyOption) {
+            emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = '请选择年级';
+            dropdown.insertBefore(emptyOption, dropdown.firstChild);
+        }
+        
+        // Force select the empty option if no value is currently selected
+        if (!dropdown.value) {
+            dropdown.value = '';
+        }
+    });
+};
+
+const originalPopulateSubjectOptions = window.populateSubjectOptions || function() {};
+window.populateSubjectOptions = function(school) {
+    // Call the original function
+    originalPopulateSubjectOptions(school);
+    
+    // Get both the form and sidebar subject dropdowns
+    const subjectDropdown = document.getElementById('subject');
+    const sidebarSubjectDropdown = document.getElementById('sidebar-subject');
+    
+    // Ensure empty option exists and is selected for both dropdowns
+    [subjectDropdown, sidebarSubjectDropdown].forEach(dropdown => {
+        if (!dropdown) return;
+        
+        // Check if an empty option already exists
+        let emptyOption = Array.from(dropdown.options).find(option => option.value === '');
+        
+        // If no empty option exists, create one
+        if (!emptyOption) {
+            emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = '请选择科目';
+            dropdown.insertBefore(emptyOption, dropdown.firstChild);
+        }
+        
+        // Force select the empty option if no value is currently selected
+        if (!dropdown.value) {
+            dropdown.value = '';
+        }
+    });
+};
+
 // API configuration variables
 let currentApiFunction = 'chat';
 let currentModel = 'deepseek-r1';
