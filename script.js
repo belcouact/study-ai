@@ -4317,3 +4317,31 @@ ${questionText}`;
         });
     }
 }
+
+// Add a flag to track if setupChatButtons has been called
+let chatButtonsInitialized = false;
+
+// Modify the createChatInterface function to only call setupChatButtons once
+function createChatInterface() {
+    // ... existing code ...
+    
+    // Add the chat interface to the QA container
+    qaContainer.innerHTML = ''; // Clear any existing content
+    qaContainer.appendChild(chatInterface);
+    
+    // Reset the initialization flag since we've recreated the interface
+    chatButtonsInitialized = false;
+    
+    // ... rest of existing code ...
+}
+
+// Modify the document.addEventListener at the end of the file
+document.addEventListener('DOMContentLoaded', function() {
+    // Only call setupChatButtons if it hasn't been initialized yet
+    if (!chatButtonsInitialized) {
+        setTimeout(() => {
+            setupChatButtons();
+            chatButtonsInitialized = true;
+        }, 300);
+    }
+});
