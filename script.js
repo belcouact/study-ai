@@ -1313,15 +1313,34 @@ function showEvaluationModal(content) {
             </div>
         `;
     } else {
-        // Format the evaluation content
-        const formattedContent = content
+        // Format the evaluation content with improved readability
+        let formattedContent = content
             .replace(/\n\n/g, '</p><p>')
             .replace(/\n/g, '<br>')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/# (.*?)(\n|$)/g, '<h3>$1</h3>')
-            .replace(/## (.*?)(\n|$)/g, '<h4>$1</h4>')
-            .replace(/### (.*?)(\n|$)/g, '<h5>$1</h5>');
+            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Improve headings and sections
+        formattedContent = formattedContent
+            .replace(/# (.*?)(\n|$)/g, '</p><h3 style="color:#2c5282;margin-top:20px;margin-bottom:10px;font-size:20px;border-bottom:1px solid #e2e8f0;padding-bottom:8px;">$1</h3><p>')
+            .replace(/## (.*?)(\n|$)/g, '</p><h4 style="color:#2b6cb0;margin-top:15px;margin-bottom:8px;font-size:18px;">$1</h4><p>')
+            .replace(/### (.*?)(\n|$)/g, '</p><h5 style="color:#3182ce;margin-top:12px;margin-bottom:6px;font-size:16px;">$1</h5><p>');
+        
+        // Improve lists
+        formattedContent = formattedContent
+            .replace(/<br>(\d+\. .*?)(?=<br>\d+\. |<br><br>|$)/g, '<li style="margin-bottom:8px;">$1</li>')
+            .replace(/<br>- (.*?)(?=<br>- |<br><br>|$)/g, '<li style="margin-bottom:8px;">$1</li>');
+        
+        // Wrap lists in ul tags
+        formattedContent = formattedContent
+            .replace(/(<li.*?<\/li>)+/g, '<ul style="padding-left:20px;margin:10px 0;">$&</ul>');
+        
+        // Add color highlighting for important sections
+        formattedContent = formattedContent
+            .replace(/(优势|strengths|强项)/gi, '<span style="color:#38a169;font-weight:500;">$1</span>')
+            .replace(/(不足|weaknesses|弱项|问题)/gi, '<span style="color:#e53e3e;font-weight:500;">$1</span>')
+            .replace(/(建议|suggestions|提高|改进|提升)/gi, '<span style="color:#3182ce;font-weight:500;">$1</span>')
+            .replace(/(总体评价|overall|表现)/gi, '<span style="color:#6b46c1;font-weight:500;">$1</span>');
         
         modalContent = `
             <div class="modal-content" style="
@@ -1348,19 +1367,59 @@ function showEvaluationModal(content) {
                     z-index: 1;
                 ">×</button>
                 
-                <h2 style="
-                    font-size: 24px;
-                    color: #2d3748;
-                    margin-bottom: 20px;
+                <div style="
                     text-align: center;
-                ">成绩评估结果</h2>
+                    margin-bottom: 20px;
+                    padding-bottom: 15px;
+                    border-bottom: 1px solid #e2e8f0;
+                ">
+                    <h2 style="
+                        font-size: 24px;
+                        color: #2d3748;
+                        margin-bottom: 5px;
+                    ">成绩评估结果</h2>
+                    <div style="
+                        font-size: 14px;
+                        color: #718096;
+                    ">基于您的测试表现提供的个性化评估和建议</div>
+                </div>
                 
                 <div class="evaluation-content" style="
                     font-size: 16px;
                     color: #4a5568;
                     line-height: 1.6;
+                    background: #f7fafc;
+                    padding: 20px;
+                    border-radius: 8px;
                 ">
                     <p>${formattedContent}</p>
+                </div>
+                
+                <div style="
+                    text-align: center;
+                    margin-top: 25px;
+                ">
+                    <button id="print-evaluation" style="
+                        padding: 10px 20px;
+                        background-color: #4299e1;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        margin-right: 10px;
+                    ">打印评估结果</button>
+                    <button id="close-evaluation" style="
+                        padding: 10px 20px;
+                        background-color: #e2e8f0;
+                        color: #4a5568;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        font-weight: 500;
+                        cursor: pointer;
+                    ">关闭</button>
                 </div>
             </div>
         `;
@@ -1368,20 +1427,81 @@ function showEvaluationModal(content) {
     
     modalContainer.innerHTML = modalContent;
     
-    // Add close button event listener
+    // Add event listeners
     const closeButton = document.getElementById('close-modal');
+    const closeEvaluation = document.getElementById('close-evaluation');
+    const printEvaluation = document.getElementById('print-evaluation');
+    
     if (closeButton) {
         closeButton.addEventListener('click', () => {
             modalContainer.remove();
         });
-        
-        // Close modal when clicking outside
-        modalContainer.addEventListener('click', (e) => {
-            if (e.target === modalContainer) {
-                modalContainer.remove();
-            }
+    }
+    
+    if (closeEvaluation) {
+        closeEvaluation.addEventListener('click', () => {
+            modalContainer.remove();
         });
     }
+    
+    if (printEvaluation) {
+        printEvaluation.addEventListener('click', () => {
+            // Create a printable version
+            const printContent = document.querySelector('.evaluation-content').innerHTML;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>成绩评估结果</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            line-height: 1.6;
+                            color: #333;
+                            max-width: 800px;
+                            margin: 0 auto;
+                            padding: 20px;
+                        }
+                        h1 {
+                            text-align: center;
+                            margin-bottom: 30px;
+                        }
+                        .content {
+                            background: #f9f9f9;
+                            padding: 20px;
+                            border-radius: 8px;
+                        }
+                        @media print {
+                            body {
+                                padding: 0;
+                            }
+                            .content {
+                                background: none;
+                                padding: 0;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>成绩评估结果</h1>
+                    <div class="content">${printContent}</div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+            }, 500);
+        });
+    }
+    
+    // Close modal when clicking outside
+    modalContainer.addEventListener('click', (e) => {
+        if (e.target === modalContainer) {
+            modalContainer.remove();
+        }
+    });
 }
 
 // Function to handle generating questions
@@ -1410,10 +1530,15 @@ function handleGenerateQuestionsClick() {
                       !document.getElementById('create-container').classList.contains('hidden');
     
     if (isTestPage) {
-    // Show loading state on button
-    generateQuestionsButton.textContent = '生成中...';
-    generateQuestionsButton.disabled = true;
-    
+        // Show loading state on button
+        generateQuestionsButton.textContent = '生成中...';
+        generateQuestionsButton.disabled = true;
+        
+        // Hide empty state if it exists
+        if (emptyState) {
+            emptyState.classList.add('hidden');
+        }
+        
         // Show loading indicator on the test page
         showLoadingIndicator();
     }
@@ -1617,6 +1742,12 @@ function showLoadingIndicator() {
         return;
     }
     
+    // Hide empty state if it exists
+    const emptyState = document.getElementById('empty-state');
+    if (emptyState) {
+        emptyState.classList.add('hidden');
+    }
+    
     // Create loading indicator if it doesn't exist
     let loadingIndicator = document.getElementById('test-loading-indicator');
     if (!loadingIndicator) {
@@ -1683,12 +1814,6 @@ function showLoadingIndicator() {
         questionsDisplayContainer.classList.remove('hidden');
     } else {
         loadingIndicator.style.display = 'flex';
-    }
-    
-    // Hide empty state if it exists
-    const emptyState = document.getElementById('empty-state');
-    if (emptyState) {
-        emptyState.classList.add('hidden');
     }
 }
 
