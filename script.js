@@ -1041,6 +1041,112 @@ function initializeFormLayout() {
     }
 }
 
+// Function to populate grade options based on selected school
+function populateGradeOptions(school) {
+    const gradeSelect = document.getElementById('grade-select');
+    const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
+    
+    if (!gradeSelect) return;
+    
+    // Clear existing options
+    gradeSelect.innerHTML = '';
+    
+    // Define grade options based on school
+    let gradeOptions = [];
+    
+    switch (school) {
+        case '小学':
+            gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+            break;
+        case '初中':
+            gradeOptions = ['初一', '初二', '初三'];
+            break;
+        case '高中':
+            gradeOptions = ['高一', '高二', '高三'];
+            break;
+        case '大学':
+            gradeOptions = ['大一', '大二', '大三', '大四'];
+            break;
+        default:
+            gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+    }
+    
+    // Add options to the select element
+    gradeOptions.forEach(grade => {
+        const option = document.createElement('option');
+        option.value = grade;
+        option.textContent = grade;
+        gradeSelect.appendChild(option);
+    });
+    
+    // Also update the sidebar dropdown if it exists
+    if (gradeSelectSidebar) {
+        // Clear existing options
+        gradeSelectSidebar.innerHTML = '';
+        
+        // Add the same options to the sidebar dropdown
+        gradeOptions.forEach(grade => {
+            const option = document.createElement('option');
+            option.value = grade;
+            option.textContent = grade;
+            gradeSelectSidebar.appendChild(option);
+        });
+    }
+}
+
+// Function to populate subject options based on selected school
+function populateSubjectOptions(school) {
+    const subjectSelect = document.getElementById('subject-select');
+    const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
+    
+    if (!subjectSelect) return;
+    
+    // Clear existing options
+    subjectSelect.innerHTML = '';
+    
+    // Define subject options based on school
+    let subjectOptions = [];
+    
+    switch (school) {
+        case '小学':
+            subjectOptions = ['语文', '数学', '英语', '科学', '道德与法治'];
+            break;
+        case '初中':
+            subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+            break;
+        case '高中':
+            subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+            break;
+        case '大学':
+            subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
+            break;
+        default:
+            subjectOptions = ['语文', '数学', '英语'];
+    }
+    
+    // Add options to the select element
+    subjectOptions.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject;
+        subjectSelect.appendChild(option);
+    });
+    
+    // Also update the sidebar dropdown if it exists
+    if (subjectSelectSidebar) {
+        // Clear existing options
+        subjectSelectSidebar.innerHTML = '';
+        
+        // Add the same options to the sidebar dropdown
+        subjectOptions.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            subjectSelectSidebar.appendChild(option);
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize form layout
     initializeFormLayout();
