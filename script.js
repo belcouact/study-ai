@@ -4315,3 +4315,102 @@ function getSimplifiedContextSummary() {
     
     return summary;
 }
+
+// Add this function to apply centered styling to buttons
+function applyCenteredButtonStyles() {
+    console.log('Applying centered button styles');
+    
+    // Create a style element
+    const style = document.createElement('style');
+    style.textContent = `
+        /* Center text on tab buttons */
+        .tab-button {
+            text-align: center !important;
+            justify-content: center !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        
+        /* Center text on AI service buttons */
+        .ai-service-button {
+            text-align: center !important;
+            justify-content: center !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        
+        /* Add specific styling for the sidebar buttons */
+        #qa-button, #create-button {
+            text-align: center !important;
+            justify-content: center !important;
+            display: flex !important;
+            align-items: center !important;
+            padding: 10px !important;
+        }
+        
+        /* Add specific styling for AI service links */
+        .ai-service-link {
+            text-align: center !important;
+            display: block !important;
+            padding: 8px !important;
+        }
+    `;
+    
+    // Add the style to the document
+    document.head.appendChild(style);
+    
+    // Apply classes to buttons if they don't already have them
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    
+    if (qaButton) {
+        qaButton.classList.add('tab-button');
+    }
+    
+    if (createButton) {
+        createButton.classList.add('tab-button');
+    }
+    
+    // Find and apply classes to AI service buttons
+    const aiServiceLinks = document.querySelectorAll('a[href*="tencent"], a[href*="tongyi"]');
+    aiServiceLinks.forEach(link => {
+        link.classList.add('ai-service-link');
+    });
+}
+
+// Call the function in the DOMContentLoaded event
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded');
+    
+    // Apply centered button styles
+    applyCenteredButtonStyles();
+    
+    // Populate sidebar dropdowns if school is selected
+    const sidebarSchoolSelect = document.getElementById('sidebar-school-select');
+    if (sidebarSchoolSelect && sidebarSchoolSelect.value && sidebarSchoolSelect.value !== 'none') {
+        populateSidebarGradeOptions(sidebarSchoolSelect.value);
+        populateSidebarSubjectOptions(sidebarSchoolSelect.value);
+    }
+    
+    // Set up chat buttons when the page loads with multiple retries
+    setTimeout(() => {
+        setupChatButtons();
+        
+        // Try again after a longer delay to ensure everything is loaded
+        setTimeout(() => {
+            setupChatButtons();
+            // Apply centered styles again after a delay to catch dynamically added elements
+            applyCenteredButtonStyles();
+        }, 1000);
+    }, 300);
+});
+
+// Also call the function in initializeFormLayout to ensure it's applied
+function initializeFormLayout() {
+    // ... existing code ...
+    
+    // Apply centered button styles
+    applyCenteredButtonStyles();
+    
+    // ... rest of existing code ...
+}
