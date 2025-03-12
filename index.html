@@ -139,64 +139,11 @@
             <!-- Create Questions Container (initially hidden) -->
             <div id="create-container" class="container hidden">
                 <div class="create-content">
-                    <!-- Question form container (initially visible) -->
-                    <div id="question-form-container" class="question-form-container">
-                        <form id="question-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="school-select">学校</label>
-                                    <select id="school-select" name="school">
-                                        <option value="小学">小学</option>
-                                        <option value="初中">初中</option>
-                                        <option value="高中">高中</option>
-                                        <option value="大学">大学</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="grade-select">年级</label>
-                                    <select id="grade-select" name="grade">
-                                        <!-- Options will be populated dynamically -->
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="semester-select">学期</label>
-                                    <select id="semester-select" name="semester">
-                                        <option value="上学期">上学期</option>
-                                        <option value="下学期">下学期</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="subject-select">科目</label>
-                                    <select id="subject-select" name="subject">
-                                        <!-- Options will be populated dynamically -->
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="difficulty-select">难度</label>
-                                    <select id="difficulty-select" name="difficulty">
-                                        <option value="容易">容易</option>
-                                        <option value="中等">中等</option>
-                                        <option value="偏难">偏难</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="question-count-select">题数</label>
-                                    <select id="question-count-select" name="questionCount">
-                                        <option value="5">5</option>
-                                        <option value="10">10</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <button type="button" id="generate-questions-button" class="primary-button">出题</button>
-                        </form>
+                    <!-- Empty state message (initially visible) -->
+                    <div id="empty-state" class="empty-state">
+                        <i class="fas fa-book"></i>
+                        <h3>准备好开始测验了吗？</h3>
+                        <p>请使用左侧边栏选择学校、年级、科目和难度，然后点击"出题"按钮生成题目。</p>
                     </div>
                     
                     <!-- Questions display container (initially hidden) -->

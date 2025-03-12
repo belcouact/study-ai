@@ -679,19 +679,20 @@ function updateNavigationButtons() {
     }
 }
 
-// Global function to handle generate questions button click
+// Function to handle generating questions
 function handleGenerateQuestionsClick() {
     console.log('handleGenerateQuestionsClick called');
     
-    // Get form elements
-    const schoolSelect = document.getElementById('school-select');
-    const gradeSelect = document.getElementById('grade-select');
-    const semesterSelect = document.getElementById('semester-select');
-    const subjectSelect = document.getElementById('subject-select');
-    const difficultySelect = document.getElementById('difficulty-select');
-    const questionCountSelect = document.getElementById('question-count-select');
-    const generateQuestionsButton = document.getElementById('generate-questions-button');
+    // Get form elements from sidebar
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    const gradeSelect = document.getElementById('grade-select-sidebar');
+    const semesterSelect = document.getElementById('semester-select-sidebar');
+    const subjectSelect = document.getElementById('subject-select-sidebar');
+    const difficultySelect = document.getElementById('difficulty-select-sidebar');
+    const questionCountSelect = document.getElementById('question-count-select-sidebar');
+    const generateQuestionsButton = document.querySelector('.sidebar-generate-button');
     const questionsDisplayContainer = document.getElementById('questions-display-container');
+    const emptyState = document.getElementById('empty-state');
     
     if (!schoolSelect || !gradeSelect || !semesterSelect || !subjectSelect || 
         !difficultySelect || !questionCountSelect || !generateQuestionsButton) {
@@ -709,7 +710,7 @@ function handleGenerateQuestionsClick() {
         generateQuestionsButton.disabled = true;
     }
     
-    // Collect form data
+    // Collect form data from sidebar
     const schoolType = schoolSelect.value;
     const grade = gradeSelect.value;
     const semester = semesterSelect.value;
@@ -775,8 +776,15 @@ D. [选项D内容]
                 window.userAnswers = Array(parsedQuestions.length).fill(null);
                 window.currentQuestionIndex = 0;
                 
+                // Hide empty state and show questions
+                if (emptyState) {
+                    emptyState.classList.add('hidden');
+                }
+                
                 // Show the questions display container
-                questionsDisplayContainer.classList.remove('hidden');
+                if (questionsDisplayContainer) {
+                    questionsDisplayContainer.classList.remove('hidden');
+                }
                 
                 // Display the first question
                 displayCurrentQuestion();
