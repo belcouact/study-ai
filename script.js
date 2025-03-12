@@ -3065,12 +3065,24 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(setupChatButtons, 300);
 });
 
-// Modify the setupChatButtons function to create the chat interface if it doesn't exist
+// Modify the setupChatButtons function to include better checks and prevent multiple calls
 function setupChatButtons() {
-    console.log('Setting up chat buttons');
+    console.log('Setting up chat buttons - checking if elements exist');
     
-    // First, ensure the chat interface exists
-    createChatInterface();
+    // Check if we're on the QA tab first
+    const qaContainer = document.getElementById('qa-container');
+    const qaButton = document.getElementById('qa-button');
+    
+    if (!qaContainer || (qaButton && !qaButton.classList.contains('active'))) {
+        console.log('Not on QA tab or QA container not found, skipping chat button setup');
+        return;
+    }
+    
+    // Check if chat interface exists, create it if not
+    if (!document.getElementById('chat-interface')) {
+        console.log('Chat interface not found, creating it');
+        createChatInterface();
+    }
     
     // Now get the chat input and response area
     const chatInput = document.getElementById('chat-input');
@@ -3081,20 +3093,27 @@ function setupChatButtons() {
         return;
     }
     
-    // Set up optimize button
+    // Check if buttons already have event listeners by looking for a data attribute
     const optimizeButton = document.getElementById('optimize-button');
-    if (optimizeButton) {
+    const submitButton = document.getElementById('submit-button');
+    
+    if (optimizeButton && !optimizeButton.hasAttribute('data-has-listener')) {
+        console.log('Setting up optimize button listener');
+        
+        // Mark the button as having a listener
+        optimizeButton.setAttribute('data-has-listener', 'true');
+        
+        // Add event listener
         optimizeButton.addEventListener('click', function() {
             const questionText = chatInput.value.trim();
             
             if (!questionText) {
                 showSystemMessage('请先输入问题内容', 'warning');
-            return;
-        }
-        
-            // Get selected school and grade from sidebar - add debug logging
-            const selectedSchool = document.getElementById('sidebar-school')?.value || '';
-            const selectedGrade = document.getElementById('sidebar-grade')?.value || '';
+                return;
+            }
+            
+            // Get selected school and grade using the helper function
+            const { school: selectedSchool, grade: selectedGrade } = getSidebarDropdownValues();
             
             console.log('Optimize button clicked with school:', selectedSchool, 'and grade:', selectedGrade);
             
@@ -3170,9 +3189,13 @@ function setupChatButtons() {
         });
     }
     
-    // Set up submit button - similar fix for the submit button
-    const submitButton = document.getElementById('submit-button');
-    if (submitButton) {
+    if (submitButton && !submitButton.hasAttribute('data-has-listener')) {
+        console.log('Setting up submit button listener');
+        
+        // Mark the button as having a listener
+        submitButton.setAttribute('data-has-listener', 'true');
+        
+        // Add event listener
         submitButton.addEventListener('click', function() {
             const questionText = chatInput.value.trim();
             
@@ -3181,9 +3204,8 @@ function setupChatButtons() {
                 return;
             }
             
-            // Get selected school and grade from sidebar - add debug logging
-            const selectedSchool = document.getElementById('sidebar-school')?.value || '';
-            const selectedGrade = document.getElementById('sidebar-grade')?.value || '';
+            // Get selected school and grade using the helper function
+            const { school: selectedSchool, grade: selectedGrade } = getSidebarDropdownValues();
             
             console.log('Submit button clicked with school:', selectedSchool, 'and grade:', selectedGrade);
             
@@ -3262,20 +3284,20 @@ ${questionText}`;
                         contextHeader = `
                             <div class="context-header">
                                 <span class="context-badge">${contextParts.join(' · ')}</span>
-                                            </div>
+                            </div>
                         `;
                     }
                     
                     chatResponse.innerHTML = `
                         <div class="response-header">
                             <i class="fas fa-robot"></i> AI 助手回答
-                                </div>
+                        </div>
                         ${contextHeader}
                         <div class="response-content">
                             ${formattedResponse}
-                            </div>
-                        `;
-        
+                        </div>
+                    `;
+                    
                     // Render MathJax in the response
                     if (window.MathJax) {
                         MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
@@ -3298,10 +3320,14 @@ ${questionText}`;
                 });
         });
     }
+    
+    console.log('Chat buttons setup completed');
 }
 
-// Add a new function to create the chat interface
+// Modify the createChatInterface function to ensure it only creates the interface once
 function createChatInterface() {
+    console.log('Creating chat interface');
+    
     // Get the QA container first
     const qaContainer = document.getElementById('qa-container');
     if (!qaContainer) {
@@ -3311,8 +3337,11 @@ function createChatInterface() {
     
     // Check if the chat interface already exists
     if (document.getElementById('chat-interface')) {
+        console.log('Chat interface already exists, skipping creation');
         return; // Already exists, no need to create it
     }
+    
+    console.log('Building new chat interface');
     
     // Create the chat interface
     const chatInterface = document.createElement('div');
@@ -3371,8 +3400,8 @@ function createChatInterface() {
             <i class="fas fa-comment-dots" style="font-size: 24px; margin-bottom: 10px;"></i>
             <h3 style="margin: 0 0 10px 0; font-size: 18px;">欢迎使用AI学习助手</h3>
             <p style="margin: 0; font-size: 14px;">在上方输入您的问题，点击"提交问题"获取回答</p>
-                </div>
-            `;
+        </div>
+    `;
     
     // Add input area and response area to chat interface
     chatInterface.appendChild(chatInputArea);
@@ -3381,9 +3410,6 @@ function createChatInterface() {
     // Add the chat interface to the QA container
     qaContainer.innerHTML = ''; // Clear any existing content
     qaContainer.appendChild(chatInterface);
-    
-    // Reset the initialization flag since we've recreated the interface
-    window.chatButtonsInitialized = false;
     
     // Add CSS for the chat interface
     const style = document.createElement('style');
@@ -3447,21 +3473,73 @@ function createChatInterface() {
     chatInput.addEventListener('keydown', function(event) {
         if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
             event.preventDefault();
-            submitButton.click();
+            const submitButton = document.getElementById('submit-button');
+            if (submitButton) {
+                submitButton.click();
+            }
         }
     });
+    
+    console.log('Chat interface created successfully');
 }
 
-// Make sure chatButtonsInitialized is defined globally
-window.chatButtonsInitialized = false;
+// Modify the initializeFormLayout function to set up tab switching with proper chat interface initialization
+function initializeFormLayout() {
+    // ... existing code ...
+    
+    // Setup tab switching functionality
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    
+    if (qaButton && createButton && qaContainer && createContainer) {
+        qaButton.addEventListener('click', function() {
+            console.log('QA tab clicked');
+            qaButton.classList.add('active');
+            createButton.classList.remove('active');
+            qaContainer.classList.remove('hidden');
+            createContainer.classList.add('hidden');
+            
+            // Set up chat buttons when switching to QA tab
+            setTimeout(setupChatButtons, 100);
+        });
+        
+        createButton.addEventListener('click', function() {
+            console.log('Create tab clicked');
+            createButton.classList.add('active');
+            qaButton.classList.remove('active');
+            createContainer.classList.remove('hidden');
+            qaContainer.classList.add('hidden');
+            
+            // Initialize empty state if no questions are loaded
+            initializeEmptyState();
+        });
+        
+        // Initialize based on which tab is active
+        if (createButton.classList.contains('active')) {
+            console.log('Create tab is active on load');
+            initializeEmptyState();
+        } else if (qaButton.classList.contains('active')) {
+            console.log('QA tab is active on load');
+            // Set up chat buttons if QA tab is active
+            setTimeout(setupChatButtons, 100);
+        }
+    } else {
+        // If tab buttons don't exist, initialize empty state anyway
+        initializeEmptyState();
+    }
+    
+    // ... rest of existing code ...
+}
 
 // Update the document.addEventListener at the end of the file
 document.addEventListener('DOMContentLoaded', function() {
-    // Only call setupChatButtons if it hasn't been initialized yet
-    if (!window.chatButtonsInitialized) {
-        setTimeout(() => {
-            setupChatButtons();
-            window.chatButtonsInitialized = true;
-        }, 300);
-    }
+    console.log('DOM fully loaded');
+    
+    // Initialize form layout which will handle tab setup
+    initializeFormLayout();
+    
+    // Initialize dropdowns with empty values
+    initializeDropdownsWithEmptyValues();
 }); 
