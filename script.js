@@ -1194,202 +1194,140 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Populate initial grade and subject options based on default school
-    const schoolSelect = document.getElementById('school-select');
-    if (schoolSelect) {
-        const initialSchool = schoolSelect.value;
-        populateGradeOptions(initialSchool);
-        populateSubjectOptions(initialSchool);
-    }
-    
-    // Add change event listener to school select
-    if (schoolSelect) {
-        schoolSelect.addEventListener('change', function() {
-            populateGradeOptions(this.value);
-            populateSubjectOptions(this.value);
-        });
-    }
-    
-    // Add change event listener to sidebar school select
+    // Directly populate sidebar dropdowns with initial values
     const schoolSelectSidebar = document.getElementById('school-select-sidebar');
     if (schoolSelectSidebar) {
+        const initialSchool = schoolSelectSidebar.value || '小学';
+        
+        // Define grade options based on school
+        let gradeOptions = [];
+        switch (initialSchool) {
+            case '小学':
+                gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+                break;
+            case '初中':
+                gradeOptions = ['初一', '初二', '初三'];
+                break;
+            case '高中':
+                gradeOptions = ['高一', '高二', '高三'];
+                break;
+            case '大学':
+                gradeOptions = ['大一', '大二', '大三', '大四'];
+                break;
+            default:
+                gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+        }
+        
+        // Define subject options based on school
+        let subjectOptions = [];
+        switch (initialSchool) {
+            case '小学':
+                subjectOptions = ['语文', '数学', '英语', '科学', '道德与法治'];
+                break;
+            case '初中':
+                subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+                break;
+            case '高中':
+                subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+                break;
+            case '大学':
+                subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
+                break;
+            default:
+                subjectOptions = ['语文', '数学', '英语'];
+        }
+        
+        // Populate grade dropdown
+        const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
+        if (gradeSelectSidebar) {
+            gradeSelectSidebar.innerHTML = '';
+            gradeOptions.forEach(grade => {
+                const option = document.createElement('option');
+                option.value = grade;
+                option.textContent = grade;
+                gradeSelectSidebar.appendChild(option);
+            });
+        }
+        
+        // Populate subject dropdown
+        const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
+        if (subjectSelectSidebar) {
+            subjectSelectSidebar.innerHTML = '';
+            subjectOptions.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectSelectSidebar.appendChild(option);
+            });
+        }
+        
+        // Add change event listener to update dropdowns when school changes
         schoolSelectSidebar.addEventListener('change', function() {
-            populateGradeOptions(this.value);
-            populateSubjectOptions(this.value);
+            const school = this.value;
             
-            // Also update the main form school select
-            if (schoolSelect) {
-                schoolSelect.value = this.value;
+            // Define grade options based on school
+            let gradeOptions = [];
+            switch (school) {
+                case '小学':
+                    gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+                    break;
+                case '初中':
+                    gradeOptions = ['初一', '初二', '初三'];
+                    break;
+                case '高中':
+                    gradeOptions = ['高一', '高二', '高三'];
+                    break;
+                case '大学':
+                    gradeOptions = ['大一', '大二', '大三', '大四'];
+                    break;
+                default:
+                    gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+            }
+            
+            // Define subject options based on school
+            let subjectOptions = [];
+            switch (school) {
+                case '小学':
+                    subjectOptions = ['语文', '数学', '英语', '科学', '道德与法治'];
+                    break;
+                case '初中':
+                    subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+                    break;
+                case '高中':
+                    subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+                    break;
+                case '大学':
+                    subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
+                    break;
+                default:
+                    subjectOptions = ['语文', '数学', '英语'];
+            }
+            
+            // Update grade dropdown
+            const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
+            if (gradeSelectSidebar) {
+                gradeSelectSidebar.innerHTML = '';
+                gradeOptions.forEach(grade => {
+                    const option = document.createElement('option');
+                    option.value = grade;
+                    option.textContent = grade;
+                    gradeSelectSidebar.appendChild(option);
+                });
+            }
+            
+            // Update subject dropdown
+            const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
+            if (subjectSelectSidebar) {
+                subjectSelectSidebar.innerHTML = '';
+                subjectOptions.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject;
+                    option.textContent = subject;
+                    subjectSelectSidebar.appendChild(option);
+                });
             }
         });
     }
-    
-    // Sync sidebar dropdowns with form dropdowns
-    function syncDropdowns() {
-        // School dropdown sync
-        const schoolSelect = document.getElementById('school-select');
-        const schoolSelectSidebar = document.getElementById('school-select-sidebar');
-        if (schoolSelect && schoolSelectSidebar) {
-            // Initial sync
-            schoolSelectSidebar.value = schoolSelect.value;
-            
-            // Two-way binding
-            schoolSelect.addEventListener('change', function() {
-                schoolSelectSidebar.value = this.value;
-                // Trigger change event to update dependent dropdowns
-                const event = new Event('change');
-                schoolSelectSidebar.dispatchEvent(event);
-                
-                // Also update sidebar dropdowns directly
-                populateSidebarDropdowns();
-            });
-            
-            schoolSelectSidebar.addEventListener('change', function() {
-                schoolSelect.value = this.value;
-                // Trigger change event to update dependent dropdowns
-                const event = new Event('change');
-                schoolSelect.dispatchEvent(event);
-                
-                // Also update sidebar dropdowns directly
-                populateSidebarDropdowns();
-            });
-        }
-        
-        // Grade dropdown sync
-        const gradeSelect = document.getElementById('grade-select');
-        const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
-        if (gradeSelect && gradeSelectSidebar) {
-            // Two-way binding
-            gradeSelect.addEventListener('change', function() {
-                // First ensure options are the same
-                while (gradeSelectSidebar.options.length > 0) {
-                    gradeSelectSidebar.options.remove(0);
-                }
-                
-                Array.from(gradeSelect.options).forEach(option => {
-                    gradeSelectSidebar.options.add(new Option(option.text, option.value));
-                });
-                
-                gradeSelectSidebar.value = this.value;
-            });
-            
-            gradeSelectSidebar.addEventListener('change', function() {
-                gradeSelect.value = this.value;
-            });
-        }
-        
-        // Subject dropdown sync
-        const subjectSelect = document.getElementById('subject-select');
-        const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
-        if (subjectSelect && subjectSelectSidebar) {
-            // Two-way binding
-            subjectSelect.addEventListener('change', function() {
-                // First ensure options are the same
-                while (subjectSelectSidebar.options.length > 0) {
-                    subjectSelectSidebar.options.remove(0);
-                }
-                
-                Array.from(subjectSelect.options).forEach(option => {
-                    subjectSelectSidebar.options.add(new Option(option.text, option.value));
-                });
-                
-                subjectSelectSidebar.value = this.value;
-            });
-            
-            subjectSelectSidebar.addEventListener('change', function() {
-                subjectSelect.value = this.value;
-            });
-        }
-        
-        // Semester dropdown sync
-        const semesterSelect = document.getElementById('semester-select');
-        const semesterSelectSidebar = document.getElementById('semester-select-sidebar');
-        if (semesterSelect && semesterSelectSidebar) {
-            // Initial sync
-            semesterSelectSidebar.value = semesterSelect.value;
-            
-            // Two-way binding
-            semesterSelect.addEventListener('change', function() {
-                semesterSelectSidebar.value = this.value;
-            });
-            
-            semesterSelectSidebar.addEventListener('change', function() {
-                semesterSelect.value = this.value;
-            });
-        }
-        
-        // Difficulty dropdown sync
-        const difficultySelect = document.getElementById('difficulty-select');
-        const difficultySelectSidebar = document.getElementById('difficulty-select-sidebar');
-        if (difficultySelect && difficultySelectSidebar) {
-            // Initial sync
-            difficultySelectSidebar.value = difficultySelect.value;
-            
-            // Two-way binding
-            difficultySelect.addEventListener('change', function() {
-                difficultySelectSidebar.value = this.value;
-            });
-            
-            difficultySelectSidebar.addEventListener('change', function() {
-                difficultySelect.value = this.value;
-            });
-        }
-        
-        // Question count dropdown sync
-        const questionCountSelect = document.getElementById('question-count-select');
-        const questionCountSelectSidebar = document.getElementById('question-count-select-sidebar');
-        if (questionCountSelect && questionCountSelectSidebar) {
-            // Initial sync
-            questionCountSelectSidebar.value = questionCountSelect.value;
-            
-            // Two-way binding
-            questionCountSelect.addEventListener('change', function() {
-                questionCountSelectSidebar.value = this.value;
-            });
-            
-            questionCountSelectSidebar.addEventListener('change', function() {
-                questionCountSelect.value = this.value;
-            });
-        }
-    }
-    
-    // Function to populate sidebar dropdowns
-    function populateSidebarDropdowns() {
-        // Populate grade dropdown in sidebar
-        const gradeSelect = document.getElementById('grade-select');
-        const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
-        if (gradeSelect && gradeSelectSidebar) {
-            // Clear existing options
-            gradeSelectSidebar.innerHTML = '';
-            
-            // Copy options from main form
-            Array.from(gradeSelect.options).forEach(option => {
-                gradeSelectSidebar.options.add(new Option(option.text, option.value));
-            });
-            
-            // Set the same selected value
-            gradeSelectSidebar.value = gradeSelect.value;
-        }
-        
-        // Populate subject dropdown in sidebar
-        const subjectSelect = document.getElementById('subject-select');
-        const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
-        if (subjectSelect && subjectSelectSidebar) {
-            // Clear existing options
-            subjectSelectSidebar.innerHTML = '';
-            
-            // Copy options from main form
-            Array.from(subjectSelect.options).forEach(option => {
-                subjectSelectSidebar.options.add(new Option(option.text, option.value));
-            });
-            
-            // Set the same selected value
-            subjectSelectSidebar.value = subjectSelect.value;
-        }
-    }
-    
-    // Initialize dropdown sync
-    syncDropdowns();
     
     // Add click handler for sidebar generate button
     const sidebarGenerateButton = document.createElement('button');
@@ -1411,16 +1349,4 @@ document.addEventListener('DOMContentLoaded', function() {
     if (testFrame) {
         testFrame.appendChild(sidebarGenerateButton);
     }
-    
-    // Add event listeners for form changes to update sidebar
-    const formSelects = ['school-select', 'grade-select', 'subject-select', 'semester-select', 'difficulty-select', 'question-count-select'];
-    formSelects.forEach(id => {
-        const select = document.getElementById(id);
-        if (select) {
-            select.addEventListener('change', populateSidebarDropdowns);
-        }
-    });
-    
-    // Call populateSidebarDropdowns to ensure sidebar dropdowns are populated
-    populateSidebarDropdowns();
 }); 
