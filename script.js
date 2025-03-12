@@ -91,8 +91,11 @@ function parseQuestionsFromResponse(response) {
     // Standard parsing for normal format
     for (const block of questionBlocks) {
         try {
+            console.log('Processing question block:', block.substring(0, 100) + '...');
+            
             // Extract question text
             const questionText = block.split(/[A-D]\.|\n答案：|\n解析：/)[0].trim();
+            console.log('Extracted question text:', questionText);
             
             // Extract choices
             const choiceA = block.match(/A\.(.*?)(?=B\.|$)/s)?.[1]?.trim() || '';
@@ -100,11 +103,15 @@ function parseQuestionsFromResponse(response) {
             const choiceC = block.match(/C\.(.*?)(?=D\.|$)/s)?.[1]?.trim() || '';
             const choiceD = block.match(/D\.(.*?)(?=\n答案：|$)/s)?.[1]?.trim() || '';
             
+            console.log('Extracted choices:', { A: choiceA, B: choiceB, C: choiceC, D: choiceD });
+            
             // Extract answer
             const answer = block.match(/答案：([A-D])/)?.[1] || '';
+            console.log('Extracted answer:', answer);
             
             // Extract explanation
             const explanation = block.match(/解析：([\s\S]*?)(?=题目：|$)/)?.[1]?.trim() || '';
+            console.log('Extracted explanation:', explanation.substring(0, 100) + '...');
             
             if (!questionText || !answer) {
                 console.warn('Skipping question with missing text or answer');
@@ -114,13 +121,13 @@ function parseQuestionsFromResponse(response) {
             parsedQuestions.push({
                 questionText: `题目：${questionText}`,
                 choices: {
-                    A: choiceA,
-                    B: choiceB,
-                    C: choiceC,
-                    D: choiceD
+                    A: choiceA || '选项A未提供',
+                    B: choiceB || '选项B未提供',
+                    C: choiceC || '选项C未提供',
+                    D: choiceD || '选项D未提供'
                 },
-                answer,
-                explanation
+                answer: answer,
+                explanation: explanation || '无解析'
             });
         } catch (error) {
             console.error('Error parsing question block:', error, block);
@@ -143,7 +150,7 @@ function parseQuestionsFromResponse(response) {
         });
     }
     
-    console.log(`Successfully parsed ${parsedQuestions.length} questions`);
+    console.log(`Successfully parsed ${parsedQuestions.length} questions:`, parsedQuestions);
     return parsedQuestions;
 }
 
@@ -361,15 +368,24 @@ function showResultsPopup() {
     });
 }
 
-// Global function to display the current question
+// Function to display the current question
 function displayCurrentQuestion() {
     console.log('displayCurrentQuestion called', window.currentQuestionIndex);
+    console.log('Questions array:', window.questions);
+    
+    if (!window.questions || window.questions.length === 0) {
+        console.error('No questions available to display');
+        return;
+    }
+    
     const question = window.questions[window.currentQuestionIndex];
     
     if (!question) {
         console.error('No question found at index', window.currentQuestionIndex);
         return;
     }
+    
+    console.log('Current question:', question);
 
     // Check if all questions are answered
     const allQuestionsAnswered = window.userAnswers && 
@@ -396,6 +412,9 @@ function displayCurrentQuestion() {
             width: fit-content;
         `;
         questionCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
+        console.log('Updated question counter:', questionCounter.textContent);
+    } else {
+        console.error('Question counter element not found');
     }
     
     // Format and display question text with responsive styling
@@ -412,12 +431,22 @@ function displayCurrentQuestion() {
             width: 100%;
             box-sizing: border-box;
         `;
-        questionText.innerHTML = formatMathExpressions(question.questionText);
+        // Remove "题目：" prefix if it exists
+        let displayText = question.questionText;
+        if (displayText.startsWith('题目：')) {
+            displayText = displayText.substring(3);
+        }
+        questionText.innerHTML = formatMathExpressions(displayText);
+        console.log('Updated question text:', displayText);
+    } else {
+        console.error('Question text element not found');
     }
     
     // Create responsive grid for choices with 2x2 layout
     const choicesContainer = document.getElementById('choices-container');
     if (choicesContainer) {
+        console.log('Choices container found, updating with choices:', question.choices);
+        
         choicesContainer.innerHTML = `
             <div class="choices-grid" style="
                 display: grid;
@@ -489,6 +518,54 @@ function displayCurrentQuestion() {
                 // Save the answer
                 const value = cell.dataset.value;
                 window.userAnswers[window.currentQuestionIndex] = value;
+                
+                // Show the answer container after selecting an option
+                const answerContainer = document.getElementById('answer-container');
+                if (answerContainer) {
+                    answerContainer.classList.remove('hidden');
+                    
+                    // Update answer result
+                    const answerResult = document.getElementById('answer-result');
+                    const correctAnswer = question.answer;
+                    const isCorrect = value === correctAnswer;
+                    
+                    if (answerResult) {
+                        answerResult.style.cssText = `
+                            font-size: 18px;
+                            font-weight: 500;
+                            color: ${isCorrect ? '#48bb78' : '#e53e3e'};
+                            margin-bottom: 20px;
+                            padding: 15px;
+                            background: ${isCorrect ? '#f0fff4' : '#fff5f5'};
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                        `;
+                        
+                        const resultText = isCorrect 
+                            ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 正确！答案是：${correctAnswer}`
+                            : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> 错误。正确答案是：${correctAnswer}`;
+                        
+                        answerResult.innerHTML = formatMathExpressions(resultText);
+                    }
+                    
+                    // Update explanation
+                    const answerExplanation = document.getElementById('answer-explanation');
+                    if (answerExplanation) {
+                        answerExplanation.style.cssText = `
+                            font-size: 16px;
+                            color: #4a5568;
+                            line-height: 1.8;
+                            margin-top: 20px;
+                            padding: 20px;
+                            background: #f8f9fa;
+                            border-radius: 8px;
+                            white-space: pre-wrap;
+                        `;
+                        answerExplanation.innerHTML = formatMathExpressions(question.explanation);
+                    }
+                }
             });
             
             // Touch and hover effects
@@ -521,11 +598,15 @@ function displayCurrentQuestion() {
             });
 
             // Set initial state if answer exists
-            if (window.userAnswers[window.currentQuestionIndex] === cell.dataset.value) {
+            if (window.userAnswers && window.userAnswers[window.currentQuestionIndex] === cell.dataset.value) {
                 selectedCell = cell;
                 updateCellStyles(cell, true);
             }
         });
+        
+        console.log('Choice cells set up:', choiceCells.length);
+    } else {
+        console.error('Choices container element not found');
     }
     
     // Style the answer container when showing results
@@ -622,10 +703,24 @@ function displayCurrentQuestion() {
         `;
     }
     
+    // Make sure the questions display container is visible
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    if (questionsDisplayContainer) {
+        questionsDisplayContainer.classList.remove('hidden');
+        
+        // Hide the empty state if it exists
+        const emptyState = document.getElementById('empty-state');
+        if (emptyState) {
+            emptyState.classList.add('hidden');
+        }
+    }
+    
     // Render math expressions
     if (window.MathJax) {
         window.MathJax.typesetPromise && window.MathJax.typesetPromise();
     }
+    
+    console.log('displayCurrentQuestion completed');
 }
 
 // Function to format math expressions
@@ -782,14 +877,18 @@ D. [选项D内容]
                 window.userAnswers = Array(parsedQuestions.length).fill(null);
                 window.currentQuestionIndex = 0;
                 
-                // Hide empty state and show questions
+                // Hide empty state
                 if (emptyState) {
                     emptyState.classList.add('hidden');
+                    console.log('Empty state hidden');
                 }
                 
                 // Show the questions display container
                 if (questionsDisplayContainer) {
                     questionsDisplayContainer.classList.remove('hidden');
+                    console.log('Questions display container shown');
+                } else {
+                    console.error('Questions display container not found');
                 }
                 
                 // Display the first question
@@ -799,15 +898,18 @@ D. [选项D内容]
                 // Set up navigation button event listeners
                 setupNavigationButtons();
                 
-                // Set up option selection buttons
-                setupOptionButtons();
-                
                 // Show success message
                 showSystemMessage(`已生成 ${parsedQuestions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`, 'success');
             } catch (error) {
                 console.error('Error processing questions:', error);
                 showSystemMessage('生成题目时出错，请重试', 'error');
                 hideLoadingIndicator();
+                
+                // Show empty state again if there was an error
+                if (emptyState && questionsDisplayContainer) {
+                    emptyState.classList.remove('hidden');
+                    questionsDisplayContainer.classList.remove('hidden');
+                }
             } finally {
                 // Reset button state
                 if (isTestPage) {
@@ -820,6 +922,13 @@ D. [选项D内容]
             console.error('API error:', error);
             showSystemMessage('API调用失败，请重试', 'error');
             hideLoadingIndicator();
+            
+            // Show empty state again if there was an error
+            if (emptyState && questionsDisplayContainer) {
+                emptyState.classList.remove('hidden');
+                questionsDisplayContainer.classList.remove('hidden');
+            }
+            
             // Reset button state
             if (isTestPage) {
                 generateQuestionsButton.textContent = '出题';
@@ -1419,7 +1528,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let subjectOptions = [];
         switch (initialSchool) {
             case '小学':
-                subjectOptions = ['语文', '数学', '英语', '科学', '道德与法治'];
+                subjectOptions = ['语文', '数学', '英语', '科学'];
                 break;
             case '初中':
                 subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
