@@ -3233,16 +3233,77 @@ ${questionText}
     });
 }
 
-// Add this function after initializeFormLayout()
+// Modify initializeFormLayout to call setupChatButtons
+function initializeFormLayout() {
+    // ... existing code ...
+    
+    // Setup tab switching functionality
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    
+    if (qaButton && createButton && qaContainer && createContainer) {
+        qaButton.addEventListener('click', function() {
+            qaButton.classList.add('active');
+            createButton.classList.remove('active');
+            qaContainer.classList.remove('hidden');
+            createContainer.classList.add('hidden');
+            
+            // Set up chat buttons when switching to QA tab
+            setTimeout(setupChatButtons, 100);
+        });
+        
+        createButton.addEventListener('click', function() {
+            createButton.classList.add('active');
+            qaButton.classList.remove('active');
+            createContainer.classList.remove('hidden');
+            qaContainer.classList.add('hidden');
+            
+            // Initialize empty state if no questions are loaded
+            initializeEmptyState();
+        });
+        
+        // Initialize empty state on the test page if it's active
+        if (createButton.classList.contains('active')) {
+            initializeEmptyState();
+        } else if (qaButton.classList.contains('active')) {
+            // Set up chat buttons if QA tab is active
+            setTimeout(setupChatButtons, 100);
+        }
+    } else {
+        // If tab buttons don't exist, initialize empty state anyway
+        initializeEmptyState();
+    }
+    
+    // Set up initial navigation buttons
+    setupNavigationButtons();
+    
+    // Set up chat buttons on page load
+    setupChatButtons();
+    
+    // ... existing code ...
+}
+
+// Add this at the end of the file to ensure buttons are set up when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up chat buttons when the page loads
+    setTimeout(setupChatButtons, 300);
+});
+
+// Modify the setupChatButtons function to create the chat interface if it doesn't exist
 function setupChatButtons() {
     console.log('Setting up chat buttons');
     
-    // Get the chat input and response area
+    // First, ensure the chat interface exists
+    createChatInterface();
+    
+    // Now get the chat input and response area
     const chatInput = document.getElementById('chat-input');
     const chatResponse = document.getElementById('chat-response');
     
     if (!chatInput || !chatResponse) {
-        console.error('Chat input or response area not found');
+        console.error('Chat input or response area not found even after creation');
         return;
     }
     
@@ -3362,60 +3423,138 @@ ${questionText}
     }
 }
 
-// Modify initializeFormLayout to call setupChatButtons
-function initializeFormLayout() {
-    // ... existing code ...
-    
-    // Setup tab switching functionality
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
+// Add a new function to create the chat interface
+function createChatInterface() {
     const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
-    
-    if (qaButton && createButton && qaContainer && createContainer) {
-        qaButton.addEventListener('click', function() {
-            qaButton.classList.add('active');
-            createButton.classList.remove('active');
-            qaContainer.classList.remove('hidden');
-            createContainer.classList.add('hidden');
-            
-            // Set up chat buttons when switching to QA tab
-            setTimeout(setupChatButtons, 100);
-        });
-        
-        createButton.addEventListener('click', function() {
-            createButton.classList.add('active');
-            qaButton.classList.remove('active');
-            createContainer.classList.remove('hidden');
-            qaContainer.classList.add('hidden');
-            
-            // Initialize empty state if no questions are loaded
-            initializeEmptyState();
-        });
-        
-        // Initialize empty state on the test page if it's active
-        if (createButton.classList.contains('active')) {
-            initializeEmptyState();
-        } else if (qaButton.classList.contains('active')) {
-            // Set up chat buttons if QA tab is active
-            setTimeout(setupChatButtons, 100);
-        }
-    } else {
-        // If tab buttons don't exist, initialize empty state anyway
-        initializeEmptyState();
+    if (!qaContainer) {
+        console.error('QA container not found');
+        return;
     }
     
-    // Set up initial navigation buttons
-    setupNavigationButtons();
+    // Check if the chat interface already exists
+    if (document.getElementById('chat-interface')) {
+        return; // Already exists, no need to create it
+    }
     
-    // Set up chat buttons on page load
-    setupChatButtons();
+    // Create the chat interface
+    const chatInterface = document.createElement('div');
+    chatInterface.id = 'chat-interface';
+    chatInterface.className = 'chat-interface';
+    chatInterface.style.cssText = 'display: flex; flex-direction: column; height: 100%; padding: 20px; gap: 20px;';
     
-    // ... existing code ...
+    // Create the chat input area
+    const chatInputArea = document.createElement('div');
+    chatInputArea.className = 'chat-input-area';
+    chatInputArea.style.cssText = 'display: flex; flex-direction: column; gap: 10px;';
+    
+    // Create the textarea
+    const chatInput = document.createElement('textarea');
+    chatInput.id = 'chat-input';
+    chatInput.className = 'chat-input';
+    chatInput.placeholder = '输入您的问题...';
+    chatInput.style.cssText = 'width: 100%; min-height: 100px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 16px; resize: vertical;';
+    
+    // Create the buttons container
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.className = 'chat-buttons';
+    buttonsContainer.style.cssText = 'display: flex; gap: 10px; justify-content: flex-end;';
+    
+    // Create the optimize button
+    const optimizeButton = document.createElement('button');
+    optimizeButton.id = 'optimize-button';
+    optimizeButton.className = 'chat-button optimize-button';
+    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+    optimizeButton.style.cssText = 'padding: 8px 16px; background-color: #4299e1; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
+    
+    // Create the submit button
+    const submitButton = document.createElement('button');
+    submitButton.id = 'submit-button';
+    submitButton.className = 'chat-button submit-button';
+    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
+    submitButton.style.cssText = 'padding: 8px 16px; background-color: #48bb78; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
+    
+    // Add buttons to container
+    buttonsContainer.appendChild(optimizeButton);
+    buttonsContainer.appendChild(submitButton);
+    
+    // Add textarea and buttons to input area
+    chatInputArea.appendChild(chatInput);
+    chatInputArea.appendChild(buttonsContainer);
+    
+    // Create the response area
+    const chatResponse = document.createElement('div');
+    chatResponse.id = 'chat-response';
+    chatResponse.className = 'chat-response';
+    chatResponse.style.cssText = 'background-color: #f8fafc; border-radius: 8px; padding: 20px; min-height: 100px; max-height: 500px; overflow-y: auto;';
+    
+    // Add a welcome message
+    chatResponse.innerHTML = `
+        <div class="welcome-message" style="text-align: center; color: #718096;">
+            <i class="fas fa-comment-dots" style="font-size: 24px; margin-bottom: 10px;"></i>
+            <h3 style="margin: 0 0 10px 0; font-size: 18px;">欢迎使用AI学习助手</h3>
+            <p style="margin: 0; font-size: 14px;">在上方输入您的问题，点击"提交问题"获取回答</p>
+        </div>
+    `;
+    
+    // Add input area and response area to chat interface
+    chatInterface.appendChild(chatInputArea);
+    chatInterface.appendChild(chatResponse);
+    
+    // Add the chat interface to the QA container
+    qaContainer.innerHTML = ''; // Clear any existing content
+    qaContainer.appendChild(chatInterface);
+    
+    // Add CSS for the chat interface
+    const style = document.createElement('style');
+    style.textContent = `
+        .chat-button:hover {
+            opacity: 0.9;
+        }
+        .chat-button:active {
+            transform: translateY(1px);
+        }
+        .chat-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .loading-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #718096;
+            font-size: 16px;
+            padding: 20px;
+        }
+        .response-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .response-content {
+            line-height: 1.6;
+            color: #4a5568;
+            white-space: pre-wrap;
+        }
+        .error-message {
+            color: #e53e3e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Add event listener for Ctrl+Enter to submit
+    chatInput.addEventListener('keydown', function(event) {
+        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+            event.preventDefault();
+            submitButton.click();
+        }
+    });
 }
-
-// Add this at the end of the file to ensure buttons are set up when the page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Set up chat buttons when the page loads
-    setTimeout(setupChatButtons, 300);
-});
