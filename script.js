@@ -3613,9 +3613,19 @@ function setupChatButtons() {
     
     // Add event listener to the optimize button
     newOptimizeButton.addEventListener('click', function() {
-        // Get dropdown values from sidebar
-        const dropdownValues = getSidebarDropdownValues();
-        const { school, grade, subject } = dropdownValues;
+        // Get dropdown values from sidebar - with safety checks
+        let dropdownValues = {};
+        try {
+            dropdownValues = getSidebarDropdownValues() || {};
+        } catch (error) {
+            console.error('Error getting dropdown values:', error);
+            dropdownValues = {};
+        }
+        
+        // Safely extract values with fallbacks
+        const school = dropdownValues.school || '';
+        const grade = dropdownValues.grade || '';
+        const subject = dropdownValues.subject || '';
         
         // Check if we're on the chat page
         if (isOnChatPage()) {
@@ -3703,7 +3713,7 @@ function setupChatButtons() {
                 });
         } else {
             // Handle optimize on test page - get the current question
-            const currentQuestion = window.questions[window.currentQuestionIndex];
+            const currentQuestion = window.questions ? window.questions[window.currentQuestionIndex] : null;
             if (!currentQuestion) {
                 showSystemMessage('没有可优化的问题', 'warning');
                 return;
@@ -3787,9 +3797,19 @@ D. [选项D]
     
     // Add event listener to the submit button
     newSubmitButton.addEventListener('click', function() {
-        // Get dropdown values from sidebar
-        const dropdownValues = getSidebarDropdownValues();
-        const { school, grade, subject } = dropdownValues;
+        // Get dropdown values from sidebar - with safety checks
+        let dropdownValues = {};
+        try {
+            dropdownValues = getSidebarDropdownValues() || {};
+        } catch (error) {
+            console.error('Error getting dropdown values:', error);
+            dropdownValues = {};
+        }
+        
+        // Safely extract values with fallbacks
+        const school = dropdownValues.school || '';
+        const grade = dropdownValues.grade || '';
+        const subject = dropdownValues.subject || '';
         
         // Check if we're on the chat page
         if (isOnChatPage()) {
@@ -3864,7 +3884,7 @@ D. [选项D]
                 });
         } else {
             // Handle submit on test page - get the current question
-            const currentQuestion = window.questions[window.currentQuestionIndex];
+            const currentQuestion = window.questions ? window.questions[window.currentQuestionIndex] : null;
             if (!currentQuestion) {
                 showSystemMessage('没有可提交的问题', 'warning');
                 return;
