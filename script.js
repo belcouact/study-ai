@@ -3611,6 +3611,16 @@ function setupChatButtons() {
         return activeTab && activeTab.getAttribute('data-tab') === 'qa';
     }
     
+    // Helper function to check if questions are available
+    function hasAvailableQuestions() {
+        return window.questions && 
+               Array.isArray(window.questions) && 
+               window.questions.length > 0 && 
+               typeof window.currentQuestionIndex !== 'undefined' &&
+               window.currentQuestionIndex >= 0 &&
+               window.currentQuestionIndex < window.questions.length;
+    }
+    
     // Add event listener to the optimize button
     newOptimizeButton.addEventListener('click', function() {
         // Get dropdown values from sidebar - with safety checks
@@ -3712,12 +3722,15 @@ function setupChatButtons() {
                     newSubmitButton.disabled = false;
                 });
         } else {
-            // Handle optimize on test page - get the current question
-            const currentQuestion = window.questions ? window.questions[window.currentQuestionIndex] : null;
-            if (!currentQuestion) {
-                showSystemMessage('没有可优化的问题', 'warning');
+            // On test page, check if questions are available
+            if (!hasAvailableQuestions()) {
+                // If no questions available, suggest generating some
+                showSystemMessage('请先在侧边栏选择选项并点击"出题"生成问题', 'info');
                 return;
             }
+            
+            // Get the current question
+            const currentQuestion = window.questions[window.currentQuestionIndex];
             
             // Show loading indicator
             showLoadingIndicator();
@@ -3883,12 +3896,15 @@ D. [选项D]
                     newSubmitButton.disabled = false;
                 });
         } else {
-            // Handle submit on test page - get the current question
-            const currentQuestion = window.questions ? window.questions[window.currentQuestionIndex] : null;
-            if (!currentQuestion) {
-                showSystemMessage('没有可提交的问题', 'warning');
+            // On test page, check if questions are available
+            if (!hasAvailableQuestions()) {
+                // If no questions available, suggest generating some
+                showSystemMessage('请先在侧边栏选择选项并点击"出题"生成问题', 'info');
                 return;
             }
+            
+            // Get the current question
+            const currentQuestion = window.questions[window.currentQuestionIndex];
             
             // Show loading indicator
             showLoadingIndicator();
