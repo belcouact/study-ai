@@ -2748,11 +2748,41 @@ function populateGradeOptions(school) {
     }
 }
 
+// Add this at the top of the file to ensure questions is globally available
+// If it's already defined elsewhere, this will be a fallback
+let questions = [];
+let currentQuestionIndex = 0;
+
+// Add this function if it doesn't exist
+function initializeEmptyState() {
+    console.log('Initializing empty state');
+    // Check if the empty state container exists in the create container
+    const createContainer = document.getElementById('create-container');
+    const emptyState = document.querySelector('.empty-state');
+    
+    if (createContainer && !emptyState && (!questions || questions.length === 0)) {
+        console.log('Creating empty state for create container');
+        const emptyStateDiv = document.createElement('div');
+        emptyStateDiv.className = 'empty-state';
+        emptyStateDiv.innerHTML = `
+            <div class="empty-state-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <h3>准备好开始测验了吗？</h3>
+            <p>使用左侧边栏选择学校类型、年级、学期、科目和难度，然后点击"出题"按钮生成问题。</p>
+        `;
+        createContainer.appendChild(emptyStateDiv);
+    }
+}
+
+// Replace the document.addEventListener section with this fixed version
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded - initializing buttons');
     
-    // Initialize the form layout
-    initializeFormLayout();
+    // Initialize the form layout if it exists
+    if (typeof initializeFormLayout === 'function') {
+        initializeFormLayout();
+    }
     
     // Direct button event listeners with console logging
     setTimeout(function() {
@@ -2765,6 +2795,13 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Optimize button found:', optimizeButton);
         console.log('Submit button found:', submitButton);
         
+        // Make sure questions array exists
+        if (typeof questions === 'undefined') {
+            console.log('Questions array not found, initializing empty array');
+            window.questions = [];
+            window.currentQuestionIndex = 0;
+        }
+        
         // Add event listener to optimize button
         if (optimizeButton) {
             optimizeButton.onclick = function(event) {
@@ -2772,13 +2809,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 event.preventDefault();
                 event.stopPropagation();
                 
-                const currentQuestion = questions[currentQuestionIndex];
-                if (!currentQuestion) {
-                    console.log('No current question found');
-                    return;
+                // Safely access questions array
+                const questionsArray = window.questions || [];
+                const currentIndex = window.currentQuestionIndex || 0;
+                
+                if (!questionsArray || questionsArray.length === 0 || !questionsArray[currentIndex]) {
+                    console.log('No current question found or questions array is empty');
+                    showSystemMessage('没有可优化的问题', 'warning');
+                    return false;
                 }
                 
-                console.log('Processing optimization for question:', currentQuestionIndex);
+                const currentQuestion = questionsArray[currentIndex];
+                console.log('Processing optimization for question:', currentIndex);
                 
                 // Show loading state
                 optimizeButton.disabled = true;
@@ -2821,13 +2863,18 @@ D. [选项D]
                         if (optimizedQuestion) {
                             console.log('Successfully parsed optimized question');
                             // Update the current question with optimized content
-                            questions[currentQuestionIndex] = {
-                                ...questions[currentQuestionIndex],
+                            questionsArray[currentIndex] = {
+                                ...questionsArray[currentIndex],
                                 ...optimizedQuestion
                             };
                             
+                            // Update global questions array
+                            window.questions = questionsArray;
+                            
                             // Display the updated question
-                            displayCurrentQuestion();
+                            if (typeof displayCurrentQuestion === 'function') {
+                                displayCurrentQuestion();
+                            }
                             
                             // Show success message
                             showSystemMessage('问题已成功优化！', 'success');
@@ -2866,7 +2913,12 @@ D. [选项D]
                     const selectedValue = selectedChoice.getAttribute('data-value');
                     console.log('Selected value:', selectedValue);
                     
-                    displayAnswer(selectedValue);
+                    if (typeof displayAnswer === 'function') {
+                        displayAnswer(selectedValue);
+                    } else {
+                        console.error('displayAnswer function not found');
+                        showSystemMessage('无法显示答案，请刷新页面重试', 'error');
+                    }
                     
                     // Disable the submit button after submission
                     submitButton.disabled = true;
@@ -2883,85 +2935,66 @@ D. [选项D]
         }
     }, 1000); // Short delay to ensure DOM is fully processed
     
-    // Also add global click handler as backup
-    document.body.addEventListener('click', function(event) {
-        const target = event.target.closest('#optimize-button, #submit-button');
-        
-        if (!target) return;
-        
-        console.log('Button clicked via delegation:', target.id);
-        
-        if (target.id === 'optimize-button') {
-            // Trigger the optimize button's direct click handler
-            const optimizeButton = document.getElementById('optimize-button');
-            if (optimizeButton && optimizeButton.onclick) {
-                optimizeButton.onclick(event);
-            }
-        } else if (target.id === 'submit-button') {
-            // Trigger the submit button's direct click handler
-            const submitButton = document.getElementById('submit-button');
-            if (submitButton && submitButton.onclick) {
-                submitButton.onclick(event);
-            }
-        }
-    });
-    
     // Initialize empty state if needed
     initializeEmptyState();
 });
 
-// Modify the displayCurrentQuestion function to ensure buttons are created with inline event handlers
-function displayCurrentQuestion() {
-    // ... existing code until the action buttons section ...
-    
-    // Ensure the action buttons container exists
-    let actionButtonsContainer = document.querySelector('.action-buttons');
-    if (!actionButtonsContainer) {
-        actionButtonsContainer = document.createElement('div');
-        actionButtonsContainer.className = 'action-buttons';
-        actionButtonsContainer.style.cssText = 'display: flex; gap: 10px; margin-top: 20px; justify-content: center;';
+// Helper function to show system messages if not already defined
+if (typeof showSystemMessage !== 'function') {
+    function showSystemMessage(message, type = 'info') {
+        console.log(`System message (${type}): ${message}`);
         
-        const questionsContainer = document.querySelector('.questions-display-container');
-        if (questionsContainer) {
-            questionsContainer.appendChild(actionButtonsContainer);
+        // Create message element
+        const messageElement = document.createElement('div');
+        messageElement.className = `system-message ${type}`;
+        messageElement.textContent = message;
+        
+        // Style the message
+        messageElement.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 4px;
+            color: white;
+            font-size: 14px;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        `;
+        
+        // Set background color based on type
+        switch (type) {
+            case 'success':
+                messageElement.style.backgroundColor = '#48bb78';
+                break;
+            case 'error':
+                messageElement.style.backgroundColor = '#f56565';
+                break;
+            case 'warning':
+                messageElement.style.backgroundColor = '#ed8936';
+                break;
+            default:
+                messageElement.style.backgroundColor = '#4299e1';
         }
-    }
-    
-    // Create or update the optimize button with inline event handler
-    let optimizeButton = document.getElementById('optimize-button');
-    if (!optimizeButton) {
-        optimizeButton = document.createElement('button');
-        optimizeButton.id = 'optimize-button';
-        optimizeButton.className = 'action-button optimize-button';
-        optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
-        optimizeButton.style.cssText = 'padding: 8px 16px; background-color: #4299e1; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
-        // Add inline event handler
-        optimizeButton.setAttribute('onclick', 'console.log("Optimize button clicked (inline)"); return false;');
-        actionButtonsContainer.appendChild(optimizeButton);
         
-        console.log('Optimize button created in displayCurrentQuestion');
-    }
-    
-    // Create or update the submit button with inline event handler
-    let submitButton = document.getElementById('submit-button');
-    if (!submitButton) {
-        submitButton = document.createElement('button');
-        submitButton.id = 'submit-button';
-        submitButton.className = 'action-button submit-button';
-        submitButton.innerHTML = '<i class="fas fa-check"></i> 提交答案';
-        submitButton.style.cssText = 'padding: 8px 16px; background-color: #48bb78; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
-        // Add inline event handler
-        submitButton.setAttribute('onclick', 'console.log("Submit button clicked (inline)"); return false;');
-        actionButtonsContainer.appendChild(submitButton);
+        // Add to document
+        document.body.appendChild(messageElement);
         
-        console.log('Submit button created in displayCurrentQuestion');
+        // Show message
+        setTimeout(() => {
+            messageElement.style.opacity = '1';
+        }, 10);
+        
+        // Remove after delay
+        setTimeout(() => {
+            messageElement.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(messageElement);
+            }, 300);
+        }, 3000);
     }
-    
-    // Reset the submit button state
-    submitButton.disabled = false;
-    submitButton.classList.remove('disabled');
-    
-    // ... rest of existing code ...
 }
 
 // ... existing code ... 
