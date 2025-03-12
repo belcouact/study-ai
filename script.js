@@ -148,14 +148,16 @@ function parseQuestionsFromResponse(response) {
 }
 
 // Global function to fetch AI response for question generation
-async function fetchAIResponse(prompt) {
+async function fetchAIResponse(prompt, isGeneratingQuestions = true) {
     console.log('Fetching AI response with prompt:', prompt);
     
     try {
-        // Show loading indicator if it exists
-        const loading = document.getElementById('loading');
-        if (loading) {
-            loading.classList.remove('hidden');
+        // Only show loading indicator on chat page if not generating questions
+        if (!isGeneratingQuestions) {
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.classList.remove('hidden');
+            }
         }
         
         // Make the actual API call using the current API function and model
@@ -190,10 +192,12 @@ async function fetchAIResponse(prompt) {
         console.error('Error in fetchAIResponse:', error);
         throw error; // Re-throw the error to be handled by the caller
     } finally {
-        // Hide loading indicator if it exists
-        const loading = document.getElementById('loading');
-        if (loading) {
-            loading.classList.add('hidden');
+        // Only hide loading indicator on chat page if not generating questions
+        if (!isGeneratingQuestions) {
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.classList.add('hidden');
+            }
         }
     }
 }
@@ -388,8 +392,8 @@ function displayCurrentQuestion() {
             font-size: clamp(14px, 2.5vw, 16px);
             color: #4a5568;
             font-weight: 500;
-            margin-bottom: 20px;
-            padding: 8px 16px;
+            margin-bottom: 15px;
+            padding: 6px 12px;
             background: #edf2f7;
             border-radius: 20px;
             display: inline-block;
@@ -402,11 +406,11 @@ function displayCurrentQuestion() {
     const questionText = document.getElementById('question-text');
     if (questionText) {
         questionText.style.cssText = `
-            font-size: clamp(16px, 4vw, 18px);
+            font-size: clamp(16px, 3.5vw, 18px);
             color: #2d3748;
-            line-height: 1.6;
-            margin-bottom: clamp(15px, 4vw, 25px);
-            padding: clamp(15px, 4vw, 20px);
+            line-height: 1.5;
+            margin-bottom: clamp(12px, 3vw, 20px);
+            padding: clamp(12px, 3vw, 18px);
             background: #f8f9fa;
             border-radius: 12px;
             width: 100%;
@@ -421,28 +425,28 @@ function displayCurrentQuestion() {
         choicesContainer.innerHTML = `
             <div class="choices-grid" style="
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: clamp(8px, 2vw, 20px);
-                margin: 25px 0;
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: clamp(6px, 1.5vw, 16px);
+                margin: 20px 0;
                 width: 100%;
             ">
                 ${['A', 'B', 'C', 'D'].map(letter => `
                     <div class="choice-cell" data-value="${letter}" style="
-                        padding: clamp(10px, 2vw, 15px);
+                        padding: clamp(8px, 1.5vw, 12px);
                         border: 2px solid #e2e8f0;
-                        border-radius: 12px;
+                        border-radius: 10px;
                         background-color: white;
                         display: flex;
                         align-items: center;
-                        gap: 12px;
+                        gap: 10px;
                         cursor: pointer;
                         transition: all 0.2s ease;
                         user-select: none;
                         -webkit-tap-highlight-color: transparent;
                     ">
                         <div class="choice-indicator" style="
-                            width: 28px;
-                            height: 28px;
+                            width: 26px;
+                            height: 26px;
                             border-radius: 50%;
                             background: #edf2f7;
                             display: flex;
@@ -454,9 +458,9 @@ function displayCurrentQuestion() {
                         ">${letter}</div>
                         <div class="choice-text" style="
                             flex: 1;
-                            font-size: clamp(14px, 2.5vw, 16px);
+                            font-size: clamp(14px, 2.2vw, 16px);
                             color: #2d3748;
-                            line-height: 1.5;
+                            line-height: 1.4;
                         ">${formatMathExpressions(question.choices[letter])}</div>
                     </div>
                 `).join('')}
@@ -534,9 +538,9 @@ function displayCurrentQuestion() {
         if (answerContainer) {
             answerContainer.classList.remove('hidden');
             answerContainer.style.cssText = `
-                margin-top: clamp(20px, 5vw, 30px);
-                padding: clamp(15px, 4vw, 25px);
-                border-radius: 12px;
+                margin-top: clamp(15px, 4vw, 25px);
+                padding: clamp(12px, 3vw, 20px);
+                border-radius: 10px;
                 background-color: white;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
                 width: 100%;
@@ -552,21 +556,21 @@ function displayCurrentQuestion() {
             const answerResult = document.getElementById('answer-result');
             if (answerResult) {
                 answerResult.style.cssText = `
-                    font-size: 18px;
+                    font-size: 16px;
                     font-weight: 500;
                     color: ${isCorrect ? '#48bb78' : '#e53e3e'};
-                    margin-bottom: 20px;
-                    padding: 15px;
+                    margin-bottom: 15px;
+                    padding: 12px;
                     background: ${isCorrect ? '#f0fff4' : '#fff5f5'};
                     border-radius: 8px;
                     display: flex;
                     align-items: center;
-                    gap: 10px;
+                    gap: 8px;
                 `;
                 
                 const resultText = isCorrect 
-                    ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 正确！答案是：${correctAnswer}`
-                    : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> 错误。正确答案是：${correctAnswer}`;
+                    ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 正确！答案是：${correctAnswer}`
+                    : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> 错误。正确答案是：${correctAnswer}`;
                 
                 answerResult.innerHTML = formatMathExpressions(resultText);
             }
@@ -575,11 +579,11 @@ function displayCurrentQuestion() {
             const answerExplanation = document.getElementById('answer-explanation');
             if (answerExplanation) {
                 answerExplanation.style.cssText = `
-                    font-size: 16px;
+                    font-size: 15px;
                     color: #4a5568;
-                    line-height: 1.8;
-                    margin-top: 20px;
-                    padding: 20px;
+                    line-height: 1.6;
+                    margin-top: 15px;
+                    padding: 15px;
                     background: #f8f9fa;
                     border-radius: 8px;
                     white-space: pre-wrap;
@@ -607,9 +611,9 @@ function displayCurrentQuestion() {
     const createContainer = document.getElementById('create-container');
     if (createContainer) {
         createContainer.style.cssText = `
-            min-height: 100vh;
+            min-height: 80vh;
             height: auto;
-            padding: clamp(15px, 4vw, 30px);
+            padding: clamp(10px, 3vw, 20px);
             overflow-y: auto;
             scroll-behavior: smooth;
             background: transparent;
@@ -621,6 +625,9 @@ function displayCurrentQuestion() {
             margin: 0 auto;
         `;
     }
+    
+    // Scroll to top when displaying a new question
+    window.scrollTo(0, 0);
     
     // Render math expressions
     if (window.MathJax) {
@@ -700,14 +707,46 @@ function handleGenerateQuestionsClick() {
         return;
     }
     
-    // Only show loading state if we're on the test page
-    const isTestPage = document.getElementById('create-container').classList.contains('active') || 
-                      !document.getElementById('create-container').classList.contains('hidden');
+    // Show loading state on button
+    generateQuestionsButton.textContent = '生成中...';
+    generateQuestionsButton.disabled = true;
     
-    if (isTestPage) {
-        // Show loading state on button
-        generateQuestionsButton.textContent = '生成中...';
-        generateQuestionsButton.disabled = true;
+    // Show loading spinner on the test page
+    let loadingElement = document.getElementById('test-loading');
+    if (!loadingElement) {
+        loadingElement = document.createElement('div');
+        loadingElement.id = 'test-loading';
+        loadingElement.className = 'loading-container';
+        loadingElement.innerHTML = `
+            <div class="spinner"></div>
+            <p>Thinking...</p>
+        `;
+        loadingElement.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        `;
+        
+        // Add to the create container
+        const createContent = document.querySelector('.create-content');
+        if (createContent) {
+            createContent.appendChild(loadingElement);
+        }
+    } else {
+        loadingElement.style.display = 'flex';
+    }
+    
+    // Hide empty state while loading
+    if (emptyState) {
+        emptyState.style.display = 'none';
     }
     
     // Collect form data from sidebar
@@ -790,28 +829,143 @@ D. [选项D内容]
                 displayCurrentQuestion();
                 updateNavigationButtons();
                 
+                // Set up navigation button event listeners
+                setupNavigationButtons();
+                
+                // Set up option selection buttons
+                setupOptionButtons();
+                
                 // Show success message
                 showSystemMessage(`已生成 ${parsedQuestions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`, 'success');
             } catch (error) {
                 console.error('Error processing questions:', error);
                 showSystemMessage('生成题目时出错，请重试', 'error');
+                
+                // Show empty state again if there was an error
+                if (emptyState) {
+                    emptyState.classList.remove('hidden');
+                    emptyState.style.display = 'block';
+                }
             } finally {
                 // Reset button state
-                if (isTestPage) {
-                    generateQuestionsButton.textContent = '出题';
-                    generateQuestionsButton.disabled = false;
+                generateQuestionsButton.textContent = '出题';
+                generateQuestionsButton.disabled = false;
+                
+                // Hide loading spinner
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
                 }
             }
         })
         .catch(error => {
             console.error('API error:', error);
             showSystemMessage('API调用失败，请重试', 'error');
+            
             // Reset button state
-            if (isTestPage) {
-                generateQuestionsButton.textContent = '出题';
-                generateQuestionsButton.disabled = false;
+            generateQuestionsButton.textContent = '出题';
+            generateQuestionsButton.disabled = false;
+            
+            // Hide loading spinner
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+            
+            // Show empty state again if there was an error
+            if (emptyState) {
+                emptyState.classList.remove('hidden');
+                emptyState.style.display = 'block';
             }
         });
+}
+
+// Function to set up navigation button event listeners
+function setupNavigationButtons() {
+    console.log('Setting up navigation buttons');
+    
+    const prevButton = document.getElementById('prev-question-button');
+    const nextButton = document.getElementById('next-question-button');
+    
+    if (prevButton) {
+        // Remove any existing event listeners
+        const newPrevButton = prevButton.cloneNode(true);
+        prevButton.parentNode.replaceChild(newPrevButton, prevButton);
+        
+        // Add new event listener
+        newPrevButton.addEventListener('click', function() {
+            if (window.currentQuestionIndex > 0) {
+                window.currentQuestionIndex--;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+    }
+    
+    if (nextButton) {
+        // Remove any existing event listeners
+        const newNextButton = nextButton.cloneNode(true);
+        nextButton.parentNode.replaceChild(newNextButton, nextButton);
+        
+        // Add new event listener
+        newNextButton.addEventListener('click', function() {
+            if (window.questions && window.currentQuestionIndex < window.questions.length - 1) {
+                window.currentQuestionIndex++;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+    }
+}
+
+// Function to set up option selection buttons
+function setupOptionButtons() {
+    console.log('Setting up option buttons');
+    
+    const optionButtons = document.querySelectorAll('.option-button');
+    
+    optionButtons.forEach(button => {
+        // Remove any existing event listeners
+        const newButton = button.cloneNode(true);
+        button.parentNode.replaceChild(newButton, button);
+        
+        // Add new event listener
+        newButton.addEventListener('click', function() {
+            const option = this.getAttribute('data-option');
+            if (option && window.questions) {
+                // Save user's answer
+                window.userAnswers[window.currentQuestionIndex] = option;
+                
+                // Update UI to show selected option
+                document.querySelectorAll('.option-button').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                
+                // Check if answer is correct
+                const currentQuestion = window.questions[window.currentQuestionIndex];
+                const isCorrect = option === currentQuestion.answer;
+                
+                // Show feedback
+                const feedbackElement = document.getElementById('answer-feedback');
+                if (feedbackElement) {
+                    feedbackElement.textContent = isCorrect ? '✓ 正确!' : '✗ 错误!';
+                    feedbackElement.className = isCorrect ? 'feedback correct' : 'feedback incorrect';
+                    feedbackElement.style.display = 'block';
+                }
+                
+                // Show explanation
+                const explanationElement = document.getElementById('explanation');
+                if (explanationElement) {
+                    explanationElement.innerHTML = formatMathExpressions(currentQuestion.explanation);
+                    explanationElement.style.display = 'block';
+                    
+                    // Render math expressions if MathJax is available
+                    if (window.MathJax) {
+                        MathJax.typeset();
+                    }
+                }
+            }
+        });
+    });
 }
 
 // Make sure the function is available globally for the inline onclick handler
@@ -1193,6 +1347,12 @@ document.addEventListener('DOMContentLoaded', function() {
             qaContainer.classList.add('hidden');
         });
     }
+    
+    // Set up initial navigation buttons
+    setupNavigationButtons();
+    
+    // Set up initial option buttons if they exist
+    setupOptionButtons();
     
     // Directly populate sidebar dropdowns with initial values
     const schoolSelectSidebar = document.getElementById('school-select-sidebar');
