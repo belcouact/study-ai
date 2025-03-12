@@ -2218,519 +2218,305 @@ function showSystemMessage(message, type = 'info') {
 
 // Initialize the page with form layout
 function initializeFormLayout() {
-    const formContainer = document.getElementById('question-form-container');
-    if (!formContainer) return;
-    
-    // Style the form container with a more compact look
-    formContainer.style.cssText = `
-        padding: 15px;
-        margin-bottom: 10px;
-        background: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        min-height: auto;
-        height: auto;
-        display: flex;
-        flex-direction: column;
-        transition: all 0.3s ease;
-    `;
-    
-    // Create a flex container for the dropdowns with reduced spacing
-    const dropdownContainer = document.createElement('div');
-    dropdownContainer.className = 'dropdown-container';
-    dropdownContainer.style.cssText = `
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 15px;
-        flex-wrap: nowrap;
-        padding: 8px;
-        background: #f8f9fa;
-        border-radius: 8px;
-    `;
-    
-    // Move all select elements into the dropdown container
-    const selects = formContainer.querySelectorAll('select');
-    selects.forEach(select => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'select-wrapper';
-        wrapper.style.cssText = `
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            margin: 0;
-            position: relative;
-        `;
-        
-        // Get the label for this select
-        const label = formContainer.querySelector(`label[for="${select.id}"]`);
-        if (label) {
-            label.style.cssText = `
-                margin-bottom: 4px;
-                font-size: 13px;
-                font-weight: 500;
-                color: #4a5568;
-                white-space: nowrap;
-            `;
-            wrapper.appendChild(label);
-        }
-        
-        // Style the select element
-        select.style.cssText = `
-            width: 100%;
-            padding: 6px 10px;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #2d3748;
-            background-color: white;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234a5568' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            background-size: 12px;
-            margin: 0;
-        `;
-        
-        wrapper.appendChild(select);
-        dropdownContainer.appendChild(wrapper);
-    });
-    
-    // Create a more compact button container
-    const buttonContainer = document.createElement('div');
-    buttonContainer.style.cssText = `
-        display: flex;
-        justify-content: center;
-        padding: 10px 0;
-        margin: 5px 0 10px 0;
-        border-bottom: 1px solid #edf2f7;
-    `;
-    
-    // Style the generate questions button
-    const generateButton = document.getElementById('generate-questions-button');
-    if (generateButton) {
-        generateButton.style.cssText = `
-            padding: 10px 25px;
-            font-size: 15px;
-            font-weight: 500;
-            background-color: #4299e1;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
-        `;
-        
-        buttonContainer.appendChild(generateButton);
-    }
-    
-    // Style the API function container with reduced spacing
-    const apiRadioContainer = document.querySelector('.api-function-container');
-    if (apiRadioContainer) {
-        apiRadioContainer.style.cssText = `
-            padding: 12px;
-            margin-top: 5px;
-            background-color: #f8f9fa;
-            border-top: 1px solid #edf2f7;
-            border-radius: 0 0 12px 12px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        `;
-        
-        // Style radio buttons and labels
-        const radioButtons = apiRadioContainer.querySelectorAll('input[type="radio"]');
-        radioButtons.forEach(radio => {
-            const label = radio.nextElementSibling;
-            if (label) {
-                const wrapper = document.createElement('div');
-                wrapper.style.cssText = `
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    padding: 6px 12px;
-                    background: white;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                `;
-                
-                radio.style.cssText = `
-                    width: 14px;
-                    height: 14px;
-                    cursor: pointer;
-                    accent-color: #4299e1;
-                    margin: 0;
-                `;
-                
-                label.style.cssText = `
-                    font-size: 13px;
-                    color: #4a5568;
-                    cursor: pointer;
-                    margin: 0;
-                `;
-                
-                // Move radio and label to the wrapper
-                radio.parentNode.insertBefore(wrapper, radio);
-                wrapper.appendChild(radio);
-                wrapper.appendChild(label);
-            }
-        });
-    }
-    
-    // Insert elements in the correct order with minimal spacing
-    const form = document.getElementById('question-form');
-    if (form) {
-        form.style.cssText = `
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 0;
-            margin: 0;
-        `;
-        
-        // Remove any existing containers
-        const existingDropdownContainer = form.querySelector('.dropdown-container');
-        if (existingDropdownContainer) {
-            existingDropdownContainer.remove();
-        }
-        
-        // Remove the header if it exists
-        const header = form.querySelector('h3');
-        if (header && header.textContent.includes('设置问题参数')) {
-            header.remove();
-        }
-        
-        // Insert containers in the correct order
-        form.insertBefore(dropdownContainer, form.firstChild);
-        formContainer.parentNode.insertBefore(buttonContainer, formContainer.nextSibling);
-    }
-}
-
-// Function to populate grade options based on selected school
-function populateGradeOptions(school) {
-    const gradeSelect = document.getElementById('grade-select');
-    const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
-    
-    if (!gradeSelect) return;
-    
-        // Clear existing options
-        gradeSelect.innerHTML = '';
-        
-    // Define grade options based on school
-    let gradeOptions = [];
-        
-        switch (school) {
-            case '小学':
-            gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-                break;
-            case '初中':
-            gradeOptions = ['初一', '初二', '初三'];
-                break;
-            case '高中':
-            gradeOptions = ['高一', '高二', '高三'];
-                break;
-            case '大学':
-            gradeOptions = ['大一', '大二', '大三', '大四'];
-                break;
-            default:
-            gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-    }
-    
-    // Add options to the select element
-    gradeOptions.forEach(grade => {
-        const option = document.createElement('option');
-        option.value = grade;
-        option.textContent = grade;
-        gradeSelect.appendChild(option);
-    });
-    
-    // Also update the sidebar dropdown if it exists
-    if (gradeSelectSidebar) {
-        // Clear existing options
-        gradeSelectSidebar.innerHTML = '';
-        
-        // Add the same options to the sidebar dropdown
-        gradeOptions.forEach(grade => {
-            const option = document.createElement('option');
-            option.value = grade;
-            option.textContent = grade;
-            gradeSelectSidebar.appendChild(option);
-        });
-    }
-    }
-    
-    // Function to populate subject options based on selected school
-    function populateSubjectOptions(school) {
-    const subjectSelect = document.getElementById('subject-select');
-    const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
-    
-    if (!subjectSelect) return;
-    
-        // Clear existing options
-        subjectSelect.innerHTML = '';
-        
-    // Define subject options based on school
-    let subjectOptions = [];
-        
-        switch (school) {
-            case '小学':
-            subjectOptions = ['语文', '数学', '英语', '科学', '道德与法治'];
-                break;
-            case '初中':
-            subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                break;
-            case '高中':
-            subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                break;
-            case '大学':
-            subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
-                break;
-            default:
-            subjectOptions = ['语文', '数学', '英语'];
-    }
-    
-    // Add options to the select element
-    subjectOptions.forEach(subject => {
-        const option = document.createElement('option');
-        option.value = subject;
-        option.textContent = subject;
-        subjectSelect.appendChild(option);
-    });
-    
-    // Also update the sidebar dropdown if it exists
-    if (subjectSelectSidebar) {
-        // Clear existing options
-        subjectSelectSidebar.innerHTML = '';
-        
-        // Add the same options to the sidebar dropdown
-        subjectOptions.forEach(subject => {
-            const option = document.createElement('option');
-            option.value = subject;
-            option.textContent = subject;
-            subjectSelectSidebar.appendChild(option);
-        });
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize form layout
-    initializeFormLayout();
-    
-    // Move content creation area to the top for better screen utilization
-    moveContentCreationToTop();
-    
-    // Setup sidebar toggle functionality
+    // Setup sidebar toggle
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const leftPanel = document.querySelector('.left-panel');
     const contentArea = document.querySelector('.content-area');
     
     if (sidebarToggle && leftPanel && contentArea) {
-        sidebarToggle.addEventListener('click', function() {
+        sidebarToggle.addEventListener('click', () => {
             leftPanel.classList.toggle('hidden');
             contentArea.classList.toggle('full-width');
-            this.classList.toggle('collapsed');
+            sidebarToggle.classList.toggle('collapsed');
+            
+            // Change icon direction
+            const icon = sidebarToggle.querySelector('i');
+            if (icon) {
+                if (icon.classList.contains('fa-chevron-left')) {
+                    icon.classList.remove('fa-chevron-left');
+                    icon.classList.add('fa-chevron-right');
+                } else {
+                    icon.classList.remove('fa-chevron-right');
+                    icon.classList.add('fa-chevron-left');
+                }
+            }
         });
     }
     
-    // Setup tab switching functionality
+    // Setup tab switching
     const qaButton = document.getElementById('qa-button');
     const createButton = document.getElementById('create-button');
     const qaContainer = document.getElementById('qa-container');
     const createContainer = document.getElementById('create-container');
     
     if (qaButton && createButton && qaContainer && createContainer) {
-        qaButton.addEventListener('click', function() {
+        qaButton.addEventListener('click', () => {
             qaButton.classList.add('active');
             createButton.classList.remove('active');
             qaContainer.classList.remove('hidden');
             createContainer.classList.add('hidden');
         });
         
-        createButton.addEventListener('click', function() {
-            createButton.classList.add('active');
+        createButton.addEventListener('click', () => {
             qaButton.classList.remove('active');
-            createContainer.classList.remove('hidden');
+            createButton.classList.add('active');
             qaContainer.classList.add('hidden');
-            
-            // Initialize empty state if no questions are loaded
-            initializeEmptyState();
+            createContainer.classList.remove('hidden');
         });
+    }
+    
+    // Setup sidebar dropdowns
+    const schoolSelect = document.getElementById('sidebar-school-select');
+    const gradeSelect = document.getElementById('sidebar-grade-select');
+    const subjectSelect = document.getElementById('sidebar-subject-select');
+    
+    if (schoolSelect) {
+        schoolSelect.addEventListener('change', (e) => {
+            const selectedSchool = e.target.value;
+            populateSidebarGradeOptions(selectedSchool);
+            populateSidebarSubjectOptions(selectedSchool);
+        });
+    }
+    
+    // Setup generate button in sidebar
+    const generateButton = document.getElementById('sidebar-generate-button');
+    if (generateButton) {
+        // Remove any existing event listeners to prevent duplicates
+        const newGenerateButton = generateButton.cloneNode(true);
+        generateButton.parentNode.replaceChild(newGenerateButton, generateButton);
         
-        // Initialize empty state on the test page if it's active
-        if (createButton.classList.contains('active')) {
-            initializeEmptyState();
-        }
+        // Add event listener to the new button
+        newGenerateButton.addEventListener('click', handleGenerateQuestionsClick);
+        console.log('Generate button event listener attached');
     } else {
-        // If tab buttons don't exist, initialize empty state anyway
-        initializeEmptyState();
+        console.error('Generate button not found');
     }
     
-    // Set up initial navigation buttons
-    setupNavigationButtons();
+    // Initialize empty state
+    initializeEmptyState();
     
-    // Set up initial option buttons if they exist
-    setupOptionButtons();
-    
-    // Directly populate sidebar dropdowns with initial values
-    const schoolSelectSidebar = document.getElementById('school-select-sidebar');
-    if (schoolSelectSidebar) {
-        const initialSchool = schoolSelectSidebar.value || '小学';
-        
-        // Define grade options based on school
-        let gradeOptions = [];
-        switch (initialSchool) {
-            case '小学':
-                gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-                break;
-            case '初中':
-                gradeOptions = ['初一', '初二', '初三'];
-                break;
-            case '高中':
-                gradeOptions = ['高一', '高二', '高三'];
-                break;
-            case '大学':
-                gradeOptions = ['大一', '大二', '大三', '大四'];
-                break;
-            default:
-                gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-        }
-        
-        // Define subject options based on school
-        let subjectOptions = [];
-        switch (initialSchool) {
-            case '小学':
-                subjectOptions = ['语文', '数学', '英语', '科学'];
-                break;
-            case '初中':
-                subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                break;
-            case '高中':
-                subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                break;
-            case '大学':
-                subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
-                break;
-            default:
-                subjectOptions = ['语文', '数学', '英语'];
-        }
-        
-        // Populate grade dropdown
-        const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
-        if (gradeSelectSidebar) {
-            gradeSelectSidebar.innerHTML = '';
-            gradeOptions.forEach(grade => {
-                const option = document.createElement('option');
-                option.value = grade;
-                option.textContent = grade;
-                gradeSelectSidebar.appendChild(option);
-            });
-        }
-        
-        // Populate subject dropdown
-        const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
-        if (subjectSelectSidebar) {
-            subjectSelectSidebar.innerHTML = '';
-            subjectOptions.forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject;
-                option.textContent = subject;
-                subjectSelectSidebar.appendChild(option);
-            });
-        }
-        
-        // Add change event listener to update dropdowns when school changes
-        schoolSelectSidebar.addEventListener('change', function() {
-            const school = this.value;
-            
-            // Define grade options based on school
-            let gradeOptions = [];
-            switch (school) {
-                case '小学':
-                    gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-                    break;
-                case '初中':
-                    gradeOptions = ['初一', '初二', '初三'];
-                    break;
-                case '高中':
-                    gradeOptions = ['高一', '高二', '高三'];
-                    break;
-                case '大学':
-                    gradeOptions = ['大一', '大二', '大三', '大四'];
-                    break;
-                default:
-                    gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-            }
-            
-            // Define subject options based on school
-            let subjectOptions = [];
-            switch (school) {
-                case '小学':
-                    subjectOptions = ['语文', '数学', '英语', '科学'];
-                    break;
-                case '初中':
-                    subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'];
-                    break;
-                case '高中':
-                    subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                    break;
-                case '大学':
-                    subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
-                    break;
-                default:
-                    subjectOptions = ['语文', '数学', '英语'];
-            }
-            
-            // Update grade dropdown
-            const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
-            if (gradeSelectSidebar) {
-                gradeSelectSidebar.innerHTML = '';
-                gradeOptions.forEach(grade => {
-                    const option = document.createElement('option');
-                    option.value = grade;
-                    option.textContent = grade;
-                    gradeSelectSidebar.appendChild(option);
-                });
-            }
-            
-            // Update subject dropdown
-            const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
-            if (subjectSelectSidebar) {
-                subjectSelectSidebar.innerHTML = '';
-                subjectOptions.forEach(subject => {
-                    const option = document.createElement('option');
-                    option.value = subject;
-                    option.textContent = subject;
-                    subjectSelectSidebar.appendChild(option);
-                });
-            }
-        });
+    // Populate sidebar dropdowns initially
+    populateSidebarDropdowns();
+}
+
+// Function to populate sidebar dropdowns
+function populateSidebarDropdowns() {
+    const schoolSelect = document.getElementById('sidebar-school-select');
+    if (schoolSelect) {
+        const selectedSchool = schoolSelect.value;
+        populateSidebarGradeOptions(selectedSchool);
+        populateSidebarSubjectOptions(selectedSchool);
     }
+}
+
+// Function to populate sidebar grade options
+function populateSidebarGradeOptions(school) {
+    const gradeSelect = document.getElementById('sidebar-grade-select');
+    if (!gradeSelect) return;
     
-    // Add click handler for sidebar generate button
-    const sidebarGenerateButton = document.createElement('button');
-    sidebarGenerateButton.textContent = '出题';
-    sidebarGenerateButton.className = 'sidebar-generate-button';
-    sidebarGenerateButton.addEventListener('click', function() {
-        // Switch to the test tab if not already there
-        const createButton = document.getElementById('create-button');
-        if (createButton && !createButton.classList.contains('active')) {
-            createButton.click();
-        }
-        
-        // Then generate questions
-        handleGenerateQuestionsClick();
+    // Clear existing options
+    gradeSelect.innerHTML = '';
+    
+    // Get grade options based on school
+    const gradeOptions = populateGradeOptions(school);
+    
+    // Add options to select
+    gradeOptions.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option.value;
+        optionElement.textContent = option.text;
+        gradeSelect.appendChild(optionElement);
     });
+}
+
+// Function to populate sidebar subject options
+function populateSidebarSubjectOptions(school) {
+    const subjectSelect = document.getElementById('sidebar-subject-select');
+    if (!subjectSelect) return;
     
-    // Add the button to the second frame
-    const testFrame = document.querySelector('.sidebar-frame:nth-child(2) .frame-content');
-    if (testFrame) {
-        testFrame.appendChild(sidebarGenerateButton);
+    // Clear existing options
+    subjectSelect.innerHTML = '';
+    
+    // Get subject options based on school
+    const subjectOptions = populateSubjectOptions(school);
+    
+    // Add options to select
+    subjectOptions.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option.value;
+        optionElement.textContent = option.text;
+        subjectSelect.appendChild(optionElement);
+    });
+}
+
+// Add a debug version of handleGenerateQuestionsClick to help diagnose issues
+function handleGenerateQuestionsClick() {
+    console.log('Generate button clicked');
+    
+    // Get form elements from sidebar
+    const schoolSelect = document.getElementById('sidebar-school-select');
+    const gradeSelect = document.getElementById('sidebar-grade-select');
+    const semesterSelect = document.getElementById('sidebar-semester-select');
+    const subjectSelect = document.getElementById('sidebar-subject-select');
+    const difficultySelect = document.getElementById('sidebar-difficulty-select');
+    const questionCountSelect = document.getElementById('sidebar-question-count-select');
+    
+    // Log elements to check if they exist
+    console.log('School select:', schoolSelect);
+    console.log('Grade select:', gradeSelect);
+    console.log('Semester select:', semesterSelect);
+    console.log('Subject select:', subjectSelect);
+    console.log('Difficulty select:', difficultySelect);
+    console.log('Question count select:', questionCountSelect);
+    
+    // Check if elements exist
+    if (!schoolSelect || !gradeSelect || !semesterSelect || !subjectSelect || !difficultySelect || !questionCountSelect) {
+        console.error('One or more form elements not found');
+        showSystemMessage('表单元素缺失，请刷新页面重试', 'error');
+        return;
+    }
+    
+    // Switch to test tab if not already active
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    
+    if (!createButton.classList.contains('active')) {
+        qaButton.classList.remove('active');
+        createButton.classList.add('active');
+        qaContainer.classList.add('hidden');
+        createContainer.classList.remove('hidden');
+    }
+    
+    // Re-initialize the test page
+    resetTestPage();
+    
+    // Show loading state
+    const generateButton = document.getElementById('sidebar-generate-button');
+    generateButton.disabled = true;
+    generateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
+    
+    // Hide empty state if it exists
+    const emptyState = document.querySelector('.empty-state');
+    if (emptyState) {
+        emptyState.style.display = 'none';
+    }
+    
+    // Show loading indicator
+    showLoadingIndicator('正在生成题目，请稍候...');
+    
+    // Get form values
+    const school = schoolSelect.value;
+    const grade = gradeSelect.value;
+    const semester = semesterSelect.value;
+    const subject = subjectSelect.value;
+    const difficulty = difficultySelect.value;
+    const questionCount = questionCountSelect.value;
+    
+    console.log('Form values:', { school, grade, semester, subject, difficulty, questionCount });
+    
+    // Create prompt
+    const prompt = `请根据以下条件生成${questionCount}道${school}${grade}${semester}${subject}的${difficulty}难度选择题，每道题有4个选项(A, B, C, D)，并且只有一个正确答案。
+    
+请严格按照以下格式输出:
+1. 问题1
+A. 选项A
+B. 选项B
+C. 选项C
+D. 选项D
+答案: [正确选项字母]
+解析: [详细解析]
+
+2. 问题2
+...以此类推
+
+请确保题目难度适合${school}${grade}${semester}的学生，内容符合${subject}的教学大纲。
+请确保每个问题都有明确的正确答案，并提供详细的解析说明为什么该选项是正确的。
+如果问题中包含数学公式，请使用LaTeX格式。`;
+
+    console.log('Generated prompt:', prompt);
+
+    // Call API
+    fetchAIResponse(prompt)
+        .then(response => {
+            console.log('API response received');
+            
+            // Parse questions from response
+            const questions = parseQuestionsFromResponse(response);
+            console.log('Parsed questions:', questions);
+            
+            if (questions.length > 0) {
+                // Store questions globally
+                window.currentQuestions = questions;
+                window.currentQuestionIndex = 0;
+                window.userAnswers = new Array(questions.length).fill(null);
+                window.questionsStartTime = new Date();
+                
+                // Display first question
+                displayCurrentQuestion();
+                
+                // Setup navigation buttons
+                setupNavigationButtons();
+                
+                // Setup option buttons
+                setupOptionButtons();
+                
+                // Update navigation buttons
+                updateNavigationButtons();
+                
+                // Hide loading indicator
+                hideLoadingIndicator();
+                
+                // Show questions container
+                const questionsContainer = document.querySelector('.questions-display-container');
+                if (questionsContainer) {
+                    questionsContainer.classList.remove('hidden');
+                }
+            } else {
+                // Show error message if no questions were parsed
+                showSystemMessage('无法生成题目，请重试', 'error');
+                
+                // Show empty state again
+                if (emptyState) {
+                    emptyState.style.display = 'flex';
+                }
+                
+                // Hide loading indicator
+                hideLoadingIndicator();
+            }
+            
+            // Reset generate button
+            generateButton.disabled = false;
+            generateButton.innerHTML = '出题';
+        })
+        .catch(error => {
+            console.error('Error generating questions:', error);
+            showSystemMessage('生成题目时出错，请重试', 'error');
+            
+            // Show empty state again
+            if (emptyState) {
+                emptyState.style.display = 'flex';
+            }
+            
+            // Hide loading indicator
+            hideLoadingIndicator();
+            
+            // Reset generate button
+            generateButton.disabled = false;
+            generateButton.innerHTML = '出题';
+        });
+}
+
+// Add this at the end of the file to ensure the generate button is properly set up
+document.addEventListener('DOMContentLoaded', function() {
+    // Setup generate button in sidebar
+    const generateButton = document.getElementById('sidebar-generate-button');
+    if (generateButton) {
+        generateButton.addEventListener('click', handleGenerateQuestionsClick);
+        console.log('Generate button event listener attached on DOMContentLoaded');
+    } else {
+        console.error('Generate button not found on DOMContentLoaded');
     }
 });
 
