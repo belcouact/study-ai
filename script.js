@@ -1790,7 +1790,7 @@ function handleGenerateQuestionsClick() {
 
 示例格式：
 题目：[题目内容]
-A. [选项A内容] 
+A. [选项A内容]
 B. [选项B内容]
 C. [选项C内容]
 D. [选项D内容]
@@ -3315,9 +3315,9 @@ function setupChatButtons() {
             
             if (!questionText) {
                 showSystemMessage('请先输入问题内容', 'warning');
-                return;
-            }
-            
+            return;
+        }
+        
             // Get educational context from sidebar
             const educationalContext = getEducationalContext();
             
@@ -3348,12 +3348,12 @@ ${educationalContext}
                     // Focus the input and move cursor to end
                     chatInput.focus();
                     chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
-                    
-                    // Show success message
+            
+            // Show success message
                     showSystemMessage('问题已根据教育背景成功优化！', 'success');
                 })
                 .catch(error => {
-                    console.error('Error optimizing question:', error);
+            console.error('Error optimizing question:', error);
                     showSystemMessage('优化问题时出错，请重试。', 'error');
                 })
                 .finally(() => {
@@ -3372,9 +3372,9 @@ ${educationalContext}
             
             if (!questionText) {
                 showSystemMessage('请先输入问题内容', 'warning');
-                return;
-            }
-            
+            return;
+        }
+        
             // Get educational context from sidebar
             const educationalContext = getEducationalContext();
             
@@ -3429,8 +3429,8 @@ ${educationalContext}
                         <div class="error-message">
                             <i class="fas fa-exclamation-circle"></i>
                             抱歉，处理您的问题时出现了错误。请重试。
-                        </div>
-                    `;
+            </div>
+        `;
                     showSystemMessage('提交问题时出错，请重试。', 'error');
                 })
                 .finally(() => {
@@ -3695,7 +3695,7 @@ function setupChatButtons() {
 // First, let's fix the createChatInterface function definition issue by ensuring it's defined only once
 // and placed before setupChatButtons
 
-// Function to create the chat interface
+// Function to create the chat interface with improved styling
 function createChatInterface() {
     console.log('Creating chat interface');
     
@@ -3733,6 +3733,12 @@ function createChatInterface() {
     chatInterface.className = 'chat-interface';
     chatInterface.style.cssText = 'display: flex; flex-direction: column; height: 100%; padding: 20px; gap: 20px;';
     
+    // Add the AI service provider info (centered)
+    const aiProviderInfo = document.createElement('div');
+    aiProviderInfo.className = 'ai-provider-info';
+    aiProviderInfo.style.cssText = 'text-align: center; margin-bottom: 15px; color: #4a5568; font-size: 14px; font-weight: 500;';
+    aiProviderInfo.innerHTML = '腾讯元宝，通义千问';
+    
     // Create the chat input area
     const chatInputArea = document.createElement('div');
     chatInputArea.className = 'chat-input-area';
@@ -3750,19 +3756,45 @@ function createChatInterface() {
     buttonsContainer.className = 'chat-buttons';
     buttonsContainer.style.cssText = 'display: flex; gap: 10px; justify-content: flex-end;';
     
-    // Create the optimize button
+    // Create the optimize button with enhanced styling
     const optimizeButton = document.createElement('button');
     optimizeButton.id = 'optimize-button';
     optimizeButton.className = 'chat-button optimize-button';
     optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
-    optimizeButton.style.cssText = 'padding: 8px 16px; background-color: #4299e1; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
+    optimizeButton.style.cssText = `
+        padding: 8px 16px; 
+        background-color: #6366f1; 
+        color: white; 
+        border: none; 
+        border-radius: 4px; 
+        cursor: pointer; 
+        display: flex; 
+        align-items: center; 
+        gap: 5px;
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+        transition: all 0.2s ease;
+    `;
     
-    // Create the submit button
+    // Create the submit button with enhanced styling
     const submitButton = document.createElement('button');
     submitButton.id = 'submit-button';
     submitButton.className = 'chat-button submit-button';
     submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
-    submitButton.style.cssText = 'padding: 8px 16px; background-color: #48bb78; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
+    submitButton.style.cssText = `
+        padding: 8px 16px; 
+        background-color: #10b981; 
+        color: white; 
+        border: none; 
+        border-radius: 4px; 
+        cursor: pointer; 
+        display: flex; 
+        align-items: center; 
+        gap: 5px;
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+        transition: all 0.2s ease;
+    `;
     
     // Add buttons to container
     buttonsContainer.appendChild(optimizeButton);
@@ -3787,7 +3819,8 @@ function createChatInterface() {
         </div>
     `;
     
-    // Add input area and response area to chat interface
+    // Add provider info, input area and response area to chat interface
+    chatInterface.appendChild(aiProviderInfo);
     chatInterface.appendChild(chatInputArea);
     chatInterface.appendChild(chatResponse);
     
@@ -3800,13 +3833,24 @@ function createChatInterface() {
     style.textContent = `
         .chat-button:hover {
             opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .chat-button:active {
             transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
         .chat-button:disabled {
             opacity: 0.7;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .optimize-button {
+            background-color: #6366f1 !important; /* Indigo */
+        }
+        .submit-button {
+            background-color: #10b981 !important; /* Emerald */
         }
         .loading-indicator {
             display: flex;
@@ -3846,6 +3890,13 @@ function createChatInterface() {
             align-items: center;
             gap: 8px;
             font-size: 16px;
+        }
+        .ai-provider-info {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #4a5568;
+            font-size: 14px;
+            font-weight: 500;
         }
     `;
     document.head.appendChild(style);
@@ -4105,8 +4156,8 @@ function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, subm
                         </div>
                         <div class="response-content">
                             ${formattedResponse}
-                        </div>
-                    `;
+                </div>
+            `;
                     
                     // Render MathJax in the response
                     if (window.MathJax) {
@@ -4314,103 +4365,4 @@ function getSimplifiedContextSummary() {
     }
     
     return summary;
-}
-
-// Add this function to apply centered styling to buttons
-function applyCenteredButtonStyles() {
-    console.log('Applying centered button styles');
-    
-    // Create a style element
-    const style = document.createElement('style');
-    style.textContent = `
-        /* Center text on tab buttons */
-        .tab-button {
-            text-align: center !important;
-            justify-content: center !important;
-            display: flex !important;
-            align-items: center !important;
-        }
-        
-        /* Center text on AI service buttons */
-        .ai-service-button {
-            text-align: center !important;
-            justify-content: center !important;
-            display: flex !important;
-            align-items: center !important;
-        }
-        
-        /* Add specific styling for the sidebar buttons */
-        #qa-button, #create-button {
-            text-align: center !important;
-            justify-content: center !important;
-            display: flex !important;
-            align-items: center !important;
-            padding: 10px !important;
-        }
-        
-        /* Add specific styling for AI service links */
-        .ai-service-link {
-            text-align: center !important;
-            display: block !important;
-            padding: 8px !important;
-        }
-    `;
-    
-    // Add the style to the document
-    document.head.appendChild(style);
-    
-    // Apply classes to buttons if they don't already have them
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    
-    if (qaButton) {
-        qaButton.classList.add('tab-button');
-    }
-    
-    if (createButton) {
-        createButton.classList.add('tab-button');
-    }
-    
-    // Find and apply classes to AI service buttons
-    const aiServiceLinks = document.querySelectorAll('a[href*="tencent"], a[href*="tongyi"]');
-    aiServiceLinks.forEach(link => {
-        link.classList.add('ai-service-link');
-    });
-}
-
-// Call the function in the DOMContentLoaded event
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded');
-    
-    // Apply centered button styles
-    applyCenteredButtonStyles();
-    
-    // Populate sidebar dropdowns if school is selected
-    const sidebarSchoolSelect = document.getElementById('sidebar-school-select');
-    if (sidebarSchoolSelect && sidebarSchoolSelect.value && sidebarSchoolSelect.value !== 'none') {
-        populateSidebarGradeOptions(sidebarSchoolSelect.value);
-        populateSidebarSubjectOptions(sidebarSchoolSelect.value);
-    }
-    
-    // Set up chat buttons when the page loads with multiple retries
-    setTimeout(() => {
-        setupChatButtons();
-        
-        // Try again after a longer delay to ensure everything is loaded
-        setTimeout(() => {
-            setupChatButtons();
-            // Apply centered styles again after a delay to catch dynamically added elements
-            applyCenteredButtonStyles();
-        }, 1000);
-    }, 300);
-});
-
-// Also call the function in initializeFormLayout to ensure it's applied
-function initializeFormLayout() {
-    // ... existing code ...
-    
-    // Apply centered button styles
-    applyCenteredButtonStyles();
-    
-    // ... rest of existing code ...
 }
