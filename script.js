@@ -1431,13 +1431,52 @@ function formatParagraph(paragraph) {
 function handleGenerateQuestionsClick() {
     console.log('Generate questions button clicked');
     
-    // Get form elements from sidebar
-    const schoolDropdown = document.getElementById('sidebar-school');
-    const gradeDropdown = document.getElementById('sidebar-grade');
-    const semesterDropdown = document.getElementById('sidebar-semester');
-    const subjectDropdown = document.getElementById('sidebar-subject');
-    const difficultyDropdown = document.getElementById('sidebar-difficulty');
-    const countDropdown = document.getElementById('sidebar-count');
+    // Try multiple methods to find the dropdown elements
+    function findDropdown(id) {
+        // Method 1: Direct ID
+        let element = document.getElementById(id);
+        
+        // Method 2: Try with sidebar- prefix if not found
+        if (!element && !id.startsWith('sidebar-')) {
+            element = document.getElementById('sidebar-' + id);
+        }
+        
+        // Method 3: Try querySelector with attribute selector
+        if (!element) {
+            element = document.querySelector(`select[id="${id}"], select[id="sidebar-${id}"]`);
+        }
+        
+        // Method 4: Try any select with id containing the base name
+        if (!element) {
+            const allSelects = document.querySelectorAll('select');
+            for (const select of allSelects) {
+                if (select.id && select.id.includes(id.replace('sidebar-', ''))) {
+                    element = select;
+                    break;
+                }
+            }
+        }
+        
+        // Log what we found
+        console.log(`Finding dropdown ${id}: ${element ? 'Found with value: ' + element.value : 'Not found'}`);
+        
+        return element;
+    }
+    
+    // Get form elements from sidebar using the helper function
+    const schoolDropdown = findDropdown('sidebar-school');
+    const gradeDropdown = findDropdown('sidebar-grade');
+    const semesterDropdown = findDropdown('sidebar-semester');
+    const subjectDropdown = findDropdown('sidebar-subject');
+    const difficultyDropdown = findDropdown('sidebar-difficulty');
+    const countDropdown = findDropdown('sidebar-count');
+    
+    // Log all dropdowns in the document for debugging
+    console.log('All select elements in document:');
+    const allSelects = document.querySelectorAll('select');
+    allSelects.forEach(select => {
+        console.log(`- ${select.id || 'no-id'}: ${select.value || 'no-value'}`);
+    });
     
     console.log('Dropdown values:', {
         school: schoolDropdown?.value,
@@ -2300,869 +2339,55 @@ function initializeFormLayout() {
 
 // Function to set up optimize and submit buttons
 function setupOptimizeAndSubmitButtons() {
-    // Set up event listener for optimize button
-    const optimizeButton = document.getElementById('optimize-button');
-    if (optimizeButton) {
-        optimizeButton.addEventListener('click', function() {
-            const currentQuestion = questions[currentQuestionIndex];
-            if (!currentQuestion) return;
-            
-            // Show loading state
-            optimizeButton.disabled = true;
-            optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
-            
-            // Prepare the prompt for optimization
-            const prompt = `请优化以下问题，使其更清晰、更有教育价值，并确保答案和解析准确：
-            
-问题：${currentQuestion.question}
-选项：
-A. ${currentQuestion.choices[0]}
-B. ${currentQuestion.choices[1]}
-C. ${currentQuestion.choices[2]}
-D. ${currentQuestion.choices[3]}
-答案：${currentQuestion.answer}
-解析：${currentQuestion.explanation}
-
-请返回优化后的问题、选项、答案和解析，格式如下：
-问题：[优化后的问题]
-选项：
-A. [选项A]
-B. [选项B]
-C. [选项C]
-D. [选项D]
-答案：[答案]
-解析：[解析]`;
-            
-            // Call the API
-            fetchAIResponse(prompt)
-                .then(response => {
-                    // Extract the optimized question
-                    const optimizedContent = extractContentFromResponse(response);
-                    
-                    // Parse the optimized question
-                    const optimizedQuestion = parseOptimizedQuestion(optimizedContent);
-                    
-                    if (optimizedQuestion) {
-                        // Update the current question with optimized content
-                        questions[currentQuestionIndex] = {
-                            ...questions[currentQuestionIndex],
-                            ...optimizedQuestion
-                        };
-                        
-                        // Display the updated question
-                        displayCurrentQuestion();
-                        
-                        // Show success message
-                        showSystemMessage('问题已成功优化！', 'success');
-                    } else {
-                        showSystemMessage('无法解析优化后的问题，请重试。', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error optimizing question:', error);
-                    showSystemMessage('优化问题时出错，请重试。', 'error');
-                })
-                .finally(() => {
-                    // Reset button state
-                    optimizeButton.disabled = false;
-                    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
-                });
-        });
-    }
+    console.log('Setting up optimize and submit buttons');
     
-    // Set up event listener for submit button
-    const submitButton = document.getElementById('submit-button');
-    if (submitButton) {
-        submitButton.addEventListener('click', function() {
-            const selectedChoice = document.querySelector('.choice-cell.selected');
-            if (selectedChoice) {
-                const selectedValue = selectedChoice.getAttribute('data-value');
-                displayAnswer(selectedValue);
-                
-                // Disable the submit button after submission
-                submitButton.disabled = true;
-                submitButton.classList.add('disabled');
-            } else {
-                showSystemMessage('请先选择一个答案', 'warning');
-            }
-        });
-    }
-}
-
-// Helper function to parse optimized question from AI response
-function parseOptimizedQuestion(content) {
-    try {
-        const questionMatch = content.match(/问题：([\s\S]*?)(?=选项：|$)/);
-        const optionsMatch = content.match(/选项：\s*([\s\S]*?)(?=答案：|$)/);
-        const answerMatch = content.match(/答案：([\s\S]*?)(?=解析：|$)/);
-        const explanationMatch = content.match(/解析：([\s\S]*?)(?=$)/);
-        
-        if (!questionMatch || !optionsMatch || !answerMatch || !explanationMatch) {
-            return null;
-        }
-        
-        const question = questionMatch[1].trim();
-        
-        // Parse options
-        const optionsText = optionsMatch[1].trim();
-        const optionLines = optionsText.split('\n');
-        const choices = [];
-        
-        for (const line of optionLines) {
-            const match = line.match(/[A-D]\.\s*(.*)/);
-            if (match) {
-                choices.push(match[1].trim());
-            }
-        }
-        
-        if (choices.length !== 4) {
-            return null;
-        }
-        
-        const answer = answerMatch[1].trim();
-        const explanation = explanationMatch[1].trim();
-        
-        return {
-            question,
-            choices,
-            answer,
-            explanation
-        };
-    } catch (error) {
-        console.error('Error parsing optimized question:', error);
-        return null;
-    }
-    }
-    
-    // Function to populate grade options based on selected school
-    function populateGradeOptions(school) {
-    const gradeSelect = document.getElementById('grade-select');
-    const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
-    
-    if (!gradeSelect) return;
-    
-        // Clear existing options
-        gradeSelect.innerHTML = '';
-        
-    // Define grade options based on school
-    let gradeOptions = [];
-        
-        switch (school) {
-            case '小学':
-            gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-                break;
-            case '初中':
-            gradeOptions = ['初一', '初二', '初三'];
-                break;
-            case '高中':
-            gradeOptions = ['高一', '高二', '高三'];
-                break;
-            case '大学':
-            gradeOptions = ['大一', '大二', '大三', '大四'];
-                break;
-            default:
-            gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-    }
-    
-    // Add options to the select element
-    gradeOptions.forEach(grade => {
-        const option = document.createElement('option');
-        option.value = grade;
-        option.textContent = grade;
-        gradeSelect.appendChild(option);
-    });
-    
-    // Also update the sidebar dropdown if it exists
-    if (gradeSelectSidebar) {
-        // Clear existing options
-        gradeSelectSidebar.innerHTML = '';
-        
-        // Add the same options to the sidebar dropdown
-        gradeOptions.forEach(grade => {
-            const option = document.createElement('option');
-            option.value = grade;
-            option.textContent = grade;
-            gradeSelectSidebar.appendChild(option);
-        });
-    }
-    }
-    
-    // Function to populate subject options based on selected school
-    function populateSubjectOptions(school) {
-    const subjectSelect = document.getElementById('subject-select');
-    const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
-    
-    if (!subjectSelect) return;
-    
-        // Clear existing options
-        subjectSelect.innerHTML = '';
-        
-    // Define subject options based on school
-    let subjectOptions = [];
-        
-        switch (school) {
-            case '小学':
-            subjectOptions = ['语文', '数学', '英语', '科学', '道德与法治'];
-                break;
-            case '初中':
-            subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                break;
-            case '高中':
-            subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                break;
-            case '大学':
-            subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
-                break;
-            default:
-            subjectOptions = ['语文', '数学', '英语'];
-    }
-    
-    // Add options to the select element
-    subjectOptions.forEach(subject => {
-        const option = document.createElement('option');
-        option.value = subject;
-        option.textContent = subject;
-        subjectSelect.appendChild(option);
-    });
-    
-    // Also update the sidebar dropdown if it exists
-    if (subjectSelectSidebar) {
-        // Clear existing options
-        subjectSelectSidebar.innerHTML = '';
-        
-        // Add the same options to the sidebar dropdown
-        subjectOptions.forEach(subject => {
-            const option = document.createElement('option');
-            option.value = subject;
-            option.textContent = subject;
-            subjectSelectSidebar.appendChild(option);
-        });
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize form layout
-    initializeFormLayout();
-    
-    // Move content creation area to the top for better screen utilization
-    moveContentCreationToTop();
-    
-    // Setup sidebar toggle functionality
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const leftPanel = document.querySelector('.left-panel');
-    const contentArea = document.querySelector('.content-area');
-    
-    if (sidebarToggle && leftPanel && contentArea) {
-        sidebarToggle.addEventListener('click', function() {
-            leftPanel.classList.toggle('hidden');
-            contentArea.classList.toggle('full-width');
-            this.classList.toggle('collapsed');
-        });
-    }
-    
-    // Setup tab switching functionality
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
-    
-    if (qaButton && createButton && qaContainer && createContainer) {
-        qaButton.addEventListener('click', function() {
-            qaButton.classList.add('active');
-            createButton.classList.remove('active');
-            qaContainer.classList.remove('hidden');
-            createContainer.classList.add('hidden');
-        });
-        
-        createButton.addEventListener('click', function() {
-            createButton.classList.add('active');
-            qaButton.classList.remove('active');
-            createContainer.classList.remove('hidden');
-            qaContainer.classList.add('hidden');
-            
-            // Initialize empty state if no questions are loaded
-            initializeEmptyState();
-        });
-        
-        // Initialize empty state on the test page if it's active
-        if (createButton.classList.contains('active')) {
-            initializeEmptyState();
-        }
-                } else {
-        // If tab buttons don't exist, initialize empty state anyway
-        initializeEmptyState();
-    }
-    
-    // Set up initial navigation buttons
-    setupNavigationButtons();
-    
-    // Set up initial option buttons if they exist
-    setupOptionButtons();
-    
-    // Directly populate sidebar dropdowns with initial values
-    const schoolSelectSidebar = document.getElementById('school-select-sidebar');
-    if (schoolSelectSidebar) {
-        const initialSchool = schoolSelectSidebar.value || '小学';
-        
-        // Define grade options based on school
-        let gradeOptions = [];
-        switch (initialSchool) {
-            case '小学':
-                gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-                break;
-            case '初中':
-                gradeOptions = ['初一', '初二', '初三'];
-                break;
-            case '高中':
-                gradeOptions = ['高一', '高二', '高三'];
-                break;
-            case '大学':
-                gradeOptions = ['大一', '大二', '大三', '大四'];
-                break;
-            default:
-                gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-        }
-        
-        // Define subject options based on school
-        let subjectOptions = [];
-        switch (initialSchool) {
-            case '小学':
-                subjectOptions = ['语文', '数学', '英语', '科学'];
-                break;
-            case '初中':
-                subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                break;
-            case '高中':
-                subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                break;
-            case '大学':
-                subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
-                break;
-            default:
-                subjectOptions = ['语文', '数学', '英语'];
-        }
-        
-        // Populate grade dropdown
-        const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
-        if (gradeSelectSidebar) {
-            gradeSelectSidebar.innerHTML = '';
-            gradeOptions.forEach(grade => {
-                const option = document.createElement('option');
-                option.value = grade;
-                option.textContent = grade;
-                gradeSelectSidebar.appendChild(option);
-            });
-        }
-        
-        // Populate subject dropdown
-        const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
-        if (subjectSelectSidebar) {
-            subjectSelectSidebar.innerHTML = '';
-            subjectOptions.forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject;
-                option.textContent = subject;
-                subjectSelectSidebar.appendChild(option);
-            });
-        }
-        
-        // Add change event listener to update dropdowns when school changes
-        schoolSelectSidebar.addEventListener('change', function() {
-            const school = this.value;
-            
-            // Define grade options based on school
-            let gradeOptions = [];
-            switch (school) {
-                case '小学':
-                    gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-                    break;
-                case '初中':
-                    gradeOptions = ['初一', '初二', '初三'];
-                    break;
-                case '高中':
-                    gradeOptions = ['高一', '高二', '高三'];
-                    break;
-                case '大学':
-                    gradeOptions = ['大一', '大二', '大三', '大四'];
-                    break;
-                default:
-                    gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-            }
-            
-            // Define subject options based on school
-            let subjectOptions = [];
-            switch (school) {
-                case '小学':
-                    subjectOptions = ['语文', '数学', '英语', '科学'];
-                    break;
-                case '初中':
-                    subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'];
-                    break;
-                case '高中':
-                    subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                    break;
-                case '大学':
-                    subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
-                    break;
-                default:
-                    subjectOptions = ['语文', '数学', '英语'];
-            }
-            
-            // Update grade dropdown
-            const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
-            if (gradeSelectSidebar) {
-                gradeSelectSidebar.innerHTML = '';
-                gradeOptions.forEach(grade => {
-                    const option = document.createElement('option');
-                    option.value = grade;
-                    option.textContent = grade;
-                    gradeSelectSidebar.appendChild(option);
-                });
-            }
-            
-            // Update subject dropdown
-            const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
-            if (subjectSelectSidebar) {
-                subjectSelectSidebar.innerHTML = '';
-                subjectOptions.forEach(subject => {
-                    const option = document.createElement('option');
-                    option.value = subject;
-                    option.textContent = subject;
-                    subjectSelectSidebar.appendChild(option);
-                });
-            }
-        });
-    }
-
-    // Add click handler for sidebar generate button
-    const sidebarGenerateButton = document.createElement('button');
-    sidebarGenerateButton.textContent = '出题';
-    sidebarGenerateButton.className = 'sidebar-generate-button';
-    sidebarGenerateButton.addEventListener('click', function() {
-        // Switch to the test tab if not already there
-        const createButton = document.getElementById('create-button');
-        if (createButton && !createButton.classList.contains('active')) {
-            createButton.click();
-        }
-        
-        // Then generate questions
-        handleGenerateQuestionsClick();
-    });
-    
-    // Add the button to the second frame
-    const testFrame = document.querySelector('.sidebar-frame:nth-child(2) .frame-content');
-    if (testFrame) {
-        testFrame.appendChild(sidebarGenerateButton);
-    }
-});
-
-// Function to move content creation area to the top
-function moveContentCreationToTop() {
-    const createContainer = document.getElementById('create-container');
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    
-    if (createContainer && questionsDisplayContainer) {
-        // Ensure the questions display container is at the top
-        createContainer.style.display = 'flex';
-        createContainer.style.flexDirection = 'column';
-        
-        // Move questions display to the top
-        if (questionsDisplayContainer.parentNode === createContainer) {
-            createContainer.insertBefore(questionsDisplayContainer, createContainer.firstChild);
-        }
-        
-        // Style the questions display container for better visibility
-        questionsDisplayContainer.style.cssText = `
-            margin-bottom: 20px;
-            width: 100%;
-            box-sizing: border-box;
-        `;
-        
-        // Ensure navigation controls are below the questions
-        const navigationControls = document.querySelector('.navigation-controls');
-        if (navigationControls && navigationControls.parentNode === createContainer) {
-            createContainer.appendChild(navigationControls);
-        }
-    }
-}
-
-// Function to initialize empty state on the test page
-function initializeEmptyState() {
-    const createContainer = document.getElementById('create-container');
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    
-    // Only initialize empty state if no questions are loaded
-    if (!window.questions || window.questions.length === 0) {
-        // Create or get the empty state element
-        let emptyState = document.getElementById('empty-state');
-        
-        if (!emptyState) {
-            emptyState = document.createElement('div');
-            emptyState.id = 'empty-state';
-            emptyState.className = 'empty-state';
-            emptyState.style.cssText = `
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                padding: 40px 20px;
-                text-align: center;
-                background-color: white;
-                border-radius: 12px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-                margin: 20px auto;
-                max-width: 600px;
-            `;
-            
-            // Create icon
-            const icon = document.createElement('div');
-            icon.innerHTML = `
-                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#4299e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"></path>
-                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                </svg>
-            `;
-            icon.style.cssText = `
-                margin-bottom: 20px;
-                color: #4299e1;
-            `;
-            
-            // Create heading
-            const heading = document.createElement('h3');
-            heading.textContent = '准备好开始测验了吗？';
-            heading.style.cssText = `
-                font-size: 24px;
-                color: #2d3748;
-                                    margin-bottom: 15px;
-            `;
-            
-            // Create description
-            const description = document.createElement('p');
-            description.textContent = '使用左侧边栏选择学校类型、年级、学期、科目、难度和题目数量，然后点击"出题"按钮生成测验题目。';
-            description.style.cssText = `
-                font-size: 16px;
-                color: #4a5568;
-                line-height: 1.6;
-                max-width: 500px;
-            `;
-            
-            // Assemble empty state
-            emptyState.appendChild(icon);
-            emptyState.appendChild(heading);
-            emptyState.appendChild(description);
-            
-            // Add to container
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.innerHTML = '';
-                questionsDisplayContainer.appendChild(emptyState);
-                questionsDisplayContainer.classList.remove('hidden');
-            } else if (createContainer) {
-                // Create questions display container if it doesn't exist
-                const newQuestionsContainer = document.createElement('div');
-                newQuestionsContainer.id = 'questions-display-container';
-                newQuestionsContainer.className = 'questions-display-container';
-                newQuestionsContainer.appendChild(emptyState);
-                
-                createContainer.innerHTML = '';
-                createContainer.appendChild(newQuestionsContainer);
-            }
-        } else {
-            // Make sure the empty state is visible
-            emptyState.classList.remove('hidden');
-            
-            // Make sure the questions display container is visible
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.classList.remove('hidden');
-            }
-        }
-    }
-} 
-
-// Add event listeners for the optimize and submit buttons in the chat interface
-const optimizeButton = document.getElementById('optimize-button');
-if (optimizeButton) {
-    optimizeButton.addEventListener('click', function() {
-        // Get the chat input
-        const chatInput = document.getElementById('chat-input');
-        if (!chatInput || !chatInput.value.trim()) {
-            showSystemMessage('请先输入问题内容', 'warning');
-                return;
-            }
-            
-        const questionText = chatInput.value.trim();
-        
-                // Show loading state
-        optimizeButton.disabled = true;
-        optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
-        
-        // Prepare the prompt for optimization
-        const prompt = `请优化以下问题，使其更清晰、更有教育价值：
-        
-问题：${questionText}
-
-请返回优化后的问题，保持原始意图但使其更加清晰、准确和有教育意义。`;
-        
-        // Call the API
-        fetchAIResponse(prompt)
-            .then(response => {
-                // Extract the optimized question
-                const optimizedContent = extractContentFromResponse(response);
-                
-                // Update the chat input with the optimized question
-                chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
-                
-                // Focus the input and move cursor to end
-                chatInput.focus();
-                chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
-                
-                // Show success message
-                showSystemMessage('问题已成功优化！', 'success');
-            })
-            .catch(error => {
-                console.error('Error optimizing question:', error);
-                showSystemMessage('优化问题时出错，请重试。', 'error');
-            })
-            .finally(() => {
-                // Reset button state
-                optimizeButton.disabled = false;
-                optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
-            });
-    });
-}
-
-const submitButton = document.getElementById('submit-button');
-if (submitButton) {
-    submitButton.addEventListener('click', function() {
-        // Get the chat input
-        const chatInput = document.getElementById('chat-input');
-        if (!chatInput || !chatInput.value.trim()) {
-            showSystemMessage('请先输入问题内容', 'warning');
-            return;
-        }
-        
-        const questionText = chatInput.value.trim();
-        
-        // Show loading state
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
-        
-        // Add the user message to the chat
-        const chatMessages = document.querySelector('.chat-messages');
-        if (chatMessages) {
-            const userMessage = document.createElement('div');
-            userMessage.className = 'chat-message user-message';
-            userMessage.innerHTML = `
-                <div class="message-content">
-                    <div class="message-text">${questionText}</div>
-                    <div class="message-time">${new Date().toLocaleTimeString()}</div>
-                </div>
-                <div class="avatar user-avatar"><i class="fas fa-user"></i></div>
-            `;
-            chatMessages.appendChild(userMessage);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-        
-        // Clear the input
-        chatInput.value = '';
-        
-        // Prepare the prompt for the AI
-        const prompt = `请回答以下问题，提供详细且教育性的解答：
-        
-${questionText}
-
-请提供清晰、准确、有教育意义的回答，如果涉及数学或科学概念，请确保解释清楚。`;
-        
-        // Call the API
-        fetchAIResponse(prompt)
-            .then(response => {
-                // Extract the AI response
-                const aiResponse = extractContentFromResponse(response);
-                
-                // Add the AI response to the chat
-                if (chatMessages) {
-                    const assistantMessage = document.createElement('div');
-                    assistantMessage.className = 'chat-message assistant-message';
-                    assistantMessage.innerHTML = `
-                        <div class="avatar assistant-avatar"><i class="fas fa-robot"></i></div>
-                        <div class="message-content">
-                            <div class="message-text">${formatMathExpressions(aiResponse)}</div>
-                            <div class="message-time">${new Date().toLocaleTimeString()}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(assistantMessage);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                    
-                    // Render MathJax in the new message
-                    if (window.MathJax) {
-                        MathJax.typesetPromise([assistantMessage]).catch(err => console.error('MathJax error:', err));
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error submitting question:', error);
-                showSystemMessage('提交问题时出错，请重试。', 'error');
-                
-                // Add error message to chat
-                if (chatMessages) {
-                    const errorMessage = document.createElement('div');
-                    errorMessage.className = 'chat-message system-message';
-                    errorMessage.innerHTML = `
-                        <div class="avatar system-avatar"><i class="fas fa-exclamation-circle"></i></div>
-                        <div class="message-content">
-                            <div class="message-text">抱歉，处理您的问题时出现了错误。请重试。</div>
-                            <div class="message-time">${new Date().toLocaleTimeString()}</div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(errorMessage);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
-            })
-            .finally(() => {
-                // Reset button state
-                submitButton.disabled = false;
-                submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
-            });
-    });
-}
-
-// Modify initializeFormLayout to call setupChatButtons
-function initializeFormLayout() {
-    // ... existing code ...
-    
-    // Setup tab switching functionality
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
-    
-    if (qaButton && createButton && qaContainer && createContainer) {
-        qaButton.addEventListener('click', function() {
-            qaButton.classList.add('active');
-            createButton.classList.remove('active');
-            qaContainer.classList.remove('hidden');
-            createContainer.classList.add('hidden');
-            
-            // Set up chat buttons when switching to QA tab
-            setTimeout(setupChatButtons, 100);
-        });
-        
-        createButton.addEventListener('click', function() {
-            createButton.classList.add('active');
-            qaButton.classList.remove('active');
-            createContainer.classList.remove('hidden');
-            qaContainer.classList.add('hidden');
-            
-            // Initialize empty state if no questions are loaded
-            initializeEmptyState();
-        });
-        
-        // Initialize empty state on the test page if it's active
-        if (createButton.classList.contains('active')) {
-            initializeEmptyState();
-        } else if (qaButton.classList.contains('active')) {
-            // Set up chat buttons if QA tab is active
-            setTimeout(setupChatButtons, 100);
-        }
-    } else {
-        // If tab buttons don't exist, initialize empty state anyway
-        initializeEmptyState();
-    }
-    
-    // Set up initial navigation buttons
-    setupNavigationButtons();
-    
-    // Set up chat buttons on page load
-    setupChatButtons();
-    
-    // ... existing code ...
-}
-
-// Add this at the end of the file to ensure buttons are set up when the page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Set up chat buttons when the page loads
-    setTimeout(setupChatButtons, 300);
-});
-
-// Modify the setupChatButtons function to create the chat interface if it doesn't exist
-function setupChatButtons() {
-    console.log('Setting up chat buttons');
-    
-    // First, ensure the chat interface exists
-    createChatInterface();
-    
-    // Now get the chat input and response area
-    const chatInput = document.getElementById('chat-input');
-    const chatResponse = document.getElementById('chat-response');
-    
-    if (!chatInput || !chatResponse) {
-        console.error('Chat input or response area not found even after creation');
+    // Track if buttons have been set up to prevent duplicate listeners
+    if (window.optimizeSubmitButtonsInitialized) {
+        console.log('Optimize and submit buttons already initialized, skipping setup');
         return;
     }
     
-    // Set up optimize button
     const optimizeButton = document.getElementById('optimize-button');
+    const submitButton = document.getElementById('submit-button');
+    
+    // Remove any existing event listeners by cloning and replacing the buttons
     if (optimizeButton) {
-        optimizeButton.addEventListener('click', function() {
-            const questionText = chatInput.value.trim();
+        const newOptimizeButton = optimizeButton.cloneNode(true);
+        optimizeButton.parentNode.replaceChild(newOptimizeButton, optimizeButton);
+        
+        newOptimizeButton.addEventListener('click', function() {
+            console.log('Optimize button clicked');
+            const chatInput = document.getElementById('chat-input');
             
-            if (!questionText) {
-                showSystemMessage('请先输入问题内容', 'warning');
+            if (!chatInput || !chatInput.value.trim()) {
+                showSystemMessage('请先输入问题', 'warning');
                 return;
             }
             
-            // Get selected school and grade from sidebar - add debug logging
-            const selectedSchool = document.getElementById('sidebar-school')?.value || '';
-            const selectedGrade = document.getElementById('sidebar-grade')?.value || '';
-            
-            console.log('Optimize button clicked with school:', selectedSchool, 'and grade:', selectedGrade);
-            
-            // Show loading state
-            optimizeButton.disabled = true;
-            optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
-            
-            // Prepare the prompt for optimization with educational context
-            let prompt = `请优化以下问题，使其更清晰、更有教育价值：
-            
-问题：${questionText}`;
-
-            // Add educational context if available - with explicit check for non-empty values
-            if (selectedSchool !== '' || selectedGrade !== '') {
-                console.log('Adding educational context to optimize prompt');
-                
-                prompt += `\n\n教育背景：`;
-                
-                if (selectedSchool !== '') {
-                    prompt += `\n- 学校类型：${selectedSchool}`;
-                }
-                
-                if (selectedGrade !== '') {
-                    prompt += `\n- 年级：${selectedGrade}`;
-                }
-                
-                // Add specific guidance based on school level
-                if (selectedSchool === '小学') {
-                    prompt += `\n\n请根据上述教育背景，优化问题使其更适合${selectedGrade}学生的理解水平。使用简单、直观的语言，避免抽象概念，增加趣味性和生活化的元素。`;
-                } else if (selectedSchool === '初中') {
-                    prompt += `\n\n请根据上述教育背景，优化问题使其更适合${selectedGrade}学生的理解水平。使用清晰但稍有挑战性的语言，可以适当引入抽象概念，但需要配合具体例子。`;
-                } else if (selectedSchool === '高中') {
-                    prompt += `\n\n请根据上述教育背景，优化问题使其更适合${selectedGrade}学生的理解水平。使用准确、规范的学科语言，可以使用较为抽象的概念和复杂的推理。`;
-                } else {
-                    prompt += `\n\n请根据上述教育背景，优化问题使其更适合该年级学生的理解水平和学习需求。`;
-                }
-            } else {
-                console.log('No educational context available for optimize prompt');
-                prompt += `\n\n请保持原始意图但使其更加清晰、准确和有教育意义。`;
+            // Get dropdown values for context
+            const dropdownValues = getSidebarDropdownValues();
+            if (!dropdownValues.school || !dropdownValues.grade) {
+                showSystemMessage('请选择学校类型和年级以获得更准确的优化', 'warning');
+                highlightEmptyDropdowns(['sidebar-school', 'sidebar-grade']);
+                return;
             }
             
-            console.log('Fetching AI response with prompt:', prompt);
+            // Disable the button while processing
+            newOptimizeButton.disabled = true;
+            newOptimizeButton.textContent = '优化中...';
             
-            // Call the API
+            const userQuestion = chatInput.value.trim();
+            const prompt = `请优化以下${dropdownValues.school}${dropdownValues.grade}学生的问题，使其更加清晰、准确和有教育意义，但保持原始问题的核心意图：\n\n${userQuestion}\n\n请直接返回优化后的问题，不要添加任何额外的解释或格式。`;
+            
             fetchAIResponse(prompt)
                 .then(response => {
-                    // Extract the optimized question
-                    const optimizedContent = extractContentFromResponse(response);
+                    console.log('Optimization response:', response);
+                    const optimizedQuestion = parseOptimizedQuestion(response);
                     
                     // Update the chat input with the optimized question
+                    chatInput.value = optimizedQuestion;
+                    
+                    // Add the interaction to the chat history
                     chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
                     
                     // Focus the input and move cursor to end
