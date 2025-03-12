@@ -2339,16 +2339,12 @@ function initializeFormLayout() {
 
 // Function to set up optimize and submit buttons
 function setupOptimizeAndSubmitButtons() {
-    console.log('Setting up optimize and submit buttons');
-    
-    // Track if buttons have been set up to prevent duplicate listeners
     if (window.optimizeSubmitButtonsInitialized) {
         console.log('Optimize and submit buttons already initialized, skipping setup');
         return;
     }
     
     const optimizeButton = document.getElementById('optimize-button');
-    const submitButton = document.getElementById('submit-button');
     
     // Remove any existing event listeners by cloning and replacing the buttons
     if (optimizeButton) {
@@ -2388,159 +2384,178 @@ function setupOptimizeAndSubmitButtons() {
                     chatInput.value = optimizedQuestion;
                     
                     // Add the interaction to the chat history
-                    chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
-                    
-                    // Focus the input and move cursor to end
-                    chatInput.focus();
-                    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
-                    
-                    // Show success message with educational context if available
-                    if (selectedSchool && selectedGrade) {
-                        showSystemMessage(`问题已根据${selectedSchool}${selectedGrade}教学要求成功优化！`, 'success');
-                    } else {
-                        showSystemMessage('问题已成功优化！', 'success');
+                    const chatResponseArea = document.getElementById('chat-response-area');
+                    if (chatResponseArea) {
+                        // Add user question
+                        const userMessageDiv = document.createElement('div');
+                        userMessageDiv.className = 'chat-message user-message';
+                        userMessageDiv.innerHTML = `<strong>原始问题:</strong> ${userQuestion}`;
+                        chatResponseArea.appendChild(userMessageDiv);
+                        
+                        // Add system response
+                        const systemMessageDiv = document.createElement('div');
+                        systemMessageDiv.className = 'chat-message system-message';
+                        systemMessageDiv.innerHTML = `<strong>优化后的问题:</strong> ${optimizedQuestion}`;
+                        chatResponseArea.appendChild(systemMessageDiv);
+                        
+                        // Scroll to bottom
+                        chatResponseArea.scrollTop = chatResponseArea.scrollHeight;
                     }
+                    
+                    // Show success message
+                    showSystemMessage('问题已优化', 'success');
                 })
                 .catch(error => {
                     console.error('Error optimizing question:', error);
-                    showSystemMessage('优化问题时出错，请重试。', 'error');
+                    showSystemMessage('优化问题时出错，请重试', 'error');
                 })
                 .finally(() => {
-                    // Reset button state
-                    optimizeButton.disabled = false;
-                    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+                    // Re-enable the button
+                    newOptimizeButton.disabled = false;
+                    newOptimizeButton.textContent = '优化问题';
                 });
         });
     }
     
-    // Set up submit button - similar fix for the submit button
-    const submitButton = document.getElementById('submit-button');
-    if (submitButton) {
-        submitButton.addEventListener('click', function() {
-            const questionText = chatInput.value.trim();
+    // Set up submit button
+    const submitBtn = document.getElementById('submit-button');
+    if (submitBtn) {
+        const newSubmitBtn = submitBtn.cloneNode(true);
+        submitBtn.parentNode.replaceChild(newSubmitBtn, submitBtn);
+        
+        newSubmitBtn.addEventListener('click', function() {
+            console.log('Submit button clicked');
+            const chatInput = document.getElementById('chat-input');
             
-            if (!questionText) {
-                showSystemMessage('请先输入问题内容', 'warning');
+            if (!chatInput || !chatInput.value.trim()) {
+                showSystemMessage('请先输入问题', 'warning');
                 return;
             }
             
-            // Get selected school and grade from sidebar - add debug logging
-            const selectedSchool = document.getElementById('sidebar-school')?.value || '';
-            const selectedGrade = document.getElementById('sidebar-grade')?.value || '';
-            
-            console.log('Submit button clicked with school:', selectedSchool, 'and grade:', selectedGrade);
-            
-            // Show loading state
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
-            chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
-            
-            // Prepare the prompt for the AI with educational context
-            let prompt = `请回答以下问题，提供详细且教育性的解答：
-            
-${questionText}`;
-
-            // Add educational context if available - with explicit check for non-empty values
-            if (selectedSchool !== '' || selectedGrade !== '') {
-                console.log('Adding educational context to submit prompt');
-                
-                prompt += `\n\n教育背景：`;
-                
-                if (selectedSchool !== '') {
-                    prompt += `\n- 学校类型：${selectedSchool}`;
-                }
-                
-                if (selectedGrade !== '') {
-                    prompt += `\n- 年级：${selectedGrade}`;
-                }
-                
-                // Add specific guidance based on school level
-                if (selectedSchool === '小学') {
-                    prompt += `\n\n请根据上述教育背景，提供适合${selectedGrade}学生理解水平的回答。解释应该：
-1. 使用简单、直观的语言
-2. 避免复杂的术语和抽象概念
-3. 使用具体的例子和生活化的比喻
-4. 分步骤解释，每一步都要清晰明了
-5. 增加趣味性和鼓励性的内容`;
-                } else if (selectedSchool === '初中') {
-                    prompt += `\n\n请根据上述教育背景，提供适合${selectedGrade}学生理解水平的回答。解释应该：
-1. 使用清晰但稍有挑战性的语言
-2. 可以引入基础学科术语，但需要解释
-3. 结合具体例子和适当的抽象概念
-4. 强调思维方法和解题思路
-5. 鼓励批判性思考和自主探索`;
-                } else if (selectedSchool === '高中') {
-                    prompt += `\n\n请根据上述教育背景，提供适合${selectedGrade}学生理解水平的回答。解释应该：
-1. 使用准确、规范的学科语言
-2. 可以使用专业术语和抽象概念
-3. 深入分析问题的本质和解决方法
-4. 强调知识点之间的联系和系统性
-5. 提供与升学考试相关的解题技巧和方法`;
-                } else {
-                    prompt += `\n\n请根据上述教育背景，提供适合该年级学生理解水平的回答。解释应该清晰易懂，使用适合该年级学生的语言和概念。`;
-                }
-            } else {
-                console.log('No educational context available for submit prompt');
-                prompt += `\n\n请提供清晰、准确、有教育意义的回答，如果涉及数学或科学概念，请确保解释清楚。`;
+            // Get dropdown values for context
+            const dropdownValues = getSidebarDropdownValues();
+            if (!dropdownValues.school || !dropdownValues.grade) {
+                showSystemMessage('请选择学校类型和年级以获得更准确的回答', 'warning');
+                highlightEmptyDropdowns(['sidebar-school', 'sidebar-grade']);
+                return;
             }
             
-            console.log('Fetching AI response with prompt:', prompt);
+            // Disable the button while processing
+            newSubmitBtn.disabled = true;
+            newSubmitBtn.textContent = '处理中...';
             
-            // Call the API
+            const userQuestion = chatInput.value.trim();
+            const prompt = `你是一位经验丰富的${dropdownValues.school}${dropdownValues.grade}${dropdownValues.subject || ''}老师，请回答以下学生的问题。请提供详细、准确且有教育意义的回答，适合${dropdownValues.school}${dropdownValues.grade}学生的理解水平：\n\n${userQuestion}\n\n回答要求：\n1. 使用简明易懂的语言\n2. 提供具体的例子\n3. 解释相关的概念和原理\n4. 如果问题涉及数学公式，请使用LaTeX格式\n5. 如果问题有多种解法，请展示最适合学生水平的方法`;
+            
+            // Add the user question to the chat history
+            const chatResponseArea = document.getElementById('chat-response-area');
+            if (chatResponseArea) {
+                const userMessageDiv = document.createElement('div');
+                userMessageDiv.className = 'chat-message user-message';
+                userMessageDiv.innerHTML = `<strong>问题:</strong> ${userQuestion}`;
+                chatResponseArea.appendChild(userMessageDiv);
+                
+                // Add loading message
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'chat-message system-message loading';
+                loadingDiv.innerHTML = '<div class="loading-spinner"></div> 正在思考...';
+                chatResponseArea.appendChild(loadingDiv);
+                
+                // Scroll to bottom
+                chatResponseArea.scrollTop = chatResponseArea.scrollHeight;
+            }
+            
             fetchAIResponse(prompt)
                 .then(response => {
-                    // Extract the AI response
-                    const aiResponse = extractContentFromResponse(response);
+                    console.log('Response:', response);
                     
-                    // Format the response with MathJax
-                    const formattedResponse = formatMathExpressions(aiResponse);
-                    
-                    // Display the response with educational context
-                    let contextHeader = '';
-                    if (selectedSchool !== '' || selectedGrade !== '') {
-                        const contextParts = [];
-                        if (selectedSchool !== '') contextParts.push(selectedSchool);
-                        if (selectedGrade !== '') contextParts.push(selectedGrade);
-                        
-                        contextHeader = `
-                            <div class="context-header">
-                                <span class="context-badge">${contextParts.join(' · ')}</span>
-                            </div>
-                        `;
+                    // Remove loading message
+                    const loadingMessage = chatResponseArea.querySelector('.loading');
+                    if (loadingMessage) {
+                        chatResponseArea.removeChild(loadingMessage);
                     }
                     
-                    chatResponse.innerHTML = `
-                        <div class="response-header">
-                            <i class="fas fa-robot"></i> AI 助手回答
-                        </div>
-                        ${contextHeader}
-                        <div class="response-content">
-                            ${formattedResponse}
-            </div>
-        `;
-        
-                    // Render MathJax in the response
+                    // Format the response with MathJax
+                    const formattedResponse = formatMathExpressions(response);
+                    
+                    // Add the response to the chat history
+                    if (chatResponseArea) {
+                        const systemMessageDiv = document.createElement('div');
+                        systemMessageDiv.className = 'chat-message system-message';
+                        systemMessageDiv.innerHTML = `<strong>回答:</strong> ${formattedResponse}`;
+                        chatResponseArea.appendChild(systemMessageDiv);
+                        
+                        // Scroll to bottom
+                        chatResponseArea.scrollTop = chatResponseArea.scrollHeight;
+                    }
+                    
+                    // Clear the input
+                    chatInput.value = '';
+                    
+                    // Render MathJax
                     if (window.MathJax) {
-                        MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
+                        window.MathJax.typeset();
                     }
                 })
                 .catch(error => {
                     console.error('Error submitting question:', error);
-                    chatResponse.innerHTML = `
-                        <div class="error-message">
-                            <i class="fas fa-exclamation-circle"></i>
-                            抱歉，处理您的问题时出错。请重试。
-                        </div>
-                    `;
-                    showSystemMessage('提交问题时出错，请重试。', 'error');
+                    
+                    // Remove loading message
+                    const loadingMessage = chatResponseArea.querySelector('.loading');
+                    if (loadingMessage) {
+                        chatResponseArea.removeChild(loadingMessage);
+                    }
+                    
+                    // Add error message to chat
+                    if (chatResponseArea) {
+                        const errorMessageDiv = document.createElement('div');
+                        errorMessageDiv.className = 'chat-message system-message error';
+                        errorMessageDiv.textContent = '处理问题时出错，请重试';
+                        chatResponseArea.appendChild(errorMessageDiv);
+                        
+                        // Scroll to bottom
+                        chatResponseArea.scrollTop = chatResponseArea.scrollHeight;
+                    }
+                    
+                    showSystemMessage('提交问题时出错，请重试', 'error');
                 })
                 .finally(() => {
-                    // Reset button state
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
+                    // Re-enable the button
+                    newSubmitBtn.disabled = false;
+                    newSubmitBtn.textContent = '提交问题';
                 });
         });
     }
+    
+    // Helper function to get dropdown values
+    function getSidebarDropdownValues() {
+        const schoolDropdown = document.getElementById('sidebar-school');
+        const gradeDropdown = document.getElementById('sidebar-grade');
+        const subjectDropdown = document.getElementById('sidebar-subject');
+        
+        return {
+            school: schoolDropdown ? schoolDropdown.value : '',
+            grade: gradeDropdown ? gradeDropdown.value : '',
+            subject: subjectDropdown ? subjectDropdown.value : ''
+        };
+    }
+    
+    // Helper function to highlight empty dropdowns
+    function highlightEmptyDropdowns(ids) {
+        ids.forEach(id => {
+            const dropdown = document.getElementById(id);
+            if (dropdown && (!dropdown.value || dropdown.value === '')) {
+                dropdown.style.border = '2px solid #e53e3e';
+                setTimeout(() => {
+                    dropdown.style.border = '';
+                }, 3000);
+            }
+        });
+    }
+    
+    // Mark as initialized
+    window.optimizeSubmitButtonsInitialized = true;
+    console.log('Optimize and submit buttons initialized');
 }
 
 // Add a new function to create the chat interface
