@@ -2550,221 +2550,234 @@ function populateGradeOptions(school) {
     }
 }
 
+// Initialize the application when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize form layout
     initializeFormLayout();
     
-    // Move content creation area to the top for better screen utilization
-    moveContentCreationToTop();
-    
-    // Setup sidebar toggle functionality
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const leftPanel = document.querySelector('.left-panel');
-    const contentArea = document.querySelector('.content-area');
-    
-    if (sidebarToggle && leftPanel && contentArea) {
-        sidebarToggle.addEventListener('click', function() {
-            leftPanel.classList.toggle('hidden');
-            contentArea.classList.toggle('full-width');
-            this.classList.toggle('collapsed');
-        });
-    }
-    
-    // Setup tab switching functionality
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
-    
-    if (qaButton && createButton && qaContainer && createContainer) {
-        qaButton.addEventListener('click', function() {
-            qaButton.classList.add('active');
-            createButton.classList.remove('active');
-            qaContainer.classList.remove('hidden');
-            createContainer.classList.add('hidden');
-        });
-        
-        createButton.addEventListener('click', function() {
-            createButton.classList.add('active');
-            qaButton.classList.remove('active');
-            createContainer.classList.remove('hidden');
-            qaContainer.classList.add('hidden');
-            
-            // Initialize empty state if no questions are loaded
-            initializeEmptyState();
-        });
-        
-        // Initialize empty state on the test page if it's active
-        if (createButton.classList.contains('active')) {
-            initializeEmptyState();
-        }
-    } else {
-        // If tab buttons don't exist, initialize empty state anyway
-        initializeEmptyState();
-    }
-    
-    // Set up initial navigation buttons
+    // Setup navigation buttons
     setupNavigationButtons();
     
-    // Set up initial option buttons if they exist
+    // Setup option buttons
     setupOptionButtons();
     
-    // Directly populate sidebar dropdowns with initial values
-    const schoolSelectSidebar = document.getElementById('school-select-sidebar');
-    if (schoolSelectSidebar) {
-        const initialSchool = schoolSelectSidebar.value || '小学';
-        
-        // Define grade options based on school
-        let gradeOptions = [];
-        switch (initialSchool) {
-            case '小学':
-                gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-                break;
-            case '初中':
-                gradeOptions = ['初一', '初二', '初三'];
-                break;
-            case '高中':
-                gradeOptions = ['高一', '高二', '高三'];
-                break;
-            case '大学':
-                gradeOptions = ['大一', '大二', '大三', '大四'];
-                break;
-            default:
-                gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-        }
-        
-        // Define subject options based on school
-        let subjectOptions = [];
-        switch (initialSchool) {
-            case '小学':
-                subjectOptions = ['语文', '数学', '英语', '科学'];
-                break;
-            case '初中':
-                subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                break;
-            case '高中':
-                subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                break;
-            case '大学':
-                subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
-                break;
-            default:
-                subjectOptions = ['语文', '数学', '英语'];
-        }
-        
-        // Populate grade dropdown
-        const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
-        if (gradeSelectSidebar) {
-            gradeSelectSidebar.innerHTML = '';
-            gradeOptions.forEach(grade => {
-                const option = document.createElement('option');
-                option.value = grade;
-                option.textContent = grade;
-                gradeSelectSidebar.appendChild(option);
-            });
-        }
-        
-        // Populate subject dropdown
-        const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
-        if (subjectSelectSidebar) {
-            subjectSelectSidebar.innerHTML = '';
-            subjectOptions.forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject;
-                option.textContent = subject;
-                subjectSelectSidebar.appendChild(option);
-            });
-        }
-        
-        // Add change event listener to update dropdowns when school changes
-        schoolSelectSidebar.addEventListener('change', function() {
-            const school = this.value;
-            
-            // Define grade options based on school
-            let gradeOptions = [];
-            switch (school) {
-                case '小学':
-                    gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-                    break;
-                case '初中':
-                    gradeOptions = ['初一', '初二', '初三'];
-                    break;
-                case '高中':
-                    gradeOptions = ['高一', '高二', '高三'];
-                    break;
-                case '大学':
-                    gradeOptions = ['大一', '大二', '大三', '大四'];
-                    break;
-                default:
-                    gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-            }
-            
-            // Define subject options based on school
-            let subjectOptions = [];
-            switch (school) {
-                case '小学':
-                    subjectOptions = ['语文', '数学', '英语', '科学'];
-                    break;
-                case '初中':
-                    subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'];
-                    break;
-                case '高中':
-                    subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                    break;
-                case '大学':
-                    subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
-                    break;
-                default:
-                    subjectOptions = ['语文', '数学', '英语'];
-            }
-            
-            // Update grade dropdown
-            const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
-            if (gradeSelectSidebar) {
-                gradeSelectSidebar.innerHTML = '';
-                gradeOptions.forEach(grade => {
-                    const option = document.createElement('option');
-                    option.value = grade;
-                    option.textContent = grade;
-                    gradeSelectSidebar.appendChild(option);
-                });
-            }
-            
-            // Update subject dropdown
-            const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
-            if (subjectSelectSidebar) {
-                subjectSelectSidebar.innerHTML = '';
-                subjectOptions.forEach(subject => {
-                    const option = document.createElement('option');
-                    option.value = subject;
-                    option.textContent = subject;
-                    subjectSelectSidebar.appendChild(option);
-                });
-            }
-        });
+    // Initialize empty state
+    initializeEmptyState();
+    
+    // Setup chat interface buttons
+    setupChatButtons();
+    
+    // Move content creation to top
+    moveContentCreationToTop();
+    
+    // Setup sidebar toggle
+    setupSidebarToggle();
+    
+    // Setup tab buttons
+    setupTabButtons();
+    
+    // Populate sidebar dropdowns
+    populateSidebarDropdowns();
+});
+
+// Function to set up chat interface buttons
+function setupChatButtons() {
+    const sendButton = document.getElementById('send-button');
+    const clearButton = document.getElementById('clear-button');
+    const chatInput = document.getElementById('chat-input');
+    const chatMessages = document.getElementById('chat-messages');
+    
+    if (!sendButton || !clearButton || !chatInput || !chatMessages) {
+        console.error('Chat interface elements not found');
+        return;
     }
     
-    // Add click handler for sidebar generate button
-    const sidebarGenerateButton = document.createElement('button');
-    sidebarGenerateButton.textContent = '出题';
-    sidebarGenerateButton.className = 'sidebar-generate-button';
-    sidebarGenerateButton.addEventListener('click', function() {
-        // Switch to the test tab if not already there
-        const createButton = document.getElementById('create-button');
-        if (createButton && !createButton.classList.contains('active')) {
-            createButton.click();
-        }
-        
-        // Then generate questions
-        handleGenerateQuestionsClick();
+    // Send message when clicking the send button
+    sendButton.addEventListener('click', function() {
+        sendChatMessage();
     });
     
-    // Add the button to the second frame
-    const testFrame = document.querySelector('.sidebar-frame:nth-child(2) .frame-content');
-    if (testFrame) {
-        testFrame.appendChild(sidebarGenerateButton);
+    // Send message when pressing Enter in the input field
+    chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            sendChatMessage();
+        }
+    });
+    
+    // Clear chat history when clicking the clear button
+    clearButton.addEventListener('click', function() {
+        chatMessages.innerHTML = '';
+        // Add welcome message
+        addSystemMessage('您好！我是您的AI学习助手。请输入您的问题，我会尽力帮助您。');
+    });
+    
+    // Add initial welcome message if chat is empty
+    if (chatMessages.children.length === 0) {
+        addSystemMessage('您好！我是您的AI学习助手。请输入您的问题，我会尽力帮助您。');
     }
-});
+    
+    // Function to send a chat message
+    function sendChatMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+        
+        // Add user message to chat
+        addUserMessage(message);
+        
+        // Clear input field
+        chatInput.value = '';
+        
+        // Get form values from sidebar
+        const schoolSelect = document.getElementById('sidebar-school');
+        const gradeSelect = document.getElementById('sidebar-grade');
+        const subjectSelect = document.getElementById('sidebar-subject');
+        
+        let schoolValue = schoolSelect ? schoolSelect.value : '';
+        let gradeValue = gradeSelect ? gradeSelect.value : '';
+        let subjectValue = subjectSelect ? subjectSelect.value : '';
+        
+        // Show loading indicator
+        addLoadingMessage();
+        
+        // Prepare context for the AI
+        let context = '';
+        if (schoolValue && gradeValue && subjectValue) {
+            context = `学校类型: ${schoolValue}, 年级: ${gradeValue}, 科目: ${subjectValue}. `;
+        }
+        
+        // Prepare the prompt for the AI
+        const prompt = `${context}用户问题: ${message}\n\n请提供详细、准确的回答，如果涉及数学公式，请使用LaTeX格式。`;
+        
+        // Call the AI API
+        fetchAIResponse(prompt)
+            .then(response => {
+                // Remove loading message
+                removeLoadingMessage();
+                
+                // Add AI response to chat
+                addAIMessage(response);
+                
+                // Format math expressions if any
+                formatMathExpressions(chatMessages.lastElementChild.querySelector('.message-content'));
+            })
+            .catch(error => {
+                // Remove loading message
+                removeLoadingMessage();
+                
+                // Add error message
+                addSystemMessage('抱歉，获取回答时出现了问题。请稍后再试。', 'error');
+                console.error('Error fetching AI response:', error);
+            });
+    }
+    
+    // Function to add a user message to the chat
+    function addUserMessage(message) {
+        const messageElement = document.createElement('div');
+        messageElement.className = 'message user-message';
+        messageElement.innerHTML = `
+            <div class="message-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="message-content">${escapeHTML(message)}</div>
+        `;
+        chatMessages.appendChild(messageElement);
+        
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Function to add an AI message to the chat
+    function addAIMessage(message) {
+        const messageElement = document.createElement('div');
+        messageElement.className = 'message ai-message';
+        messageElement.innerHTML = `
+            <div class="message-avatar">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="message-content">${formatMessage(message)}</div>
+        `;
+        chatMessages.appendChild(messageElement);
+        
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Function to add a system message to the chat
+    function addSystemMessage(message, type = 'info') {
+        const messageElement = document.createElement('div');
+        messageElement.className = `message system-message ${type}`;
+        messageElement.innerHTML = `
+            <div class="message-content">${message}</div>
+        `;
+        chatMessages.appendChild(messageElement);
+        
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Function to add a loading message
+    function addLoadingMessage() {
+        const messageElement = document.createElement('div');
+        messageElement.className = 'message ai-message loading';
+        messageElement.innerHTML = `
+            <div class="message-avatar">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="message-content">
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        `;
+        messageElement.id = 'loading-message';
+        chatMessages.appendChild(messageElement);
+        
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Function to remove the loading message
+    function removeLoadingMessage() {
+        const loadingMessage = document.getElementById('loading-message');
+        if (loadingMessage) {
+            loadingMessage.remove();
+        }
+    }
+    
+    // Function to format the message with markdown-like syntax
+    function formatMessage(message) {
+        // Replace newlines with <br>
+        let formatted = message.replace(/\n/g, '<br>');
+        
+        // Format code blocks
+        formatted = formatted.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+        
+        // Format inline code
+        formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
+        
+        // Format bold text
+        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Format italic text
+        formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Format lists
+        formatted = formatted.replace(/^\s*-\s+(.*?)$/gm, '<li>$1</li>');
+        formatted = formatted.replace(/(<li>.*?<\/li>)+/g, '<ul>$&</ul>');
+        
+        return formatted;
+    }
+    
+    // Function to escape HTML to prevent XSS
+    function escapeHTML(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+}
 
 // Function to move content creation area to the top
 function moveContentCreationToTop() {
