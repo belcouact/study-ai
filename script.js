@@ -3085,3 +3085,150 @@ function initializeEmptyState() {
         }
     }
 } 
+
+// Add event listeners for the optimize and submit buttons in the chat interface
+const optimizeButton = document.getElementById('optimize-button');
+if (optimizeButton) {
+    optimizeButton.addEventListener('click', function() {
+        // Get the chat input
+        const chatInput = document.getElementById('chat-input');
+        if (!chatInput || !chatInput.value.trim()) {
+            showSystemMessage('请先输入问题内容', 'warning');
+            return;
+        }
+        
+        const questionText = chatInput.value.trim();
+        
+        // Show loading state
+        optimizeButton.disabled = true;
+        optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
+        
+        // Prepare the prompt for optimization
+        const prompt = `请优化以下问题，使其更清晰、更有教育价值：
+        
+问题：${questionText}
+
+请返回优化后的问题，保持原始意图但使其更加清晰、准确和有教育意义。`;
+        
+        // Call the API
+        fetchAIResponse(prompt)
+            .then(response => {
+                // Extract the optimized question
+                const optimizedContent = extractContentFromResponse(response);
+                
+                // Update the chat input with the optimized question
+                chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
+                
+                // Focus the input and move cursor to end
+                chatInput.focus();
+                chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+                
+                // Show success message
+                showSystemMessage('问题已成功优化！', 'success');
+            })
+            .catch(error => {
+                console.error('Error optimizing question:', error);
+                showSystemMessage('优化问题时出错，请重试。', 'error');
+            })
+            .finally(() => {
+                // Reset button state
+                optimizeButton.disabled = false;
+                optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+            });
+    });
+}
+
+const submitButton = document.getElementById('submit-button');
+if (submitButton) {
+    submitButton.addEventListener('click', function() {
+        // Get the chat input
+        const chatInput = document.getElementById('chat-input');
+        if (!chatInput || !chatInput.value.trim()) {
+            showSystemMessage('请先输入问题内容', 'warning');
+            return;
+        }
+        
+        const questionText = chatInput.value.trim();
+        
+        // Show loading state
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+        
+        // Add the user message to the chat
+        const chatMessages = document.querySelector('.chat-messages');
+        if (chatMessages) {
+            const userMessage = document.createElement('div');
+            userMessage.className = 'chat-message user-message';
+            userMessage.innerHTML = `
+                <div class="message-content">
+                    <div class="message-text">${questionText}</div>
+                    <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                </div>
+                <div class="avatar user-avatar"><i class="fas fa-user"></i></div>
+            `;
+            chatMessages.appendChild(userMessage);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Clear the input
+        chatInput.value = '';
+        
+        // Prepare the prompt for the AI
+        const prompt = `请回答以下问题，提供详细且教育性的解答：
+        
+${questionText}
+
+请提供清晰、准确、有教育意义的回答，如果涉及数学或科学概念，请确保解释清楚。`;
+        
+        // Call the API
+        fetchAIResponse(prompt)
+            .then(response => {
+                // Extract the AI response
+                const aiResponse = extractContentFromResponse(response);
+                
+                // Add the AI response to the chat
+                if (chatMessages) {
+                    const assistantMessage = document.createElement('div');
+                    assistantMessage.className = 'chat-message assistant-message';
+                    assistantMessage.innerHTML = `
+                        <div class="avatar assistant-avatar"><i class="fas fa-robot"></i></div>
+                        <div class="message-content">
+                            <div class="message-text">${formatMathExpressions(aiResponse)}</div>
+                            <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                        </div>
+                    `;
+                    chatMessages.appendChild(assistantMessage);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    
+                    // Render MathJax in the new message
+                    if (window.MathJax) {
+                        MathJax.typesetPromise([assistantMessage]).catch(err => console.error('MathJax error:', err));
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting question:', error);
+                showSystemMessage('提交问题时出错，请重试。', 'error');
+                
+                // Add error message to chat
+                if (chatMessages) {
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'chat-message system-message';
+                    errorMessage.innerHTML = `
+                        <div class="avatar system-avatar"><i class="fas fa-exclamation-circle"></i></div>
+                        <div class="message-content">
+                            <div class="message-text">抱歉，处理您的问题时出现了错误。请重试。</div>
+                            <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                        </div>
+                    `;
+                    chatMessages.appendChild(errorMessage);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            })
+            .finally(() => {
+                // Reset button state
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
+            });
+    });
+}
