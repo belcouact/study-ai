@@ -2343,371 +2343,182 @@ function setupOptimizeAndSubmitButtons() {
         console.log('Optimize and submit buttons already initialized, skipping setup');
         return;
     }
-    
-    const optimizeButton = document.getElementById('optimize-button');
-    
-    // Remove any existing event listeners by cloning and replacing the buttons
-    if (optimizeButton) {
-        const newOptimizeButton = optimizeButton.cloneNode(true);
-        optimizeButton.parentNode.replaceChild(newOptimizeButton, optimizeButton);
-        
-        newOptimizeButton.addEventListener('click', function() {
-            console.log('Optimize button clicked');
-            const chatInput = document.getElementById('chat-input');
-            
-            if (!chatInput || !chatInput.value.trim()) {
-                showSystemMessage('请先输入问题', 'warning');
-                return;
-            }
-            
-            // Get dropdown values for context
-            const dropdownValues = getSidebarDropdownValues();
-            if (!dropdownValues.school || !dropdownValues.grade) {
-                showSystemMessage('请选择学校类型和年级以获得更准确的优化', 'warning');
-                highlightEmptyDropdowns(['sidebar-school', 'sidebar-grade']);
-                return;
-            }
-            
-            // Disable the button while processing
-            newOptimizeButton.disabled = true;
-            newOptimizeButton.textContent = '优化中...';
-            
-            const userQuestion = chatInput.value.trim();
-            const prompt = `请优化以下${dropdownValues.school}${dropdownValues.grade}学生的问题，使其更加清晰、准确和有教育意义，但保持原始问题的核心意图：\n\n${userQuestion}\n\n请直接返回优化后的问题，不要添加任何额外的解释或格式。`;
-            
-            fetchAIResponse(prompt)
-                .then(response => {
-                    console.log('Optimization response:', response);
-                    const optimizedQuestion = parseOptimizedQuestion(response);
-                    
-                    // Update the chat input with the optimized question
-                    chatInput.value = optimizedQuestion;
-                    
-                    // Add the interaction to the chat history
-                    const chatResponseArea = document.getElementById('chat-response-area');
-                    if (chatResponseArea) {
-                        // Add user question
-                        const userMessageDiv = document.createElement('div');
-                        userMessageDiv.className = 'chat-message user-message';
-                        userMessageDiv.innerHTML = `<strong>原始问题:</strong> ${userQuestion}`;
-                        chatResponseArea.appendChild(userMessageDiv);
-                        
-                        // Add system response
-                        const systemMessageDiv = document.createElement('div');
-                        systemMessageDiv.className = 'chat-message system-message';
-                        systemMessageDiv.innerHTML = `<strong>优化后的问题:</strong> ${optimizedQuestion}`;
-                        chatResponseArea.appendChild(systemMessageDiv);
-                        
-                        // Scroll to bottom
-                        chatResponseArea.scrollTop = chatResponseArea.scrollHeight;
-                    }
-                    
-                    // Show success message
-                    showSystemMessage('问题已优化', 'success');
-                })
-                .catch(error => {
-                    console.error('Error optimizing question:', error);
-                    showSystemMessage('优化问题时出错，请重试', 'error');
-                })
-                .finally(() => {
-                    // Re-enable the button
-                    newOptimizeButton.disabled = false;
-                    newOptimizeButton.textContent = '优化问题';
-                });
-        });
-    }
-    
-    // Set up submit button
-    const submitBtn = document.getElementById('submit-button');
-    if (submitBtn) {
-        const newSubmitBtn = submitBtn.cloneNode(true);
-        submitBtn.parentNode.replaceChild(newSubmitBtn, submitBtn);
-        
-        newSubmitBtn.addEventListener('click', function() {
-            console.log('Submit button clicked');
-            const chatInput = document.getElementById('chat-input');
-            
-            if (!chatInput || !chatInput.value.trim()) {
-                showSystemMessage('请先输入问题', 'warning');
-                return;
-            }
-            
-            // Get dropdown values for context
-            const dropdownValues = getSidebarDropdownValues();
-            if (!dropdownValues.school || !dropdownValues.grade) {
-                showSystemMessage('请选择学校类型和年级以获得更准确的回答', 'warning');
-                highlightEmptyDropdowns(['sidebar-school', 'sidebar-grade']);
-                return;
-            }
-            
-            // Disable the button while processing
-            newSubmitBtn.disabled = true;
-            newSubmitBtn.textContent = '处理中...';
-            
-            const userQuestion = chatInput.value.trim();
-            const prompt = `你是一位经验丰富的${dropdownValues.school}${dropdownValues.grade}${dropdownValues.subject || ''}老师，请回答以下学生的问题。请提供详细、准确且有教育意义的回答，适合${dropdownValues.school}${dropdownValues.grade}学生的理解水平：\n\n${userQuestion}\n\n回答要求：\n1. 使用简明易懂的语言\n2. 提供具体的例子\n3. 解释相关的概念和原理\n4. 如果问题涉及数学公式，请使用LaTeX格式\n5. 如果问题有多种解法，请展示最适合学生水平的方法`;
-            
-            // Add the user question to the chat history
-            const chatResponseArea = document.getElementById('chat-response-area');
-            if (chatResponseArea) {
-                const userMessageDiv = document.createElement('div');
-                userMessageDiv.className = 'chat-message user-message';
-                userMessageDiv.innerHTML = `<strong>问题:</strong> ${userQuestion}`;
-                chatResponseArea.appendChild(userMessageDiv);
-                
-                // Add loading message
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'chat-message system-message loading';
-                loadingDiv.innerHTML = '<div class="loading-spinner"></div> 正在思考...';
-                chatResponseArea.appendChild(loadingDiv);
-                
-                // Scroll to bottom
-                chatResponseArea.scrollTop = chatResponseArea.scrollHeight;
-            }
-            
-            fetchAIResponse(prompt)
-                .then(response => {
-                    console.log('Response:', response);
-                    
-                    // Remove loading message
-                    const loadingMessage = chatResponseArea.querySelector('.loading');
-                    if (loadingMessage) {
-                        chatResponseArea.removeChild(loadingMessage);
-                    }
-                    
-                    // Format the response with MathJax
-                    const formattedResponse = formatMathExpressions(response);
-                    
-                    // Add the response to the chat history
-                    if (chatResponseArea) {
-                        const systemMessageDiv = document.createElement('div');
-                        systemMessageDiv.className = 'chat-message system-message';
-                        systemMessageDiv.innerHTML = `<strong>回答:</strong> ${formattedResponse}`;
-                        chatResponseArea.appendChild(systemMessageDiv);
-                        
-                        // Scroll to bottom
-                        chatResponseArea.scrollTop = chatResponseArea.scrollHeight;
-                    }
-                    
-                    // Clear the input
-                    chatInput.value = '';
-                    
-                    // Render MathJax
-                    if (window.MathJax) {
-                        window.MathJax.typeset();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error submitting question:', error);
-                    
-                    // Remove loading message
-                    const loadingMessage = chatResponseArea.querySelector('.loading');
-                    if (loadingMessage) {
-                        chatResponseArea.removeChild(loadingMessage);
-                    }
-                    
-                    // Add error message to chat
-                    if (chatResponseArea) {
-                        const errorMessageDiv = document.createElement('div');
-                        errorMessageDiv.className = 'chat-message system-message error';
-                        errorMessageDiv.textContent = '处理问题时出错，请重试';
-                        chatResponseArea.appendChild(errorMessageDiv);
-                        
-                        // Scroll to bottom
-                        chatResponseArea.scrollTop = chatResponseArea.scrollHeight;
-                    }
-                    
-                    showSystemMessage('提交问题时出错，请重试', 'error');
-                })
-                .finally(() => {
-                    // Re-enable the button
-                    newSubmitBtn.disabled = false;
-                    newSubmitBtn.textContent = '提交问题';
-                });
-        });
-    }
-    
-    // Helper function to get dropdown values
-    function getSidebarDropdownValues() {
-        const schoolDropdown = document.getElementById('sidebar-school');
-        const gradeDropdown = document.getElementById('sidebar-grade');
-        const subjectDropdown = document.getElementById('sidebar-subject');
-        
-        return {
-            school: schoolDropdown ? schoolDropdown.value : '',
-            grade: gradeDropdown ? gradeDropdown.value : '',
-            subject: subjectDropdown ? subjectDropdown.value : ''
-        };
-    }
-    
-    // Helper function to highlight empty dropdowns
-    function highlightEmptyDropdowns(ids) {
-        ids.forEach(id => {
-            const dropdown = document.getElementById(id);
-            if (dropdown && (!dropdown.value || dropdown.value === '')) {
-                dropdown.style.border = '2px solid #e53e3e';
-                setTimeout(() => {
-                    dropdown.style.border = '';
-                }, 3000);
-            }
-        });
-    }
-    
-    // Mark as initialized
-    window.optimizeSubmitButtonsInitialized = true;
-    console.log('Optimize and submit buttons initialized');
-}
 
-// Add a new function to create the chat interface
-function createChatInterface() {
-    // Get the QA container first
-    const qaContainer = document.getElementById('qa-container');
-    if (!qaContainer) {
-        console.error('QA container not found');
+    console.log('Setting up optimize and submit buttons');
+
+    // Use unique variable names to avoid conflicts
+    const optimizeQuestionBtn = document.querySelector('.optimize-question-btn');
+    const submitQuestionBtn = document.querySelector('.submit-question-btn');
+
+    if (!optimizeQuestionBtn || !submitQuestionBtn) {
+        console.error('Could not find optimize or submit buttons');
         return;
     }
-    
-    // Check if the chat interface already exists
-    if (document.getElementById('chat-interface')) {
-        return; // Already exists, no need to create it
-    }
-    
-    // Create the chat interface
-    const chatInterface = document.createElement('div');
-    chatInterface.id = 'chat-interface';
-    chatInterface.className = 'chat-interface';
-    chatInterface.style.cssText = 'display: flex; flex-direction: column; height: 100%; padding: 20px; gap: 20px;';
-    
-    // Create the chat input area
-    const chatInputArea = document.createElement('div');
-    chatInputArea.className = 'chat-input-area';
-    chatInputArea.style.cssText = 'display: flex; flex-direction: column; gap: 10px;';
-    
-    // Create the textarea
-    const chatInput = document.createElement('textarea');
-    chatInput.id = 'chat-input';
-    chatInput.className = 'chat-input';
-    chatInput.placeholder = '输入您的问题...';
-    chatInput.style.cssText = 'width: 100%; min-height: 100px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 16px; resize: vertical;';
-    
-    // Create the buttons container
-    const buttonsContainer = document.createElement('div');
-    buttonsContainer.className = 'chat-buttons';
-    buttonsContainer.style.cssText = 'display: flex; gap: 10px; justify-content: flex-end;';
-    
-    // Create the optimize button
-    const optimizeButton = document.createElement('button');
-    optimizeButton.id = 'optimize-button';
-    optimizeButton.className = 'chat-button optimize-button';
-    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
-    optimizeButton.style.cssText = 'padding: 8px 16px; background-color: #4299e1; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
-    
-    // Create the submit button
-    const submitButton = document.createElement('button');
-    submitButton.id = 'submit-button';
-    submitButton.className = 'chat-button submit-button';
-    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
-    submitButton.style.cssText = 'padding: 8px 16px; background-color: #48bb78; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
-    
-    // Add buttons to container
-    buttonsContainer.appendChild(optimizeButton);
-    buttonsContainer.appendChild(submitButton);
-    
-    // Add textarea and buttons to input area
-    chatInputArea.appendChild(chatInput);
-    chatInputArea.appendChild(buttonsContainer);
-    
-    // Create the response area
-    const chatResponse = document.createElement('div');
-    chatResponse.id = 'chat-response';
-    chatResponse.className = 'chat-response';
-    chatResponse.style.cssText = 'background-color: #f8fafc; border-radius: 8px; padding: 20px; min-height: 100px; max-height: 500px; overflow-y: auto;';
-    
-    // Add a welcome message
-    chatResponse.innerHTML = `
-        <div class="welcome-message" style="text-align: center; color: #718096;">
-            <i class="fas fa-comment-dots" style="font-size: 24px; margin-bottom: 10px;"></i>
-            <h3 style="margin: 0 0 10px 0; font-size: 18px;">欢迎使用AI学习助手</h3>
-            <p style="margin: 0; font-size: 14px;">在上方输入您的问题，点击"提交问题"获取回答</p>
-        </div>
-    `;
-    
-    // Add input area and response area to chat interface
-    chatInterface.appendChild(chatInputArea);
-    chatInterface.appendChild(chatResponse);
-    
-    // Add the chat interface to the QA container
-    qaContainer.innerHTML = ''; // Clear any existing content
-    qaContainer.appendChild(chatInterface);
-    
-    // Reset the initialization flag since we've recreated the interface
-    window.chatButtonsInitialized = false;
-    
-    // Add CSS for the chat interface
-    const style = document.createElement('style');
-    style.textContent = `
-        .chat-button:hover {
-            opacity: 0.9;
+
+    // Clone and replace optimize button
+    const newOptimizeBtn = optimizeQuestionBtn.cloneNode(true);
+    optimizeQuestionBtn.parentNode.replaceChild(newOptimizeBtn, optimizeQuestionBtn);
+
+    // Clone and replace submit button
+    const newSubmitBtn = submitQuestionBtn.cloneNode(true);
+    submitQuestionBtn.parentNode.replaceChild(newSubmitBtn, submitQuestionBtn);
+
+    // Add event listeners to new buttons
+    newOptimizeBtn.addEventListener('click', async () => {
+        const chatInput = document.querySelector('.chat-input');
+        if (!chatInput || !chatInput.value.trim()) {
+            alert('请输入问题内容');
+            return;
         }
-        .chat-button:active {
-            transform: translateY(1px);
+
+        const { school, grade } = getSidebarDropdownValues();
+        if (!school || !grade) {
+            highlightEmptyDropdowns();
+            return;
         }
-        .chat-button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        .loading-indicator {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            color: #718096;
-            font-size: 16px;
-            padding: 20px;
-        }
-        .response-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-        .context-header {
-            margin-bottom: 12px;
-        }
-        .context-badge {
-            display: inline-block;
-            background-color: #ebf8ff;
-            color: #3182ce;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        .response-content {
-            line-height: 1.6;
-            color: #4a5568;
-            white-space: pre-wrap;
-        }
-        .error-message {
-            color: #e53e3e;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 16px;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // Add event listener for Ctrl+Enter to submit
-    chatInput.addEventListener('keydown', function(event) {
-        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
-            event.preventDefault();
-            submitButton.click();
+
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.textContent = '正在优化问题...';
+        loadingIndicator.className = 'loading-indicator';
+        chatInput.parentNode.appendChild(loadingIndicator);
+
+        try {
+            const prompt = `请优化以下问题，使其更加清晰和专业。考虑到这是${school}${grade}年级的问题：\n\n${chatInput.value}`;
+            const response = await fetchAIResponse(prompt);
+            chatInput.value = response;
+        } catch (error) {
+            console.error('Error optimizing question:', error);
+            alert('优化问题时出错，请稍后重试');
+        } finally {
+            loadingIndicator.remove();
         }
     });
+
+    newSubmitBtn.addEventListener('click', async () => {
+        const chatInput = document.querySelector('.chat-input');
+        if (!chatInput || !chatInput.value.trim()) {
+            alert('请输入问题内容');
+            return;
+        }
+
+        const { school, grade } = getSidebarDropdownValues();
+        if (!school || !grade) {
+            highlightEmptyDropdowns();
+            return;
+        }
+
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.textContent = '正在处理...';
+        loadingIndicator.className = 'loading-indicator';
+        chatInput.parentNode.appendChild(loadingIndicator);
+
+        try {
+            const prompt = `作为一名${school}${grade}年级的老师，请回答以下问题：\n\n${chatInput.value}`;
+            const response = await fetchAIResponse(prompt);
+            appendChatMessage(chatInput.value, response);
+            chatInput.value = '';
+        } catch (error) {
+            console.error('Error submitting question:', error);
+            alert('提交问题时出错，请稍后重试');
+        } finally {
+            loadingIndicator.remove();
+        }
+    });
+
+    window.optimizeSubmitButtonsInitialized = true;
+    console.log('Optimize and submit buttons setup completed');
+}
+
+// Add the missing setupChatButtons function
+function setupChatButtons() {
+    if (window.chatButtonsInitialized) {
+        console.log('Chat buttons already initialized, skipping setup');
+        return;
+    }
+
+    console.log('Setting up chat buttons');
+
+    // Use unique variable names for chat buttons to avoid conflicts
+    const chatOptimizeBtn = document.querySelector('.chat-optimize-btn');
+    const chatSubmitBtn = document.querySelector('.chat-submit-btn');
+
+    if (!chatOptimizeBtn || !chatSubmitBtn) {
+        console.error('Could not find chat optimize or submit buttons');
+        return;
+    }
+
+    // Clone and replace chat optimize button
+    const newChatOptimizeBtn = chatOptimizeBtn.cloneNode(true);
+    chatOptimizeBtn.parentNode.replaceChild(newChatOptimizeBtn, chatOptimizeBtn);
+
+    // Clone and replace chat submit button
+    const newChatSubmitBtn = chatSubmitBtn.cloneNode(true);
+    chatSubmitBtn.parentNode.replaceChild(newChatSubmitBtn, chatSubmitBtn);
+
+    // Add event listeners to new chat buttons
+    newChatOptimizeBtn.addEventListener('click', async () => {
+        const chatInput = document.querySelector('.chat-input');
+        if (!chatInput || !chatInput.value.trim()) {
+            alert('请输入问题内容');
+            return;
+        }
+
+        const { school, grade } = getSidebarDropdownValues();
+        if (!school || !grade) {
+            highlightEmptyDropdowns();
+            return;
+        }
+
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.textContent = '正在优化问题...';
+        loadingIndicator.className = 'loading-indicator';
+        chatInput.parentNode.appendChild(loadingIndicator);
+
+        try {
+            const prompt = `请优化以下问题，使其更加清晰和专业。考虑到这是${school}${grade}年级的问题：\n\n${chatInput.value}`;
+            const response = await fetchAIResponse(prompt);
+            chatInput.value = response;
+        } catch (error) {
+            console.error('Error optimizing question:', error);
+            alert('优化问题时出错，请稍后重试');
+        } finally {
+            loadingIndicator.remove();
+        }
+    });
+
+    newChatSubmitBtn.addEventListener('click', async () => {
+        const chatInput = document.querySelector('.chat-input');
+        if (!chatInput || !chatInput.value.trim()) {
+            alert('请输入问题内容');
+            return;
+        }
+
+        const { school, grade } = getSidebarDropdownValues();
+        if (!school || !grade) {
+            highlightEmptyDropdowns();
+            return;
+        }
+
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.textContent = '正在处理...';
+        loadingIndicator.className = 'loading-indicator';
+        chatInput.parentNode.appendChild(loadingIndicator);
+
+        try {
+            const prompt = `作为一名${school}${grade}年级的老师，请回答以下问题：\n\n${chatInput.value}`;
+            const response = await fetchAIResponse(prompt);
+            appendChatMessage(chatInput.value, response);
+            chatInput.value = '';
+        } catch (error) {
+            console.error('Error submitting question:', error);
+            alert('提交问题时出错，请稍后重试');
+        } finally {
+            loadingIndicator.remove();
+        }
+    });
+
+    window.chatButtonsInitialized = true;
+    console.log('Chat buttons setup completed');
 }
 
 // Make sure chatButtonsInitialized is defined globally
