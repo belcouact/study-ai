@@ -1722,231 +1722,200 @@ function formatParagraph(paragraph) {
 
 // Function to handle generating questions
 function handleGenerateQuestionsClick() {
-    console.log('handleGenerateQuestionsClick called');
-    
     // Get form elements from sidebar
-    const schoolSelect = document.getElementById('school-select-sidebar');
-    const gradeSelect = document.getElementById('grade-select-sidebar');
-    const semesterSelect = document.getElementById('semester-select-sidebar');
-    const subjectSelect = document.getElementById('subject-select-sidebar');
-    const difficultySelect = document.getElementById('difficulty-select-sidebar');
-    const questionCountSelect = document.getElementById('question-count-select-sidebar');
-    const generateQuestionsButton = document.querySelector('.sidebar-generate-button');
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    const emptyState = document.getElementById('empty-state');
+    const schoolSelect = document.getElementById('sidebar-school-select');
+    const gradeSelect = document.getElementById('sidebar-grade-select');
+    const semesterSelect = document.getElementById('sidebar-semester-select');
+    const subjectSelect = document.getElementById('sidebar-subject-select');
+    const difficultySelect = document.getElementById('sidebar-difficulty-select');
+    const questionCountSelect = document.getElementById('sidebar-question-count-select');
     
+    // Check if all required elements exist
     if (!schoolSelect || !gradeSelect || !semesterSelect || !subjectSelect || 
-        !difficultySelect || !questionCountSelect || !generateQuestionsButton) {
-        console.error('One or more form elements not found');
+        !difficultySelect || !questionCountSelect) {
+        console.error('Required form elements not found');
+        showSystemMessage('表单元素未找到，请刷新页面重试', 'error');
         return;
     }
     
-    // Only show loading state if we're on the test page
-    const isTestPage = document.getElementById('create-container').classList.contains('active') || 
-                      !document.getElementById('create-container').classList.contains('hidden');
+    // Switch to test tab if not already active
+    const createButton = document.getElementById('create-button');
+    if (createButton && !createButton.classList.contains('active')) {
+        createButton.click();
+    }
     
-    if (isTestPage) {
-    // Show loading state on button
-    generateQuestionsButton.textContent = '生成中...';
-    generateQuestionsButton.disabled = true;
+    // Re-initialize the test page
+    resetTestPage();
     
+    // Show loading state
+    const sidebarGenerateButton = document.getElementById('sidebar-generate-button');
+    if (sidebarGenerateButton) {
+        sidebarGenerateButton.disabled = true;
+        sidebarGenerateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
+    }
+    
+    // Show loading indicator in the content area
+    const createContainer = document.getElementById('create-container');
+    if (createContainer) {
         // Hide empty state if it exists
+        const emptyState = createContainer.querySelector('.empty-state');
         if (emptyState) {
-            emptyState.classList.add('hidden');
+            emptyState.style.display = 'none';
         }
         
-        // Show loading indicator on the test page
+        // Show loading indicator
         showLoadingIndicator();
     }
     
-    // Collect form data from sidebar
-    const schoolType = schoolSelect.value;
+    // Get form values
+    const school = schoolSelect.value;
     const grade = gradeSelect.value;
     const semester = semesterSelect.value;
     const subject = subjectSelect.value;
     const difficulty = difficultySelect.value;
     const questionCount = questionCountSelect.value;
     
-    console.log('Form data collected:', { schoolType, grade, semester, subject, difficulty, questionCount });
-    
     // Create prompt for API
-    const prompt = `请生成${questionCount}道${schoolType}${grade}${semester}${subject}的${difficulty}难度选择题，每道题包括题目、四个选项(A、B、C、D)、答案和详细解析。严格的格式要求：
-每道题必须包含以下六个部分，缺一不可：
-1. "题目："后接具体题目
-2. "A."后接选项A的内容
-3. "B."后接选项B的内容
-4. "C."后接选项C的内容
-5. "D."后接选项D的内容
-6. "答案："后接正确选项（必须是A、B、C、D其中之一）
-7. "解析："后必须包含完整的解析（至少50字）
+    const prompt = `请根据以下条件生成${questionCount}道选择题：
+学校类型：${school}
+年级：${grade}
+学期：${semester}
+科目：${subject}
+难度：${difficulty}
 
-解析部分必须包含以下内容（缺一不可）：
-1. 解题思路和方法，不能超纲
-2. 关键知识点解释
-3. 正确答案的推导过程
-4. 为什么其他选项是错误的
-5. 相关知识点的总结
-6. 易错点提醒
+请严格按照以下格式生成问题，确保每个问题都有四个选项(A, B, C, D)，并且只有一个正确答案：
 
-示例格式：
-题目：[题目内容]
-A. [选项A内容]
-B. [选项B内容]
-C. [选项C内容]
-D. [选项D内容]
-答案：[A或B或C或D]
-解析：本题主要考察[知识点]。解题思路是[详细说明]。首先，[推导过程]。选项分析：A选项[分析]，B选项[分析]，C选项[分析]，D选项[分析]。需要注意的是[易错点]。总的来说，[知识点总结]。同学们在解题时要特别注意[关键提醒]。
+1. [问题1]
+A. [选项A]
+B. [选项B]
+C. [选项C]
+D. [选项D]
+答案：[正确选项字母]
+解析：[详细解析]
 
-题目质量要求：
-1. 题目表述必须清晰、准确，无歧义
-2. 选项内容必须完整，符合逻辑
-3. 所有选项必须有实际意义，不能有无意义的干扰项
-4. 难度必须符合年级水平
-5. 解析必须详尽，有教育意义
-6. 不出带图形的题目
-`;
+2. [问题2]
+...
 
-    // Call API to generate questions
+请确保问题难度符合要求，解析详细且准确。如果涉及数学公式，请使用LaTeX格式。`;
+
+    // Call API
     fetchAIResponse(prompt)
         .then(response => {
-            try {
-                console.log('Processing API response:', response);
+            // Parse questions from response
+            const parsedQuestions = parseQuestionsFromResponse(response);
+            
+            if (parsedQuestions && parsedQuestions.length > 0) {
+                // Store questions globally
+                questions = parsedQuestions;
+                currentQuestionIndex = 0;
+                
+                // Create or update questions container
+                createQuestionsContainer();
+                
+                // Display first question
+                displayCurrentQuestion();
+                
+                // Update navigation buttons
+                updateNavigationButtons();
                 
                 // Hide loading indicator
                 hideLoadingIndicator();
+            } else {
+                console.error('Failed to parse questions from response');
+                showSystemMessage('无法解析问题，请重试', 'error');
                 
-                // Parse the response
-                const parsedQuestions = parseQuestionsFromResponse(response);
-                console.log('Parsed questions:', parsedQuestions);
+                // Show empty state with error
+                showEmptyState('生成问题失败', '无法解析返回的问题，请重试或调整条件。');
                 
-                if (parsedQuestions.length === 0) {
-                    throw new Error('No questions could be parsed from the response');
-                }
-                
-                // Make variables globally available
-                window.questions = parsedQuestions;
-                window.userAnswers = Array(parsedQuestions.length).fill(null);
-                window.currentQuestionIndex = 0;
-                
-                // Ensure the questions display container exists and is visible
-                if (!questionsDisplayContainer) {
-                    console.error('Questions display container not found, creating one');
-                    const newContainer = document.createElement('div');
-                    newContainer.id = 'questions-display-container';
-                    newContainer.className = 'questions-display-container';
-                    
-                    // Create required elements inside the container
-                    newContainer.innerHTML = `
-                        <div id="question-counter" class="question-counter"></div>
-                        <div id="question-text" class="question-text"></div>
-                        <div id="choices-container" class="choices-container"></div>
-                        <div id="answer-container" class="answer-container hidden">
-                            <div id="answer-result" class="answer-result"></div>
-                            <div id="answer-explanation" class="answer-explanation"></div>
-                        </div>
-                    `;
-                    
-                    // Add to the create container
-                    const createContainer = document.getElementById('create-container');
-                    if (createContainer) {
-                        createContainer.insertBefore(newContainer, createContainer.firstChild);
-                    }
-                }
-                
-                // Get a fresh reference to the questions display container
-                const questionsContainer = document.getElementById('questions-display-container');
-                
-                // Hide empty state if it exists
-                if (emptyState) {
-                    emptyState.classList.add('hidden');
-                    console.log('Empty state hidden');
-                }
-                
-                // Make sure the questions display container is visible
-                if (questionsContainer) {
-                    questionsContainer.classList.remove('hidden');
-                    console.log('Questions display container shown');
-                    
-                    // Ensure the container has the necessary child elements
-                    if (!document.getElementById('question-counter')) {
-                        const counterDiv = document.createElement('div');
-                        counterDiv.id = 'question-counter';
-                        counterDiv.className = 'question-counter';
-                        questionsContainer.appendChild(counterDiv);
-                    }
-                    
-                    if (!document.getElementById('question-text')) {
-                        const textDiv = document.createElement('div');
-                        textDiv.id = 'question-text';
-                        textDiv.className = 'question-text';
-                        questionsContainer.appendChild(textDiv);
-                    }
-                    
-                    if (!document.getElementById('choices-container')) {
-                        const choicesDiv = document.createElement('div');
-                        choicesDiv.id = 'choices-container';
-                        choicesDiv.className = 'choices-container';
-                        questionsContainer.appendChild(choicesDiv);
-                    }
-                    
-                    if (!document.getElementById('answer-container')) {
-                        const answerDiv = document.createElement('div');
-                        answerDiv.id = 'answer-container';
-                        answerDiv.className = 'answer-container hidden';
-                        answerDiv.innerHTML = `
-                            <div id="answer-result" class="answer-result"></div>
-                            <div id="answer-explanation" class="answer-explanation"></div>
-                        `;
-                        questionsContainer.appendChild(answerDiv);
-                    }
-                } else {
-                    console.error('Questions display container still not found after creation attempt');
-                }
-                
-                // Display the first question
-                displayCurrentQuestion();
-                updateNavigationButtons();
-                
-                // Set up navigation button event listeners
-                setupNavigationButtons();
-                
-                // Show success message
-                showSystemMessage(`已生成 ${parsedQuestions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`, 'success');
-            } catch (error) {
-                console.error('Error processing questions:', error);
-                showSystemMessage('生成题目时出错，请重试', 'error');
+                // Hide loading indicator
                 hideLoadingIndicator();
-                
-                // Show empty state again if there was an error
-                if (emptyState && questionsDisplayContainer) {
-                    emptyState.classList.remove('hidden');
-                    questionsDisplayContainer.classList.remove('hidden');
-                }
-            } finally {
-                // Reset button state
-                if (isTestPage) {
-                generateQuestionsButton.textContent = '出题';
-                generateQuestionsButton.disabled = false;
-                }
             }
         })
         .catch(error => {
-            console.error('API error:', error);
-            showSystemMessage('API调用失败，请重试', 'error');
+            console.error('Error generating questions:', error);
+            showSystemMessage('生成问题时出错，请重试', 'error');
+            
+            // Show empty state with error
+            showEmptyState('生成问题失败', '请求过程中出现错误，请检查网络连接并重试。');
+            
+            // Hide loading indicator
             hideLoadingIndicator();
-            
-            // Show empty state again if there was an error
-            if (emptyState && questionsDisplayContainer) {
-                emptyState.classList.remove('hidden');
-                questionsDisplayContainer.classList.remove('hidden');
-            }
-            
+        })
+        .finally(() => {
             // Reset button state
-            if (isTestPage) {
-            generateQuestionsButton.textContent = '出题';
-            generateQuestionsButton.disabled = false;
+            if (sidebarGenerateButton) {
+                sidebarGenerateButton.disabled = false;
+                sidebarGenerateButton.innerHTML = '出题';
             }
         });
+}
+
+// Add a new function to reset the test page
+function resetTestPage() {
+    // Reset global variables
+    questions = [];
+    currentQuestionIndex = 0;
+    userAnswers = [];
+    
+    // Clear any existing questions container
+    const questionsContainer = document.querySelector('.questions-display-container');
+    if (questionsContainer) {
+        questionsContainer.innerHTML = '';
+    }
+    
+    // Reset any completion status
+    const completionStatus = document.querySelector('.completion-status');
+    if (completionStatus) {
+        completionStatus.remove();
+    }
+    
+    // Hide any results popup
+    const resultsPopup = document.getElementById('results-popup');
+    if (resultsPopup) {
+        resultsPopup.remove();
+    }
+    
+    // Show empty state with loading message
+    showEmptyState('准备生成问题', '正在根据您的选择生成题目，请稍候...', true);
+}
+
+// Modify the showEmptyState function to support loading state
+function showEmptyState(title = '准备开始测验', message = '请使用左侧边栏选择学校、年级、科目等选项，然后点击"出题"按钮生成问题。', isLoading = false) {
+    const createContainer = document.getElementById('create-container');
+    if (!createContainer) return;
+    
+    // Check if empty state already exists
+    let emptyState = createContainer.querySelector('.empty-state');
+    
+    if (!emptyState) {
+        // Create empty state if it doesn't exist
+        emptyState = document.createElement('div');
+        emptyState.className = 'empty-state';
+        emptyState.style.cssText = 'text-align: center; padding: 40px 20px; color: #718096;';
+        createContainer.appendChild(emptyState);
+    }
+    
+    // Set content based on loading state
+    if (isLoading) {
+        emptyState.innerHTML = `
+            <div style="font-size: 48px; margin-bottom: 20px; color: #4299e1;">
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
+            <h3 style="font-size: 24px; margin-bottom: 10px; color: #2d3748;">${title}</h3>
+            <p style="font-size: 16px; max-width: 500px; margin: 0 auto;">${message}</p>
+        `;
+    } else {
+        emptyState.innerHTML = `
+            <div style="font-size: 48px; margin-bottom: 20px; color: #4299e1;">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <h3 style="font-size: 24px; margin-bottom: 10px; color: #2d3748;">${title}</h3>
+            <p style="font-size: 16px; max-width: 500px; margin: 0 auto;">${message}</p>
+        `;
+    }
+    
+    // Make sure it's visible
+    emptyState.style.display = 'block';
 }
 
 // Function to show loading indicator with spinning icon
