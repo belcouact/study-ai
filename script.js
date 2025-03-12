@@ -3540,6 +3540,43 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize form layout which will handle tab setup
     initializeFormLayout();
     
-    // Initialize dropdowns with empty values
-    initializeDropdownsWithEmptyValues();
+    // Remove the call to initializeDropdownsWithEmptyValues since it's causing an error
+    // initializeDropdownsWithEmptyValues();
+    
+    // Instead, use the existing initialization functions
+    // Initialize empty dropdowns if they exist
+    try {
+        // Check if the function exists in the global scope
+        if (typeof window.initializeEmptyDropdowns === 'function') {
+            window.initializeEmptyDropdowns();
+        } else if (typeof initializeEmptyDropdowns === 'function') {
+            initializeEmptyDropdowns();
+        } else {
+            console.log('Empty dropdown initialization function not found, skipping');
+        }
+    } catch (error) {
+        console.error('Error initializing empty dropdowns:', error);
+    }
 }); 
+
+/**
+ * Gets the values from the sidebar dropdown elements
+ * @returns {Object} An object containing the values of all sidebar dropdowns
+ */
+function getSidebarDropdownValues() {
+    const school = document.getElementById('sidebar-school-select')?.value || '';
+    const grade = document.getElementById('sidebar-grade-select')?.value || '';
+    const semester = document.getElementById('sidebar-semester-select')?.value || '';
+    const subject = document.getElementById('sidebar-subject-select')?.value || '';
+    const difficulty = document.getElementById('sidebar-difficulty-select')?.value || '';
+    const questionCount = document.getElementById('sidebar-question-count-select')?.value || '5';
+    
+    return {
+        school,
+        grade,
+        semester,
+        subject,
+        difficulty,
+        questionCount
+    };
+}
