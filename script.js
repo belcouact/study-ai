@@ -1790,7 +1790,7 @@ function handleGenerateQuestionsClick() {
 
 示例格式：
 题目：[题目内容]
-A. [选项A内容]
+A. [选项A内容] 
 B. [选项B内容]
 C. [选项C内容]
 D. [选项D内容]
@@ -3865,4 +3865,235 @@ function initializeFormLayout() {
     }
     
     // ... rest of existing code ...
+}
+
+// Make sure this runs when the document is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded, initializing dropdowns with empty values');
+    
+    // Initialize all dropdowns with empty values
+    initializeDropdownsWithEmptyValues();
+    
+    // Set up chat buttons
+    setupChatButtons();
+});
+
+// Add a new function to initialize all dropdowns with empty values
+function initializeDropdownsWithEmptyValues() {
+    console.log('Initializing dropdowns with empty values');
+    
+    // Get all dropdown elements
+    const schoolDropdowns = [
+        document.getElementById('school'),
+        document.getElementById('sidebar-school')
+    ];
+    
+    const gradeDropdowns = [
+        document.getElementById('grade'),
+        document.getElementById('sidebar-grade')
+    ];
+    
+    const subjectDropdowns = [
+        document.getElementById('subject'),
+        document.getElementById('sidebar-subject')
+    ];
+    
+    const semesterDropdowns = [
+        document.getElementById('semester'),
+        document.getElementById('sidebar-semester')
+    ];
+    
+    const difficultyDropdowns = [
+        document.getElementById('difficulty'),
+        document.getElementById('sidebar-difficulty')
+    ];
+    
+    const countDropdowns = [
+        document.getElementById('count'),
+        document.getElementById('sidebar-count')
+    ];
+    
+    // Initialize school dropdowns
+    schoolDropdowns.forEach(dropdown => {
+        if (dropdown) {
+            dropdown.innerHTML = '<option value="">请选择学校类型</option>';
+            
+            const schoolOptions = ['小学', '初中', '高中'];
+            schoolOptions.forEach(option => {
+                const optElement = document.createElement('option');
+                optElement.value = option;
+                optElement.textContent = option;
+                dropdown.appendChild(optElement);
+            });
+            
+            // Force the empty value
+            dropdown.value = '';
+        }
+    });
+    
+    // Initialize grade dropdowns with empty option
+    gradeDropdowns.forEach(dropdown => {
+        if (dropdown) {
+            dropdown.innerHTML = '<option value="">请选择年级</option>';
+            // Force the empty value
+            dropdown.value = '';
+        }
+    });
+    
+    // Initialize subject dropdowns with empty option
+    subjectDropdowns.forEach(dropdown => {
+        if (dropdown) {
+            dropdown.innerHTML = '<option value="">请选择科目</option>';
+            // Force the empty value
+            dropdown.value = '';
+        }
+    });
+    
+    // Initialize semester dropdowns
+    semesterDropdowns.forEach(dropdown => {
+        if (dropdown) {
+            dropdown.innerHTML = '<option value="">请选择学期</option>';
+            
+            const semesterOptions = ['上学期', '下学期'];
+            semesterOptions.forEach(option => {
+                const optElement = document.createElement('option');
+                optElement.value = option;
+                optElement.textContent = option;
+                dropdown.appendChild(optElement);
+            });
+            
+            // Force the empty value
+            dropdown.value = '';
+        }
+    });
+    
+    // Initialize difficulty dropdowns
+    difficultyDropdowns.forEach(dropdown => {
+        if (dropdown) {
+            dropdown.innerHTML = '<option value="">请选择难度</option>';
+            
+            const difficultyOptions = ['简单', '中等', '困难'];
+            difficultyOptions.forEach(option => {
+                const optElement = document.createElement('option');
+                optElement.value = option;
+                optElement.textContent = option;
+                dropdown.appendChild(optElement);
+            });
+            
+            // Force the empty value
+            dropdown.value = '';
+        }
+    });
+    
+    // Initialize count dropdowns
+    countDropdowns.forEach(dropdown => {
+        if (dropdown) {
+            dropdown.innerHTML = '<option value="">请选择题目数量</option>';
+            
+            const countOptions = ['5', '10', '15', '20'];
+            countOptions.forEach(option => {
+                const optElement = document.createElement('option');
+                optElement.value = option;
+                optElement.textContent = option + '题';
+                dropdown.appendChild(optElement);
+            });
+            
+            // Force the empty value
+            dropdown.value = '';
+        }
+    });
+    
+    // Set up event listeners for school dropdowns
+    schoolDropdowns.forEach((dropdown, index) => {
+        if (dropdown) {
+            dropdown.addEventListener('change', function() {
+                const selectedSchool = this.value;
+                console.log(`School changed to: ${selectedSchool}`);
+                
+                // Update grade and subject dropdowns based on selected school
+                updateGradeOptions(selectedSchool);
+                updateSubjectOptions(selectedSchool);
+                
+                // Sync with other school dropdown
+                const otherIndex = index === 0 ? 1 : 0;
+                if (schoolDropdowns[otherIndex] && schoolDropdowns[otherIndex].value !== selectedSchool) {
+                    schoolDropdowns[otherIndex].value = selectedSchool;
+                }
+            });
+        }
+    });
+}
+
+// Function to update grade options based on selected school
+function updateGradeOptions(school) {
+    console.log(`Updating grade options for school: ${school}`);
+    
+    const gradeOptions = {
+        '小学': ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'],
+        '初中': ['初一', '初二', '初三'],
+        '高中': ['高一', '高二', '高三']
+    };
+    
+    const gradeDropdowns = [
+        document.getElementById('grade'),
+        document.getElementById('sidebar-grade')
+    ];
+    
+    gradeDropdowns.forEach(dropdown => {
+        if (dropdown) {
+            // Clear existing options
+            dropdown.innerHTML = '<option value="">请选择年级</option>';
+            
+            // If a school is selected, add the corresponding grade options
+            if (school && school !== '') {
+                const options = gradeOptions[school] || [];
+                options.forEach(option => {
+                    const optElement = document.createElement('option');
+                    optElement.value = option;
+                    optElement.textContent = option;
+                    dropdown.appendChild(optElement);
+                });
+            }
+            
+            // Force the empty value
+            dropdown.value = '';
+        }
+    });
+}
+
+// Function to update subject options based on selected school
+function updateSubjectOptions(school) {
+    console.log(`Updating subject options for school: ${school}`);
+    
+    const subjectOptions = {
+        '小学': ['语文', '数学', '英语', '科学', '道德与法治'],
+        '初中': ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'],
+        '高中': ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治']
+    };
+    
+    const subjectDropdowns = [
+        document.getElementById('subject'),
+        document.getElementById('sidebar-subject')
+    ];
+    
+    subjectDropdowns.forEach(dropdown => {
+        if (dropdown) {
+            // Clear existing options
+            dropdown.innerHTML = '<option value="">请选择科目</option>';
+            
+            // If a school is selected, add the corresponding subject options
+            if (school && school !== '') {
+                const options = subjectOptions[school] || [];
+                options.forEach(option => {
+                    const optElement = document.createElement('option');
+                    optElement.value = option;
+                    optElement.textContent = option;
+                    dropdown.appendChild(optElement);
+                });
+            }
+            
+            // Force the empty value
+            dropdown.value = '';
+        }
+    });
 }
