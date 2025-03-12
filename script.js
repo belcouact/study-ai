@@ -1151,15 +1151,69 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize form layout
     initializeFormLayout();
     
+    // Setup sidebar toggle functionality
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const leftPanel = document.querySelector('.left-panel');
+    const contentArea = document.querySelector('.content-area');
+    
+    if (sidebarToggle && leftPanel && contentArea) {
+        sidebarToggle.addEventListener('click', function() {
+            leftPanel.classList.toggle('hidden');
+            contentArea.classList.toggle('full-width');
+            this.classList.toggle('collapsed');
+        });
+    }
+    
+    // Setup tab switching functionality
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    
+    if (qaButton && createButton && qaContainer && createContainer) {
+        qaButton.addEventListener('click', function() {
+            qaButton.classList.add('active');
+            createButton.classList.remove('active');
+            qaContainer.classList.remove('hidden');
+            createContainer.classList.add('hidden');
+        });
+        
+        createButton.addEventListener('click', function() {
+            createButton.classList.add('active');
+            qaButton.classList.remove('active');
+            createContainer.classList.remove('hidden');
+            qaContainer.classList.add('hidden');
+        });
+    }
+    
     // Populate initial grade and subject options based on default school
     const schoolSelect = document.getElementById('school-select');
     if (schoolSelect) {
         const initialSchool = schoolSelect.value;
         populateGradeOptions(initialSchool);
         populateSubjectOptions(initialSchool);
-        
-        // Also populate sidebar dropdowns
-        populateSidebarDropdowns();
+    }
+    
+    // Add change event listener to school select
+    if (schoolSelect) {
+        schoolSelect.addEventListener('change', function() {
+            populateGradeOptions(this.value);
+            populateSubjectOptions(this.value);
+        });
+    }
+    
+    // Add change event listener to sidebar school select
+    const schoolSelectSidebar = document.getElementById('school-select-sidebar');
+    if (schoolSelectSidebar) {
+        schoolSelectSidebar.addEventListener('change', function() {
+            populateGradeOptions(this.value);
+            populateSubjectOptions(this.value);
+            
+            // Also update the main form school select
+            if (schoolSelect) {
+                schoolSelect.value = this.value;
+            }
+        });
     }
     
     // Sync sidebar dropdowns with form dropdowns
@@ -1358,4 +1412,7 @@ document.addEventListener('DOMContentLoaded', function() {
             select.addEventListener('change', populateSidebarDropdowns);
         }
     });
+    
+    // Call populateSidebarDropdowns to ensure sidebar dropdowns are populated
+    populateSidebarDropdowns();
 }); 
