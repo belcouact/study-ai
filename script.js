@@ -387,6 +387,27 @@ function displayCurrentQuestion() {
     
     console.log('Current question:', question);
 
+    // Make sure the questions display container is visible
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    if (questionsDisplayContainer) {
+        questionsDisplayContainer.classList.remove('hidden');
+        
+        // Hide the empty state if it exists
+        const emptyState = document.getElementById('empty-state');
+        if (emptyState) {
+            emptyState.classList.add('hidden');
+        }
+        
+        // Hide the loading indicator if it exists
+        const loadingIndicator = document.getElementById('test-loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
+    } else {
+        console.error('Questions display container not found in displayCurrentQuestion');
+        return;
+    }
+
     // Check if all questions are answered
     const allQuestionsAnswered = window.userAnswers && 
                                window.userAnswers.length === window.questions.length && 
@@ -415,6 +436,23 @@ function displayCurrentQuestion() {
         console.log('Updated question counter:', questionCounter.textContent);
     } else {
         console.error('Question counter element not found');
+        // Create it if it doesn't exist
+        const newCounter = document.createElement('div');
+        newCounter.id = 'question-counter';
+        newCounter.className = 'question-counter';
+        newCounter.style.cssText = `
+            font-size: clamp(14px, 2.5vw, 16px);
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: #edf2f7;
+            border-radius: 20px;
+            display: inline-block;
+            width: fit-content;
+        `;
+        newCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
+        questionsDisplayContainer.appendChild(newCounter);
     }
     
     // Format and display question text with responsive styling
@@ -440,6 +478,27 @@ function displayCurrentQuestion() {
         console.log('Updated question text:', displayText);
     } else {
         console.error('Question text element not found');
+        // Create it if it doesn't exist
+        const newText = document.createElement('div');
+        newText.id = 'question-text';
+        newText.className = 'question-text';
+        newText.style.cssText = `
+            font-size: clamp(16px, 4vw, 18px);
+            color: #2d3748;
+            line-height: 1.6;
+            margin-bottom: clamp(15px, 4vw, 25px);
+            padding: clamp(15px, 4vw, 20px);
+            background: #f8f9fa;
+            border-radius: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        `;
+        let displayText = question.questionText;
+        if (displayText.startsWith('题目：')) {
+            displayText = displayText.substring(3);
+        }
+        newText.innerHTML = formatMathExpressions(displayText);
+        questionsDisplayContainer.appendChild(newText);
     }
     
     // Create responsive grid for choices with 2x2 layout
@@ -607,6 +666,158 @@ function displayCurrentQuestion() {
         console.log('Choice cells set up:', choiceCells.length);
     } else {
         console.error('Choices container element not found');
+        // Create it if it doesn't exist
+        const newChoices = document.createElement('div');
+        newChoices.id = 'choices-container';
+        newChoices.className = 'choices-container';
+        newChoices.innerHTML = `
+            <div class="choices-grid" style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: clamp(8px, 2vw, 20px);
+                margin: 25px 0;
+                width: 100%;
+            ">
+                ${['A', 'B', 'C', 'D'].map(letter => `
+                    <div class="choice-cell" data-value="${letter}" style="
+                        padding: clamp(10px, 2vw, 15px);
+                        border: 2px solid #e2e8f0;
+                        border-radius: 12px;
+                        background-color: white;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        user-select: none;
+                        -webkit-tap-highlight-color: transparent;
+                    ">
+                        <div class="choice-indicator" style="
+                            width: 28px;
+                            height: 28px;
+                            border-radius: 50%;
+                            background: #edf2f7;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: 500;
+                            color: #4a5568;
+                            flex-shrink: 0;
+                        ">${letter}</div>
+                        <div class="choice-text" style="
+                            flex: 1;
+                            font-size: clamp(14px, 2.5vw, 16px);
+                            color: #2d3748;
+                            line-height: 1.5;
+                        ">${formatMathExpressions(question.choices[letter])}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        questionsDisplayContainer.appendChild(newChoices);
+        
+        // Add event listeners to the newly created choice cells
+        const choiceCells = newChoices.querySelectorAll('.choice-cell');
+        choiceCells.forEach(cell => {
+            cell.addEventListener('click', function() {
+                // Save the answer
+                const value = this.dataset.value;
+                window.userAnswers[window.currentQuestionIndex] = value;
+                
+                // Update UI to show this cell as selected
+                choiceCells.forEach(c => {
+                    c.style.borderColor = '#e2e8f0';
+                    c.style.backgroundColor = 'white';
+                    c.querySelector('.choice-indicator').style.backgroundColor = '#edf2f7';
+                    c.querySelector('.choice-indicator').style.color = '#4a5568';
+                });
+                
+                this.style.borderColor = '#4299e1';
+                this.style.backgroundColor = '#ebf8ff';
+                this.querySelector('.choice-indicator').style.backgroundColor = '#4299e1';
+                this.querySelector('.choice-indicator').style.color = 'white';
+                
+                // Show answer and explanation
+                displayAnswer(value);
+            });
+        });
+    }
+    
+    // Function to display answer and explanation
+    function displayAnswer(selectedValue) {
+        // Create or get the answer container
+        let answerContainer = document.getElementById('answer-container');
+        if (!answerContainer) {
+            answerContainer = document.createElement('div');
+            answerContainer.id = 'answer-container';
+            answerContainer.className = 'answer-container';
+            answerContainer.style.cssText = `
+                margin-top: clamp(20px, 5vw, 30px);
+                padding: clamp(15px, 4vw, 25px);
+                border-radius: 12px;
+                background-color: white;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                width: 100%;
+                box-sizing: border-box;
+                animation: fadeIn 0.3s ease;
+            `;
+            questionsDisplayContainer.appendChild(answerContainer);
+        }
+        
+        answerContainer.classList.remove('hidden');
+        
+        // Check if answer is correct
+        const correctAnswer = question.answer;
+        const isCorrect = selectedValue === correctAnswer;
+        
+        // Create or update the answer result
+        let answerResult = document.getElementById('answer-result');
+        if (!answerResult) {
+            answerResult = document.createElement('div');
+            answerResult.id = 'answer-result';
+            answerResult.className = 'answer-result';
+            answerContainer.appendChild(answerResult);
+        }
+        
+        answerResult.style.cssText = `
+            font-size: 18px;
+            font-weight: 500;
+            color: ${isCorrect ? '#48bb78' : '#e53e3e'};
+            margin-bottom: 20px;
+            padding: 15px;
+            background: ${isCorrect ? '#f0fff4' : '#fff5f5'};
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        `;
+        
+        const resultText = isCorrect 
+            ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 正确！答案是：${correctAnswer}`
+            : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> 错误。正确答案是：${correctAnswer}`;
+        
+        answerResult.innerHTML = formatMathExpressions(resultText);
+        
+        // Create or update the explanation
+        let answerExplanation = document.getElementById('answer-explanation');
+        if (!answerExplanation) {
+            answerExplanation = document.createElement('div');
+            answerExplanation.id = 'answer-explanation';
+            answerExplanation.className = 'answer-explanation';
+            answerContainer.appendChild(answerExplanation);
+        }
+        
+        answerExplanation.style.cssText = `
+            font-size: 16px;
+            color: #4a5568;
+            line-height: 1.8;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            white-space: pre-wrap;
+        `;
+        answerExplanation.innerHTML = formatMathExpressions(question.explanation);
     }
     
     // Style the answer container when showing results
@@ -701,18 +912,6 @@ function displayCurrentQuestion() {
             box-sizing: border-box;
             margin: 0 auto;
         `;
-    }
-    
-    // Make sure the questions display container is visible
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    if (questionsDisplayContainer) {
-        questionsDisplayContainer.classList.remove('hidden');
-        
-        // Hide the empty state if it exists
-        const emptyState = document.getElementById('empty-state');
-        if (emptyState) {
-            emptyState.classList.add('hidden');
-        }
     }
     
     // Render math expressions
@@ -877,18 +1076,79 @@ D. [选项D内容]
                 window.userAnswers = Array(parsedQuestions.length).fill(null);
                 window.currentQuestionIndex = 0;
                 
-                // Hide empty state
+                // Ensure the questions display container exists and is visible
+                if (!questionsDisplayContainer) {
+                    console.error('Questions display container not found, creating one');
+                    const newContainer = document.createElement('div');
+                    newContainer.id = 'questions-display-container';
+                    newContainer.className = 'questions-display-container';
+                    
+                    // Create required elements inside the container
+                    newContainer.innerHTML = `
+                        <div id="question-counter" class="question-counter"></div>
+                        <div id="question-text" class="question-text"></div>
+                        <div id="choices-container" class="choices-container"></div>
+                        <div id="answer-container" class="answer-container hidden">
+                            <div id="answer-result" class="answer-result"></div>
+                            <div id="answer-explanation" class="answer-explanation"></div>
+                        </div>
+                    `;
+                    
+                    // Add to the create container
+                    const createContainer = document.getElementById('create-container');
+                    if (createContainer) {
+                        createContainer.insertBefore(newContainer, createContainer.firstChild);
+                    }
+                }
+                
+                // Get a fresh reference to the questions display container
+                const questionsContainer = document.getElementById('questions-display-container');
+                
+                // Hide empty state if it exists
                 if (emptyState) {
                     emptyState.classList.add('hidden');
                     console.log('Empty state hidden');
                 }
                 
-                // Show the questions display container
-                if (questionsDisplayContainer) {
-                    questionsDisplayContainer.classList.remove('hidden');
+                // Make sure the questions display container is visible
+                if (questionsContainer) {
+                    questionsContainer.classList.remove('hidden');
                     console.log('Questions display container shown');
+                    
+                    // Ensure the container has the necessary child elements
+                    if (!document.getElementById('question-counter')) {
+                        const counterDiv = document.createElement('div');
+                        counterDiv.id = 'question-counter';
+                        counterDiv.className = 'question-counter';
+                        questionsContainer.appendChild(counterDiv);
+                    }
+                    
+                    if (!document.getElementById('question-text')) {
+                        const textDiv = document.createElement('div');
+                        textDiv.id = 'question-text';
+                        textDiv.className = 'question-text';
+                        questionsContainer.appendChild(textDiv);
+                    }
+                    
+                    if (!document.getElementById('choices-container')) {
+                        const choicesDiv = document.createElement('div');
+                        choicesDiv.id = 'choices-container';
+                        choicesDiv.className = 'choices-container';
+                        questionsContainer.appendChild(choicesDiv);
+                    }
+                    
+                    if (!document.getElementById('answer-container')) {
+                        const answerDiv = document.createElement('div');
+                        answerDiv.id = 'answer-container';
+                        answerDiv.className = 'answer-container hidden';
+                        answerDiv.innerHTML = `
+                            <div id="answer-result" class="answer-result"></div>
+                            <div id="answer-explanation" class="answer-explanation"></div>
+                        `;
+                        questionsContainer.appendChild(answerDiv);
+                    }
                 } else {
-                    console.error('Questions display container not found');
+                    console.error('Questions display container still not found after creation attempt');
                 }
                 
                 // Display the first question
@@ -941,7 +1201,10 @@ D. [选项D内容]
 function showLoadingIndicator() {
     // Get the questions display container
     const questionsDisplayContainer = document.getElementById('questions-display-container');
-    if (!questionsDisplayContainer) return;
+    if (!questionsDisplayContainer) {
+        console.error('Questions display container not found in showLoadingIndicator');
+        return;
+    }
     
     // Create loading indicator if it doesn't exist
     let loadingIndicator = document.getElementById('test-loading-indicator');
@@ -960,6 +1223,11 @@ function showLoadingIndicator() {
             margin: 20px auto;
             width: 80%;
             max-width: 500px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
         `;
         
         // Create spinning icon
@@ -998,8 +1266,8 @@ function showLoadingIndicator() {
         loadingIndicator.appendChild(spinnerIcon);
         loadingIndicator.appendChild(loadingText);
         
-        // Add to container
-        questionsDisplayContainer.innerHTML = '';
+        // Add to container without clearing its contents
+        questionsDisplayContainer.style.position = 'relative';
         questionsDisplayContainer.appendChild(loadingIndicator);
         questionsDisplayContainer.classList.remove('hidden');
     } else {
