@@ -3291,7 +3291,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(setupChatButtons, 300);
 });
 
-// Modify the setupChatButtons function to create the chat interface if it doesn't exist
+// Modify the setupChatButtons function to include school and grade information
 function setupChatButtons() {
     console.log('Setting up chat buttons');
     
@@ -3315,19 +3315,26 @@ function setupChatButtons() {
             
             if (!questionText) {
                 showSystemMessage('请先输入问题内容', 'warning');
-            return;
-        }
-        
+                return;
+            }
+            
+            // Get educational context from sidebar
+            const educationalContext = getEducationalContext();
+            
             // Show loading state
             optimizeButton.disabled = true;
             optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
             
-            // Prepare the prompt for optimization
-            const prompt = `请优化以下问题，使其更清晰、更有教育价值：
-            
-问题：${questionText}
+            // Prepare the prompt for optimization with educational context
+            const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值：
 
-请返回优化后的问题，保持原始意图但使其更加清晰、准确和有教育意义。`;
+教育背景：
+${educationalContext}
+
+原始问题：${questionText}
+
+请返回优化后的问题，使其更适合上述教育背景的学生，保持原始意图但使其更加清晰、准确和有教育意义。
+优化时请考虑学生的认知水平、课程要求和教育阶段，使问题更有针对性。`;
             
             // Call the API
             fetchAIResponse(prompt)
@@ -3341,12 +3348,12 @@ function setupChatButtons() {
                     // Focus the input and move cursor to end
                     chatInput.focus();
                     chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
-            
-            // Show success message
-                    showSystemMessage('问题已成功优化！', 'success');
+                    
+                    // Show success message
+                    showSystemMessage('问题已根据教育背景成功优化！', 'success');
                 })
                 .catch(error => {
-            console.error('Error optimizing question:', error);
+                    console.error('Error optimizing question:', error);
                     showSystemMessage('优化问题时出错，请重试。', 'error');
                 })
                 .finally(() => {
@@ -3365,20 +3372,28 @@ function setupChatButtons() {
             
             if (!questionText) {
                 showSystemMessage('请先输入问题内容', 'warning');
-            return;
-        }
-        
+                return;
+            }
+            
+            // Get educational context from sidebar
+            const educationalContext = getEducationalContext();
+            
             // Show loading state
             submitButton.disabled = true;
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
             chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
             
-            // Prepare the prompt for the AI
-            const prompt = `请回答以下问题，提供详细且教育性的解答：
-            
-${questionText}
+            // Prepare the prompt for the AI with educational context
+            const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
 
-请提供清晰、准确、有教育意义的回答，如果涉及数学或科学概念，请确保解释清楚。`;
+教育背景：
+${educationalContext}
+
+问题：${questionText}
+
+请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
+如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平和课程要求。
+如果可能，请提供一些例子或应用场景来帮助理解。`;
             
             // Call the API
             fetchAIResponse(prompt)
@@ -3389,16 +3404,20 @@ ${questionText}
                     // Format the response with MathJax
                     const formattedResponse = formatMathExpressions(aiResponse);
                     
-                    // Display the response
+                    // Get context summary for display
+                    const contextSummary = getContextSummary();
+                    
+                    // Display the response with educational context
                     chatResponse.innerHTML = `
                         <div class="response-header">
                             <i class="fas fa-robot"></i> AI 助手回答
+                            ${contextSummary ? `<span class="context-badge">${contextSummary}</span>` : ''}
                         </div>
                         <div class="response-content">
                             ${formattedResponse}
-            </div>
-        `;
-        
+                        </div>
+                    `;
+                    
                     // Render MathJax in the response
                     if (window.MathJax) {
                         MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
@@ -3423,86 +3442,149 @@ ${questionText}
     }
 }
 
-// Add a new function to create the chat interface
+// Function to get educational context from sidebar selections
+function getEducationalContext() {
+    // Get values from sidebar dropdowns
+    const schoolSelect = document.getElementById('sidebar-school-select');
+    const gradeSelect = document.getElementById('sidebar-grade-select');
+    const semesterSelect = document.getElementById('sidebar-semester-select');
+    const subjectSelect = document.getElementById('sidebar-subject-select');
+    
+    // Default values if not found
+    let school = '未指定学校类型';
+    let grade = '未指定年级';
+    let semester = '未指定学期';
+    let subject = '未指定科目';
+    
+    // Get selected values if available
+    if (schoolSelect && schoolSelect.value) {
+        school = schoolSelect.options[schoolSelect.selectedIndex].text;
+    }
+    
+    if (gradeSelect && gradeSelect.value) {
+        grade = gradeSelect.options[gradeSelect.selectedIndex].text;
+    }
+    
+    if (semesterSelect && semesterSelect.value) {
+        semester = semesterSelect.options[semesterSelect.selectedIndex].text;
+    }
+    
+    if (subjectSelect && subjectSelect.value) {
+        subject = subjectSelect.options[subjectSelect.selectedIndex].text;
+    }
+    
+    // Build educational context string
+    let context = `学校类型：${school}\n年级：${grade}\n学期：${semester}\n科目：${subject}\n`;
+    
+    // Add curriculum information based on selections
+    context += getCurriculumInfo(school, grade, subject);
+    
+    return context;
+}
+
+// Function to get a brief summary of the context for display
+function getContextSummary() {
+    const schoolSelect = document.getElementById('sidebar-school-select');
+    const gradeSelect = document.getElementById('sidebar-grade-select');
+    const subjectSelect = document.getElementById('sidebar-subject-select');
+    
+    if (!schoolSelect || !gradeSelect || !subjectSelect) {
+        return '';
+    }
+    
+    const hasSchool = schoolSelect.value && schoolSelect.value !== 'none';
+    const hasGrade = gradeSelect.value && gradeSelect.value !== 'none';
+    const hasSubject = subjectSelect.value && subjectSelect.value !== 'none';
+    
+    if (!hasSchool && !hasGrade && !hasSubject) {
+        return '';
+    }
+    
+    let summary = '';
+    
+    if (hasSchool) {
+        summary += schoolSelect.options[schoolSelect.selectedIndex].text;
+    }
+    
+    if (hasGrade) {
+        if (summary) summary += ' · ';
+        summary += gradeSelect.options[gradeSelect.selectedIndex].text;
+    }
+    
+    if (hasSubject) {
+        if (summary) summary += ' · ';
+        summary += subjectSelect.options[subjectSelect.selectedIndex].text;
+    }
+    
+    return summary;
+}
+
+// Function to get curriculum information based on school, grade and subject
+function getCurriculumInfo(school, grade, subject) {
+    // Default curriculum info
+    let curriculumInfo = '根据中国教育大纲标准提供适合的回答。';
+    
+    // Primary school curriculum info
+    if (school.includes('小学')) {
+        curriculumInfo = '根据小学教育大纲，注重基础知识的讲解，使用简单易懂的语言，多用具体例子，避免抽象概念。';
+        
+        if (subject.includes('数学')) {
+            if (grade.includes('一年级') || grade.includes('二年级')) {
+                curriculumInfo += '一二年级数学主要包括20以内的加减法、100以内的加减法、认识图形、认识时间等基础内容。';
+            } else if (grade.includes('三年级') || grade.includes('四年级')) {
+                curriculumInfo += '三四年级数学主要包括乘除法、分数初步、小数初步、面积、周长等内容。';
+            } else if (grade.includes('五年级') || grade.includes('六年级')) {
+                curriculumInfo += '五六年级数学主要包括分数四则运算、小数四则运算、比例、百分数、统计等内容。';
+            }
+        } else if (subject.includes('语文')) {
+            curriculumInfo += '小学语文注重汉字识记、阅读理解、写作基础等能力培养。';
+        } else if (subject.includes('英语')) {
+            curriculumInfo += '小学英语注重基础词汇、简单句型和日常交流用语的学习。';
+        }
+    }
+    // Middle school curriculum info
+    else if (school.includes('初中')) {
+        curriculumInfo = '根据初中教育大纲，注重系统性知识的讲解，可以引入一定的抽象概念，但需要配合例子说明。';
+        
+        if (subject.includes('数学')) {
+            if (grade.includes('初一')) {
+                curriculumInfo += '初一数学主要包括有理数、整式、一元一次方程、几何初步等内容。';
+            } else if (grade.includes('初二')) {
+                curriculumInfo += '初二数学主要包括二元一次方程组、不等式、相似三角形、勾股定理等内容。';
+            } else if (grade.includes('初三')) {
+                curriculumInfo += '初三数学主要包括一元二次方程、二次函数、圆、概率初步等内容。';
+            }
+        } else if (subject.includes('物理')) {
+            curriculumInfo += '初中物理注重基本概念、基本规律的理解和简单应用，包括力学、热学、光学、电学等基础内容。';
+        } else if (subject.includes('化学')) {
+            curriculumInfo += '初中化学注重基本概念、元素性质、化学反应等基础内容的学习。';
+        }
+    }
+    // High school curriculum info
+    else if (school.includes('高中')) {
+        curriculumInfo = '根据高中教育大纲，可以使用较为抽象的概念和复杂的理论，注重知识的系统性和应用能力的培养。';
+        
+        if (subject.includes('数学')) {
+            if (grade.includes('高一')) {
+                curriculumInfo += '高一数学主要包括集合、函数、三角函数、平面向量等内容。';
+            } else if (grade.includes('高二')) {
+                curriculumInfo += '高二数学主要包括立体几何、概率统计、数列、导数等内容。';
+            } else if (grade.includes('高三')) {
+                curriculumInfo += '高三数学主要是对高中数学知识的综合复习和应用，注重解题技巧和方法。';
+            }
+        } else if (subject.includes('物理')) {
+            curriculumInfo += '高中物理包括力学、热学、电磁学、原子物理等内容，注重理论与实验的结合。';
+        } else if (subject.includes('化学')) {
+            curriculumInfo += '高中化学包括化学反应原理、元素化学、有机化学等内容，注重微观结构与宏观性质的联系。';
+        }
+    }
+    
+    return curriculumInfo;
+}
+
+// Modify the createChatInterface function to add styles for the context badge
 function createChatInterface() {
-    const qaContainer = document.getElementById('qa-container');
-    if (!qaContainer) {
-        console.error('QA container not found');
-        return;
-    }
-    
-    // Check if the chat interface already exists
-    if (document.getElementById('chat-interface')) {
-        return; // Already exists, no need to create it
-    }
-    
-    // Create the chat interface
-    const chatInterface = document.createElement('div');
-    chatInterface.id = 'chat-interface';
-    chatInterface.className = 'chat-interface';
-    chatInterface.style.cssText = 'display: flex; flex-direction: column; height: 100%; padding: 20px; gap: 20px;';
-    
-    // Create the chat input area
-    const chatInputArea = document.createElement('div');
-    chatInputArea.className = 'chat-input-area';
-    chatInputArea.style.cssText = 'display: flex; flex-direction: column; gap: 10px;';
-    
-    // Create the textarea
-    const chatInput = document.createElement('textarea');
-    chatInput.id = 'chat-input';
-    chatInput.className = 'chat-input';
-    chatInput.placeholder = '输入您的问题...';
-    chatInput.style.cssText = 'width: 100%; min-height: 100px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 16px; resize: vertical;';
-    
-    // Create the buttons container
-    const buttonsContainer = document.createElement('div');
-    buttonsContainer.className = 'chat-buttons';
-    buttonsContainer.style.cssText = 'display: flex; gap: 10px; justify-content: flex-end;';
-    
-    // Create the optimize button
-    const optimizeButton = document.createElement('button');
-    optimizeButton.id = 'optimize-button';
-    optimizeButton.className = 'chat-button optimize-button';
-    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
-    optimizeButton.style.cssText = 'padding: 8px 16px; background-color: #4299e1; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
-    
-    // Create the submit button
-    const submitButton = document.createElement('button');
-    submitButton.id = 'submit-button';
-    submitButton.className = 'chat-button submit-button';
-    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
-    submitButton.style.cssText = 'padding: 8px 16px; background-color: #48bb78; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
-    
-    // Add buttons to container
-    buttonsContainer.appendChild(optimizeButton);
-    buttonsContainer.appendChild(submitButton);
-    
-    // Add textarea and buttons to input area
-    chatInputArea.appendChild(chatInput);
-    chatInputArea.appendChild(buttonsContainer);
-    
-    // Create the response area
-    const chatResponse = document.createElement('div');
-    chatResponse.id = 'chat-response';
-    chatResponse.className = 'chat-response';
-    chatResponse.style.cssText = 'background-color: #f8fafc; border-radius: 8px; padding: 20px; min-height: 100px; max-height: 500px; overflow-y: auto;';
-    
-    // Add a welcome message
-    chatResponse.innerHTML = `
-        <div class="welcome-message" style="text-align: center; color: #718096;">
-            <i class="fas fa-comment-dots" style="font-size: 24px; margin-bottom: 10px;"></i>
-            <h3 style="margin: 0 0 10px 0; font-size: 18px;">欢迎使用AI学习助手</h3>
-            <p style="margin: 0; font-size: 14px;">在上方输入您的问题，点击"提交问题"获取回答</p>
-        </div>
-    `;
-    
-    // Add input area and response area to chat interface
-    chatInterface.appendChild(chatInputArea);
-    chatInterface.appendChild(chatResponse);
-    
-    // Add the chat interface to the QA container
-    qaContainer.innerHTML = ''; // Clear any existing content
-    qaContainer.appendChild(chatInterface);
+    // ... existing code ...
     
     // Add CSS for the chat interface
     const style = document.createElement('style');
@@ -3524,24 +3606,33 @@ function createChatInterface() {
             gap: 10px;
             color: #718096;
             font-size: 16px;
-                                padding: 20px;
+            padding: 20px;
         }
         .response-header {
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-weight: 600;
             color: #2d3748;
             margin-bottom: 10px;
             font-size: 16px;
         }
+        .context-badge {
+            font-size: 12px;
+            background-color: #ebf8ff;
+            color: #3182ce;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+            font-weight: normal;
+        }
         .response-content {
             line-height: 1.6;
-                                    color: #4a5568;
+            color: #4a5568;
             white-space: pre-wrap;
         }
         .error-message {
-                    color: #e53e3e;
+            color: #e53e3e;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -3550,11 +3641,5 @@ function createChatInterface() {
     `;
     document.head.appendChild(style);
     
-    // Add event listener for Ctrl+Enter to submit
-    chatInput.addEventListener('keydown', function(event) {
-        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
-            event.preventDefault();
-            submitButton.click();
-        }
-    });
+    // ... existing code ...
 }
