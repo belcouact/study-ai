@@ -1722,203 +1722,235 @@ function formatParagraph(paragraph) {
 
 // Function to handle generating questions
 function handleGenerateQuestionsClick() {
-    // Get form elements from sidebar
-    const schoolSelect = document.getElementById('sidebar-school-select');
-    const gradeSelect = document.getElementById('sidebar-grade-select');
-    const semesterSelect = document.getElementById('sidebar-semester-select');
-    const subjectSelect = document.getElementById('sidebar-subject-select');
-    const difficultySelect = document.getElementById('sidebar-difficulty-select');
-    const questionCountSelect = document.getElementById('sidebar-question-count-select');
+    console.log('handleGenerateQuestionsClick called');
     
-    // Check if elements exist
-    if (!schoolSelect || !gradeSelect || !semesterSelect || !subjectSelect || !difficultySelect || !questionCountSelect) {
+    // Get form elements from sidebar
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    const gradeSelect = document.getElementById('grade-select-sidebar');
+    const semesterSelect = document.getElementById('semester-select-sidebar');
+    const subjectSelect = document.getElementById('subject-select-sidebar');
+    const difficultySelect = document.getElementById('difficulty-select-sidebar');
+    const questionCountSelect = document.getElementById('question-count-select-sidebar');
+    const generateQuestionsButton = document.querySelector('.sidebar-generate-button');
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    const emptyState = document.getElementById('empty-state');
+    
+    if (!schoolSelect || !gradeSelect || !semesterSelect || !subjectSelect || 
+        !difficultySelect || !questionCountSelect || !generateQuestionsButton) {
         console.error('One or more form elements not found');
         return;
     }
     
-    // Switch to test tab if not already active
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
+    // Only show loading state if we're on the test page
+    const isTestPage = document.getElementById('create-container').classList.contains('active') || 
+                      !document.getElementById('create-container').classList.contains('hidden');
     
-    if (!createButton.classList.contains('active')) {
-        qaButton.classList.remove('active');
-        createButton.classList.add('active');
-        qaContainer.classList.add('hidden');
-        createContainer.classList.remove('hidden');
+    if (isTestPage) {
+        // Show loading state on button
+        generateQuestionsButton.textContent = '生成中...';
+        generateQuestionsButton.disabled = true;
+        
+        // Hide empty state if it exists
+        if (emptyState) {
+            emptyState.classList.add('hidden');
+        }
+        
+        // Show loading indicator on the test page
+        showLoadingIndicator();
     }
     
-    // Re-initialize the test page
-    resetTestPage();
-    
-    // Show loading state
-    const generateButton = document.getElementById('sidebar-generate-button');
-    generateButton.disabled = true;
-    generateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
-    
-    // Hide empty state if it exists
-    const emptyState = document.querySelector('.empty-state');
-    if (emptyState) {
-        emptyState.style.display = 'none';
-    }
-    
-    // Show loading indicator
-    showLoadingIndicator('正在生成题目，请稍候...');
-    
-    // Get form values
-    const school = schoolSelect.value;
+    // Collect form data from sidebar
+    const schoolType = schoolSelect.value;
     const grade = gradeSelect.value;
     const semester = semesterSelect.value;
     const subject = subjectSelect.value;
     const difficulty = difficultySelect.value;
     const questionCount = questionCountSelect.value;
     
-    // Create prompt
-    const prompt = `请根据以下条件生成${questionCount}道${school}${grade}${semester}${subject}的${difficulty}难度选择题，每道题有4个选项(A, B, C, D)，并且只有一个正确答案。
+    console.log('Form data collected:', { schoolType, grade, semester, subject, difficulty, questionCount });
     
-请严格按照以下格式输出:
-1. 问题1
-A. 选项A
-B. 选项B
-C. 选项C
-D. 选项D
-答案: [正确选项字母]
-解析: [详细解析]
+    // Create prompt for API
+    const prompt = `请生成${questionCount}道${schoolType}${grade}${semester}${subject}的${difficulty}难度选择题，每道题包括题目、四个选项(A、B、C、D)、答案和详细解析。严格的格式要求：
+每道题必须包含以下六个部分，缺一不可：
+1. "题目："后接具体题目
+2. "A."后接选项A的内容
+3. "B."后接选项B的内容
+4. "C."后接选项C的内容
+5. "D."后接选项D的内容
+6. "答案："后接正确选项（必须是A、B、C、D其中之一）
+7. "解析："后必须包含完整的解析（至少50字）
 
-2. 问题2
-...以此类推
+解析部分必须包含以下内容（缺一不可）：
+1. 解题思路和方法，不能超纲
+2. 关键知识点解释
+3. 正确答案的推导过程
+4. 为什么其他选项是错误的
+5. 相关知识点的总结
+6. 易错点提醒
 
-请确保题目难度适合${school}${grade}${semester}的学生，内容符合${subject}的教学大纲。
-请确保每个问题都有明确的正确答案，并提供详细的解析说明为什么该选项是正确的。
-如果问题中包含数学公式，请使用LaTeX格式。`;
+示例格式：
+题目：[题目内容]
+A. [选项A内容]
+B. [选项B内容]
+C. [选项C内容]
+D. [选项D内容]
+答案：[A或B或C或D]
+解析：本题主要考察[知识点]。解题思路是[详细说明]。首先，[推导过程]。选项分析：A选项[分析]，B选项[分析]，C选项[分析]，D选项[分析]。需要注意的是[易错点]。总的来说，[知识点总结]。同学们在解题时要特别注意[关键提醒]。
 
-    // Call API
+题目质量要求：
+1. 题目表述必须清晰、准确，无歧义
+2. 选项内容必须完整，符合逻辑
+3. 所有选项必须有实际意义，不能有无意义的干扰项
+4. 难度必须符合年级水平
+5. 解析必须详尽，有教育意义
+6. 不出带图形的题目
+`;
+
+    // Call API to generate questions
     fetchAIResponse(prompt)
         .then(response => {
-            // Parse questions from response
-            const questions = parseQuestionsFromResponse(response);
-            
-            if (questions.length > 0) {
-                // Store questions globally
-                window.currentQuestions = questions;
-                window.currentQuestionIndex = 0;
-                window.userAnswers = new Array(questions.length).fill(null);
-                window.questionsStartTime = new Date();
-                
-                // Display first question
-                displayCurrentQuestion();
-                
-                // Setup navigation buttons
-                setupNavigationButtons();
-                
-                // Setup option buttons
-                setupOptionButtons();
-                
-                // Update navigation buttons
-                updateNavigationButtons();
+            try {
+                console.log('Processing API response:', response);
                 
                 // Hide loading indicator
                 hideLoadingIndicator();
                 
-                // Show questions container
-                const questionsContainer = document.querySelector('.questions-display-container');
+                // Parse the response
+                const parsedQuestions = parseQuestionsFromResponse(response);
+                console.log('Parsed questions:', parsedQuestions);
+                
+                if (parsedQuestions.length === 0) {
+                    throw new Error('No questions could be parsed from the response');
+                }
+                
+                // Make variables globally available
+                window.questions = parsedQuestions;
+                window.userAnswers = Array(parsedQuestions.length).fill(null);
+                window.currentQuestionIndex = 0;
+                
+                // Ensure the questions display container exists and is visible
+                if (!questionsDisplayContainer) {
+                    console.error('Questions display container not found, creating one');
+                    const newContainer = document.createElement('div');
+                    newContainer.id = 'questions-display-container';
+                    newContainer.className = 'questions-display-container';
+                    
+                    // Create required elements inside the container
+                    newContainer.innerHTML = `
+                        <div id="question-counter" class="question-counter"></div>
+                        <div id="question-text" class="question-text"></div>
+                        <div id="choices-container" class="choices-container"></div>
+                        <div id="answer-container" class="answer-container hidden">
+                            <div id="answer-result" class="answer-result"></div>
+                            <div id="answer-explanation" class="answer-explanation"></div>
+                        </div>
+                    `;
+                    
+                    // Add to the create container
+                    const createContainer = document.getElementById('create-container');
+                    if (createContainer) {
+                        createContainer.insertBefore(newContainer, createContainer.firstChild);
+                    }
+                }
+                
+                // Get a fresh reference to the questions display container
+                const questionsContainer = document.getElementById('questions-display-container');
+                
+                // Hide empty state if it exists
+                if (emptyState) {
+                    emptyState.classList.add('hidden');
+                    console.log('Empty state hidden');
+                }
+                
+                // Make sure the questions display container is visible
                 if (questionsContainer) {
                     questionsContainer.classList.remove('hidden');
+                    console.log('Questions display container shown');
+                    
+                    // Ensure the container has the necessary child elements
+                    if (!document.getElementById('question-counter')) {
+                        const counterDiv = document.createElement('div');
+                        counterDiv.id = 'question-counter';
+                        counterDiv.className = 'question-counter';
+                        questionsContainer.appendChild(counterDiv);
+                    }
+                    
+                    if (!document.getElementById('question-text')) {
+                        const textDiv = document.createElement('div');
+                        textDiv.id = 'question-text';
+                        textDiv.className = 'question-text';
+                        questionsContainer.appendChild(textDiv);
+                    }
+                    
+                    if (!document.getElementById('choices-container')) {
+                        const choicesDiv = document.createElement('div');
+                        choicesDiv.id = 'choices-container';
+                        choicesDiv.className = 'choices-container';
+                        questionsContainer.appendChild(choicesDiv);
+                    }
+                    
+                    if (!document.getElementById('answer-container')) {
+                        const answerDiv = document.createElement('div');
+                        answerDiv.id = 'answer-container';
+                        answerDiv.className = 'answer-container hidden';
+                        answerDiv.innerHTML = `
+                            <div id="answer-result" class="answer-result"></div>
+                            <div id="answer-explanation" class="answer-explanation"></div>
+                        `;
+                        questionsContainer.appendChild(answerDiv);
+                    }
+                } else {
+                    console.error('Questions display container still not found after creation attempt');
                 }
-            } else {
-                // Show error message if no questions were parsed
-                showSystemMessage('无法生成题目，请重试', 'error');
                 
-                // Show empty state again
-                if (emptyState) {
-                    emptyState.style.display = 'flex';
-                }
+                // Display the first question
+                displayCurrentQuestion();
+                updateNavigationButtons();
                 
-                // Hide loading indicator
+                // Set up navigation button event listeners
+                setupNavigationButtons();
+                
+                // Show success message
+                showSystemMessage(`已生成 ${parsedQuestions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`, 'success');
+            } catch (error) {
+                console.error('Error processing questions:', error);
+                showSystemMessage('生成题目时出错，请重试', 'error');
                 hideLoadingIndicator();
+                
+                // Show empty state again if there was an error
+                if (emptyState && questionsDisplayContainer) {
+                    emptyState.classList.remove('hidden');
+                    questionsDisplayContainer.classList.remove('hidden');
+                }
+            } finally {
+                // Reset button state
+                if (isTestPage) {
+                generateQuestionsButton.textContent = '出题';
+                generateQuestionsButton.disabled = false;
+                }
             }
-            
-            // Reset generate button
-            generateButton.disabled = false;
-            generateButton.innerHTML = '出题';
         })
         .catch(error => {
-            console.error('Error generating questions:', error);
-            showSystemMessage('生成题目时出错，请重试', 'error');
-            
-            // Show empty state again
-            if (emptyState) {
-                emptyState.style.display = 'flex';
-            }
-            
-            // Hide loading indicator
+            console.error('API error:', error);
+            showSystemMessage('API调用失败，请重试', 'error');
             hideLoadingIndicator();
             
-            // Reset generate button
-            generateButton.disabled = false;
-            generateButton.innerHTML = '出题';
+            // Show empty state again if there was an error
+            if (emptyState && questionsDisplayContainer) {
+                emptyState.classList.remove('hidden');
+                questionsDisplayContainer.classList.remove('hidden');
+            }
+            
+            // Reset button state
+            if (isTestPage) {
+            generateQuestionsButton.textContent = '出题';
+            generateQuestionsButton.disabled = false;
+            }
         });
 }
 
-// Function to reset the test page
-function resetTestPage() {
-    // Reset global variables
-    window.currentQuestions = [];
-    window.currentQuestionIndex = 0;
-    window.userAnswers = [];
-    window.questionsStartTime = null;
-    
-    // Clear any existing questions display
-    const questionsContainer = document.querySelector('.questions-display-container');
-    if (questionsContainer) {
-        questionsContainer.innerHTML = '';
-    }
-    
-    // Remove any completion status display
-    const completionStatus = document.querySelector('.completion-status');
-    if (completionStatus) {
-        completionStatus.remove();
-    }
-    
-    // Remove any answer display
-    const answerContainer = document.querySelector('.answer-container');
-    if (answerContainer) {
-        answerContainer.innerHTML = '';
-    }
-    
-    // Reset any active choice cells
-    const choiceCells = document.querySelectorAll('.choice-cell');
-    choiceCells.forEach(cell => {
-        cell.classList.remove('selected', 'correct', 'incorrect');
-    });
-    
-    // Hide submit button if it exists
-    const submitButton = document.querySelector('.submit-button');
-    if (submitButton) {
-        submitButton.classList.add('hidden');
-    }
-    
-    // Reset navigation buttons
-    const prevButton = document.getElementById('prev-question');
-    const nextButton = document.getElementById('next-question');
-    if (prevButton) prevButton.disabled = true;
-    if (nextButton) nextButton.disabled = false;
-    
-    // Show empty state
-    const emptyState = document.querySelector('.empty-state');
-    if (emptyState) {
-        emptyState.style.display = 'flex';
-    }
-    
-    // Hide questions container
-    if (questionsContainer) {
-        questionsContainer.classList.add('hidden');
-    }
-}
-
 // Function to show loading indicator with spinning icon
-function showLoadingIndicator(message) {
+function showLoadingIndicator() {
     // Get the questions display container
     const questionsDisplayContainer = document.getElementById('questions-display-container');
     if (!questionsDisplayContainer) {
@@ -1971,7 +2003,7 @@ function showLoadingIndicator(message) {
         
         // Create loading text
         const loadingText = document.createElement('div');
-        loadingText.textContent = message || 'Thinking...';
+        loadingText.textContent = 'Thinking...';
         loadingText.style.cssText = `
             font-size: 18px;
             color: #4a5568;
@@ -2218,305 +2250,519 @@ function showSystemMessage(message, type = 'info') {
 
 // Initialize the page with form layout
 function initializeFormLayout() {
-    // Setup sidebar toggle
+    const formContainer = document.getElementById('question-form-container');
+    if (!formContainer) return;
+    
+    // Style the form container with a more compact look
+    formContainer.style.cssText = `
+        padding: 15px;
+        margin-bottom: 10px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        min-height: auto;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s ease;
+    `;
+    
+    // Create a flex container for the dropdowns with reduced spacing
+    const dropdownContainer = document.createElement('div');
+    dropdownContainer.className = 'dropdown-container';
+    dropdownContainer.style.cssText = `
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 15px;
+        flex-wrap: nowrap;
+        padding: 8px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    `;
+    
+    // Move all select elements into the dropdown container
+    const selects = formContainer.querySelectorAll('select');
+    selects.forEach(select => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'select-wrapper';
+        wrapper.style.cssText = `
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            position: relative;
+        `;
+        
+        // Get the label for this select
+        const label = formContainer.querySelector(`label[for="${select.id}"]`);
+        if (label) {
+            label.style.cssText = `
+                margin-bottom: 4px;
+                font-size: 13px;
+                font-weight: 500;
+                color: #4a5568;
+                white-space: nowrap;
+            `;
+            wrapper.appendChild(label);
+        }
+        
+        // Style the select element
+        select.style.cssText = `
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #2d3748;
+            background-color: white;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234a5568' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 12px;
+            margin: 0;
+        `;
+        
+        wrapper.appendChild(select);
+        dropdownContainer.appendChild(wrapper);
+    });
+    
+    // Create a more compact button container
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = `
+        display: flex;
+        justify-content: center;
+        padding: 10px 0;
+        margin: 5px 0 10px 0;
+        border-bottom: 1px solid #edf2f7;
+    `;
+    
+    // Style the generate questions button
+    const generateButton = document.getElementById('generate-questions-button');
+    if (generateButton) {
+        generateButton.style.cssText = `
+            padding: 10px 25px;
+            font-size: 15px;
+            font-weight: 500;
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+        `;
+        
+        buttonContainer.appendChild(generateButton);
+    }
+    
+    // Style the API function container with reduced spacing
+    const apiRadioContainer = document.querySelector('.api-function-container');
+    if (apiRadioContainer) {
+        apiRadioContainer.style.cssText = `
+            padding: 12px;
+            margin-top: 5px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #edf2f7;
+            border-radius: 0 0 12px 12px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        `;
+        
+        // Style radio buttons and labels
+        const radioButtons = apiRadioContainer.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach(radio => {
+            const label = radio.nextElementSibling;
+            if (label) {
+                const wrapper = document.createElement('div');
+                wrapper.style.cssText = `
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 6px 12px;
+                    background: white;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                `;
+                
+                radio.style.cssText = `
+                    width: 14px;
+                    height: 14px;
+                    cursor: pointer;
+                    accent-color: #4299e1;
+                    margin: 0;
+                `;
+                
+                label.style.cssText = `
+                    font-size: 13px;
+                    color: #4a5568;
+                    cursor: pointer;
+                    margin: 0;
+                `;
+                
+                // Move radio and label to the wrapper
+                radio.parentNode.insertBefore(wrapper, radio);
+                wrapper.appendChild(radio);
+                wrapper.appendChild(label);
+            }
+        });
+    }
+    
+    // Insert elements in the correct order with minimal spacing
+    const form = document.getElementById('question-form');
+    if (form) {
+        form.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 0;
+            margin: 0;
+        `;
+        
+        // Remove any existing containers
+        const existingDropdownContainer = form.querySelector('.dropdown-container');
+        if (existingDropdownContainer) {
+            existingDropdownContainer.remove();
+        }
+        
+        // Remove the header if it exists
+        const header = form.querySelector('h3');
+        if (header && header.textContent.includes('设置问题参数')) {
+            header.remove();
+        }
+        
+        // Insert containers in the correct order
+        form.insertBefore(dropdownContainer, form.firstChild);
+        formContainer.parentNode.insertBefore(buttonContainer, formContainer.nextSibling);
+    }
+}
+
+// Function to populate grade options based on selected school
+function populateGradeOptions(school) {
+    const gradeSelect = document.getElementById('grade-select');
+    const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
+    
+    if (!gradeSelect) return;
+    
+        // Clear existing options
+        gradeSelect.innerHTML = '';
+        
+    // Define grade options based on school
+    let gradeOptions = [];
+        
+        switch (school) {
+            case '小学':
+            gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+                break;
+            case '初中':
+            gradeOptions = ['初一', '初二', '初三'];
+                break;
+            case '高中':
+            gradeOptions = ['高一', '高二', '高三'];
+                break;
+            case '大学':
+            gradeOptions = ['大一', '大二', '大三', '大四'];
+                break;
+            default:
+            gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+    }
+    
+    // Add options to the select element
+    gradeOptions.forEach(grade => {
+        const option = document.createElement('option');
+        option.value = grade;
+        option.textContent = grade;
+        gradeSelect.appendChild(option);
+    });
+    
+    // Also update the sidebar dropdown if it exists
+    if (gradeSelectSidebar) {
+        // Clear existing options
+        gradeSelectSidebar.innerHTML = '';
+        
+        // Add the same options to the sidebar dropdown
+        gradeOptions.forEach(grade => {
+            const option = document.createElement('option');
+            option.value = grade;
+            option.textContent = grade;
+            gradeSelectSidebar.appendChild(option);
+        });
+    }
+    }
+    
+    // Function to populate subject options based on selected school
+    function populateSubjectOptions(school) {
+    const subjectSelect = document.getElementById('subject-select');
+    const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
+    
+    if (!subjectSelect) return;
+    
+        // Clear existing options
+        subjectSelect.innerHTML = '';
+        
+    // Define subject options based on school
+    let subjectOptions = [];
+        
+        switch (school) {
+            case '小学':
+            subjectOptions = ['语文', '数学', '英语', '科学', '道德与法治'];
+                break;
+            case '初中':
+            subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+                break;
+            case '高中':
+            subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+                break;
+            case '大学':
+            subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
+                break;
+            default:
+            subjectOptions = ['语文', '数学', '英语'];
+    }
+    
+    // Add options to the select element
+    subjectOptions.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject;
+        subjectSelect.appendChild(option);
+    });
+    
+    // Also update the sidebar dropdown if it exists
+    if (subjectSelectSidebar) {
+        // Clear existing options
+        subjectSelectSidebar.innerHTML = '';
+        
+        // Add the same options to the sidebar dropdown
+        subjectOptions.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            subjectSelectSidebar.appendChild(option);
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize form layout
+    initializeFormLayout();
+    
+    // Move content creation area to the top for better screen utilization
+    moveContentCreationToTop();
+    
+    // Setup sidebar toggle functionality
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const leftPanel = document.querySelector('.left-panel');
     const contentArea = document.querySelector('.content-area');
     
     if (sidebarToggle && leftPanel && contentArea) {
-        sidebarToggle.addEventListener('click', () => {
+        sidebarToggle.addEventListener('click', function() {
             leftPanel.classList.toggle('hidden');
             contentArea.classList.toggle('full-width');
-            sidebarToggle.classList.toggle('collapsed');
-            
-            // Change icon direction
-            const icon = sidebarToggle.querySelector('i');
-            if (icon) {
-                if (icon.classList.contains('fa-chevron-left')) {
-                    icon.classList.remove('fa-chevron-left');
-                    icon.classList.add('fa-chevron-right');
-                } else {
-                    icon.classList.remove('fa-chevron-right');
-                    icon.classList.add('fa-chevron-left');
-                }
-            }
+            this.classList.toggle('collapsed');
         });
     }
     
-    // Setup tab switching
+    // Setup tab switching functionality
     const qaButton = document.getElementById('qa-button');
     const createButton = document.getElementById('create-button');
     const qaContainer = document.getElementById('qa-container');
     const createContainer = document.getElementById('create-container');
     
     if (qaButton && createButton && qaContainer && createContainer) {
-        qaButton.addEventListener('click', () => {
+        qaButton.addEventListener('click', function() {
             qaButton.classList.add('active');
             createButton.classList.remove('active');
             qaContainer.classList.remove('hidden');
             createContainer.classList.add('hidden');
         });
         
-        createButton.addEventListener('click', () => {
-            qaButton.classList.remove('active');
+        createButton.addEventListener('click', function() {
             createButton.classList.add('active');
-            qaContainer.classList.add('hidden');
+            qaButton.classList.remove('active');
             createContainer.classList.remove('hidden');
+            qaContainer.classList.add('hidden');
+            
+            // Initialize empty state if no questions are loaded
+            initializeEmptyState();
         });
-    }
-    
-    // Setup sidebar dropdowns
-    const schoolSelect = document.getElementById('sidebar-school-select');
-    const gradeSelect = document.getElementById('sidebar-grade-select');
-    const subjectSelect = document.getElementById('sidebar-subject-select');
-    
-    if (schoolSelect) {
-        schoolSelect.addEventListener('change', (e) => {
-            const selectedSchool = e.target.value;
-            populateSidebarGradeOptions(selectedSchool);
-            populateSidebarSubjectOptions(selectedSchool);
-        });
-    }
-    
-    // Setup generate button in sidebar
-    const generateButton = document.getElementById('sidebar-generate-button');
-    if (generateButton) {
-        // Remove any existing event listeners to prevent duplicates
-        const newGenerateButton = generateButton.cloneNode(true);
-        generateButton.parentNode.replaceChild(newGenerateButton, generateButton);
         
-        // Add event listener to the new button
-        newGenerateButton.addEventListener('click', handleGenerateQuestionsClick);
-        console.log('Generate button event listener attached');
+        // Initialize empty state on the test page if it's active
+        if (createButton.classList.contains('active')) {
+            initializeEmptyState();
+        }
     } else {
-        console.error('Generate button not found');
+        // If tab buttons don't exist, initialize empty state anyway
+        initializeEmptyState();
     }
     
-    // Initialize empty state
-    initializeEmptyState();
+    // Set up initial navigation buttons
+    setupNavigationButtons();
     
-    // Populate sidebar dropdowns initially
-    populateSidebarDropdowns();
-}
-
-// Function to populate sidebar dropdowns
-function populateSidebarDropdowns() {
-    const schoolSelect = document.getElementById('sidebar-school-select');
-    if (schoolSelect) {
-        const selectedSchool = schoolSelect.value;
-        populateSidebarGradeOptions(selectedSchool);
-        populateSidebarSubjectOptions(selectedSchool);
-    }
-}
-
-// Function to populate sidebar grade options
-function populateSidebarGradeOptions(school) {
-    const gradeSelect = document.getElementById('sidebar-grade-select');
-    if (!gradeSelect) return;
+    // Set up initial option buttons if they exist
+    setupOptionButtons();
     
-    // Clear existing options
-    gradeSelect.innerHTML = '';
-    
-    // Get grade options based on school
-    const gradeOptions = populateGradeOptions(school);
-    
-    // Add options to select
-    gradeOptions.forEach(option => {
-        const optionElement = document.createElement('option');
-        optionElement.value = option.value;
-        optionElement.textContent = option.text;
-        gradeSelect.appendChild(optionElement);
-    });
-}
-
-// Function to populate sidebar subject options
-function populateSidebarSubjectOptions(school) {
-    const subjectSelect = document.getElementById('sidebar-subject-select');
-    if (!subjectSelect) return;
-    
-    // Clear existing options
-    subjectSelect.innerHTML = '';
-    
-    // Get subject options based on school
-    const subjectOptions = populateSubjectOptions(school);
-    
-    // Add options to select
-    subjectOptions.forEach(option => {
-        const optionElement = document.createElement('option');
-        optionElement.value = option.value;
-        optionElement.textContent = option.text;
-        subjectSelect.appendChild(optionElement);
-    });
-}
-
-// Add a debug version of handleGenerateQuestionsClick to help diagnose issues
-function handleGenerateQuestionsClick() {
-    console.log('Generate button clicked');
-    
-    // Get form elements from sidebar
-    const schoolSelect = document.getElementById('sidebar-school-select');
-    const gradeSelect = document.getElementById('sidebar-grade-select');
-    const semesterSelect = document.getElementById('sidebar-semester-select');
-    const subjectSelect = document.getElementById('sidebar-subject-select');
-    const difficultySelect = document.getElementById('sidebar-difficulty-select');
-    const questionCountSelect = document.getElementById('sidebar-question-count-select');
-    
-    // Log elements to check if they exist
-    console.log('School select:', schoolSelect);
-    console.log('Grade select:', gradeSelect);
-    console.log('Semester select:', semesterSelect);
-    console.log('Subject select:', subjectSelect);
-    console.log('Difficulty select:', difficultySelect);
-    console.log('Question count select:', questionCountSelect);
-    
-    // Check if elements exist
-    if (!schoolSelect || !gradeSelect || !semesterSelect || !subjectSelect || !difficultySelect || !questionCountSelect) {
-        console.error('One or more form elements not found');
-        showSystemMessage('表单元素缺失，请刷新页面重试', 'error');
-        return;
-    }
-    
-    // Switch to test tab if not already active
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
-    
-    if (!createButton.classList.contains('active')) {
-        qaButton.classList.remove('active');
-        createButton.classList.add('active');
-        qaContainer.classList.add('hidden');
-        createContainer.classList.remove('hidden');
-    }
-    
-    // Re-initialize the test page
-    resetTestPage();
-    
-    // Show loading state
-    const generateButton = document.getElementById('sidebar-generate-button');
-    generateButton.disabled = true;
-    generateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
-    
-    // Hide empty state if it exists
-    const emptyState = document.querySelector('.empty-state');
-    if (emptyState) {
-        emptyState.style.display = 'none';
-    }
-    
-    // Show loading indicator
-    showLoadingIndicator('正在生成题目，请稍候...');
-    
-    // Get form values
-    const school = schoolSelect.value;
-    const grade = gradeSelect.value;
-    const semester = semesterSelect.value;
-    const subject = subjectSelect.value;
-    const difficulty = difficultySelect.value;
-    const questionCount = questionCountSelect.value;
-    
-    console.log('Form values:', { school, grade, semester, subject, difficulty, questionCount });
-    
-    // Create prompt
-    const prompt = `请根据以下条件生成${questionCount}道${school}${grade}${semester}${subject}的${difficulty}难度选择题，每道题有4个选项(A, B, C, D)，并且只有一个正确答案。
-    
-请严格按照以下格式输出:
-1. 问题1
-A. 选项A
-B. 选项B
-C. 选项C
-D. 选项D
-答案: [正确选项字母]
-解析: [详细解析]
-
-2. 问题2
-...以此类推
-
-请确保题目难度适合${school}${grade}${semester}的学生，内容符合${subject}的教学大纲。
-请确保每个问题都有明确的正确答案，并提供详细的解析说明为什么该选项是正确的。
-如果问题中包含数学公式，请使用LaTeX格式。`;
-
-    console.log('Generated prompt:', prompt);
-
-    // Call API
-    fetchAIResponse(prompt)
-        .then(response => {
-            console.log('API response received');
+    // Directly populate sidebar dropdowns with initial values
+    const schoolSelectSidebar = document.getElementById('school-select-sidebar');
+    if (schoolSelectSidebar) {
+        const initialSchool = schoolSelectSidebar.value || '小学';
+        
+        // Define grade options based on school
+        let gradeOptions = [];
+        switch (initialSchool) {
+            case '小学':
+                gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+                break;
+            case '初中':
+                gradeOptions = ['初一', '初二', '初三'];
+                break;
+            case '高中':
+                gradeOptions = ['高一', '高二', '高三'];
+                break;
+            case '大学':
+                gradeOptions = ['大一', '大二', '大三', '大四'];
+                break;
+            default:
+                gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+        }
+        
+        // Define subject options based on school
+        let subjectOptions = [];
+        switch (initialSchool) {
+            case '小学':
+                subjectOptions = ['语文', '数学', '英语', '科学'];
+                break;
+            case '初中':
+                subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+                break;
+            case '高中':
+                subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+                break;
+            case '大学':
+                subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
+                break;
+            default:
+                subjectOptions = ['语文', '数学', '英语'];
+        }
+        
+        // Populate grade dropdown
+        const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
+        if (gradeSelectSidebar) {
+            gradeSelectSidebar.innerHTML = '';
+            gradeOptions.forEach(grade => {
+                const option = document.createElement('option');
+                option.value = grade;
+                option.textContent = grade;
+                gradeSelectSidebar.appendChild(option);
+            });
+        }
+        
+        // Populate subject dropdown
+        const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
+        if (subjectSelectSidebar) {
+            subjectSelectSidebar.innerHTML = '';
+            subjectOptions.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectSelectSidebar.appendChild(option);
+            });
+        }
+        
+        // Add change event listener to update dropdowns when school changes
+        schoolSelectSidebar.addEventListener('change', function() {
+            const school = this.value;
             
-            // Parse questions from response
-            const questions = parseQuestionsFromResponse(response);
-            console.log('Parsed questions:', questions);
-            
-            if (questions.length > 0) {
-                // Store questions globally
-                window.currentQuestions = questions;
-                window.currentQuestionIndex = 0;
-                window.userAnswers = new Array(questions.length).fill(null);
-                window.questionsStartTime = new Date();
-                
-                // Display first question
-                displayCurrentQuestion();
-                
-                // Setup navigation buttons
-                setupNavigationButtons();
-                
-                // Setup option buttons
-                setupOptionButtons();
-                
-                // Update navigation buttons
-                updateNavigationButtons();
-                
-                // Hide loading indicator
-                hideLoadingIndicator();
-                
-                // Show questions container
-                const questionsContainer = document.querySelector('.questions-display-container');
-                if (questionsContainer) {
-                    questionsContainer.classList.remove('hidden');
-                }
-            } else {
-                // Show error message if no questions were parsed
-                showSystemMessage('无法生成题目，请重试', 'error');
-                
-                // Show empty state again
-                if (emptyState) {
-                    emptyState.style.display = 'flex';
-                }
-                
-                // Hide loading indicator
-                hideLoadingIndicator();
+            // Define grade options based on school
+            let gradeOptions = [];
+            switch (school) {
+                case '小学':
+                    gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+                    break;
+                case '初中':
+                    gradeOptions = ['初一', '初二', '初三'];
+                    break;
+                case '高中':
+                    gradeOptions = ['高一', '高二', '高三'];
+                    break;
+                case '大学':
+                    gradeOptions = ['大一', '大二', '大三', '大四'];
+                    break;
+                default:
+                    gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
             }
             
-            // Reset generate button
-            generateButton.disabled = false;
-            generateButton.innerHTML = '出题';
-        })
-        .catch(error => {
-            console.error('Error generating questions:', error);
-            showSystemMessage('生成题目时出错，请重试', 'error');
-            
-            // Show empty state again
-            if (emptyState) {
-                emptyState.style.display = 'flex';
+            // Define subject options based on school
+            let subjectOptions = [];
+            switch (school) {
+                case '小学':
+                    subjectOptions = ['语文', '数学', '英语', '科学'];
+                    break;
+                case '初中':
+                    subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'];
+                    break;
+                case '高中':
+                    subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+                    break;
+                case '大学':
+                    subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
+                    break;
+                default:
+                    subjectOptions = ['语文', '数学', '英语'];
             }
             
-            // Hide loading indicator
-            hideLoadingIndicator();
+            // Update grade dropdown
+            const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
+            if (gradeSelectSidebar) {
+                gradeSelectSidebar.innerHTML = '';
+                gradeOptions.forEach(grade => {
+                    const option = document.createElement('option');
+                    option.value = grade;
+                    option.textContent = grade;
+                    gradeSelectSidebar.appendChild(option);
+                });
+            }
             
-            // Reset generate button
-            generateButton.disabled = false;
-            generateButton.innerHTML = '出题';
+            // Update subject dropdown
+            const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
+            if (subjectSelectSidebar) {
+                subjectSelectSidebar.innerHTML = '';
+                subjectOptions.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject;
+                    option.textContent = subject;
+                    subjectSelectSidebar.appendChild(option);
+                });
+            }
         });
-}
-
-// Add this at the end of the file to ensure the generate button is properly set up
-document.addEventListener('DOMContentLoaded', function() {
-    // Setup generate button in sidebar
-    const generateButton = document.getElementById('sidebar-generate-button');
-    if (generateButton) {
-        generateButton.addEventListener('click', handleGenerateQuestionsClick);
-        console.log('Generate button event listener attached on DOMContentLoaded');
-    } else {
-        console.error('Generate button not found on DOMContentLoaded');
+    }
+    
+    // Add click handler for sidebar generate button
+    const sidebarGenerateButton = document.createElement('button');
+    sidebarGenerateButton.textContent = '出题';
+    sidebarGenerateButton.className = 'sidebar-generate-button';
+    sidebarGenerateButton.addEventListener('click', function() {
+        // Switch to the test tab if not already there
+        const createButton = document.getElementById('create-button');
+        if (createButton && !createButton.classList.contains('active')) {
+            createButton.click();
+        }
+        
+        // Then generate questions
+        handleGenerateQuestionsClick();
+    });
+    
+    // Add the button to the second frame
+    const testFrame = document.querySelector('.sidebar-frame:nth-child(2) .frame-content');
+    if (testFrame) {
+        testFrame.appendChild(sidebarGenerateButton);
     }
 });
 
