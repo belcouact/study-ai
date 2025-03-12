@@ -474,6 +474,8 @@ function displayCurrentQuestion() {
         if (displayText.startsWith('题目：')) {
             displayText = displayText.substring(3);
         }
+        
+        // Apply enhanced math formatting
         questionText.innerHTML = formatMathExpressions(displayText);
         console.log('Updated question text:', displayText);
     } else {
@@ -882,6 +884,11 @@ function displayCurrentQuestion() {
             submitButton.style.pointerEvents = 'none';
             submitButton.textContent = '已提交';
         }
+        
+        // Render math expressions
+        if (window.MathJax) {
+            window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+        }
     }
     
     // Style the answer container when showing results
@@ -981,6 +988,30 @@ function displayCurrentQuestion() {
     // Render math expressions
     if (window.MathJax) {
         window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+    } else {
+        // If MathJax is not loaded, try to load it
+        if (!document.getElementById('mathjax-script')) {
+            const script = document.createElement('script');
+            script.id = 'mathjax-script';
+            script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+            script.async = true;
+            document.head.appendChild(script);
+            
+            script.onload = function() {
+                window.MathJax = {
+                    tex: {
+                        inlineMath: [['\\(', '\\)']],
+                        displayMath: [['\\[', '\\]']]
+                    },
+                    svg: {
+                        fontCache: 'global'
+                    }
+                };
+                
+                // Typeset the math after MathJax is loaded
+                window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+            };
+        }
     }
     
     console.log('displayCurrentQuestion completed');
@@ -990,13 +1021,22 @@ function displayCurrentQuestion() {
 function formatMathExpressions(text) {
     if (!text) return '';
     
+    // Don't process text that already contains properly formatted LaTeX
+    if (text.includes('\\(') && text.includes('\\)')) {
+        return text;
+    }
+    
+    // Replace LaTeX-style expressions with proper LaTeX delimiters
+    // This handles expressions like \( g' = \frac{GM}{(R+h)^2} \)
+    text = text.replace(/\\\( (.*?) \\\)/g, '\\($1\\)');
+    
     // Replace simple math expressions with LaTeX
     text = text.replace(/\b(\d+[+\-*/]\d+)\b/g, '\\($1\\)');
     
-    // Replace fractions
+    // Replace fractions written as a/b
     text = text.replace(/(\d+)\/(\d+)/g, '\\(\\frac{$1}{$2}\\)');
     
-    // Replace powers
+    // Replace powers written as a^b
     text = text.replace(/(\d+)\^(\d+)/g, '\\($1^{$2}\\)');
     
     // Replace square roots
@@ -1313,34 +1353,8 @@ function showEvaluationModal(content) {
             </div>
         `;
     } else {
-        // Format the evaluation content with improved readability
-        let formattedContent = content
-            .replace(/\n\n/g, '</p><p>')
-            .replace(/\n/g, '<br>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>');
-        
-        // Improve headings and sections
-        formattedContent = formattedContent
-            .replace(/# (.*?)(\n|$)/g, '</p><h3 style="color:#2c5282;margin-top:20px;margin-bottom:10px;font-size:20px;border-bottom:1px solid #e2e8f0;padding-bottom:8px;">$1</h3><p>')
-            .replace(/## (.*?)(\n|$)/g, '</p><h4 style="color:#2b6cb0;margin-top:15px;margin-bottom:8px;font-size:18px;">$1</h4><p>')
-            .replace(/### (.*?)(\n|$)/g, '</p><h5 style="color:#3182ce;margin-top:12px;margin-bottom:6px;font-size:16px;">$1</h5><p>');
-        
-        // Improve lists
-        formattedContent = formattedContent
-            .replace(/<br>(\d+\. .*?)(?=<br>\d+\. |<br><br>|$)/g, '<li style="margin-bottom:8px;">$1</li>')
-            .replace(/<br>- (.*?)(?=<br>- |<br><br>|$)/g, '<li style="margin-bottom:8px;">$1</li>');
-        
-        // Wrap lists in ul tags
-        formattedContent = formattedContent
-            .replace(/(<li.*?<\/li>)+/g, '<ul style="padding-left:20px;margin:10px 0;">$&</ul>');
-        
-        // Add color highlighting for important sections
-        formattedContent = formattedContent
-            .replace(/(优势|strengths|强项)/gi, '<span style="color:#38a169;font-weight:500;">$1</span>')
-            .replace(/(不足|weaknesses|弱项|问题)/gi, '<span style="color:#e53e3e;font-weight:500;">$1</span>')
-            .replace(/(建议|suggestions|提高|改进|提升)/gi, '<span style="color:#3182ce;font-weight:500;">$1</span>')
-            .replace(/(总体评价|overall|表现)/gi, '<span style="color:#6b46c1;font-weight:500;">$1</span>');
+        // Process the content to identify different sections
+        const sections = processEvaluationContent(content);
         
         modalContent = `
             <div class="modal-content" style="
@@ -1384,15 +1398,49 @@ function showEvaluationModal(content) {
                     ">基于您的测试表现提供的个性化评估和建议</div>
                 </div>
                 
-                <div class="evaluation-content" style="
-                    font-size: 16px;
-                    color: #4a5568;
-                    line-height: 1.6;
-                    background: #f7fafc;
-                    padding: 20px;
-                    border-radius: 8px;
+                <div class="evaluation-cards" style="
+                    display: flex;
+                    flex-direction: column;
+                    gap: 20px;
                 ">
-                    <p>${formattedContent}</p>
+                    ${sections.map(section => `
+                        <div class="evaluation-card" style="
+                            background: ${section.color};
+                            border-radius: 10px;
+                            padding: 20px;
+                            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+                            border-left: 5px solid ${section.borderColor};
+                        ">
+                            <div class="card-header" style="
+                                display: flex;
+                                align-items: center;
+                                margin-bottom: 15px;
+                            ">
+                                <div class="card-icon" style="
+                                    width: 32px;
+                                    height: 32px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    margin-right: 12px;
+                                    color: ${section.iconColor};
+                                ">${section.icon}</div>
+                                <h3 style="
+                                    font-size: 18px;
+                                    color: #2d3748;
+                                    margin: 0;
+                                    font-weight: 600;
+                                ">${section.title}</h3>
+                            </div>
+                            <div class="card-content" style="
+                                font-size: 16px;
+                                color: #4a5568;
+                                line-height: 1.6;
+                            ">
+                                ${section.content}
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
                 
                 <div style="
@@ -1447,7 +1495,7 @@ function showEvaluationModal(content) {
     if (printEvaluation) {
         printEvaluation.addEventListener('click', () => {
             // Create a printable version
-            const printContent = document.querySelector('.evaluation-content').innerHTML;
+            const printContent = document.querySelector('.evaluation-cards').innerHTML;
             const printWindow = window.open('', '_blank');
             printWindow.document.write(`
                 <html>
@@ -1466,25 +1514,38 @@ function showEvaluationModal(content) {
                             text-align: center;
                             margin-bottom: 30px;
                         }
-                        .content {
-                            background: #f9f9f9;
-                            padding: 20px;
+                        .evaluation-card {
+                            margin-bottom: 20px;
+                            padding: 15px;
                             border-radius: 8px;
+                            border-left: 5px solid #4299e1;
+                        }
+                        .card-header {
+                            display: flex;
+                            align-items: center;
+                            margin-bottom: 10px;
+                        }
+                        .card-icon {
+                            margin-right: 10px;
+                        }
+                        h3 {
+                            margin: 0;
+                            font-size: 18px;
                         }
                         @media print {
                             body {
                                 padding: 0;
                             }
-                            .content {
-                                background: none;
-                                padding: 0;
+                            .evaluation-card {
+                                break-inside: avoid;
+                                page-break-inside: avoid;
                             }
                         }
                     </style>
                 </head>
                 <body>
                     <h1>成绩评估结果</h1>
-                    <div class="content">${printContent}</div>
+                    <div class="evaluation-cards">${printContent}</div>
                 </body>
                 </html>
             `);
@@ -1502,6 +1563,161 @@ function showEvaluationModal(content) {
             modalContainer.remove();
         }
     });
+}
+
+// Function to process evaluation content into sections
+function processEvaluationContent(content) {
+    // Define section patterns to look for
+    const sectionPatterns = [
+        {
+            keywords: ['总体评价', '总评', '整体表现', 'overall', '总结'],
+            title: '总体评价',
+            color: '#f0f9ff',
+            borderColor: '#3b82f6',
+            iconColor: '#3b82f6',
+            icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>'
+        },
+        {
+            keywords: ['优势', '强项', '做得好', 'strengths', '正确'],
+            title: '优势与亮点',
+            color: '#f0fff4',
+            borderColor: '#38a169',
+            iconColor: '#38a169',
+            icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>'
+        },
+        {
+            keywords: ['不足', '弱项', '问题', 'weaknesses', '错误', '需要改进'],
+            title: '需要改进的地方',
+            color: '#fff5f5',
+            borderColor: '#e53e3e',
+            iconColor: '#e53e3e',
+            icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>'
+        },
+        {
+            keywords: ['建议', '提高', '改进', '提升', 'suggestions', '学习方法'],
+            title: '学习建议',
+            color: '#ebf8ff',
+            borderColor: '#4299e1',
+            iconColor: '#4299e1',
+            icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>'
+        },
+        {
+            keywords: ['下一步', '计划', '未来', '接下来', 'next steps', '后续'],
+            title: '下一步计划',
+            color: '#faf5ff',
+            borderColor: '#805ad5',
+            iconColor: '#805ad5',
+            icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>'
+        }
+    ];
+    
+    // Split content into paragraphs
+    const paragraphs = content.split('\n\n').filter(p => p.trim());
+    
+    // Initialize sections with default "Other" section
+    const sections = [];
+    let currentSection = null;
+    
+    // Process each paragraph
+    paragraphs.forEach(paragraph => {
+        // Check if paragraph starts a new section
+        let foundSection = false;
+        
+        for (const pattern of sectionPatterns) {
+            // Check if paragraph contains any of the section keywords
+            if (pattern.keywords.some(keyword => 
+                paragraph.toLowerCase().includes(keyword.toLowerCase()) &&
+                (paragraph.length < 100 || paragraph.indexOf(keyword) < 50)
+            )) {
+                // If we already have content in the current section, add it to sections
+                if (currentSection && currentSection.content) {
+                    sections.push(currentSection);
+                }
+                
+                // Start a new section
+                currentSection = {
+                    title: pattern.title,
+                    color: pattern.color,
+                    borderColor: pattern.borderColor,
+                    iconColor: pattern.iconColor,
+                    icon: pattern.icon,
+                    content: formatParagraph(paragraph)
+                };
+                
+                foundSection = true;
+                break;
+            }
+        }
+        
+        // If not a new section, add to current section
+        if (!foundSection && currentSection) {
+            currentSection.content += formatParagraph(paragraph);
+        } else if (!foundSection && !currentSection) {
+            // If no current section, create a general section
+            currentSection = {
+                title: '评估结果',
+                color: '#f7fafc',
+                borderColor: '#718096',
+                iconColor: '#718096',
+                icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>',
+                content: formatParagraph(paragraph)
+            };
+        }
+    });
+    
+    // Add the last section if it exists
+    if (currentSection && currentSection.content) {
+        sections.push(currentSection);
+    }
+    
+    // If no sections were created, create a default one with all content
+    if (sections.length === 0) {
+        sections.push({
+            title: '评估结果',
+            color: '#f7fafc',
+            borderColor: '#718096',
+            iconColor: '#718096',
+            icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>',
+            content: formatParagraph(content)
+        });
+    }
+    
+    return sections;
+}
+
+// Helper function to format paragraphs with proper styling
+function formatParagraph(paragraph) {
+    // Format headings
+    let formatted = paragraph
+        .replace(/# (.*?)(\n|$)/g, '<h3 style="color:#2c5282;margin-top:15px;margin-bottom:10px;font-size:18px;">$1</h3>')
+        .replace(/## (.*?)(\n|$)/g, '<h4 style="color:#2b6cb0;margin-top:12px;margin-bottom:8px;font-size:16px;">$1</h4>')
+        .replace(/### (.*?)(\n|$)/g, '<h5 style="color:#3182ce;margin-top:10px;margin-bottom:6px;font-size:15px;">$1</h5>');
+    
+    // Format lists
+    formatted = formatted
+        .replace(/\n(\d+\. .*?)(?=\n\d+\. |\n\n|$)/g, '<li style="margin-bottom:8px;">$1</li>')
+        .replace(/\n- (.*?)(?=\n- |\n\n|$)/g, '<li style="margin-bottom:8px;">$1</li>');
+    
+    // Wrap lists in ul tags
+    formatted = formatted
+        .replace(/(<li.*?<\/li>)+/g, '<ul style="padding-left:20px;margin:10px 0;">$&</ul>');
+    
+    // Format bold and italic
+    formatted = formatted
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Replace newlines with <br> tags
+    formatted = formatted.replace(/\n/g, '<br>');
+    
+    // Add color highlighting for important terms
+    formatted = formatted
+        .replace(/(优势|strengths|强项)/gi, '<span style="color:#38a169;font-weight:500;">$1</span>')
+        .replace(/(不足|weaknesses|弱项|问题)/gi, '<span style="color:#e53e3e;font-weight:500;">$1</span>')
+        .replace(/(建议|suggestions|提高|改进|提升)/gi, '<span style="color:#3182ce;font-weight:500;">$1</span>')
+        .replace(/(总体评价|overall|表现)/gi, '<span style="color:#6b46c1;font-weight:500;">$1</span>');
+    
+    return formatted;
 }
 
 // Function to handle generating questions
