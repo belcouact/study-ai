@@ -3558,3 +3558,511 @@ function createChatInterface() {
         }
     });
 }
+
+// Modify the populateGradeOptions function to start with an empty option
+function populateGradeOptions(school) {
+    const gradeOptions = {
+        '小学': ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'],
+        '初中': ['初一', '初二', '初三'],
+        '高中': ['高一', '高二', '高三']
+    };
+    
+    // Get both the form and sidebar grade dropdowns
+    const gradeDropdown = document.getElementById('grade');
+    const sidebarGradeDropdown = document.getElementById('sidebar-grade');
+    
+    // Clear existing options in both dropdowns
+    if (gradeDropdown) {
+        gradeDropdown.innerHTML = '<option value="">请选择年级</option>';
+    }
+    
+    if (sidebarGradeDropdown) {
+        sidebarGradeDropdown.innerHTML = '<option value="">请选择年级</option>';
+    }
+    
+    // If no school is selected, return early
+    if (!school || school === '') {
+        return;
+    }
+    
+    // Get the options for the selected school
+    const options = gradeOptions[school] || [];
+    
+    // Add options to both dropdowns
+    options.forEach(option => {
+        if (gradeDropdown) {
+            const optElement = document.createElement('option');
+            optElement.value = option;
+            optElement.textContent = option;
+            gradeDropdown.appendChild(optElement);
+        }
+        
+        if (sidebarGradeDropdown) {
+            const sidebarOptElement = document.createElement('option');
+            sidebarOptElement.value = option;
+            sidebarOptElement.textContent = option;
+            sidebarGradeDropdown.appendChild(sidebarOptElement);
+        }
+    });
+}
+
+// Modify the populateSubjectOptions function to start with an empty option
+function populateSubjectOptions(school) {
+    const subjectOptions = {
+        '小学': ['语文', '数学', '英语', '科学', '道德与法治'],
+        '初中': ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'],
+        '高中': ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治']
+    };
+    
+    // Get both the form and sidebar subject dropdowns
+    const subjectDropdown = document.getElementById('subject');
+    const sidebarSubjectDropdown = document.getElementById('sidebar-subject');
+    
+    // Clear existing options in both dropdowns
+    if (subjectDropdown) {
+        subjectDropdown.innerHTML = '<option value="">请选择科目</option>';
+    }
+    
+    if (sidebarSubjectDropdown) {
+        sidebarSubjectDropdown.innerHTML = '<option value="">请选择科目</option>';
+    }
+    
+    // If no school is selected, return early
+    if (!school || school === '') {
+        return;
+    }
+    
+    // Get the options for the selected school
+    const options = subjectOptions[school] || [];
+    
+    // Add options to both dropdowns
+    options.forEach(option => {
+        if (subjectDropdown) {
+            const optElement = document.createElement('option');
+            optElement.value = option;
+            optElement.textContent = option;
+            subjectDropdown.appendChild(optElement);
+        }
+        
+        if (sidebarSubjectDropdown) {
+            const sidebarOptElement = document.createElement('option');
+            sidebarOptElement.value = option;
+            sidebarOptElement.textContent = option;
+            sidebarSubjectDropdown.appendChild(sidebarOptElement);
+        }
+    });
+}
+
+// Modify the initializeFormLayout function to initialize all dropdowns with empty values
+function initializeFormLayout() {
+    // ... existing code ...
+    
+    // Initialize school dropdowns with empty option
+    const schoolDropdown = document.getElementById('school');
+    const sidebarSchoolDropdown = document.getElementById('sidebar-school');
+    
+    if (schoolDropdown) {
+        // Clear existing options
+        schoolDropdown.innerHTML = '';
+        
+        // Add empty option
+        const emptyOption = document.createElement('option');
+        emptyOption.value = '';
+        emptyOption.textContent = '请选择学校类型';
+        schoolDropdown.appendChild(emptyOption);
+        
+        // Add school options
+        const schoolOptions = ['小学', '初中', '高中'];
+        schoolOptions.forEach(option => {
+            const optElement = document.createElement('option');
+            optElement.value = option;
+            optElement.textContent = option;
+            schoolDropdown.appendChild(optElement);
+        });
+    }
+    
+    if (sidebarSchoolDropdown) {
+        // Clear existing options
+        sidebarSchoolDropdown.innerHTML = '';
+        
+        // Add empty option
+        const emptyOption = document.createElement('option');
+        emptyOption.value = '';
+        emptyOption.textContent = '请选择学校类型';
+        sidebarSchoolDropdown.appendChild(emptyOption);
+        
+        // Add school options
+        const schoolOptions = ['小学', '初中', '高中'];
+        schoolOptions.forEach(option => {
+            const optElement = document.createElement('option');
+            optElement.value = option;
+            optElement.textContent = option;
+            sidebarSchoolDropdown.appendChild(optElement);
+        });
+    }
+    
+    // Initialize semester dropdown with empty option
+    const semesterDropdown = document.getElementById('semester');
+    const sidebarSemesterDropdown = document.getElementById('sidebar-semester');
+    
+    if (semesterDropdown) {
+        // Clear existing options
+        semesterDropdown.innerHTML = '';
+        
+        // Add empty option
+        const emptyOption = document.createElement('option');
+        emptyOption.value = '';
+        emptyOption.textContent = '请选择学期';
+        semesterDropdown.appendChild(emptyOption);
+        
+        // Add semester options
+        const semesterOptions = ['上学期', '下学期'];
+        semesterOptions.forEach(option => {
+            const optElement = document.createElement('option');
+            optElement.value = option;
+            optElement.textContent = option;
+            semesterDropdown.appendChild(optElement);
+        });
+    }
+    
+    if (sidebarSemesterDropdown) {
+        // Clear existing options
+        sidebarSemesterDropdown.innerHTML = '';
+        
+        // Add empty option
+        const emptyOption = document.createElement('option');
+        emptyOption.value = '';
+        emptyOption.textContent = '请选择学期';
+        sidebarSemesterDropdown.appendChild(emptyOption);
+        
+        // Add semester options
+        const semesterOptions = ['上学期', '下学期'];
+        semesterOptions.forEach(option => {
+            const optElement = document.createElement('option');
+            optElement.value = option;
+            optElement.textContent = option;
+            sidebarSemesterDropdown.appendChild(optElement);
+        });
+    }
+    
+    // Initialize difficulty dropdown with empty option
+    const difficultyDropdown = document.getElementById('difficulty');
+    const sidebarDifficultyDropdown = document.getElementById('sidebar-difficulty');
+    
+    if (difficultyDropdown) {
+        // Clear existing options
+        difficultyDropdown.innerHTML = '';
+        
+        // Add empty option
+        const emptyOption = document.createElement('option');
+        emptyOption.value = '';
+        emptyOption.textContent = '请选择难度';
+        difficultyDropdown.appendChild(emptyOption);
+        
+        // Add difficulty options
+        const difficultyOptions = ['简单', '中等', '困难'];
+        difficultyOptions.forEach(option => {
+            const optElement = document.createElement('option');
+            optElement.value = option;
+            optElement.textContent = option;
+            difficultyDropdown.appendChild(optElement);
+        });
+    }
+    
+    if (sidebarDifficultyDropdown) {
+        // Clear existing options
+        sidebarDifficultyDropdown.innerHTML = '';
+        
+        // Add empty option
+        const emptyOption = document.createElement('option');
+        emptyOption.value = '';
+        emptyOption.textContent = '请选择难度';
+        sidebarDifficultyDropdown.appendChild(emptyOption);
+        
+        // Add difficulty options
+        const difficultyOptions = ['简单', '中等', '困难'];
+        difficultyOptions.forEach(option => {
+            const optElement = document.createElement('option');
+            optElement.value = option;
+            optElement.textContent = option;
+            sidebarDifficultyDropdown.appendChild(optElement);
+        });
+    }
+    
+    // Initialize count dropdown with empty option
+    const countDropdown = document.getElementById('count');
+    const sidebarCountDropdown = document.getElementById('sidebar-count');
+    
+    if (countDropdown) {
+        // Clear existing options
+        countDropdown.innerHTML = '';
+        
+        // Add empty option
+        const emptyOption = document.createElement('option');
+        emptyOption.value = '';
+        emptyOption.textContent = '请选择题目数量';
+        countDropdown.appendChild(emptyOption);
+        
+        // Add count options
+        const countOptions = ['5', '10', '15', '20'];
+        countOptions.forEach(option => {
+            const optElement = document.createElement('option');
+            optElement.value = option;
+            optElement.textContent = option + '题';
+            countDropdown.appendChild(optElement);
+        });
+    }
+    
+    if (sidebarCountDropdown) {
+        // Clear existing options
+        sidebarCountDropdown.innerHTML = '';
+        
+        // Add empty option
+        const emptyOption = document.createElement('option');
+        emptyOption.value = '';
+        emptyOption.textContent = '请选择题目数量';
+        sidebarCountDropdown.appendChild(emptyOption);
+        
+        // Add count options
+        const countOptions = ['5', '10', '15', '20'];
+        countOptions.forEach(option => {
+            const optElement = document.createElement('option');
+            optElement.value = option;
+            optElement.textContent = option + '题';
+            sidebarCountDropdown.appendChild(optElement);
+        });
+    }
+    
+    // Initialize grade and subject dropdowns with empty options
+    populateGradeOptions('');
+    populateSubjectOptions('');
+    
+    // Add event listeners for school dropdowns to update grade and subject options
+    if (schoolDropdown) {
+        schoolDropdown.addEventListener('change', function() {
+            const selectedSchool = this.value;
+            populateGradeOptions(selectedSchool);
+            populateSubjectOptions(selectedSchool);
+            
+            // Sync with sidebar dropdown
+            if (sidebarSchoolDropdown && sidebarSchoolDropdown.value !== selectedSchool) {
+                sidebarSchoolDropdown.value = selectedSchool;
+            }
+        });
+    }
+    
+    if (sidebarSchoolDropdown) {
+        sidebarSchoolDropdown.addEventListener('change', function() {
+            const selectedSchool = this.value;
+            populateGradeOptions(selectedSchool);
+            populateSubjectOptions(selectedSchool);
+            
+            // Sync with main form dropdown
+            if (schoolDropdown && schoolDropdown.value !== selectedSchool) {
+                schoolDropdown.value = selectedSchool;
+            }
+        });
+    }
+    
+    // ... rest of existing code ...
+}
+
+// Modify the setupChatButtons function to prevent multiple event listeners and submissions
+function setupChatButtons() {
+    console.log('Setting up chat buttons');
+    
+    // First, ensure the chat interface exists
+    createChatInterface();
+    
+    // Now get the chat input and response area
+    const chatInput = document.getElementById('chat-input');
+    const chatResponse = document.getElementById('chat-response');
+    
+    if (!chatInput || !chatResponse) {
+        console.error('Chat input or response area not found even after creation');
+        return;
+    }
+    
+    // Set up optimize button - remove any existing listeners first
+    const optimizeButton = document.getElementById('optimize-button');
+    if (optimizeButton) {
+        // Remove existing event listeners by cloning and replacing the button
+        const newOptimizeButton = optimizeButton.cloneNode(true);
+        optimizeButton.parentNode.replaceChild(newOptimizeButton, optimizeButton);
+        
+        // Add the event listener to the new button
+        newOptimizeButton.addEventListener('click', function() {
+            // Prevent multiple clicks
+            if (newOptimizeButton.disabled) return;
+            
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+                return;
+            }
+            
+            // Show loading state
+            newOptimizeButton.disabled = true;
+            newOptimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
+            
+            // Prepare the prompt for optimization
+            const prompt = `请优化以下问题，使其更清晰、更有教育价值：
+            
+问题：${questionText}
+
+请返回优化后的问题，保持原始意图但使其更加清晰、准确和有教育意义。`;
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the optimized question
+                    const optimizedContent = extractContentFromResponse(response);
+                    
+                    // Update the chat input with the optimized question
+                    chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
+                    
+                    // Focus the input and move cursor to end
+                    chatInput.focus();
+                    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+                    
+                    // Show success message
+                    showSystemMessage('问题已成功优化！', 'success');
+                })
+                .catch(error => {
+                    console.error('Error optimizing question:', error);
+                    showSystemMessage('优化问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    newOptimizeButton.disabled = false;
+                    newOptimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+                });
+        });
+    }
+    
+    // Set up submit button - remove any existing listeners first
+    const submitButton = document.getElementById('submit-button');
+    if (submitButton) {
+        // Remove existing event listeners by cloning and replacing the button
+        const newSubmitButton = submitButton.cloneNode(true);
+        submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
+        
+        // Add a processing flag to the button
+        newSubmitButton.setAttribute('data-processing', 'false');
+        
+        // Add the event listener to the new button
+        newSubmitButton.addEventListener('click', function() {
+            // Check if already processing a request
+            if (newSubmitButton.getAttribute('data-processing') === 'true' || newSubmitButton.disabled) {
+                console.log('Already processing a request, ignoring click');
+                return;
+            }
+            
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+                return;
+            }
+            
+            // Set processing flag
+            newSubmitButton.setAttribute('data-processing', 'true');
+            
+            // Show loading state
+            newSubmitButton.disabled = true;
+            newSubmitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+            chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
+            
+            // Prepare the prompt for the AI
+            const prompt = `请回答以下问题，提供详细且教育性的解答：
+            
+${questionText}
+
+请提供清晰、准确、有教育意义的回答，如果涉及数学或科学概念，请确保解释清楚。`;
+            
+            // Call the API - use a single call with proper error handling
+            console.log('Sending API request for question:', questionText);
+            
+            fetchAIResponse(prompt)
+                .then(response => {
+                    console.log('Received API response for question');
+                    
+                    // Extract the AI response
+                    const aiResponse = extractContentFromResponse(response);
+                    
+                    // Format the response with MathJax
+                    const formattedResponse = formatMathExpressions(aiResponse);
+                    
+                    // Display the response
+                    chatResponse.innerHTML = `
+                        <div class="response-header">
+                            <i class="fas fa-robot"></i> AI 助手回答
+                        </div>
+                        <div class="response-content">
+                            ${formattedResponse}
+                        </div>
+                    `;
+                    
+                    // Render MathJax in the response
+                    if (window.MathJax) {
+                        MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
+                    }
+                    
+                    // Clear the input after successful submission
+                    chatInput.value = '';
+                })
+                .catch(error => {
+                    console.error('Error submitting question:', error);
+                    chatResponse.innerHTML = `
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            抱歉，处理您的问题时出现了错误。请重试。
+                        </div>
+                    `;
+                    showSystemMessage('提交问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state and processing flag
+                    newSubmitButton.disabled = false;
+                    newSubmitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
+                    newSubmitButton.setAttribute('data-processing', 'false');
+                    console.log('Request processing completed');
+                });
+        });
+    }
+}
+
+// Modify the createChatInterface function to ensure it's only created once
+function createChatInterface() {
+    const qaContainer = document.getElementById('qa-container');
+    if (!qaContainer) {
+        console.error('QA container not found');
+        return;
+    }
+    
+    // Check if the chat interface already exists
+    if (document.getElementById('chat-interface')) {
+        console.log('Chat interface already exists, not creating again');
+        return; // Already exists, no need to create it
+    }
+    
+    console.log('Creating new chat interface');
+    
+    // Create the chat interface
+    // ... rest of existing code ...
+}
+
+// Modify the document ready handler to only set up chat buttons once
+// Replace or add this at the end of the file
+const chatButtonsInitialized = false;
+document.addEventListener('DOMContentLoaded', function() {
+    // Only set up chat buttons once
+    if (!window.chatButtonsInitialized) {
+        console.log('Initializing chat buttons on DOMContentLoaded');
+        setTimeout(function() {
+            setupChatButtons();
+            window.chatButtonsInitialized = true;
+        }, 300);
+    }
+});
