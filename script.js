@@ -3049,10 +3049,9 @@ function setupChatButtons() {
                 return;
             }
             
-            // Get selected school and grade from sidebar
+            // Get selected school and grade from sidebar (ignore subject)
             const selectedSchool = document.getElementById('sidebar-school')?.value || '';
             const selectedGrade = document.getElementById('sidebar-grade')?.value || '';
-            const selectedSubject = document.getElementById('sidebar-subject')?.value || '';
             
             // Show loading state
             optimizeButton.disabled = true;
@@ -3063,8 +3062,8 @@ function setupChatButtons() {
             
 问题：${questionText}`;
 
-            // Add educational context if available
-            if (selectedSchool || selectedGrade || selectedSubject) {
+            // Add educational context if available - focus on school and grade only
+            if (selectedSchool || selectedGrade) {
                 prompt += `\n\n教育背景：`;
                 
                 if (selectedSchool) {
@@ -3075,11 +3074,16 @@ function setupChatButtons() {
                     prompt += `\n- 年级：${selectedGrade}`;
                 }
                 
-                if (selectedSubject) {
-                    prompt += `\n- 科目：${selectedSubject}`;
+                // Add specific guidance based on school level
+                if (selectedSchool === '小学') {
+                    prompt += `\n\n请根据上述教育背景，优化问题使其更适合${selectedGrade}学生的理解水平。使用简单、直观的语言，避免抽象概念，增加趣味性和生活化的元素。`;
+                } else if (selectedSchool === '初中') {
+                    prompt += `\n\n请根据上述教育背景，优化问题使其更适合${selectedGrade}学生的理解水平。使用清晰但稍有挑战性的语言，可以适当引入抽象概念，但需要配合具体例子。`;
+                } else if (selectedSchool === '高中') {
+                    prompt += `\n\n请根据上述教育背景，优化问题使其更适合${selectedGrade}学生的理解水平。使用准确、规范的学科语言，可以使用较为抽象的概念和复杂的推理。`;
+                } else {
+                    prompt += `\n\n请根据上述教育背景，优化问题使其更适合该年级学生的理解水平和学习需求。`;
                 }
-                
-                prompt += `\n\n请根据上述教育背景，优化问题使其更适合该年级学生的理解水平和学习需求。`;
             } else {
                 prompt += `\n\n请保持原始意图但使其更加清晰、准确和有教育意义。`;
             }
@@ -3097,8 +3101,12 @@ function setupChatButtons() {
                     chatInput.focus();
                     chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
                     
-                    // Show success message
-                    showSystemMessage('问题已成功优化！', 'success');
+                    // Show success message with educational context if available
+                    if (selectedSchool && selectedGrade) {
+                        showSystemMessage(`问题已根据${selectedSchool}${selectedGrade}教学要求成功优化！`, 'success');
+                    } else {
+                        showSystemMessage('问题已成功优化！', 'success');
+                    }
                 })
                 .catch(error => {
                     console.error('Error optimizing question:', error);
@@ -3123,10 +3131,9 @@ function setupChatButtons() {
                 return;
             }
             
-            // Get selected school and grade from sidebar
+            // Get selected school and grade from sidebar (ignore subject)
             const selectedSchool = document.getElementById('sidebar-school')?.value || '';
             const selectedGrade = document.getElementById('sidebar-grade')?.value || '';
-            const selectedSubject = document.getElementById('sidebar-subject')?.value || '';
             
             // Show loading state
             submitButton.disabled = true;
@@ -3138,7 +3145,7 @@ function setupChatButtons() {
             
 ${questionText}`;
 
-            // Add educational context if available
+            // Add educational context if available - focus on school and grade only
             if (selectedSchool || selectedGrade) {
                 prompt += `\n\n教育背景：`;
                 
@@ -3149,8 +3156,32 @@ ${questionText}`;
                 if (selectedGrade) {
                     prompt += `\n- 年级：${selectedGrade}`;
                 }
-
-                prompt += `\n\n请根据上述教育背景，提供适合该年级学生理解水平的回答。解释应该清晰易懂，使用适合该年级学生的语言和概念。`;
+                
+                // Add specific guidance based on school level
+                if (selectedSchool === '小学') {
+                    prompt += `\n\n请根据上述教育背景，提供适合${selectedGrade}学生理解水平的回答。解释应该：
+1. 使用简单、直观的语言
+2. 避免复杂的术语和抽象概念
+3. 使用具体的例子和生活化的比喻
+4. 分步骤解释，每一步都要清晰明了
+5. 增加趣味性和鼓励性的内容`;
+                } else if (selectedSchool === '初中') {
+                    prompt += `\n\n请根据上述教育背景，提供适合${selectedGrade}学生理解水平的回答。解释应该：
+1. 使用清晰但稍有挑战性的语言
+2. 可以引入基础学科术语，但需要解释
+3. 结合具体例子和适当的抽象概念
+4. 强调思维方法和解题思路
+5. 鼓励批判性思考和自主探索`;
+                } else if (selectedSchool === '高中') {
+                    prompt += `\n\n请根据上述教育背景，提供适合${selectedGrade}学生理解水平的回答。解释应该：
+1. 使用准确、规范的学科语言
+2. 可以使用专业术语和抽象概念
+3. 深入分析问题的本质和解决方法
+4. 强调知识点之间的联系和系统性
+5. 提供与升学考试相关的解题技巧和方法`;
+                } else {
+                    prompt += `\n\n请根据上述教育背景，提供适合该年级学生理解水平的回答。解释应该清晰易懂，使用适合该年级学生的语言和概念。`;
+                }
             } else {
                 prompt += `\n\n请提供清晰、准确、有教育意义的回答，如果涉及数学或科学概念，请确保解释清楚。`;
             }
@@ -3166,11 +3197,10 @@ ${questionText}`;
                     
                     // Display the response with educational context
                     let contextHeader = '';
-                    if (selectedSchool || selectedGrade || selectedSubject) {
+                    if (selectedSchool || selectedGrade) {
                         const contextParts = [];
                         if (selectedSchool) contextParts.push(selectedSchool);
                         if (selectedGrade) contextParts.push(selectedGrade);
-                        if (selectedSubject) contextParts.push(selectedSubject);
                         
                         contextHeader = `
                             <div class="context-header">
@@ -3199,7 +3229,7 @@ ${questionText}`;
                     chatResponse.innerHTML = `
                         <div class="error-message">
                             <i class="fas fa-exclamation-circle"></i>
-                            抱歉，处理您的问题时出现了错误。请重试。
+                            抱歉，处理您的问题时出错。请重试。
                         </div>
                     `;
                     showSystemMessage('提交问题时出错，请重试。', 'error');
