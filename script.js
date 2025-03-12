@@ -34,7 +34,7 @@
                 
                 // Set appropriate text based on dropdown type
                 if (dropdown.id.includes('school')) {
-                    emptyOption.textContent = '请选择学校类型';
+                    emptyOption.textContent = '请选择学校';
                 } else if (dropdown.id.includes('grade')) {
                     emptyOption.textContent = '请选择年级';
                 } else if (dropdown.id.includes('subject')) {
@@ -44,7 +44,7 @@
                 } else if (dropdown.id.includes('difficulty')) {
                     emptyOption.textContent = '请选择难度';
                 } else if (dropdown.id.includes('count')) {
-                    emptyOption.textContent = '请选择题目数量';
+                    emptyOption.textContent = '请选择题数';
                 }
                 
                 // Insert at the beginning
@@ -4056,7 +4056,7 @@ function initializeDropdownsWithEmptyValues() {
     // Initialize school dropdowns
     schoolDropdowns.forEach(dropdown => {
         if (dropdown) {
-            dropdown.innerHTML = '<option value="">请选择学校类型</option>';
+            dropdown.innerHTML = '<option value="">请选择学校</option>';
             
             const schoolOptions = ['小学', '初中', '高中'];
             schoolOptions.forEach(option => {
@@ -4128,7 +4128,7 @@ function initializeDropdownsWithEmptyValues() {
     // Initialize count dropdowns
     countDropdowns.forEach(dropdown => {
         if (dropdown) {
-            dropdown.innerHTML = '<option value="">请选择题目数量</option>';
+            dropdown.innerHTML = '<option value="">请选择题数</option>';
             
             const countOptions = ['5', '10', '15', '20'];
             countOptions.forEach(option => {
