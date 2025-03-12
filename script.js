@@ -2442,6 +2442,204 @@ function initializeFormLayout() {
         form.insertBefore(dropdownContainer, form.firstChild);
         formContainer.parentNode.insertBefore(buttonContainer, formContainer.nextSibling);
     }
+    
+    // Set up event listeners for the sidebar toggle
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            const leftPanel = document.querySelector('.left-panel');
+            const contentArea = document.querySelector('.content-area');
+            
+            leftPanel.classList.toggle('hidden');
+            contentArea.classList.toggle('full-width');
+            sidebarToggle.classList.toggle('collapsed');
+            
+            // Change the icon direction
+            const icon = sidebarToggle.querySelector('i');
+            if (icon) {
+                if (leftPanel.classList.contains('hidden')) {
+                    icon.className = 'fas fa-chevron-right';
+                } else {
+                    icon.className = 'fas fa-chevron-left';
+                }
+            }
+        });
+    }
+    
+    // Set up event listeners for tab buttons
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    
+    if (qaButton && createButton && qaContainer && createContainer) {
+        qaButton.addEventListener('click', function() {
+            qaButton.classList.add('active');
+            createButton.classList.remove('active');
+            qaContainer.style.display = 'block';
+            createContainer.style.display = 'none';
+        });
+        
+        createButton.addEventListener('click', function() {
+            createButton.classList.add('active');
+            qaButton.classList.remove('active');
+            createContainer.style.display = 'block';
+            qaContainer.style.display = 'none';
+        });
+    }
+    
+    // Set up event listeners for the sidebar generate button
+    const sidebarGenerateButton = document.getElementById('sidebar-generate-button');
+    if (sidebarGenerateButton) {
+        sidebarGenerateButton.addEventListener('click', function() {
+            // If not already on the test tab, switch to it
+            if (createButton && !createButton.classList.contains('active')) {
+                createButton.click();
+            }
+            
+            // Call the generate questions function
+            handleGenerateQuestionsClick();
+        });
+    }
+    
+    // Add event listeners for the optimize and submit buttons
+    setupOptimizeAndSubmitButtons();
+}
+
+// Function to set up optimize and submit buttons
+function setupOptimizeAndSubmitButtons() {
+    // Set up event listener for optimize button
+    const optimizeButton = document.getElementById('optimize-button');
+    if (optimizeButton) {
+        optimizeButton.addEventListener('click', function() {
+            const currentQuestion = questions[currentQuestionIndex];
+            if (!currentQuestion) return;
+            
+            // Show loading state
+            optimizeButton.disabled = true;
+            optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
+            
+            // Prepare the prompt for optimization
+            const prompt = `请优化以下问题，使其更清晰、更有教育价值，并确保答案和解析准确：
+            
+问题：${currentQuestion.question}
+选项：
+A. ${currentQuestion.choices[0]}
+B. ${currentQuestion.choices[1]}
+C. ${currentQuestion.choices[2]}
+D. ${currentQuestion.choices[3]}
+答案：${currentQuestion.answer}
+解析：${currentQuestion.explanation}
+
+请返回优化后的问题、选项、答案和解析，格式如下：
+问题：[优化后的问题]
+选项：
+A. [选项A]
+B. [选项B]
+C. [选项C]
+D. [选项D]
+答案：[答案]
+解析：[解析]`;
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the optimized question
+                    const optimizedContent = extractContentFromResponse(response);
+                    
+                    // Parse the optimized question
+                    const optimizedQuestion = parseOptimizedQuestion(optimizedContent);
+                    
+                    if (optimizedQuestion) {
+                        // Update the current question with optimized content
+                        questions[currentQuestionIndex] = {
+                            ...questions[currentQuestionIndex],
+                            ...optimizedQuestion
+                        };
+                        
+                        // Display the updated question
+                        displayCurrentQuestion();
+                        
+                        // Show success message
+                        showSystemMessage('问题已成功优化！', 'success');
+                    } else {
+                        showSystemMessage('无法解析优化后的问题，请重试。', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error optimizing question:', error);
+                    showSystemMessage('优化问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    optimizeButton.disabled = false;
+                    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+                });
+        });
+    }
+    
+    // Set up event listener for submit button
+    const submitButton = document.getElementById('submit-button');
+    if (submitButton) {
+        submitButton.addEventListener('click', function() {
+            const selectedChoice = document.querySelector('.choice-cell.selected');
+            if (selectedChoice) {
+                const selectedValue = selectedChoice.getAttribute('data-value');
+                displayAnswer(selectedValue);
+                
+                // Disable the submit button after submission
+                submitButton.disabled = true;
+                submitButton.classList.add('disabled');
+            } else {
+                showSystemMessage('请先选择一个答案', 'warning');
+            }
+        });
+    }
+}
+
+// Helper function to parse optimized question from AI response
+function parseOptimizedQuestion(content) {
+    try {
+        const questionMatch = content.match(/问题：([\s\S]*?)(?=选项：|$)/);
+        const optionsMatch = content.match(/选项：\s*([\s\S]*?)(?=答案：|$)/);
+        const answerMatch = content.match(/答案：([\s\S]*?)(?=解析：|$)/);
+        const explanationMatch = content.match(/解析：([\s\S]*?)(?=$)/);
+        
+        if (!questionMatch || !optionsMatch || !answerMatch || !explanationMatch) {
+            return null;
+        }
+        
+        const question = questionMatch[1].trim();
+        
+        // Parse options
+        const optionsText = optionsMatch[1].trim();
+        const optionLines = optionsText.split('\n');
+        const choices = [];
+        
+        for (const line of optionLines) {
+            const match = line.match(/[A-D]\.\s*(.*)/);
+            if (match) {
+                choices.push(match[1].trim());
+            }
+        }
+        
+        if (choices.length !== 4) {
+            return null;
+        }
+        
+        const answer = answerMatch[1].trim();
+        const explanation = explanationMatch[1].trim();
+        
+        return {
+            question,
+            choices,
+            answer,
+            explanation
+        };
+    } catch (error) {
+        console.error('Error parsing optimized question:', error);
+        return null;
+    }
 }
 
 // Function to populate grade options based on selected school
