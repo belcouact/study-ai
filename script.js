@@ -1862,61 +1862,90 @@ function formatParagraph(paragraph) {
 
 // Function to handle generating questions
 function handleGenerateQuestionsClick() {
-    console.log('handleGenerateQuestionsClick called');
+    console.log('Generate questions button clicked');
     
     // Get form elements from sidebar
-    const schoolSelect = document.getElementById('school-select-sidebar');
-    const gradeSelect = document.getElementById('grade-select-sidebar');
-    const semesterSelect = document.getElementById('semester-select-sidebar');
-    const subjectSelect = document.getElementById('subject-select-sidebar');
-    const difficultySelect = document.getElementById('difficulty-select-sidebar');
-    const questionCountSelect = document.getElementById('question-count-select-sidebar');
-    const generateQuestionsButton = document.querySelector('.sidebar-generate-button');
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    const emptyState = document.getElementById('empty-state');
+    const schoolDropdown = document.getElementById('sidebar-school');
+    const gradeDropdown = document.getElementById('sidebar-grade');
+    const semesterDropdown = document.getElementById('sidebar-semester');
+    const subjectDropdown = document.getElementById('sidebar-subject');
+    const difficultyDropdown = document.getElementById('sidebar-difficulty');
+    const countDropdown = document.getElementById('sidebar-count');
     
-    if (!schoolSelect || !gradeSelect || !semesterSelect || !subjectSelect || 
-        !difficultySelect || !questionCountSelect || !generateQuestionsButton) {
-        console.error('One or more form elements not found');
-        return;
-    }
+    // Validate all dropdowns are filled
+    const dropdowns = [
+        { element: schoolDropdown, name: '学校类型' },
+        { element: gradeDropdown, name: '年级' },
+        { element: semesterDropdown, name: '学期' },
+        { element: subjectDropdown, name: '科目' },
+        { element: difficultyDropdown, name: '难度' },
+        { element: countDropdown, name: '题目数量' }
+    ];
     
-    // Only show loading state if we're on the test page
-    const isTestPage = document.getElementById('create-container').classList.contains('active') || 
-                      !document.getElementById('create-container').classList.contains('hidden');
-    
-    if (isTestPage) {
-    // Show loading state on button
-    generateQuestionsButton.textContent = '生成中...';
-    generateQuestionsButton.disabled = true;
-    
-        // Hide empty state if it exists
-        if (emptyState) {
-            emptyState.classList.add('hidden');
+    // Check each dropdown
+    for (const dropdown of dropdowns) {
+        if (!dropdown.element || !dropdown.element.value) {
+            showSystemMessage(`请选择${dropdown.name}`, 'warning');
+            
+            // Highlight the empty dropdown
+            if (dropdown.element) {
+                // Add a red border to highlight the empty dropdown
+                dropdown.element.style.border = '2px solid #e53e3e';
+                
+                // Remove the highlight after 3 seconds
+                setTimeout(() => {
+                    dropdown.element.style.border = '';
+                }, 3000);
+                
+                // Focus on the empty dropdown
+                dropdown.element.focus();
+            }
+            
+            return; // Stop execution if any dropdown is empty
         }
-        
-        // Show loading indicator on the test page
-        showLoadingIndicator();
     }
     
-    // Collect form data from sidebar
-    const schoolType = schoolSelect.value;
-    const grade = gradeSelect.value;
-    const semester = semesterSelect.value;
-    const subject = subjectSelect.value;
-    const difficulty = difficultySelect.value;
-    const questionCount = questionCountSelect.value;
+    // If we get here, all dropdowns are filled
     
-    console.log('Form data collected:', { schoolType, grade, semester, subject, difficulty, questionCount });
+    // Get the create container and questions display container
+    const createContainer = document.getElementById('create-container');
+    let questionsDisplayContainer = document.querySelector('.questions-display-container');
     
-    // Create prompt for API
-    const prompt = `请生成${questionCount}道${schoolType}${grade}${semester}${subject}的${difficulty}难度选择题，每道题包括题目、四个选项(A、B、C、D)、答案和详细解析。严格的格式要求：
-每道题必须包含以下六个部分，缺一不可：
-1. "题目："后接具体题目
-2. "A."后接选项A的内容
-3. "B."后接选项B的内容
-4. "C."后接选项C的内容
-5. "D."后接选项D的内容
+    // Create the questions display container if it doesn't exist
+    if (!questionsDisplayContainer && createContainer) {
+        questionsDisplayContainer = document.createElement('div');
+        questionsDisplayContainer.className = 'questions-display-container';
+        createContainer.appendChild(questionsDisplayContainer);
+    }
+    
+    // Show loading indicator
+    showLoadingIndicator();
+    
+    // Hide empty state if it exists
+    const emptyState = document.querySelector('.empty-state');
+    if (emptyState) {
+        emptyState.classList.add('hidden');
+    }
+    
+    // Get form data
+    const school = schoolDropdown ? schoolDropdown.value : '';
+    const grade = gradeDropdown ? gradeDropdown.value : '';
+    const semester = semesterDropdown ? semesterDropdown.value : '';
+    const subject = subjectDropdown ? subjectDropdown.value : '';
+    const difficulty = difficultyDropdown ? difficultyDropdown.value : '';
+    const count = countDropdown ? countDropdown.value : '5';
+    
+    console.log(`Generating questions for ${school} ${grade} ${semester} ${subject}, difficulty: ${difficulty}, count: ${count}`);
+    
+    // Prepare the prompt
+    const prompt = `请为${school}${grade}${semester}${subject}生成${count}道${difficulty}难度的选择题，每道题有4个选项(A,B,C,D)，并且只有一个正确答案。
+
+题目格式要求：
+1. 每道题必须包含题目、4个选项、答案和详细解析
+2. 题目必须按顺序编号
+3. 选项必须使用A、B、C、D标记
+4. 每道题的答案必须是A、B、C、D中的一个
+5. 每道题必须有详细解析
 6. "答案："后接正确选项（必须是A、B、C、D其中之一）
 7. "解析："后必须包含完整的解析（至少50字）
 
@@ -1930,7 +1959,7 @@ function handleGenerateQuestionsClick() {
 
 示例格式：
 题目：[题目内容]
-A. [选项A内容]
+A. [选项A内容] 
 B. [选项B内容]
 C. [选项C内容]
 D. [选项D内容]
@@ -1945,7 +1974,7 @@ D. [选项D内容]
 5. 解析必须详尽，有教育意义
 6. 不出带图形的题目
 `;
-
+    
     // Call API to generate questions
     fetchAIResponse(prompt)
         .then(response => {
@@ -1957,135 +1986,56 @@ D. [选项D内容]
                 
                 // Parse the response
                 const parsedQuestions = parseQuestionsFromResponse(response);
-                console.log('Parsed questions:', parsedQuestions);
                 
-                if (parsedQuestions.length === 0) {
-                    throw new Error('No questions could be parsed from the response');
-                }
-                
-                // Make variables globally available
-                window.questions = parsedQuestions;
-                window.userAnswers = Array(parsedQuestions.length).fill(null);
-                window.currentQuestionIndex = 0;
-                
-                // Ensure the questions display container exists and is visible
-                if (!questionsDisplayContainer) {
-                    console.error('Questions display container not found, creating one');
-                    const newContainer = document.createElement('div');
-                    newContainer.id = 'questions-display-container';
-                    newContainer.className = 'questions-display-container';
+                if (parsedQuestions.length > 0) {
+                    // Store the questions globally
+                    window.questions = parsedQuestions;
+                    window.currentQuestionIndex = 0;
                     
-                    // Create required elements inside the container
-                    newContainer.innerHTML = `
-                        <div id="question-counter" class="question-counter"></div>
-                        <div id="question-text" class="question-text"></div>
-                        <div id="choices-container" class="choices-container"></div>
-                        <div id="answer-container" class="answer-container hidden">
-                            <div id="answer-result" class="answer-result"></div>
-                            <div id="answer-explanation" class="answer-explanation"></div>
-                        </div>
-                    `;
+                    // Display the first question
+                    displayCurrentQuestion();
                     
-                    // Add to the create container
-                    const createContainer = document.getElementById('create-container');
-                    if (createContainer) {
-                        createContainer.insertBefore(newContainer, createContainer.firstChild);
-                    }
-                }
-                
-                // Get a fresh reference to the questions display container
-                const questionsContainer = document.getElementById('questions-display-container');
-                
-                // Hide empty state if it exists
-                if (emptyState) {
-                    emptyState.classList.add('hidden');
-                    console.log('Empty state hidden');
-                }
-                
-                // Make sure the questions display container is visible
-                if (questionsContainer) {
-                    questionsContainer.classList.remove('hidden');
-                    console.log('Questions display container shown');
+                    // Set up navigation buttons
+                    setupNavigationButtons();
                     
-                    // Ensure the container has the necessary child elements
-                    if (!document.getElementById('question-counter')) {
-                        const counterDiv = document.createElement('div');
-                        counterDiv.id = 'question-counter';
-                        counterDiv.className = 'question-counter';
-                        questionsContainer.appendChild(counterDiv);
+                    // Hide empty state if it exists
+                    if (emptyState) {
+                        emptyState.classList.add('hidden');
                     }
                     
-                    if (!document.getElementById('question-text')) {
-                        const textDiv = document.createElement('div');
-                        textDiv.id = 'question-text';
-                        textDiv.className = 'question-text';
-                        questionsContainer.appendChild(textDiv);
-                    }
-                    
-                    if (!document.getElementById('choices-container')) {
-                        const choicesDiv = document.createElement('div');
-                        choicesDiv.id = 'choices-container';
-                        choicesDiv.className = 'choices-container';
-                        questionsContainer.appendChild(choicesDiv);
-                    }
-                    
-                    if (!document.getElementById('answer-container')) {
-                        const answerDiv = document.createElement('div');
-                        answerDiv.id = 'answer-container';
-                        answerDiv.className = 'answer-container hidden';
-                        answerDiv.innerHTML = `
-                            <div id="answer-result" class="answer-result"></div>
-                            <div id="answer-explanation" class="answer-explanation"></div>
-                        `;
-                        questionsContainer.appendChild(answerDiv);
-                    }
+                    // Show success message
+                    showSystemMessage(`成功生成了 ${parsedQuestions.length} 道题目`, 'success');
                 } else {
-                    console.error('Questions display container still not found after creation attempt');
+                    // Show error message
+                    showSystemMessage('无法解析生成的题目，请重试', 'error');
+                    
+                    // Show empty state
+                    initializeEmptyState();
                 }
-                
-                // Display the first question
-                displayCurrentQuestion();
-                updateNavigationButtons();
-                
-                // Set up navigation button event listeners
-                setupNavigationButtons();
-                
-                // Show success message
-                showSystemMessage(`已生成 ${parsedQuestions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`, 'success');
             } catch (error) {
                 console.error('Error processing questions:', error);
-                showSystemMessage('生成题目时出错，请重试', 'error');
+                
+                // Hide loading indicator
                 hideLoadingIndicator();
                 
-                // Show empty state again if there was an error
-                if (emptyState && questionsDisplayContainer) {
-                    emptyState.classList.remove('hidden');
-                    questionsDisplayContainer.classList.remove('hidden');
-                }
-            } finally {
-                // Reset button state
-                if (isTestPage) {
-                generateQuestionsButton.textContent = '出题';
-                generateQuestionsButton.disabled = false;
-                }
+                // Show error message
+                showSystemMessage('处理题目时出错，请重试', 'error');
+                
+                // Show empty state
+                initializeEmptyState();
             }
         })
         .catch(error => {
-            console.error('API error:', error);
-            showSystemMessage('API调用失败，请重试', 'error');
+            console.error('Error generating questions:', error);
+            
+            // Hide loading indicator
             hideLoadingIndicator();
             
-            // Show empty state again if there was an error
-            if (emptyState && questionsDisplayContainer) {
-                emptyState.classList.remove('hidden');
-                questionsDisplayContainer.classList.remove('hidden');
-            }
+            // Show error message
+            showSystemMessage('生成题目时出错，请重试', 'error');
             
-            // Reset button state
-            if (isTestPage) {
-            generateQuestionsButton.textContent = '出题';
-            generateQuestionsButton.disabled = false;
-            }
+            // Show empty state
+            initializeEmptyState();
         });
 }
 
@@ -3455,19 +3405,43 @@ function setupChatButtons() {
             
             if (!questionText) {
                 showSystemMessage('请先输入问题内容', 'warning');
-            return;
-        }
-        
+                return;
+            }
+            
+            // Get selected school and grade from sidebar
+            const selectedSchool = document.getElementById('sidebar-school')?.value || '';
+            const selectedGrade = document.getElementById('sidebar-grade')?.value || '';
+            const selectedSubject = document.getElementById('sidebar-subject')?.value || '';
+            
             // Show loading state
             optimizeButton.disabled = true;
             optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
             
-            // Prepare the prompt for optimization
-            const prompt = `请优化以下问题，使其更清晰、更有教育价值：
+            // Prepare the prompt for optimization with educational context
+            let prompt = `请优化以下问题，使其更清晰、更有教育价值：
             
-问题：${questionText}
+问题：${questionText}`;
 
-请返回优化后的问题，保持原始意图但使其更加清晰、准确和有教育意义。`;
+            // Add educational context if available
+            if (selectedSchool || selectedGrade || selectedSubject) {
+                prompt += `\n\n教育背景：`;
+                
+                if (selectedSchool) {
+                    prompt += `\n- 学校类型：${selectedSchool}`;
+                }
+                
+                if (selectedGrade) {
+                    prompt += `\n- 年级：${selectedGrade}`;
+                }
+                
+                if (selectedSubject) {
+                    prompt += `\n- 科目：${selectedSubject}`;
+                }
+                
+                prompt += `\n\n请根据上述教育背景，优化问题使其更适合该年级学生的理解水平和学习需求。`;
+            } else {
+                prompt += `\n\n请保持原始意图但使其更加清晰、准确和有教育意义。`;
+            }
             
             // Call the API
             fetchAIResponse(prompt)
@@ -3481,12 +3455,12 @@ function setupChatButtons() {
                     // Focus the input and move cursor to end
                     chatInput.focus();
                     chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
-            
-            // Show success message
+                    
+                    // Show success message
                     showSystemMessage('问题已成功优化！', 'success');
                 })
                 .catch(error => {
-            console.error('Error optimizing question:', error);
+                    console.error('Error optimizing question:', error);
                     showSystemMessage('优化问题时出错，请重试。', 'error');
                 })
                 .finally(() => {
@@ -3505,20 +3479,44 @@ function setupChatButtons() {
             
             if (!questionText) {
                 showSystemMessage('请先输入问题内容', 'warning');
-            return;
-        }
-        
+                return;
+            }
+            
+            // Get selected school and grade from sidebar
+            const selectedSchool = document.getElementById('sidebar-school')?.value || '';
+            const selectedGrade = document.getElementById('sidebar-grade')?.value || '';
+            const selectedSubject = document.getElementById('sidebar-subject')?.value || '';
+            
             // Show loading state
             submitButton.disabled = true;
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
             chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
             
-            // Prepare the prompt for the AI
-            const prompt = `请回答以下问题，提供详细且教育性的解答：
+            // Prepare the prompt for the AI with educational context
+            let prompt = `请回答以下问题，提供详细且教育性的解答：
             
-${questionText}
+${questionText}`;
 
-请提供清晰、准确、有教育意义的回答，如果涉及数学或科学概念，请确保解释清楚。`;
+            // Add educational context if available
+            if (selectedSchool || selectedGrade || selectedSubject) {
+                prompt += `\n\n教育背景：`;
+                
+                if (selectedSchool) {
+                    prompt += `\n- 学校类型：${selectedSchool}`;
+                }
+                
+                if (selectedGrade) {
+                    prompt += `\n- 年级：${selectedGrade}`;
+                }
+                
+                if (selectedSubject) {
+                    prompt += `\n- 科目：${selectedSubject}`;
+                }
+                
+                prompt += `\n\n请根据上述教育背景，提供适合该年级学生理解水平的回答。解释应该清晰易懂，使用适合该年级学生的语言和概念。`;
+            } else {
+                prompt += `\n\n请提供清晰、准确、有教育意义的回答，如果涉及数学或科学概念，请确保解释清楚。`;
+            }
             
             // Call the API
             fetchAIResponse(prompt)
@@ -3529,11 +3527,26 @@ ${questionText}
                     // Format the response with MathJax
                     const formattedResponse = formatMathExpressions(aiResponse);
                     
-                    // Display the response
+                    // Display the response with educational context
+                    let contextHeader = '';
+                    if (selectedSchool || selectedGrade || selectedSubject) {
+                        const contextParts = [];
+                        if (selectedSchool) contextParts.push(selectedSchool);
+                        if (selectedGrade) contextParts.push(selectedGrade);
+                        if (selectedSubject) contextParts.push(selectedSubject);
+                        
+                        contextHeader = `
+                            <div class="context-header">
+                                <span class="context-badge">${contextParts.join(' · ')}</span>
+                            </div>
+                        `;
+                    }
+                    
                     chatResponse.innerHTML = `
                         <div class="response-header">
                             <i class="fas fa-robot"></i> AI 助手回答
                         </div>
+                        ${contextHeader}
                         <div class="response-content">
                             ${formattedResponse}
             </div>
@@ -3664,24 +3677,36 @@ function createChatInterface() {
             gap: 10px;
             color: #718096;
             font-size: 16px;
-                                padding: 20px;
+            padding: 20px;
         }
         .response-header {
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-weight: 600;
             color: #2d3748;
             margin-bottom: 10px;
             font-size: 16px;
         }
+        .context-header {
+            margin-bottom: 12px;
+        }
+        .context-badge {
+            display: inline-block;
+            background-color: #ebf8ff;
+            color: #3182ce;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
         .response-content {
             line-height: 1.6;
-                                    color: #4a5568;
+            color: #4a5568;
             white-space: pre-wrap;
         }
         .error-message {
-                    color: #e53e3e;
+            color: #e53e3e;
             display: flex;
             align-items: center;
             gap: 8px;
