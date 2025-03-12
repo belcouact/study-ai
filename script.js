@@ -2749,339 +2749,219 @@ function populateGradeOptions(school) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize form layout
+    console.log('DOM fully loaded - initializing buttons');
+    
+    // Initialize the form layout
     initializeFormLayout();
     
-    // Move content creation area to the top for better screen utilization
-    moveContentCreationToTop();
-    
-    // Setup sidebar toggle functionality
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const leftPanel = document.querySelector('.left-panel');
-    const contentArea = document.querySelector('.content-area');
-    
-    if (sidebarToggle && leftPanel && contentArea) {
-        sidebarToggle.addEventListener('click', function() {
-            leftPanel.classList.toggle('hidden');
-            contentArea.classList.toggle('full-width');
-            this.classList.toggle('collapsed');
-        });
-    }
-    
-    // Setup tab switching functionality
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
-    
-    if (qaButton && createButton && qaContainer && createContainer) {
-        qaButton.addEventListener('click', function() {
-            qaButton.classList.add('active');
-            createButton.classList.remove('active');
-            qaContainer.classList.remove('hidden');
-            createContainer.classList.add('hidden');
-        });
+    // Direct button event listeners with console logging
+    setTimeout(function() {
+        console.log('Setting up direct button event listeners');
         
-        createButton.addEventListener('click', function() {
-            createButton.classList.add('active');
-            qaButton.classList.remove('active');
-            createContainer.classList.remove('hidden');
-            qaContainer.classList.add('hidden');
-            
-            // Initialize empty state if no questions are loaded
-            initializeEmptyState();
-        });
+        // Get the buttons
+        const optimizeButton = document.getElementById('optimize-button');
+        const submitButton = document.getElementById('submit-button');
         
-        // Initialize empty state on the test page if it's active
-        if (createButton.classList.contains('active')) {
-            initializeEmptyState();
-        }
-    } else {
-        // If tab buttons don't exist, initialize empty state anyway
-        initializeEmptyState();
-    }
-    
-    // Set up initial navigation buttons
-    setupNavigationButtons();
-    
-    // Set up initial option buttons if they exist
-    setupOptionButtons();
-    
-    // Directly populate sidebar dropdowns with initial values
-    const schoolSelectSidebar = document.getElementById('school-select-sidebar');
-    if (schoolSelectSidebar) {
-        const initialSchool = schoolSelectSidebar.value || '小学';
+        console.log('Optimize button found:', optimizeButton);
+        console.log('Submit button found:', submitButton);
         
-        // Define grade options based on school
-        let gradeOptions = [];
-        switch (initialSchool) {
-            case '小学':
-                gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-                break;
-            case '初中':
-                gradeOptions = ['初一', '初二', '初三'];
-                break;
-            case '高中':
-                gradeOptions = ['高一', '高二', '高三'];
-                break;
-            case '大学':
-                gradeOptions = ['大一', '大二', '大三', '大四'];
-                break;
-            default:
-                gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-        }
-        
-        // Define subject options based on school
-        let subjectOptions = [];
-        switch (initialSchool) {
-            case '小学':
-                subjectOptions = ['语文', '数学', '英语', '科学'];
-                break;
-            case '初中':
-                subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                break;
-            case '高中':
-                subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                break;
-            case '大学':
-                subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
-                break;
-            default:
-                subjectOptions = ['语文', '数学', '英语'];
-        }
-        
-        // Populate grade dropdown
-        const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
-        if (gradeSelectSidebar) {
-            gradeSelectSidebar.innerHTML = '';
-            gradeOptions.forEach(grade => {
-                const option = document.createElement('option');
-                option.value = grade;
-                option.textContent = grade;
-                gradeSelectSidebar.appendChild(option);
-            });
+        // Add event listener to optimize button
+        if (optimizeButton) {
+            optimizeButton.onclick = function(event) {
+                console.log('Optimize button clicked!');
+                event.preventDefault();
+                event.stopPropagation();
+                
+                const currentQuestion = questions[currentQuestionIndex];
+                if (!currentQuestion) {
+                    console.log('No current question found');
+                    return;
+                }
+                
+                console.log('Processing optimization for question:', currentQuestionIndex);
+                
+                // Show loading state
+                optimizeButton.disabled = true;
+                optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
+                
+                // Prepare the prompt for optimization
+                const prompt = `请优化以下问题，使其更清晰、更有教育价值，并确保答案和解析准确：
+                
+问题：${currentQuestion.question}
+选项：
+A. ${currentQuestion.choices[0]}
+B. ${currentQuestion.choices[1]}
+C. ${currentQuestion.choices[2]}
+D. ${currentQuestion.choices[3]}
+答案：${currentQuestion.answer}
+解析：${currentQuestion.explanation}
+
+请返回优化后的问题、选项、答案和解析，格式如下：
+问题：[优化后的问题]
+选项：
+A. [选项A]
+B. [选项B]
+C. [选项C]
+D. [选项D]
+答案：[答案]
+解析：[解析]`;
+                
+                console.log('Sending optimization prompt to API');
+                
+                // Call the API
+                fetchAIResponse(prompt)
+                    .then(response => {
+                        console.log('Received API response for optimization');
+                        // Extract the optimized question
+                        const optimizedContent = extractContentFromResponse(response);
+                        
+                        // Parse the optimized question
+                        const optimizedQuestion = parseOptimizedQuestion(optimizedContent);
+                        
+                        if (optimizedQuestion) {
+                            console.log('Successfully parsed optimized question');
+                            // Update the current question with optimized content
+                            questions[currentQuestionIndex] = {
+                                ...questions[currentQuestionIndex],
+                                ...optimizedQuestion
+                            };
+                            
+                            // Display the updated question
+                            displayCurrentQuestion();
+                            
+                            // Show success message
+                            showSystemMessage('问题已成功优化！', 'success');
+                        } else {
+                            console.error('Failed to parse optimized question');
+                            showSystemMessage('无法解析优化后的问题，请重试。', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error optimizing question:', error);
+                        showSystemMessage('优化问题时出错，请重试。', 'error');
+                    })
+                    .finally(() => {
+                        console.log('Optimization process completed');
+                        // Reset button state
+                        optimizeButton.disabled = false;
+                        optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+                    });
+                
+                return false;
+            };
+            console.log('Optimize button event listener attached');
         }
         
-        // Populate subject dropdown
-        const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
-        if (subjectSelectSidebar) {
-            subjectSelectSidebar.innerHTML = '';
-            subjectOptions.forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject;
-                option.textContent = subject;
-                subjectSelectSidebar.appendChild(option);
-            });
+        // Add event listener to submit button
+        if (submitButton) {
+            submitButton.onclick = function(event) {
+                console.log('Submit button clicked!');
+                event.preventDefault();
+                event.stopPropagation();
+                
+                const selectedChoice = document.querySelector('.choice-cell.selected');
+                console.log('Selected choice:', selectedChoice);
+                
+                if (selectedChoice) {
+                    const selectedValue = selectedChoice.getAttribute('data-value');
+                    console.log('Selected value:', selectedValue);
+                    
+                    displayAnswer(selectedValue);
+                    
+                    // Disable the submit button after submission
+                    submitButton.disabled = true;
+                    submitButton.classList.add('disabled');
+                    console.log('Submit button disabled after submission');
+                } else {
+                    console.log('No choice selected');
+                    showSystemMessage('请先选择一个答案', 'warning');
+                }
+                
+                return false;
+            };
+            console.log('Submit button event listener attached');
         }
+    }, 1000); // Short delay to ensure DOM is fully processed
+    
+    // Also add global click handler as backup
+    document.body.addEventListener('click', function(event) {
+        const target = event.target.closest('#optimize-button, #submit-button');
         
-        // Add change event listener to update dropdowns when school changes
-        schoolSelectSidebar.addEventListener('change', function() {
-            const school = this.value;
-            
-            // Define grade options based on school
-            let gradeOptions = [];
-            switch (school) {
-                case '小学':
-                    gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-                    break;
-                case '初中':
-                    gradeOptions = ['初一', '初二', '初三'];
-                    break;
-                case '高中':
-                    gradeOptions = ['高一', '高二', '高三'];
-                    break;
-                case '大学':
-                    gradeOptions = ['大一', '大二', '大三', '大四'];
-                    break;
-                default:
-                    gradeOptions = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+        if (!target) return;
+        
+        console.log('Button clicked via delegation:', target.id);
+        
+        if (target.id === 'optimize-button') {
+            // Trigger the optimize button's direct click handler
+            const optimizeButton = document.getElementById('optimize-button');
+            if (optimizeButton && optimizeButton.onclick) {
+                optimizeButton.onclick(event);
             }
-            
-            // Define subject options based on school
-            let subjectOptions = [];
-            switch (school) {
-                case '小学':
-                    subjectOptions = ['语文', '数学', '英语', '科学'];
-                    break;
-                case '初中':
-                    subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'];
-                    break;
-                case '高中':
-                    subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                    break;
-                case '大学':
-                    subjectOptions = ['高等数学', '大学物理', '计算机科学', '经济学', '管理学'];
-                    break;
-                default:
-                    subjectOptions = ['语文', '数学', '英语'];
+        } else if (target.id === 'submit-button') {
+            // Trigger the submit button's direct click handler
+            const submitButton = document.getElementById('submit-button');
+            if (submitButton && submitButton.onclick) {
+                submitButton.onclick(event);
             }
-            
-            // Update grade dropdown
-            const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
-            if (gradeSelectSidebar) {
-                gradeSelectSidebar.innerHTML = '';
-                gradeOptions.forEach(grade => {
-                    const option = document.createElement('option');
-                    option.value = grade;
-                    option.textContent = grade;
-                    gradeSelectSidebar.appendChild(option);
-                });
-            }
-            
-            // Update subject dropdown
-            const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
-            if (subjectSelectSidebar) {
-                subjectSelectSidebar.innerHTML = '';
-                subjectOptions.forEach(subject => {
-                    const option = document.createElement('option');
-                    option.value = subject;
-                    option.textContent = subject;
-                    subjectSelectSidebar.appendChild(option);
-                });
-            }
-        });
-    }
-    
-    // Add click handler for sidebar generate button
-    const sidebarGenerateButton = document.createElement('button');
-    sidebarGenerateButton.textContent = '出题';
-    sidebarGenerateButton.className = 'sidebar-generate-button';
-    sidebarGenerateButton.addEventListener('click', function() {
-        // Switch to the test tab if not already there
-        const createButton = document.getElementById('create-button');
-        if (createButton && !createButton.classList.contains('active')) {
-            createButton.click();
         }
-        
-        // Then generate questions
-        handleGenerateQuestionsClick();
     });
     
-    // Add the button to the second frame
-    const testFrame = document.querySelector('.sidebar-frame:nth-child(2) .frame-content');
-    if (testFrame) {
-        testFrame.appendChild(sidebarGenerateButton);
-    }
+    // Initialize empty state if needed
+    initializeEmptyState();
 });
 
-// Function to move content creation area to the top
-function moveContentCreationToTop() {
-    const createContainer = document.getElementById('create-container');
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
+// Modify the displayCurrentQuestion function to ensure buttons are created with inline event handlers
+function displayCurrentQuestion() {
+    // ... existing code until the action buttons section ...
     
-    if (createContainer && questionsDisplayContainer) {
-        // Ensure the questions display container is at the top
-        createContainer.style.display = 'flex';
-        createContainer.style.flexDirection = 'column';
+    // Ensure the action buttons container exists
+    let actionButtonsContainer = document.querySelector('.action-buttons');
+    if (!actionButtonsContainer) {
+        actionButtonsContainer = document.createElement('div');
+        actionButtonsContainer.className = 'action-buttons';
+        actionButtonsContainer.style.cssText = 'display: flex; gap: 10px; margin-top: 20px; justify-content: center;';
         
-        // Move questions display to the top
-        if (questionsDisplayContainer.parentNode === createContainer) {
-            createContainer.insertBefore(questionsDisplayContainer, createContainer.firstChild);
-        }
-        
-        // Style the questions display container for better visibility
-        questionsDisplayContainer.style.cssText = `
-            margin-bottom: 20px;
-            width: 100%;
-            box-sizing: border-box;
-        `;
-        
-        // Ensure navigation controls are below the questions
-        const navigationControls = document.querySelector('.navigation-controls');
-        if (navigationControls && navigationControls.parentNode === createContainer) {
-            createContainer.appendChild(navigationControls);
+        const questionsContainer = document.querySelector('.questions-display-container');
+        if (questionsContainer) {
+            questionsContainer.appendChild(actionButtonsContainer);
         }
     }
+    
+    // Create or update the optimize button with inline event handler
+    let optimizeButton = document.getElementById('optimize-button');
+    if (!optimizeButton) {
+        optimizeButton = document.createElement('button');
+        optimizeButton.id = 'optimize-button';
+        optimizeButton.className = 'action-button optimize-button';
+        optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+        optimizeButton.style.cssText = 'padding: 8px 16px; background-color: #4299e1; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
+        // Add inline event handler
+        optimizeButton.setAttribute('onclick', 'console.log("Optimize button clicked (inline)"); return false;');
+        actionButtonsContainer.appendChild(optimizeButton);
+        
+        console.log('Optimize button created in displayCurrentQuestion');
+    }
+    
+    // Create or update the submit button with inline event handler
+    let submitButton = document.getElementById('submit-button');
+    if (!submitButton) {
+        submitButton = document.createElement('button');
+        submitButton.id = 'submit-button';
+        submitButton.className = 'action-button submit-button';
+        submitButton.innerHTML = '<i class="fas fa-check"></i> 提交答案';
+        submitButton.style.cssText = 'padding: 8px 16px; background-color: #48bb78; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
+        // Add inline event handler
+        submitButton.setAttribute('onclick', 'console.log("Submit button clicked (inline)"); return false;');
+        actionButtonsContainer.appendChild(submitButton);
+        
+        console.log('Submit button created in displayCurrentQuestion');
+    }
+    
+    // Reset the submit button state
+    submitButton.disabled = false;
+    submitButton.classList.remove('disabled');
+    
+    // ... rest of existing code ...
 }
 
-// Function to initialize empty state on the test page
-function initializeEmptyState() {
-    const createContainer = document.getElementById('create-container');
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    
-    // Only initialize empty state if no questions are loaded
-    if (!window.questions || window.questions.length === 0) {
-        // Create or get the empty state element
-        let emptyState = document.getElementById('empty-state');
-        
-        if (!emptyState) {
-            emptyState = document.createElement('div');
-            emptyState.id = 'empty-state';
-            emptyState.className = 'empty-state';
-            emptyState.style.cssText = `
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                padding: 40px 20px;
-                text-align: center;
-                background-color: white;
-                border-radius: 12px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-                margin: 20px auto;
-                max-width: 600px;
-            `;
-            
-            // Create icon
-            const icon = document.createElement('div');
-            icon.innerHTML = `
-                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#4299e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"></path>
-                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                </svg>
-            `;
-            icon.style.cssText = `
-                margin-bottom: 20px;
-                color: #4299e1;
-            `;
-            
-            // Create heading
-            const heading = document.createElement('h3');
-            heading.textContent = '准备好开始测验了吗？';
-            heading.style.cssText = `
-                font-size: 24px;
-                color: #2d3748;
-                margin-bottom: 15px;
-            `;
-            
-            // Create description
-            const description = document.createElement('p');
-            description.textContent = '使用左侧边栏选择学校类型、年级、学期、科目、难度和题目数量，然后点击"出题"按钮生成测验题目。';
-            description.style.cssText = `
-                font-size: 16px;
-                color: #4a5568;
-                line-height: 1.6;
-                max-width: 500px;
-            `;
-            
-            // Assemble empty state
-            emptyState.appendChild(icon);
-            emptyState.appendChild(heading);
-            emptyState.appendChild(description);
-            
-            // Add to container
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.innerHTML = '';
-                questionsDisplayContainer.appendChild(emptyState);
-                questionsDisplayContainer.classList.remove('hidden');
-            } else if (createContainer) {
-                // Create questions display container if it doesn't exist
-                const newQuestionsContainer = document.createElement('div');
-                newQuestionsContainer.id = 'questions-display-container';
-                newQuestionsContainer.className = 'questions-display-container';
-                newQuestionsContainer.appendChild(emptyState);
-                
-                createContainer.innerHTML = '';
-                createContainer.appendChild(newQuestionsContainer);
-            }
-        } else {
-            // Make sure the empty state is visible
-            emptyState.classList.remove('hidden');
-            
-            // Make sure the questions display container is visible
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.classList.remove('hidden');
-            }
-        }
-    }
-} 
+// ... existing code ... 
