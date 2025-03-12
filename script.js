@@ -1790,7 +1790,7 @@ function handleGenerateQuestionsClick() {
 
 示例格式：
 题目：[题目内容]
-A. [选项A内容]
+A. [选项A内容] 
 B. [选项B内容]
 C. [选项C内容]
 D. [选项D内容]
@@ -3444,11 +3444,30 @@ ${educationalContext}
 
 // Function to get educational context from sidebar selections
 function getEducationalContext() {
-    // Get values from sidebar dropdowns
-    const schoolSelect = document.getElementById('sidebar-school-select');
-    const gradeSelect = document.getElementById('sidebar-grade-select');
-    const semesterSelect = document.getElementById('sidebar-semester-select');
-    const subjectSelect = document.getElementById('sidebar-subject-select');
+    console.log('Getting educational context');
+    
+    // Try to get values from sidebar dropdowns first
+    let schoolSelect = document.getElementById('sidebar-school-select');
+    let gradeSelect = document.getElementById('sidebar-grade-select');
+    let semesterSelect = document.getElementById('sidebar-semester-select');
+    let subjectSelect = document.getElementById('sidebar-subject-select');
+    
+    // If sidebar dropdowns not found, try the main form dropdowns
+    if (!schoolSelect || !schoolSelect.value) {
+        schoolSelect = document.getElementById('school-select');
+    }
+    
+    if (!gradeSelect || !gradeSelect.value) {
+        gradeSelect = document.getElementById('grade-select');
+    }
+    
+    if (!semesterSelect || !semesterSelect.value) {
+        semesterSelect = document.getElementById('semester-select');
+    }
+    
+    if (!subjectSelect || !subjectSelect.value) {
+        subjectSelect = document.getElementById('subject-select');
+    }
     
     // Default values if not found
     let school = '未指定学校类型';
@@ -3456,21 +3475,68 @@ function getEducationalContext() {
     let semester = '未指定学期';
     let subject = '未指定科目';
     
+    // Log the dropdown elements to debug
+    console.log('School select:', schoolSelect);
+    console.log('Grade select:', gradeSelect);
+    console.log('Semester select:', semesterSelect);
+    console.log('Subject select:', subjectSelect);
+    
     // Get selected values if available
-    if (schoolSelect && schoolSelect.value) {
-        school = schoolSelect.options[schoolSelect.selectedIndex].text;
+    if (schoolSelect && schoolSelect.value && schoolSelect.value !== 'none') {
+        try {
+            school = schoolSelect.options[schoolSelect.selectedIndex].text;
+            console.log('Selected school:', school);
+        } catch (e) {
+            console.error('Error getting school text:', e);
+        }
     }
     
-    if (gradeSelect && gradeSelect.value) {
-        grade = gradeSelect.options[gradeSelect.selectedIndex].text;
+    if (gradeSelect && gradeSelect.value && gradeSelect.value !== 'none') {
+        try {
+            grade = gradeSelect.options[gradeSelect.selectedIndex].text;
+            console.log('Selected grade:', grade);
+        } catch (e) {
+            console.error('Error getting grade text:', e);
+        }
     }
     
-    if (semesterSelect && semesterSelect.value) {
-        semester = semesterSelect.options[semesterSelect.selectedIndex].text;
+    if (semesterSelect && semesterSelect.value && semesterSelect.value !== 'none') {
+        try {
+            semester = semesterSelect.options[semesterSelect.selectedIndex].text;
+            console.log('Selected semester:', semester);
+        } catch (e) {
+            console.error('Error getting semester text:', e);
+        }
     }
     
-    if (subjectSelect && subjectSelect.value) {
-        subject = subjectSelect.options[subjectSelect.selectedIndex].text;
+    if (subjectSelect && subjectSelect.value && subjectSelect.value !== 'none') {
+        try {
+            subject = subjectSelect.options[subjectSelect.selectedIndex].text;
+            console.log('Selected subject:', subject);
+        } catch (e) {
+            console.error('Error getting subject text:', e);
+        }
+    }
+    
+    // Try alternative method if the above didn't work
+    if (school === '未指定学校类型' && schoolSelect && schoolSelect.value) {
+        // Map values to text
+        const schoolMap = {
+            'primary': '小学',
+            'middle': '初中',
+            'high': '高中'
+        };
+        school = schoolMap[schoolSelect.value] || schoolSelect.value;
+    }
+    
+    if (grade === '未指定年级' && gradeSelect && gradeSelect.value) {
+        // Just use the value directly if text not available
+        grade = gradeSelect.value;
+    }
+    
+    if (subject === '未指定科目' && subjectSelect && subjectSelect.value) {
+        // Just use the value directly if text not available
+        subject = subjectSelect.value;
     }
     
     // Build educational context string
@@ -3479,22 +3545,37 @@ function getEducationalContext() {
     // Add curriculum information based on selections
     context += getCurriculumInfo(school, grade, subject);
     
+    console.log('Educational context:', context);
     return context;
 }
 
 // Function to get a brief summary of the context for display
 function getContextSummary() {
-    const schoolSelect = document.getElementById('sidebar-school-select');
-    const gradeSelect = document.getElementById('sidebar-grade-select');
-    const subjectSelect = document.getElementById('sidebar-subject-select');
+    // Try to get values from sidebar dropdowns first
+    let schoolSelect = document.getElementById('sidebar-school-select');
+    let gradeSelect = document.getElementById('sidebar-grade-select');
+    let subjectSelect = document.getElementById('sidebar-subject-select');
     
-    if (!schoolSelect || !gradeSelect || !subjectSelect) {
+    // If sidebar dropdowns not found, try the main form dropdowns
+    if (!schoolSelect || !schoolSelect.value) {
+        schoolSelect = document.getElementById('school-select');
+    }
+    
+    if (!gradeSelect || !gradeSelect.value) {
+        gradeSelect = document.getElementById('grade-select');
+    }
+    
+    if (!subjectSelect || !subjectSelect.value) {
+        subjectSelect = document.getElementById('subject-select');
+    }
+    
+    if (!schoolSelect && !gradeSelect && !subjectSelect) {
         return '';
     }
     
-    const hasSchool = schoolSelect.value && schoolSelect.value !== 'none';
-    const hasGrade = gradeSelect.value && gradeSelect.value !== 'none';
-    const hasSubject = subjectSelect.value && subjectSelect.value !== 'none';
+    const hasSchool = schoolSelect && schoolSelect.value && schoolSelect.value !== 'none';
+    const hasGrade = gradeSelect && gradeSelect.value && gradeSelect.value !== 'none';
+    const hasSubject = subjectSelect && subjectSelect.value && subjectSelect.value !== 'none';
     
     if (!hasSchool && !hasGrade && !hasSubject) {
         return '';
@@ -3503,17 +3584,37 @@ function getContextSummary() {
     let summary = '';
     
     if (hasSchool) {
-        summary += schoolSelect.options[schoolSelect.selectedIndex].text;
+        try {
+            summary += schoolSelect.options[schoolSelect.selectedIndex].text;
+        } catch (e) {
+            // Fallback to value
+            const schoolMap = {
+                'primary': '小学',
+                'middle': '初中',
+                'high': '高中'
+            };
+            summary += schoolMap[schoolSelect.value] || schoolSelect.value;
+        }
     }
     
     if (hasGrade) {
         if (summary) summary += ' · ';
-        summary += gradeSelect.options[gradeSelect.selectedIndex].text;
+        try {
+            summary += gradeSelect.options[gradeSelect.selectedIndex].text;
+        } catch (e) {
+            // Fallback to value
+            summary += gradeSelect.value;
+        }
     }
     
     if (hasSubject) {
         if (summary) summary += ' · ';
-        summary += subjectSelect.options[subjectSelect.selectedIndex].text;
+        try {
+            summary += subjectSelect.options[subjectSelect.selectedIndex].text;
+        } catch (e) {
+            // Fallback to value
+            summary += subjectSelect.value;
+        }
     }
     
     return summary;
