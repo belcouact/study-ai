@@ -1390,10 +1390,10 @@ document.addEventListener('DOMContentLoaded', function() {
             let subjectOptions = [];
             switch (school) {
                 case '小学':
-                    subjectOptions = ['语文', '数学', '英语', '科学', '道德与法治'];
+                    subjectOptions = ['语文', '数学', '英语', '科学'];
                     break;
                 case '初中':
-                    subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+                    subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'];
                     break;
                 case '高中':
                     subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
