@@ -2438,14 +2438,12 @@ function setupChatButtons() {
 
     console.log('Setting up chat buttons');
 
-    // Use more specific and alternative selectors to find the chat buttons
+    // Use only valid CSS selectors to find the chat buttons
     const chatOptimizeBtn = document.querySelector('.optimize-question-btn') || 
-                           document.querySelector('[data-action="optimize"]') ||
-                           document.querySelector('button:contains("优化问题")');
+                           document.querySelector('[data-action="optimize"]');
                            
     const chatSubmitBtn = document.querySelector('.submit-question-btn') || 
-                         document.querySelector('[data-action="submit"]') ||
-                         document.querySelector('button:contains("提交问题")');
+                         document.querySelector('[data-action="submit"]');
 
     // Log what we found for debugging
     console.log('Found chat optimize button:', chatOptimizeBtn);
@@ -2459,6 +2457,18 @@ function setupChatButtons() {
             const allButtons = qaContainer.querySelectorAll('button');
             console.log('All buttons in QA container:', allButtons);
             console.log('Button classes:', Array.from(allButtons).map(btn => btn.className));
+            
+            // Try to find buttons by text content using a loop instead of :contains
+            console.log('Searching for buttons by text content:');
+            Array.from(allButtons).forEach(btn => {
+                console.log(`Button text: "${btn.textContent.trim()}", class: "${btn.className}"`);
+                if (btn.textContent.includes('优化问题')) {
+                    console.log('Found optimize button by text content:', btn);
+                }
+                if (btn.textContent.includes('提交问题')) {
+                    console.log('Found submit button by text content:', btn);
+                }
+            });
         }
         return;
     }
