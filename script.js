@@ -1041,958 +1041,21 @@ function initializeFormLayout() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Debug all clicks
-    document.addEventListener('click', (e) => {
-        console.log('Element clicked:', e.target);
-        if (e.target.id === 'generate-questions-button') {
-            console.log('Generate questions button clicked via document listener');
-        }
-    });
-    
-    // Core elements that definitely exist
-    const userInput = document.getElementById('user-input');
-    const submitButton = document.getElementById('submit-button');
-    const optimizeButton = document.getElementById('optimize-button');
-    const output = document.getElementById('output');
-    const loading = document.getElementById('loading');
-    
-    // Panel navigation elements
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
-    
-    // Question form elements
-    const questionFormContainer = document.getElementById('question-form-container');
-    const questionForm = document.getElementById('question-form');
-    const schoolSelect = document.getElementById('school-select');
-    const gradeSelect = document.getElementById('grade-select');
-    const subjectSelect = document.getElementById('subject-select');
-    const generateQuestionsButton = document.getElementById('generate-questions-button');
-    
-    // Question display elements
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    const questionCounter = document.getElementById('question-counter');
-    const questionText = document.getElementById('question-text');
-    const choiceAText = document.getElementById('choice-a-text');
-    const choiceBText = document.getElementById('choice-b-text');
-    const choiceCText = document.getElementById('choice-c-text');
-    const choiceDText = document.getElementById('choice-d-text');
-    const submitAnswerButton = document.getElementById('submit-answer-button');
-    const answerContainer = document.getElementById('answer-container');
-    const answerResult = document.getElementById('answer-result');
-    const answerExplanation = document.getElementById('answer-explanation');
-    const prevQuestionButton = document.getElementById('prev-question-button');
-    const nextQuestionButton = document.getElementById('next-question-button');
-    const choiceRadios = document.querySelectorAll('input[name="choice"]');
-    
-    // Sidebar elements
-    const leftPanel = document.querySelector('.left-panel');
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const contentArea = document.querySelector('.content-area');
-    
-    // Optional elements - may not exist in all versions of the HTML
-    const directTestButton = document.getElementById('direct-test-button');
-    const simpleApiButton = document.getElementById('simple-api-button');
-    const checkEnvButton = document.getElementById('check-env-button');
-    const apiFunctionRadios = document.querySelectorAll('input[name="api-function"]');
-    const fallbackButton = document.getElementById('fallback-button');
-    const modelSelect = document.getElementById('model-select');
-
-    let questions = [];
-    let currentQuestionIndex = 0;
-    let userAnswers = [];
-
-    // API configuration
-    // Note: These values are now for reference only and not actually used for API calls
-    // The actual values are stored in Cloudflare Pages environment variables
-    const API_BASE_URL = 'https://api.lkeap.cloud.tencent.com/v1';
-    const MODEL = 'deepseek-r1';
-
-    // Sidebar toggle functionality
-    sidebarToggle.addEventListener('click', () => {
-        leftPanel.classList.toggle('hidden');
-        contentArea.classList.toggle('full-width');
-        sidebarToggle.classList.toggle('collapsed');
-        
-        // Save sidebar state to localStorage
-        const isSidebarHidden = leftPanel.classList.contains('hidden');
-        localStorage.setItem('sidebarHidden', isSidebarHidden);
-    });
-    
-    // Load saved sidebar state from localStorage
-    const savedSidebarState = localStorage.getItem('sidebarHidden');
-    if (savedSidebarState === 'true') {
-        leftPanel.classList.add('hidden');
-        contentArea.classList.add('full-width');
-        sidebarToggle.classList.add('collapsed');
-    }
-
-    // Add event listener for the submit button
-    submitButton.addEventListener('click', handleSubmit);
-    
-    // Add event listener for the optimize button
-    optimizeButton.addEventListener('click', optimizeQuestion);
-    
-    // Add event listeners for panel navigation
-    qaButton.addEventListener('click', () => {
-        // Show Q&A container, hide Create container
-        qaContainer.classList.remove('hidden');
-        createContainer.classList.add('hidden');
-        
-        // Update active button
-        qaButton.classList.add('active');
-        createButton.classList.remove('active');
-    });
-    
-    createButton.addEventListener('click', () => {
-        // Show Create container, hide Q&A container
-        createContainer.classList.remove('hidden');
-        qaContainer.classList.add('hidden');
-        
-        // Update active button
-        createButton.classList.add('active');
-        qaButton.classList.remove('active');
-        
-        // Initialize the dropdowns when switching to create mode
-        populateGradeOptions(schoolSelect.value);
-        populateSubjectOptions(schoolSelect.value);
-    });
-    
-    // School select change event
-    if (schoolSelect) {
-        schoolSelect.addEventListener('change', () => {
-            populateGradeOptions(schoolSelect.value);
-            populateSubjectOptions(schoolSelect.value);
-        });
-    }
-    
-    // Generate Questions button click event
-    if (generateQuestionsButton) {
-        console.log('Found generate questions button:', generateQuestionsButton);
-        
-        generateQuestionsButton.addEventListener('click', handleGenerateQuestionsClick);
-    } else {
-        console.error('Generate questions button not found');
-    }
-    
-    // Add event listeners for navigation and submit buttons
-    if (submitAnswerButton) {
-        submitAnswerButton.addEventListener('click', function() {
-            console.log('Submit answer button clicked');
-            
-            // Get the selected answer from our custom choice system
-            const selectedAnswer = window.userAnswers[window.currentQuestionIndex];
-            
-            if (!selectedAnswer) {
-                alert('请选择一个答案');
-                return;
-            }
-            
-            // Get the correct answer
-            const correctAnswer = window.questions[window.currentQuestionIndex].answer;
-            
-            // Show the answer container
-            const answerContainer = document.getElementById('answer-container');
-            answerContainer.classList.remove('hidden');
-            answerContainer.style.cssText = `
-                margin-top: 20px;
-                padding: 15px;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                background-color: #f9f9f9;
-                width: 100%;
-                box-sizing: border-box;
-            `;
-            
-            // Display result with math formatting
-            const answerResult = document.getElementById('answer-result');
-            if (answerResult) {
-                const resultText = selectedAnswer === correctAnswer 
-                    ? `✓ 正确！答案是：${correctAnswer}`
-                    : `✗ 错误。正确答案是：${correctAnswer}`;
-                
-                answerResult.innerHTML = formatMathExpressions(resultText);
-                answerResult.style.cssText = `
-                    color: ${selectedAnswer === correctAnswer ? '#28a745' : '#dc3545'};
-                    margin-bottom: 10px;
-                    font-weight: bold;
-                    font-size: 16px;
-                `;
-            }
-            
-            // Display explanation with math formatting
-            const answerExplanation = document.getElementById('answer-explanation');
-            if (answerExplanation) {
-                const explanation = window.questions[window.currentQuestionIndex].explanation;
-                answerExplanation.innerHTML = formatMathExpressions(explanation);
-                answerExplanation.style.cssText = `
-                    line-height: 1.6;
-                    margin-top: 10px;
-                    white-space: pre-wrap;
-                    font-size: 15px;
-                `;
-            }
-            
-            // Render math expressions
-            if (window.MathJax && window.MathJax.typesetPromise) {
-                window.MathJax.typesetPromise([answerContainer]).catch((err) => {
-                    console.error('MathJax typesetting failed:', err);
-                });
-            }
-            
-            // Enable navigation buttons
-            updateNavigationButtons();
-            
-            // Check if all questions are answered and display score summary if needed
-            displayCurrentQuestion();
-        });
-    }
-    
-    if (prevQuestionButton) {
-        prevQuestionButton.addEventListener('click', function() {
-            console.log('Previous question button clicked');
-            if (window.currentQuestionIndex > 0) {
-                window.currentQuestionIndex--;
-                displayCurrentQuestion();
-                updateNavigationButtons();
-            }
-        });
-    }
-    
-    if (nextQuestionButton) {
-        nextQuestionButton.addEventListener('click', function() {
-            console.log('Next question button clicked');
-            if (window.currentQuestionIndex < window.questions.length - 1) {
-                window.currentQuestionIndex++;
-                displayCurrentQuestion();
-                updateNavigationButtons();
-            }
-        });
-    }
-    
-    // Function to populate grade options based on selected school
-    function populateGradeOptions(school) {
-        // Clear existing options
-        gradeSelect.innerHTML = '';
-        
-        let options = [];
-        
-        // Set options based on school
-        switch (school) {
-            case '小学':
-                options = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-                break;
-            case '初中':
-                options = ['初一', '初二', '初三'];
-                break;
-            case '高中':
-                options = ['高一', '高二', '高三'];
-                break;
-            case '大学':
-                options = ['大一', '大二', '大三', '大四'];
-                break;
-            default:
-                options = ['请先选择学校'];
-        }
-        
-        // Add options to select
-        options.forEach(option => {
-            const optionElement = document.createElement('option');
-            optionElement.value = option;
-            optionElement.textContent = option;
-            gradeSelect.appendChild(optionElement);
-        });
-    }
-    
-    // Function to populate subject options based on selected school
-    function populateSubjectOptions(school) {
-        // Clear existing options
-        subjectSelect.innerHTML = '';
-        
-        let options = [];
-        
-        // Set options based on school
-        switch (school) {
-            case '小学':
-                options = ['语文', '数学', '英语', '科学', '道德与法治'];
-                break;
-            case '初中':
-                options = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                break;
-            case '高中':
-                options = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-                break;
-            case '大学':
-                options = ['高等数学', '大学物理', '线性代数', '概率论', '英语', '计算机科学', '经济学', '管理学'];
-                break;
-            default:
-                options = ['请先选择学校'];
-        }
-        
-        // Add options to select
-        options.forEach(option => {
-            const optionElement = document.createElement('option');
-            optionElement.value = option;
-            optionElement.textContent = option;
-            subjectSelect.appendChild(optionElement);
-        });
-    }
-
-    // Add event listener for the direct test button (if it exists)
-    if (directTestButton) {
-        directTestButton.addEventListener('click', async () => {
-            try {
-                // Show loading state
-                loading.classList.remove('hidden');
-                
-                const response = await fetch('/api/direct-test');
-                const data = await response.json();
-                
-                // Hide loading state
-                loading.classList.add('hidden');
-                
-                // Removed diagnostics code
-                
-                console.log('Direct API test completed:', data);
-            } catch (error) {
-                // Hide loading state
-                loading.classList.add('hidden');
-                
-                console.error('Direct API test failed:', error);
-            }
-        });
-    }
-
-    // Add event listener for the check environment button (if it exists)
-    if (checkEnvButton) {
-        checkEnvButton.addEventListener('click', async () => {
-            try {
-                // Show loading state
-                loading.classList.remove('hidden');
-                
-                const response = await fetch('/api/check-env');
-                const data = await response.json();
-                
-                // Hide loading state
-                loading.classList.add('hidden');
-                
-                // Removed diagnostics code
-                
-                if (data.status === 'ok') {
-                    console.log('Environment check completed:', data);
-                } else {
-                    console.error('Environment check failed:', data);
-                }
-            } catch (error) {
-                // Hide loading state
-                loading.classList.add('hidden');
-                
-                console.error('Environment check failed:', error);
-            }
-        });
-    }
-
-    // Add event listeners for optional elements only if they exist
-    if (simpleApiButton) {
-        simpleApiButton.addEventListener('click', async () => {
-            const question = userInput.value.trim() || "Hello, how are you?";
-            
-            if (!question) {
-                alert('Please enter a question first.');
-                return;
-            }
-            
-            try {
-                // Show loading state
-                loading.classList.remove('hidden');
-                output.innerHTML = '';
-                
-                const response = await fetch('/api/simple-ai', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ question })
-                });
-                
-                const data = await response.json();
-                console.log('Simple API response:', data);
-                
-                // Format and display the response
-                const content = extractContentFromResponse(data);
-                output.innerHTML = `<div class="ai-message">${formatResponse(content)}</div>`;
-            } catch (error) {
-                console.error('Simple API error:', error);
-                output.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
-            } finally {
-                // Hide loading state
-                loading.classList.add('hidden');
-            }
-        });
-    }
-
-    // Add event listeners for API function radio buttons
-    if (apiFunctionRadios && apiFunctionRadios.length > 0) {
-        apiFunctionRadios.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                currentApiFunction = e.target.value;
-                console.log('API function changed to:', currentApiFunction);
-            });
-        });
-    }
-
-    // Add event listener for model select if it exists
-    if (modelSelect) {
-        modelSelect.addEventListener('change', () => {
-            currentModel = modelSelect.value;
-            console.log('Model changed to:', currentModel);
-        });
-    }
-
-    // Main submit function
-    async function handleSubmit() {
-        const question = userInput.value.trim();
-        
-        if (!question) {
-            showSystemMessage('Please enter a question.', 'warning');
-            return;
-        }
-        
-        try {
-            // Call the AI API with the user's question
-            const prompt = question;
-            const response = await fetchAIResponse(prompt);
-            
-            // Handle the response
-            handleSuccessfulResponse(response, question);
-        } catch (error) {
-            console.error('Error:', error);
-            showSystemMessage(`Error: ${error.message}`, 'error');
-        }
-    }
-    
-    // Function to handle successful responses
-    function handleSuccessfulResponse(data, question) {
-        // Extract and display content
-        let content = extractContentFromResponse(data);
-        
-        // Format the response
-        const formattedContent = formatResponse(content);
-        
-        // Display the formatted content
-        output.innerHTML = `<div class="ai-message">${formattedContent}</div>`;
-        
-        // Render math formulas
-        if (window.MathJax && typeof window.MathJax.typeset === 'function') {
-            window.MathJax.typeset();
-        }
-        
-        // Store the last question for retry functionality
-        lastQuestion = question;
-    }
-    
-    // Function to escape HTML special characters
-    function escapeHTML(text) {
-        return text
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
-    
-    // Function to format the response with proper line breaks and formatting
-    function formatResponse(text) {
-        if (!text) return '';
-        
-        // Escape HTML special characters
-        let escapedText = escapeHTML(text);
-        
-        // Handle literal '\n' characters in the text (convert them to actual newlines)
-        escapedText = escapedText.replace(/\\n/g, '\n');
-        
-        // Handle Chinese poetry formatting
-        if (escapedText.includes('《') && escapedText.includes('》')) {
-            // Split the text into lines
-            const lines = escapedText.split('\n');
-            let formattedPoem = '';
-            
-            // Process each line
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                
-                // Skip empty lines
-                if (!line) continue;
-                
-                // If it's a title line (contains 《》)
-                if (line.includes('《') && line.includes('》')) {
-                    formattedPoem += `<h3 class="poem-title">${line}</h3>`;
-                } else {
-                    // Regular poem line
-                    formattedPoem += `<div class="poem-line">${line}</div>`;
-                }
-            }
-            
-            // Add poetry class for styling
-            return `<div class="poetry">${formattedPoem}</div>`;
-        }
-        
-        // Process math formulas
-        escapedText = processMathFormulas(escapedText);
-        
-        // Detect and format code blocks
-        const codeBlockRegex = /```([a-z]*)\n([\s\S]*?)```/g;
-        escapedText = escapedText.replace(codeBlockRegex, function(match, language, code) {
-            // Check if this is a math block
-            if (language === 'math') {
-                return `<div class="math-code">${code}</div>`;
-            }
-            return `<pre><code class="language-${language}">${code}</code></pre>`;
-        });
-        
-        // Format tables
-        escapedText = formatTables(escapedText);
-        
-        // Format lists with proper indentation
-        escapedText = formatLists(escapedText);
-        
-        // Regular formatting for non-poetry text
-        return escapedText
-            // Handle literal '\n' characters that might still be in the text
-            .replace(/\\n/g, '\n')
-            // Replace double newlines with paragraph breaks
-            .replace(/\n\n/g, '</p><p>')
-            // Replace single newlines with line breaks
-            .replace(/\n/g, '<br>')
-            // Wrap in paragraphs if not already
-            .replace(/^(.+)$/gm, function(match) {
-                if (!match.startsWith('<p>') && !match.startsWith('<h') && 
-                    !match.startsWith('<ul') && !match.startsWith('<ol') && 
-                    !match.startsWith('<pre') && !match.startsWith('<blockquote') &&
-                    !match.startsWith('<div class="math')) {
-                    return `<p>${match}</p>`;
-                }
-                return match;
-            })
-            // Format markdown
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/`([^`]+)`/g, '<code>$1</code>')
-            .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-            .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-            .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-            .replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>')
-            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
-            // Highlight important information
-            .replace(/!!(.*?)!!/g, '<span class="highlight">$1</span>');
-    }
-    
-    // Function to process math formulas
-    function processMathFormulas(text) {
-        // Process inline math: $formula$
-        text = text.replace(/\$([^\$\n]+?)\$/g, function(match, formula) {
-            return `<span class="math-inline">\\(${formula}\\)</span>`;
-        });
-        
-        // Process display math: $$formula$$
-        text = text.replace(/\$\$([\s\S]+?)\$\$/g, function(match, formula) {
-            return `<div class="math-display">\\[${formula}\\]</div>`;
-        });
-        
-        return text;
-    }
-    
-    // Function to format tables in markdown
-    function formatTables(text) {
-        const tableRegex = /\|(.+)\|\n\|(?:[-:]+\|)+\n((?:\|.+\|\n)+)/g;
-        
-        return text.replace(tableRegex, function(match, headerRow, bodyRows) {
-            // Process header
-            const headers = headerRow.split('|').map(cell => cell.trim()).filter(cell => cell);
-            
-            // Process body rows
-            const rows = bodyRows.trim().split('\n');
-            
-            let tableHTML = '<table><thead><tr>';
-            
-            // Add headers
-            headers.forEach(header => {
-                tableHTML += `<th>${header}</th>`;
-            });
-            
-            tableHTML += '</tr></thead><tbody>';
-            
-            // Add rows
-            rows.forEach(row => {
-                const cells = row.split('|').map(cell => cell.trim()).filter(cell => cell);
-                tableHTML += '<tr>';
-                cells.forEach(cell => {
-                    tableHTML += `<td>${cell}</td>`;
-                });
-                tableHTML += '</tr>';
-            });
-            
-            tableHTML += '</tbody></table>';
-            return tableHTML;
-        });
-    }
-    
-    // Function to format lists
-    function formatLists(text) {
-        // Process unordered lists
-        let formattedText = text.replace(/^(\s*)-\s+(.+)$/gm, function(match, indent, content) {
-            const indentLevel = indent.length;
-            return `<ul style="margin-left: ${indentLevel * 20}px;"><li>${content}</li></ul>`;
-        });
-        
-        // Process ordered lists
-        formattedText = formattedText.replace(/^(\s*)\d+\.\s+(.+)$/gm, function(match, indent, content) {
-            const indentLevel = indent.length;
-            return `<ol style="margin-left: ${indentLevel * 20}px;"><li>${content}</li></ol>`;
-        });
-        
-        // Combine adjacent list items of the same type and level
-        formattedText = formattedText
-            .replace(/<\/ul>\s*<ul style="margin-left: (\d+)px;">/g, '')
-            .replace(/<\/ol>\s*<ol style="margin-left: (\d+)px;">/g, '');
-        
-        return formattedText;
-    }
-    
-    // Function to optimize questions
-    async function optimizeQuestion() {
-        const question = userInput.value.trim();
-        
-        if (!question) {
-            showSystemMessage('Please enter a question to optimize.', 'warning');
-            return;
-        }
-        
-        // Add optimizing class to button
-        optimizeButton.classList.add('optimizing');
-        optimizeButton.textContent = '优化中...';
-        
-        try {
-            // In a real application, this would call an API to optimize the question
-            // For now, we'll just simulate it
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            // Simulate an optimized question
-            const optimizedQuestion = `${question} (请提供详细解释和例子)`;
-            
-            // Update the textarea
-            userInput.value = optimizedQuestion;
-            
-            // Show success message
-            showSystemMessage('问题已优化！', 'success');
-        } catch (error) {
-            console.error('Error optimizing question:', error);
-            showSystemMessage('优化问题时出错，请重试', 'error');
-        } finally {
-            // Remove optimizing class from button
-            optimizeButton.classList.remove('optimizing');
-            optimizeButton.textContent = '优化问题';
-        }
-    }
-    
-    // Make handleEvaluateClick available globally
-    window.handleEvaluateClick = async function() {
-        const evaluateButton = document.getElementById('evaluate-button');
-        const evaluationResult = document.querySelector('#results-modal #evaluation-result');
-        
-        if (!evaluateButton || !evaluationResult) {
-            console.error('Evaluation button or result container not found');
-            return;
-        }
-        
-        // Show loading state with improved animation
-        evaluationResult.style.display = 'block';
-        evaluationResult.innerHTML = `
-            <div class="evaluation-loading" style="
-                text-align: center;
-                padding: 30px;
-                color: #4a5568;
-                font-size: 16px;
-                background: #f8fafc;
-                border-radius: 12px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            ">
-                <div class="loading-spinner" style="
-                    margin-bottom: 15px;
-                    display: inline-block;
-                    width: 40px;
-                    height: 40px;
-                    border: 3px solid #e2e8f0;
-                    border-radius: 50%;
-                    border-top-color: #4299e1;
-                    animation: spin 1s linear infinite;
-                "></div>
-                <div style="font-weight: 500;">正在生成评估报告，请稍候...</div>
-                <style>
-                    @keyframes spin {
-                        to { transform: rotate(360deg); }
-                    }
-                </style>
-            </div>
-        `;
-        
-        evaluateButton.disabled = true;
-        evaluateButton.textContent = '评估中...';
-        evaluateButton.style.backgroundColor = '#90cdf4';
-        
-        try {
-            // Calculate score and prepare data
-            let correctCount = 0;
-            window.userAnswers.forEach((answer, index) => {
-                if (answer === window.questions[index].answer) {
-                    correctCount++;
-                }
-            });
-            const scorePercentage = (correctCount / window.questions.length) * 100;
-
-            // Prepare test results data
-            const testResults = window.questions.map((question, index) => ({
-                questionText: question.questionText,
-                userAnswer: window.userAnswers[index],
-                correctAnswer: question.answer,
-                isCorrect: window.userAnswers[index] === question.answer,
-                explanation: question.explanation
-            }));
-
-            // Create evaluation prompt
-            const prompt = `请对以下测试结果进行全面评估。总题数：${window.questions.length}，正确题数：${correctCount}，正确率：${scorePercentage.toFixed(1)}%。
-            
-测试详情：${JSON.stringify(testResults, null, 2)}
-
-请按照以下五个方面进行分析，每个部分至少提供3-4点具体内容：
-
-总体表现评价
-• 整体答题表现分析
-• 知识掌握程度评估
-• 解题思路和方法评价
-
-知识点掌握情况
-• 已掌握的知识点（请具体指出）
-• 需要加强的知识点（请具体指出）
-• 知识运用能力分析
-
-易错点分析
-• 错误原因分析（针对具体题目）
-• 典型错误模式总结
-• 易混淆知识点辨析
-
-针对性改进建议
-• 具体的学习方法建议
-• 练习重点推荐
-• 时间分配建议
-
-推荐复习重点
-• 需要重点关注的知识点
-• 推荐的练习题型
-• 建议的学习资源
-
-回复要求：
-1. 保持鼓励性的语气
-2. 每个分析点要具体明确
-3. 建议要可操作可执行
-4. 适当使用表情符号增加亲和力
-
-请确保分析内容具体且有针对性，避免模糊的表述。`;
-
-            // Call API for evaluation
-            const response = await fetchAIResponse(prompt);
-            const evaluationContent = extractContentFromResponse(response);
-
-            // Enhanced evaluation result container styling
-            evaluationResult.style.cssText = `
-                display: block;
-                margin-top: 30px;
-                padding: 25px;
-                background: #ffffff;
-                border-radius: 12px;
-                text-align: left;
-                line-height: 1.6;
-                max-height: none;
-                opacity: 1;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            `;
-
-            // Format the evaluation content with enhanced sections
-            const formattedEvaluation = evaluationContent
-                .split(/(?=总体表现评价|知识点掌握情况|易错点分析|针对性改进建议|推荐复习重点)/)
-                .map((section, index) => {
-                    const title = section.match(/^[^：\n]+/);
-                    if (title) {
-                        // Define section-specific icons and colors
-                        const sectionStyles = {
-                            '总体表现评价': { icon: '📊', color: '#4299e1', bgColor: '#ebf8ff' },
-                            '知识点掌握情况': { icon: '📚', color: '#48bb78', bgColor: '#f0fff4' },
-                            '易错点分析': { icon: '⚠️', color: '#ed8936', bgColor: '#fffaf0' },
-                            '针对性改进建议': { icon: '💡', color: '#667eea', bgColor: '#ebf4ff' },
-                            '推荐复习重点': { icon: '🎯', color: '#9f7aea', bgColor: '#faf5ff' }
-                        };
-                        
-                        const style = sectionStyles[title[0]] || { icon: '📝', color: '#4a5568', bgColor: '#f7fafc' };
-                        
-                        return `
-                            <div class="evaluation-section" style="
-                                margin-bottom: 25px;
-                                padding: 20px;
-                                background: ${style.bgColor};
-                                border-radius: 12px;
-                                border: 1px solid ${style.color}20;
-                                animation: fadeIn 0.5s ease ${index * 0.1}s both;
-                            ">
-                                <h3 style="
-                                    color: ${style.color};
-                                    margin-bottom: 15px;
-                                    font-size: 1.25rem;
-                                    font-weight: 600;
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 8px;
-                                ">
-                                    <span style="font-size: 1.5rem;">${style.icon}</span>
-                                    ${title[0]}
-                                </h3>
-                                <div style="
-                                    color: #4a5568;
-                                    line-height: 1.8;
-                                    font-size: 1rem;
-                                ">
-                                    ${section.replace(title[0], '').trim()
-                                        .split('•').map(point => point.trim())
-                                        .filter(point => point)
-                                        .map(point => `
-                                            <div class="evaluation-point" style="
-                                                margin: 12px 0;
-                                                padding-left: 20px;
-                                                position: relative;
-                                            ">
-                                                <span style="
-                                                    position: absolute;
-                                                    left: 0;
-                                                    color: ${style.color};
-                                                ">•</span>
-                                                ${point}
-                                            </div>
-                                        `).join('')}
-                                </div>
-                            </div>
-                        `;
-                    }
-                    return section;
-                })
-                .join('');
-
-            // Add styles for animations
-            evaluationResult.innerHTML = `
-                <style>
-                    @keyframes fadeIn {
-                        from { opacity: 0; transform: translateY(10px); }
-                        to { opacity: 1; transform: translateY(0); }
-                    }
-                </style>
-                ${formattedEvaluation}
-            `;
-
-            // Force a reflow to ensure the content is displayed
-            evaluationResult.offsetHeight;
-
-            // Smooth scroll to show the evaluation
-            const modalContent = evaluationResult.closest('.modal-content');
-            if (modalContent) {
-                modalContent.scrollTo({
-                    top: evaluationResult.offsetTop - 20,
-                    behavior: 'smooth'
-                });
-            }
-
-            console.log('Evaluation content loaded and displayed in popup');
-
-        } catch (error) {
-            console.error('Evaluation error:', error);
-            evaluationResult.innerHTML = `
-                <div style="
-                    color: #e53e3e;
-                    padding: 20px;
-                    background: #fff5f5;
-                    border-radius: 12px;
-                    border: 1px solid #feb2b2;
-                    text-align: center;
-                    font-weight: 500;
-                ">
-                    <span style="font-size: 24px; margin-bottom: 10px; display: block;">❌</span>
-                    评估过程出错，请重试
-                </div>
-            `;
-            evaluationResult.style.display = 'block';
-        } finally {
-            evaluateButton.disabled = false;
-            evaluateButton.textContent = '成绩评估';
-            evaluateButton.style.backgroundColor = '#4299e1';
-        }
-    };
-    
-    // Initialize the page
-    populateGradeOptions(schoolSelect.value);
-    populateSubjectOptions(schoolSelect.value);
-
+document.addEventListener('DOMContentLoaded', function() {
     // Initialize form layout
     initializeFormLayout();
-
-    // Add event listener for generate questions button
-    if (generateQuestionsButton) {
-        generateQuestionsButton.addEventListener('click', function() {
-            console.log('Generate questions button clicked via event listener');
-            handleGenerateQuestionsClick();
-        });
+    
+    // Populate initial grade and subject options based on default school
+    const schoolSelect = document.getElementById('school-select');
+    if (schoolSelect) {
+        const initialSchool = schoolSelect.value;
+        populateGradeOptions(initialSchool);
+        populateSubjectOptions(initialSchool);
+        
+        // Also populate sidebar dropdowns
+        populateSidebarDropdowns();
     }
-
-    // Update output container styles
-    if (output) {
-        output.style.cssText = `
-            width: 100%;
-            max-width: 100%;
-            padding: clamp(10px, 3vw, 20px);
-            margin: 0;
-            background: transparent;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: clamp(14px, 4vw, 16px);
-            line-height: 1.6;
-        `;
-    }
-
-    // Update choices grid for better mobile display
-    const choicesGrid = document.querySelector('.choices-grid');
-    if (choicesGrid) {
-        choicesGrid.style.cssText = `
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: clamp(8px, 2vw, 20px);
-            margin: 25px 0;
-            width: 100%;
-        `;
-    }
-
-    // Make answer container more responsive
-    if (answerContainer) {
-        answerContainer.style.cssText = `
-            margin-top: clamp(20px, 5vw, 30px);
-            padding: clamp(15px, 4vw, 25px);
-            border-radius: 12px;
-            background-color: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            width: 100%;
-            box-sizing: border-box;
-            animation: fadeIn 0.3s ease;
-        `;
-    }
-
+    
     // Sync sidebar dropdowns with form dropdowns
     function syncDropdowns() {
         // School dropdown sync
@@ -2008,6 +1071,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Trigger change event to update dependent dropdowns
                 const event = new Event('change');
                 schoolSelectSidebar.dispatchEvent(event);
+                
+                // Also update sidebar dropdowns directly
+                populateSidebarDropdowns();
             });
             
             schoolSelectSidebar.addEventListener('change', function() {
@@ -2015,6 +1081,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Trigger change event to update dependent dropdowns
                 const event = new Event('change');
                 schoolSelect.dispatchEvent(event);
+                
+                // Also update sidebar dropdowns directly
+                populateSidebarDropdowns();
             });
         }
         
@@ -2116,6 +1185,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    // Function to populate sidebar dropdowns
+    function populateSidebarDropdowns() {
+        // Populate grade dropdown in sidebar
+        const gradeSelect = document.getElementById('grade-select');
+        const gradeSelectSidebar = document.getElementById('grade-select-sidebar');
+        if (gradeSelect && gradeSelectSidebar) {
+            // Clear existing options
+            gradeSelectSidebar.innerHTML = '';
+            
+            // Copy options from main form
+            Array.from(gradeSelect.options).forEach(option => {
+                gradeSelectSidebar.options.add(new Option(option.text, option.value));
+            });
+            
+            // Set the same selected value
+            gradeSelectSidebar.value = gradeSelect.value;
+        }
+        
+        // Populate subject dropdown in sidebar
+        const subjectSelect = document.getElementById('subject-select');
+        const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
+        if (subjectSelect && subjectSelectSidebar) {
+            // Clear existing options
+            subjectSelectSidebar.innerHTML = '';
+            
+            // Copy options from main form
+            Array.from(subjectSelect.options).forEach(option => {
+                subjectSelectSidebar.options.add(new Option(option.text, option.value));
+            });
+            
+            // Set the same selected value
+            subjectSelectSidebar.value = subjectSelect.value;
+        }
+    }
+    
     // Initialize dropdown sync
     syncDropdowns();
     
@@ -2123,11 +1227,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarGenerateButton = document.createElement('button');
     sidebarGenerateButton.textContent = '出题';
     sidebarGenerateButton.className = 'sidebar-generate-button';
-    sidebarGenerateButton.addEventListener('click', handleGenerateQuestionsClick);
+    sidebarGenerateButton.addEventListener('click', function() {
+        // Switch to the test tab if not already there
+        const createButton = document.getElementById('create-button');
+        if (createButton && !createButton.classList.contains('active')) {
+            createButton.click();
+        }
+        
+        // Then generate questions
+        handleGenerateQuestionsClick();
+    });
     
     // Add the button to the second frame
     const testFrame = document.querySelector('.sidebar-frame:nth-child(2) .frame-content');
     if (testFrame) {
         testFrame.appendChild(sidebarGenerateButton);
     }
+    
+    // Add event listeners for form changes to update sidebar
+    const formSelects = ['school-select', 'grade-select', 'subject-select', 'semester-select', 'difficulty-select', 'question-count-select'];
+    formSelects.forEach(id => {
+        const select = document.getElementById(id);
+        if (select) {
+            select.addEventListener('change', populateSidebarDropdowns);
+        }
+    });
 }); 
