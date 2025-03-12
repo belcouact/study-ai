@@ -3049,9 +3049,11 @@ function setupChatButtons() {
                 return;
             }
             
-            // Get selected school and grade from sidebar (ignore subject)
+            // Get selected school and grade from sidebar - add debug logging
             const selectedSchool = document.getElementById('sidebar-school')?.value || '';
             const selectedGrade = document.getElementById('sidebar-grade')?.value || '';
+            
+            console.log('Optimize button clicked with school:', selectedSchool, 'and grade:', selectedGrade);
             
             // Show loading state
             optimizeButton.disabled = true;
@@ -3062,15 +3064,17 @@ function setupChatButtons() {
             
 问题：${questionText}`;
 
-            // Add educational context if available - focus on school and grade only
-            if (selectedSchool || selectedGrade) {
+            // Add educational context if available - with explicit check for non-empty values
+            if (selectedSchool !== '' || selectedGrade !== '') {
+                console.log('Adding educational context to optimize prompt');
+                
                 prompt += `\n\n教育背景：`;
                 
-                if (selectedSchool) {
+                if (selectedSchool !== '') {
                     prompt += `\n- 学校类型：${selectedSchool}`;
                 }
                 
-                if (selectedGrade) {
+                if (selectedGrade !== '') {
                     prompt += `\n- 年级：${selectedGrade}`;
                 }
                 
@@ -3085,8 +3089,11 @@ function setupChatButtons() {
                     prompt += `\n\n请根据上述教育背景，优化问题使其更适合该年级学生的理解水平和学习需求。`;
                 }
             } else {
+                console.log('No educational context available for optimize prompt');
                 prompt += `\n\n请保持原始意图但使其更加清晰、准确和有教育意义。`;
             }
+            
+            console.log('Fetching AI response with prompt:', prompt);
             
             // Call the API
             fetchAIResponse(prompt)
@@ -3120,7 +3127,7 @@ function setupChatButtons() {
         });
     }
     
-    // Set up submit button
+    // Set up submit button - similar fix for the submit button
     const submitButton = document.getElementById('submit-button');
     if (submitButton) {
         submitButton.addEventListener('click', function() {
@@ -3131,9 +3138,11 @@ function setupChatButtons() {
                 return;
             }
             
-            // Get selected school and grade from sidebar (ignore subject)
+            // Get selected school and grade from sidebar - add debug logging
             const selectedSchool = document.getElementById('sidebar-school')?.value || '';
             const selectedGrade = document.getElementById('sidebar-grade')?.value || '';
+            
+            console.log('Submit button clicked with school:', selectedSchool, 'and grade:', selectedGrade);
             
             // Show loading state
             submitButton.disabled = true;
@@ -3145,15 +3154,17 @@ function setupChatButtons() {
             
 ${questionText}`;
 
-            // Add educational context if available - focus on school and grade only
-            if (selectedSchool || selectedGrade) {
+            // Add educational context if available - with explicit check for non-empty values
+            if (selectedSchool !== '' || selectedGrade !== '') {
+                console.log('Adding educational context to submit prompt');
+                
                 prompt += `\n\n教育背景：`;
                 
-                if (selectedSchool) {
+                if (selectedSchool !== '') {
                     prompt += `\n- 学校类型：${selectedSchool}`;
                 }
                 
-                if (selectedGrade) {
+                if (selectedGrade !== '') {
                     prompt += `\n- 年级：${selectedGrade}`;
                 }
                 
@@ -3183,8 +3194,11 @@ ${questionText}`;
                     prompt += `\n\n请根据上述教育背景，提供适合该年级学生理解水平的回答。解释应该清晰易懂，使用适合该年级学生的语言和概念。`;
                 }
             } else {
+                console.log('No educational context available for submit prompt');
                 prompt += `\n\n请提供清晰、准确、有教育意义的回答，如果涉及数学或科学概念，请确保解释清楚。`;
             }
+            
+            console.log('Fetching AI response with prompt:', prompt);
             
             // Call the API
             fetchAIResponse(prompt)
@@ -3197,10 +3211,10 @@ ${questionText}`;
                     
                     // Display the response with educational context
                     let contextHeader = '';
-                    if (selectedSchool || selectedGrade) {
+                    if (selectedSchool !== '' || selectedGrade !== '') {
                         const contextParts = [];
-                        if (selectedSchool) contextParts.push(selectedSchool);
-                        if (selectedGrade) contextParts.push(selectedGrade);
+                        if (selectedSchool !== '') contextParts.push(selectedSchool);
+                        if (selectedGrade !== '') contextParts.push(selectedGrade);
                         
                         contextHeader = `
                             <div class="context-header">
