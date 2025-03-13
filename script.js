@@ -5728,3 +5728,105 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry functionality initialized');
 });
+
+// ... existing code ...
+
+// Add this code right before the closing of the DOMContentLoaded event listener at line 5730
+
+    // Create a function to initialize the poetry panel if it doesn't exist
+    function initializePoetryPanel() {
+        console.log('Initializing poetry panel');
+        
+        // Check if we need to create the poetry panel
+        let poetryPanel = document.getElementById('poetry-panel');
+        if (!poetryPanel) {
+            // Get the main content area
+            const mainContent = document.querySelector('.content-area');
+            if (!mainContent) {
+                console.error('Main content element not found');
+                return false;
+            }
+            
+            // Create the poetry panel
+            console.log('Creating poetry panel element');
+            poetryPanel = document.createElement('div');
+            poetryPanel.id = 'poetry-panel';
+            poetryPanel.className = 'panel';
+            
+            // Add the panel to the main content
+            mainContent.appendChild(poetryPanel);
+            console.log('Poetry panel added to main content');
+        }
+        
+        return true;
+    }
+    
+    // Initialize the poetry panel
+    initializePoetryPanel();
+    
+    // Add a global error handler for uncaught errors
+    window.addEventListener('error', function(event) {
+        console.error('Global error caught:', event.error);
+        
+        // Check if it's a reference error for 'school'
+        if (event.error && event.error.message && event.error.message.includes('school is not defined')) {
+            console.warn('Caught "school is not defined" error - this likely means the educational context is missing');
+            
+            // Try to show a helpful message
+            try {
+                const poetryContent = document.querySelector('.poetry-content');
+                if (poetryContent) {
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'system-message error';
+                    errorMsg.textContent = '请先在左侧边栏选择学校和年级';
+                    
+                    if (poetryContent.firstChild) {
+                        poetryContent.insertBefore(errorMsg, poetryContent.firstChild);
+                    } else {
+                        poetryContent.appendChild(errorMsg);
+                    }
+                    
+                    // Auto-remove after 5 seconds
+                    setTimeout(() => {
+                        if (errorMsg.parentNode) {
+                            errorMsg.parentNode.removeChild(errorMsg);
+                        }
+                    }, 5000);
+                }
+            } catch (e) {
+                console.error('Error showing school error message:', e);
+            }
+        }
+    });
+    
+    // Add a safety check for the school variable in the click handler
+    document.addEventListener('click', function(event) {
+        if (event.target && event.target.id === 'learn-poetry-button') {
+            console.log('Learn poetry button clicked via delegation');
+            
+            // Check if school and grade are selected before proceeding
+            const schoolSelect = document.getElementById('school-select-sidebar');
+            const gradeSelect = document.getElementById('grade-select-sidebar');
+            
+            if (!schoolSelect || !schoolSelect.value) {
+                showPoetrySystemMessage('请先在左侧边栏选择学校', 'error');
+                return;
+            }
+            
+            if (!gradeSelect || !gradeSelect.selectedIndex) {
+                showPoetrySystemMessage('请先在左侧边栏选择年级', 'error');
+                return;
+            }
+            
+            // If we have both school and grade, proceed with generating poems
+            handleLearnPoetryClick();
+        }
+    });
+});
+// ... existing code ...
+
+// Initialize the application when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Application initializing...');
+    init();
+});
