@@ -5245,7 +5245,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleTabSwitch(containerType) {
         console.log('Switching to tab:', containerType);
         
-        // Remove all containers from DOM
+        // First, remove all containers from DOM to ensure clean state
         if (qaContainer && qaContainer.parentNode) {
             qaContainer.parentNode.removeChild(qaContainer);
         }
@@ -5263,15 +5263,27 @@ document.addEventListener('DOMContentLoaded', function() {
         if (createButton) createButton.classList.remove('active');
         if (poetryButton) poetryButton.classList.remove('active');
         
-        // Add the appropriate container to the content area
+        // Add only the appropriate container to the content area
         if (containerType === 'qa' && qaContainer && contentArea) {
             contentArea.appendChild(qaContainer);
             if (qaButton) qaButton.classList.add('active');
             console.log('QA container added to content area');
+            
+            // Ensure poetry container is not present
+            const existingPoetryContainer = document.getElementById('poetry-container');
+            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
+                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
+            }
         } else if (containerType === 'create' && createContainer && contentArea) {
             contentArea.appendChild(createContainer);
             if (createButton) createButton.classList.add('active');
             console.log('Create container added to content area');
+            
+            // Ensure poetry container is not present
+            const existingPoetryContainer = document.getElementById('poetry-container');
+            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
+                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
+            }
         } else if (containerType === 'poetry' && poetryContainer && contentArea) {
             contentArea.appendChild(poetryContainer);
             if (poetryButton) poetryButton.classList.add('active');
@@ -5478,16 +5490,51 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         try {
+            // Determine appropriate complexity level based on educational background
+            let complexityLevel = "简单";
+            let vocabularyLevel = "基础";
+            let explanationDetail = "详细";
+            
+            // Adjust complexity based on school level
+            if (school === "小学") {
+                if (parseInt(grade) <= 3) {
+                    complexityLevel = "非常简单";
+                    vocabularyLevel = "最基础";
+                    explanationDetail = "非常详细且通俗易懂";
+                } else {
+                    complexityLevel = "简单";
+                    vocabularyLevel = "基础";
+                    explanationDetail = "详细且通俗易懂";
+                }
+            } else if (school === "初中") {
+                complexityLevel = "中等";
+                vocabularyLevel = "适中";
+                explanationDetail = "较详细";
+            } else if (school === "高中") {
+                complexityLevel = "适当";
+                vocabularyLevel = "丰富";
+                explanationDetail = "深入";
+            }
+            
             // Prepare the prompt for the API - specifically requesting famous ancient poems
+            // with consideration for the student's educational level
             const prompt = `请为${school}${grade}的学生推荐5首著名的古代${poetryType}，风格为${poetryStyle}。
             请选择中国文学史上最著名、最经典的作品，这些作品应该是真实存在的古代诗词，不要创作新的内容。
+            
+            考虑到学生是${school}${grade}的水平：
+            - 请选择难度${complexityLevel}、词汇量${vocabularyLevel}的诗词
+            - 解释要${explanationDetail}，使用适合${school}${grade}学生理解的语言
+            - 背景介绍要有趣且与学生的知识水平相符
+            - 对于小学生，尽量选择朗朗上口、意境明确的诗词
+            - 对于初中生，可以选择稍有深度但主题明确的作品
+            - 对于高中生，可以选择有一定思想深度的经典作品
             
             每首诗都应包含以下内容：
             1. 题目
             2. 作者（必须是真实的历史人物）
             3. 原文（必须是原始的古代诗词文本）
-            4. 创作背景（包括历史背景和创作缘由）
-            5. 赏析（包括艺术特色和文学价值）
+            4. 创作背景（包括历史背景和创作缘由的详细介绍，适合${school}${grade}学生理解的深度）
+            5. 赏析（重点解释难词难句，便于学生更好的理解，同时介绍诗词曲的艺术特色和文学价值，使用${school}${grade}学生能理解的语言）
             
             请以JSON格式返回，格式如下：
             [
