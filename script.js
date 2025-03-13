@@ -2,6 +2,12 @@
 let currentApiFunction = 'chat';
 let currentModel = 'deepseek-r1';
 
+// Define poemState globally so it's available to all functions
+let poemState = {
+    poems: [],
+    currentIndex: 0
+};
+
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
     console.log('Parsing questions from response:', response);
