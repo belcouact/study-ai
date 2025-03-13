@@ -5449,9 +5449,14 @@ document.addEventListener('DOMContentLoaded', function() {
 // Add missing function definitions at the top level
 function initializePoetryPanel() {
     console.log('Initializing poetry panel...');
-    const mainContent = document.querySelector('.main-content');
+    // Try different selectors for main content
+    const mainContent = document.querySelector('#main-content') || 
+                       document.querySelector('.main-content') || 
+                       document.querySelector('main');
+                       
     if (!mainContent) {
-        console.error('Main content element not found');
+        console.error('Main content element not found. Available elements:', 
+            document.body.innerHTML);
         return;
     }
 
@@ -5462,7 +5467,6 @@ function initializePoetryPanel() {
         poetryPanel = document.createElement('div');
         poetryPanel.id = 'poetry-container';
         poetryPanel.className = 'container';
-        poetryPanel.style.display = 'none';
         
         // Create the poetry content structure
         poetryPanel.innerHTML = `
@@ -5479,6 +5483,7 @@ function initializePoetryPanel() {
         `;
         
         mainContent.appendChild(poetryPanel);
+        console.log('Poetry panel added to main content');
         
         // Initialize the poetry dropdowns
         const poetryType = document.getElementById('poetry-type');
@@ -5489,11 +5494,17 @@ function initializePoetryPanel() {
             });
         }
     }
+
+    // Show the poetry panel
+    poetryPanel.style.display = 'block';
     
     // Add event listener to the learn poetry button
     const learnPoetryButton = document.getElementById('learn-poetry-button');
     if (learnPoetryButton) {
-        learnPoetryButton.addEventListener('click', handleLearnPoetryClick);
+        // Remove any existing event listeners
+        const newButton = learnPoetryButton.cloneNode(true);
+        learnPoetryButton.parentNode.replaceChild(newButton, learnPoetryButton);
+        newButton.addEventListener('click', handleLearnPoetryClick);
         console.log('Added event listener to learn poetry button');
     }
 }
@@ -5546,10 +5557,19 @@ function handleTabSwitch(containerType) {
 
 // Update the DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize school variable from the select element
-    const schoolSelect = document.getElementById('school-select-sidebar');
-    const school = schoolSelect ? schoolSelect.value : '小学';
-    
+    // Remove any existing event listeners from the poetry button
+    const poetryButton = document.querySelector('[data-container="poetry"]');
+    if (poetryButton) {
+        const newButton = poetryButton.cloneNode(true);
+        poetryButton.parentNode.replaceChild(newButton, poetryButton);
+        
+        // Add single event listener
+        newButton.addEventListener('click', () => {
+            console.log('Poetry button clicked - single handler');
+            handleTabSwitch('poetry');
+        });
+    }
+
     // Initialize the application
     console.log('Application initializing...');
     
@@ -5558,16 +5578,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize with QA container
     handleTabSwitch('qa');
-    
-    // Initialize poetry functionality
-    console.log('Poetry functionality initializing...');
-    const poetryButton = document.querySelector('[data-container="poetry"]');
-    if (poetryButton) {
-        poetryButton.addEventListener('click', () => {
-            console.log('Poetry button clicked');
-            handleTabSwitch('poetry');
-        });
-    }
     
     console.log('Application initialized');
 });
