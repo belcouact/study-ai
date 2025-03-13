@@ -86,28 +86,11 @@
                         </div>
                     </div>
                     
-                    <!-- Poetry Configuration Frame -->
-                    <div class="sidebar-frame poetry-config-frame">
-                        <h3 class="frame-title">诗词</h3>
-                        <div class="frame-content">
-                            <div class="dropdown-container">
-                                <label for="poetry-type-select">类型</label>
-                                <select id="poetry-type-select" name="poetryType">
-                                    <option value="唐诗">唐诗</option>
-                                    <option value="宋词">宋词</option>
-                                    <option value="元曲">元曲</option>
-                                </select>
-                            </div>
-                            
-                            <div class="dropdown-container">
-                                <label for="poetry-style-select">风格</label>
-                                <select id="poetry-style-select" name="poetryStyle">
-                                    <option value="山水">山水</option>
-                                    <option value="边塞">边塞</option>
-                                    <option value="浪漫">浪漫</option>
-                                    <option value="现实">现实</option>
-                                </select>
-                            </div>
+                    <!-- Poetry Config Frame -->
+                    <div class="poetry-config-frame">
+                        <h3>诗词配置</h3>
+                        <div class="sidebar-section">
+                            <p class="sidebar-note">选择您的学校和年级以获取适合您学习阶段的诗词推荐。</p>
                         </div>
                     </div>
                 </div>
@@ -195,35 +178,60 @@
                 </div>
             </div>
             
-            <!-- Poetry Container (initially hidden) -->
-            <div id="poetry-container" class="container hidden">
+            <!-- Poetry Container -->
+            <div id="poetry-container" class="container">
                 <div class="poetry-header">
-                    <h1>Poem</h1>
-                    <button id="learn-poetry-button" class="primary-button poetry-button">学习诗词</button>
+                    <div class="poetry-controls">
+                        <div class="poetry-selectors">
+                            <div class="selector-group">
+                                <label for="poetry-type-select">类型</label>
+                                <select id="poetry-type-select" class="poetry-select">
+                                    <option value="唐诗">唐诗</option>
+                                    <option value="宋词">宋词</option>
+                                    <option value="元曲">元曲</option>
+                                </select>
+                            </div>
+                            <div class="selector-group">
+                                <label for="poetry-style-select">风格</label>
+                                <select id="poetry-style-select" class="poetry-select">
+                                    <option value="山水">山水</option>
+                                    <option value="边塞">边塞</option>
+                                    <option value="浪漫">浪漫</option>
+                                    <option value="现实">现实</option>
+                                </select>
+                            </div>
+                            <button id="learn-poetry-button" class="primary-button poetry-button">学习诗词</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="poetry-content">
                     <div id="poetry-empty-state" class="empty-state">
-                        <i class="fas fa-feather-alt empty-state-icon"></i>
-                        <h3>探索中国古典诗词的美</h3>
-                        <p>点击上方的"学习诗词"按钮，系统将根据您的学习阶段推荐适合的诗词作品。</p>
+                        <img src="assets/poetry-icon.svg" alt="Poetry Icon" class="empty-state-icon">
+                        <h3>开始学习古诗词</h3>
+                        <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成适合您学习阶段的诗词。</p>
                     </div>
-                    <div id="poetry-display" class="poetry-display hidden">
-                        <!-- Poetry content will be displayed here -->
+                    <div id="poetry-display" class="hidden">
                         <div class="poem-navigation">
-                            <button id="prev-poem-button" class="nav-button poem-nav-button" disabled>
-                                <i class="fas fa-chevron-left"></i>
+                            <button id="prev-poem-button" class="poem-nav-button" disabled>
+                                <i class="fas fa-arrow-left"></i>
                             </button>
-                            <div class="poem-counter">1 / 5</div>
-                            <button id="next-poem-button" class="nav-button poem-nav-button">
-                                <i class="fas fa-chevron-right"></i>
+                            <span class="poem-counter">1 / 5</span>
+                            <button id="next-poem-button" class="poem-nav-button">
+                                <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
-                        <div class="poem-container">
+                        <div class="poem-display">
                             <h2 class="poem-title"></h2>
                             <p class="poem-author"></p>
                             <div class="poem-content"></div>
-                            <div class="poem-background"></div>
-                            <div class="poem-explanation"></div>
+                            <div class="poem-section">
+                                <h3>创作背景</h3>
+                                <div class="poem-background"></div>
+                            </div>
+                            <div class="poem-section">
+                                <h3>赏析</h3>
+                                <div class="poem-explanation"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
