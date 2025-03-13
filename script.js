@@ -5445,3 +5445,129 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // ... existing code ...
 });
+
+// Add missing function definitions at the top level
+function initializePoetryPanel() {
+    console.log('Initializing poetry panel...');
+    const mainContent = document.querySelector('.main-content');
+    if (!mainContent) {
+        console.error('Main content element not found');
+        return;
+    }
+
+    // Check if poetry panel already exists
+    let poetryPanel = document.getElementById('poetry-container');
+    if (!poetryPanel) {
+        console.log('Creating new poetry panel');
+        poetryPanel = document.createElement('div');
+        poetryPanel.id = 'poetry-container';
+        poetryPanel.className = 'container';
+        poetryPanel.style.display = 'none';
+        
+        // Create the poetry content structure
+        poetryPanel.innerHTML = `
+            <div class="poetry-controls">
+                <select id="poetry-type">
+                    <option value="唐诗">唐诗</option>
+                    <option value="宋词">宋词</option>
+                    <option value="元曲">元曲</option>
+                </select>
+                <select id="poetry-style"></select>
+                <button id="learn-poetry-button">学习诗词</button>
+            </div>
+            <div class="poetry-content"></div>
+        `;
+        
+        mainContent.appendChild(poetryPanel);
+        
+        // Initialize the poetry dropdowns
+        const poetryType = document.getElementById('poetry-type');
+        if (poetryType) {
+            updatePoetryStyleOptions(poetryType.value);
+            poetryType.addEventListener('change', (e) => {
+                updatePoetryStyleOptions(e.target.value);
+            });
+        }
+    }
+    
+    // Add event listener to the learn poetry button
+    const learnPoetryButton = document.getElementById('learn-poetry-button');
+    if (learnPoetryButton) {
+        learnPoetryButton.addEventListener('click', handleLearnPoetryClick);
+        console.log('Added event listener to learn poetry button');
+    }
+}
+
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('collapsed');
+    }
+}
+
+// Update handleTabSwitch function
+function handleTabSwitch(containerType) {
+    console.log('Switching to container type:', containerType);
+    
+    // Always check for and remove poetry container first when switching to non-poetry tabs
+    const poetryContainer = document.getElementById('poetry-container');
+    if (containerType !== 'poetry' && poetryContainer && poetryContainer.parentNode) {
+        console.log('Removing poetry container from DOM');
+        poetryContainer.parentNode.removeChild(poetryContainer);
+    }
+
+    // Hide all containers first
+    const containers = document.querySelectorAll('.container');
+    containers.forEach(container => {
+        container.style.display = 'none';
+    });
+
+    // Show the selected container
+    const selectedContainer = document.getElementById(`${containerType}-container`);
+    if (selectedContainer) {
+        selectedContainer.style.display = 'block';
+    }
+
+    // Update active state of tab buttons
+    const buttons = document.querySelectorAll('.tab-button');
+    buttons.forEach(button => {
+        button.classList.remove('active');
+        if (button.getAttribute('data-container') === containerType) {
+            button.classList.add('active');
+        }
+    });
+
+    // Special handling for poetry tab
+    if (containerType === 'poetry') {
+        console.log('Switching to poetry tab');
+        initializePoetryPanel();
+    }
+}
+
+// Update the DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize school variable from the select element
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    const school = schoolSelect ? schoolSelect.value : '小学';
+    
+    // Initialize the application
+    console.log('Application initializing...');
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Initialize with QA container
+    handleTabSwitch('qa');
+    
+    // Initialize poetry functionality
+    console.log('Poetry functionality initializing...');
+    const poetryButton = document.querySelector('[data-container="poetry"]');
+    if (poetryButton) {
+        poetryButton.addEventListener('click', () => {
+            console.log('Poetry button clicked');
+            handleTabSwitch('poetry');
+        });
+    }
+    
+    console.log('Application initialized');
+});
