@@ -1040,4 +1040,200 @@ button:active {
     .poetry .poem-line {
         font-size: 0.95rem;
     }
+}
+
+/* Add or update poetry panel styles */
+
+/* Poetry Panel */
+#poetry-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+#poetry-panel.hidden {
+    display: none;
+}
+
+#poetry-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.poetry-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.poetry-header h2 {
+    margin: 0;
+    color: var(--primary-color);
+}
+
+.poetry-config-frame {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.config-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.config-row label {
+    font-weight: 500;
+    min-width: 80px;
+}
+
+.config-row select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-width: 120px;
+}
+
+.poetry-button {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    align-self: flex-start;
+}
+
+.poetry-button:hover {
+    background-color: #0056b3;
+}
+
+.poetry-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 2rem;
+    text-align: center;
+    color: #666;
+}
+
+#poetry-display {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.poem-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.poem-nav-button {
+    padding: 0.5rem 1rem;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.poem-nav-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.poem-display {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.poem-title {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    text-align: center;
+}
+
+.poem-author {
+    margin: 0.5rem 0 1rem;
+    font-style: italic;
+    text-align: center;
+    color: #666;
+}
+
+.poem-content {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    text-align: center;
+    margin: 1rem 0;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    white-space: pre-line;
+}
+
+.poem-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.poem-section {
+    padding: 1rem;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+}
+
+.poem-section h4 {
+    margin: 0 0 0.5rem;
+    color: var(--primary-color);
+}
+
+.poem-section p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .poetry-config-frame {
+        flex-direction: column;
+    }
+    
+    .poem-display {
+        padding: 1rem;
+    }
+    
+    .poem-title {
+        font-size: 1.3rem;
+    }
+    
+    .poem-content {
+        font-size: 1rem;
+    }
 } 

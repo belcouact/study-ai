@@ -1791,7 +1791,7 @@ function handleGenerateQuestionsClick() {
 示例格式：
 题目：[题目内容]
 A. [选项A内容]
-B. [选项B内容]
+B. [选项B内容] 
 C. [选项C内容]
 D. [选项D内容]
 答案：[A或B或C或D]
@@ -4865,6 +4865,311 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Updated poetry style options');
         });
     }
+    
+    console.log('Poetry tab functionality initialized');
+});
+
+// Add this code at the end of the file
+
+// Poetry Tab Functionality - Complete implementation
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Poetry tab functionality initializing...');
+    
+    // Get the poetry button and panel
+    const poetryButton = document.getElementById('poetry-button');
+    const poetryPanel = document.getElementById('poetry-panel');
+    const qaPanel = document.getElementById('qa-panel');
+    const createPanel = document.getElementById('create-panel');
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    
+    // Log what we found
+    console.log('Poetry elements found:', {
+        poetryButton: !!poetryButton,
+        poetryPanel: !!poetryPanel,
+        qaPanel: !!qaPanel,
+        createPanel: !!createPanel
+    });
+    
+    // If poetry panel doesn't exist, create it
+    if (!poetryPanel) {
+        console.log('Creating poetry panel element');
+        const newPoetryPanel = document.createElement('div');
+        newPoetryPanel.id = 'poetry-panel';
+        newPoetryPanel.className = 'panel hidden';
+        
+        // Create the basic structure
+        newPoetryPanel.innerHTML = `
+            <div id="poetry-container" class="content-container">
+                <div class="poetry-header">
+                    <h2>诗词学习</h2>
+                    <div class="poetry-config-frame">
+                        <div class="config-row">
+                            <label for="poetry-type">诗词类型:</label>
+                            <select id="poetry-type">
+                                <option value="唐诗">唐诗</option>
+                                <option value="宋词">宋词</option>
+                                <option value="元曲">元曲</option>
+                            </select>
+                        </div>
+                        <div class="config-row">
+                            <label for="poetry-style">诗词风格:</label>
+                            <select id="poetry-style">
+                                <option value="山水">山水</option>
+                                <option value="边塞">边塞</option>
+                                <option value="浪漫">浪漫</option>
+                                <option value="现实">现实</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="learn-poetry-button" class="primary-button poetry-button">学习诗词</button>
+                </div>
+                <div class="poetry-content">
+                    <div id="poetry-empty-state" class="empty-state">
+                        <p>请选择学校和年级，然后点击"学习诗词"按钮生成适合您的诗词。</p>
+                    </div>
+                    <div id="poetry-display" class="hidden">
+                        <div class="poem-navigation">
+                            <button id="prev-poem-button" class="poem-nav-button" disabled>◀ 上一首</button>
+                            <span id="poem-counter">1 / 5</span>
+                            <button id="next-poem-button" class="poem-nav-button">下一首 ▶</button>
+                        </div>
+                        <div class="poem-display">
+                            <h3 id="poem-title" class="poem-title"></h3>
+                            <p id="poem-author" class="poem-author"></p>
+                            <div id="poem-content" class="poem-content"></div>
+                            <div class="poem-info">
+                                <div class="poem-section">
+                                    <h4>背景</h4>
+                                    <p id="poem-background"></p>
+                                </div>
+                                <div class="poem-section">
+                                    <h4>赏析</h4>
+                                    <p id="poem-explanation"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add the panel to the document
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+            mainContent.appendChild(newPoetryPanel);
+            console.log('Poetry panel added to the document');
+        } else {
+            console.error('Main content element not found');
+        }
+    }
+    
+    // Add direct event listener to poetry button
+    if (poetryButton) {
+        poetryButton.addEventListener('click', function(event) {
+            console.log('Poetry button clicked (direct handler)');
+            
+            // Get the poetry panel again in case it was just created
+            const poetryPanel = document.getElementById('poetry-panel');
+            
+            // Hide other panels
+            if (qaPanel) qaPanel.classList.add('hidden');
+            if (createPanel) createPanel.classList.add('hidden');
+            
+            // Show poetry panel
+            if (poetryPanel) {
+                poetryPanel.classList.remove('hidden');
+                console.log('Poetry panel is now visible');
+            } else {
+                console.error('Poetry panel not found');
+            }
+            
+            // Update active states
+            if (qaButton) qaButton.classList.remove('active');
+            if (createButton) createButton.classList.remove('active');
+            poetryButton.classList.add('active');
+            
+            // Initialize poetry type and style dropdowns
+            initializePoetryDropdowns();
+        });
+        console.log('Direct event listener added to poetry button');
+    } else {
+        console.error('Poetry button not found');
+    }
+    
+    // Initialize poetry type and style dropdowns
+    function initializePoetryDropdowns() {
+        const poetryTypeSelect = document.getElementById('poetry-type');
+        const poetryStyleSelect = document.getElementById('poetry-style');
+        
+        if (poetryTypeSelect && poetryStyleSelect) {
+            // Add event listener for poetry type dropdown
+            poetryTypeSelect.addEventListener('change', function() {
+                updatePoetryStyleOptions(poetryTypeSelect.value);
+            });
+            
+            // Initialize style options based on current type
+            updatePoetryStyleOptions(poetryTypeSelect.value);
+        }
+    }
+    
+    // Update poetry style options based on selected type
+    function updatePoetryStyleOptions(poetryType) {
+        console.log('Updating poetry style options for type:', poetryType);
+        
+        const poetryStyleSelect = document.getElementById('poetry-style');
+        if (!poetryStyleSelect) {
+            console.error('Poetry style select element not found');
+            return;
+        }
+        
+        // Clear existing options
+        while (poetryStyleSelect.options.length > 0) {
+            poetryStyleSelect.remove(0);
+        }
+        
+        // Add new options based on selected type
+        let styles = [];
+        
+        if (poetryType === '唐诗') {
+            styles = ['山水', '边塞', '浪漫', '现实'];
+        } else if (poetryType === '宋词') {
+            styles = ['婉约', '豪放'];
+        } else if (poetryType === '元曲') {
+            styles = ['杂居', '散曲'];
+        }
+        
+        // Add options to select
+        styles.forEach(style => {
+            const option = document.createElement('option');
+            option.value = style;
+            option.textContent = style;
+            poetryStyleSelect.appendChild(option);
+        });
+        
+        console.log('Updated poetry style options:', styles);
+    }
+    
+    // Add event listener to Learn Poetry button
+    document.addEventListener('click', function(event) {
+        if (event.target && event.target.id === 'learn-poetry-button') {
+            console.log('Learn poetry button clicked (delegated handler)');
+            
+            // Get selected values
+            const poetryTypeSelect = document.getElementById('poetry-type');
+            const poetryStyleSelect = document.getElementById('poetry-style');
+            const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
+            const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
+            
+            console.log(`Generating poems for type: ${poetryType}, style: ${poetryStyle}`);
+            
+            // Mock data for testing
+            let mockPoems = [];
+            
+            if (poetryType === '唐诗') {
+                if (poetryStyle === '山水') {
+                    mockPoems = [
+                        {
+                            title: "望庐山瀑布",
+                            author: "李白",
+                            content: "日照香炉生紫烟，\n遥看瀑布挂前川。\n飞流直下三千尺，\n疑是银河落九天。",
+                            background: "这首诗是唐代诗人李白游览庐山时所作，描写了庐山瀑布的壮观景象。",
+                            explanation: "这首诗生动地描绘了庐山瀑布的壮丽景象，表现了诗人对自然的热爱和赞美。"
+                        },
+                        {
+                            title: "山居秋暝",
+                            author: "王维",
+                            content: "空山新雨后，\n天气晚来秋。\n明月松间照，\n清泉石上流。\n竹喧归浣女，\n莲动下渔舟。\n随意春芳歇，\n王孙自可留。",
+                            background: "这首诗是唐代诗人王维隐居辋川别墅时所作，描写了秋天傍晚山中的景色。",
+                            explanation: "这首诗描绘了一幅秋天傍晚山中的美丽图画，意境清幽，画面感强，被誉为"诗中有画"的代表作。"
+                        }
+                    ];
+                } else if (poetryStyle === '边塞') {
+                    mockPoems = [
+                        {
+                            title: "出塞",
+                            author: "王昌龄",
+                            content: "秦时明月汉时关，\n万里长征人未还。\n但使龙城飞将在，\n不教胡马度阴山。",
+                            background: "这首诗是唐代诗人王昌龄所作，描写了边塞战争的场景和诗人对国家安危的关切。",
+                            explanation: "这首诗表达了诗人对国家安危的关切，气势雄浑，情感真挚，表现了诗人的爱国情怀。"
+                        }
+                    ];
+                }
+            } else if (poetryType === '宋词') {
+                if (poetryStyle === '婉约') {
+                    mockPoems = [
+                        {
+                            title: "一剪梅",
+                            author: "李清照",
+                            content: "红藕香残玉簟秋。\n轻解罗裳，独上兰舟。\n云中谁寄锦书来？\n雁字回时，月满西楼。\n\n花自飘零水自流。\n一种相思，两处闲愁。\n此情无计可消除，\n才下眉头，却上心头。",
+                            background: "这首词是宋代女词人李清照所作，表达了词人对丈夫的思念之情。",
+                            explanation: "这首词表达了词人对丈夫的思念之情，语言优美，情感真挚，是婉约词的代表作。"
+                        }
+                    ];
+                } else if (poetryStyle === '豪放') {
+                    mockPoems = [
+                        {
+                            title: "念奴娇·赤壁怀古",
+                            author: "苏轼",
+                            content: "大江东去，浪淘尽，千古风流人物。\n故垒西边，人道是，三国周郎赤壁。\n乱石穿空，惊涛拍岸，卷起千堆雪。\n江山如画，一时多少豪杰。\n\n遥想公瑾当年，小乔初嫁了，雄姿英发。\n羽扇纶巾，谈笑间，樯橹灰飞烟灭。\n故国神游，多情应笑我，早生华发。\n人生如梦，一尊还酹江月。",
+                            background: "这首词是宋代文学家苏轼游览赤壁时所作，抒发了对历史人物和事件的感慨。",
+                            explanation: "这首词抒发了词人对历史人物和事件的感慨，气势磅礴，意境开阔，是豪放词的代表作。"
+                        }
+                    ];
+                }
+            } else if (poetryType === '元曲') {
+                if (poetryStyle === '杂居') {
+                    mockPoems = [
+                        {
+                            title: "天净沙·秋思",
+                            author: "马致远",
+                            content: "枯藤老树昏鸦，\n小桥流水人家，\n古道西风瘦马。\n夕阳西下，\n断肠人在天涯。",
+                            background: "这首曲是元代戏曲家马致远所作，描写了一幅凄凉的秋日黄昏景象。",
+                            explanation: "这首小令描绘了一幅凄凉的秋日黄昏景象，语言精炼，意境凄凉，被誉为"秋思之祖"。"
+                        }
+                    ];
+                } else if (poetryStyle === '散曲') {
+                    mockPoems = [
+                        {
+                            title: "折桂令·春情",
+                            author: "关汉卿",
+                            content: "春情难拘，\n和风解愠，\n香醪消凝。\n天与人兮，\n云与帝兮，\n今何在兮，\n共饮长江水。",
+                            background: "这首散曲是元代戏曲家关汉卿所作，描写了春天的美好景象和诗人的愉悦心情。",
+                            explanation: "这首散曲描写了春天的美好景象和诗人的愉悦心情，语言优美，意境清新。"
+                        }
+                    ];
+                }
+            }
+            
+            // Get poetry display elements
+            const poetryEmptyState = document.getElementById('poetry-empty-state');
+            const poetryDisplay = document.getElementById('poetry-display');
+            const poemTitle = document.getElementById('poem-title');
+            const poemAuthor = document.getElementById('poem-author');
+            const poemContent = document.getElementById('poem-content');
+            const poemBackground = document.getElementById('poem-background');
+            const poemExplanation = document.getElementById('poem-explanation');
+            const poemCounter = document.getElementById('poem-counter');
+            
+            // Hide empty state and show display
+            if (poetryEmptyState) poetryEmptyState.classList.add('hidden');
+            if (poetryDisplay) poetryDisplay.classList.remove('hidden');
+            
+            // Display the first poem
+            if (mockPoems.length > 0) {
+                if (poemTitle) poemTitle.textContent = mockPoems[0].title;
+                if (poemAuthor) poemAuthor.textContent = mockPoems[0].author;
+                if (poemContent) poemContent.innerHTML = mockPoems[0].content.replace(/\n/g, '<br>');
+                if (poemBackground) poemBackground.innerHTML = mockPoems[0].background;
+                if (poemExplanation) poemExplanation.innerHTML = mockPoems[0].explanation;
+                if (poemCounter) poemCounter.textContent = `1 / ${mockPoems.length}`;
+                
+                console.log('Mock poem displayed for', poetryType, poetryStyle);
+            } else {
+                console.log('No poems available for', poetryType, poetryStyle);
+            }
+        }
+    });
     
     console.log('Poetry tab functionality initialized');
 });
