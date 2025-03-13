@@ -22,6 +22,7 @@
             <div class="panel-buttons">
                 <button id="qa-button" class="panel-button active">问答</button>
                 <button id="create-button" class="panel-button">测验</button>
+                <button id="poetry-button" class="panel-button">诗词</button>
                 
                 <!-- Dropdown Frames -->
                 <div class="dropdown-frames">
@@ -80,6 +81,31 @@
                                 <select id="question-count-select-sidebar" name="questionCount">
                                     <option value="5">5</option>
                                     <option value="10">10</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Poetry Configuration Frame -->
+                    <div class="sidebar-frame poetry-config-frame">
+                        <h3 class="frame-title">诗词</h3>
+                        <div class="frame-content">
+                            <div class="dropdown-container">
+                                <label for="poetry-type-select">类型</label>
+                                <select id="poetry-type-select" name="poetryType">
+                                    <option value="唐诗">唐诗</option>
+                                    <option value="宋词">宋词</option>
+                                    <option value="元曲">元曲</option>
+                                </select>
+                            </div>
+                            
+                            <div class="dropdown-container">
+                                <label for="poetry-style-select">风格</label>
+                                <select id="poetry-style-select" name="poetryStyle">
+                                    <option value="山水">山水</option>
+                                    <option value="爱情">爱情</option>
+                                    <option value="思乡">思乡</option>
+                                    <option value="边塞">边塞</option>
                                 </select>
                             </div>
                         </div>
@@ -166,6 +192,40 @@
                 <div class="navigation-controls">
                     <button id="prev-question-button" class="nav-button" disabled>上一题</button>
                     <button id="next-question-button" class="nav-button" disabled>下一题</button>
+                </div>
+            </div>
+            
+            <!-- Poetry Container (initially hidden) -->
+            <div id="poetry-container" class="container hidden">
+                <div class="poetry-header">
+                    <h1>Poem</h1>
+                    <button id="learn-poetry-button" class="primary-button poetry-button">学习诗词</button>
+                </div>
+                <div class="poetry-content">
+                    <div id="poetry-empty-state" class="empty-state">
+                        <i class="fas fa-feather-alt empty-state-icon"></i>
+                        <h3>探索中国古典诗词的美</h3>
+                        <p>点击上方的"学习诗词"按钮，系统将根据您的学习阶段推荐适合的诗词作品。</p>
+                    </div>
+                    <div id="poetry-display" class="poetry-display hidden">
+                        <!-- Poetry content will be displayed here -->
+                        <div class="poem-navigation">
+                            <button id="prev-poem-button" class="nav-button poem-nav-button" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <div class="poem-counter">1 / 5</div>
+                            <button id="next-poem-button" class="nav-button poem-nav-button">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="poem-container">
+                            <h2 class="poem-title"></h2>
+                            <p class="poem-author"></p>
+                            <div class="poem-content"></div>
+                            <div class="poem-background"></div>
+                            <div class="poem-explanation"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
