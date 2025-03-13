@@ -5250,6 +5250,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get the content area where containers should be placed
     const contentArea = document.querySelector('.content-area');
     
+    // Global state for poems - MOVED HERE to be in scope for all functions
+    const poemState = {
+        poems: [],
+        currentIndex: 0
+    };
+    
     // Function to handle tab switching
     function handleTabSwitch(containerType) {
         console.log('Switching to tab:', containerType);
@@ -5322,7 +5328,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (freshButton) {
                         console.log('Adding fresh event listener to learn poetry button');
                         freshButton.addEventListener('click', function() {
-                            handleLearnPoetryClick(poetryTypeSelect, poetryStyleSelect);
+                            handleLearnPoetryClick();
                         });
                     }
                 }
@@ -5332,12 +5338,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize with QA container
     handleTabSwitch('qa');
-    
-    // Global state for poems
-    const poemState = {
-        poems: [],
-        currentIndex: 0
-    };
     
     // Function to display the current poem
     function displayCurrentPoem() {
@@ -5423,8 +5423,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Custom showSystemMessage function for poetry panel to avoid conflicts
+    function showPoetrySystemMessage(message, type = 'info') {
+        console.log(`Poetry System Message (${type}):`, message);
+        
+        // Create message element
+        const messageElement = document.createElement('div');
+        messageElement.className = `system-message ${type}`;
+        messageElement.textContent = message;
+        
+        // Find a suitable container to show the message
+        const poetryContent = document.querySelector('.poetry-content');
+        if (poetryContent) {
+            // Insert at the top of poetry content
+            if (poetryContent.firstChild) {
+                poetryContent.insertBefore(messageElement, poetryContent.firstChild);
+            } else {
+                poetryContent.appendChild(messageElement);
+            }
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (messageElement.parentNode) {
+                    messageElement.parentNode.removeChild(messageElement);
+                }
+            }, 5000);
+        } else {
+            // Fallback: just log to console if we can't find a container
+            console.warn('Could not find poetry content container to show message:', message);
+        }
+    }
+    
     // Function to handle learn poetry button click
-    async function handleLearnPoetryClick(typeSelect, styleSelect) {
+    async function handleLearnPoetryClick() {
         console.log('Learn poetry button clicked - function invoked');
         
         // Get user's educational context
@@ -5432,7 +5463,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const gradeSelect = document.getElementById('grade-select-sidebar');
         
         if (!schoolSelect || !gradeSelect) {
-            showSystemMessage('无法获取学校和年级信息', 'error');
+            showPoetrySystemMessage('无法获取学校和年级信息', 'error');
             return;
         }
         
@@ -5440,18 +5471,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const grade = gradeSelect.options[gradeSelect.selectedIndex].text;
         
         if (!school || !grade) {
-            showSystemMessage('请先选择学校和年级', 'warning');
+            showPoetrySystemMessage('请先选择学校和年级', 'warning');
             return;
         }
         
         // Get poetry type and style from the main panel selects (not sidebar)
-        // Use the passed in references or get fresh ones if not provided
-        const currentTypeSelect = typeSelect || document.getElementById('poetry-type-select');
-        const currentStyleSelect = styleSelect || document.getElementById('poetry-style-select');
+        const currentTypeSelect = document.getElementById('poetry-type-select');
+        const currentStyleSelect = document.getElementById('poetry-style-select');
         
         if (!currentTypeSelect || !currentStyleSelect) {
             console.error('Poetry type or style select not found');
-            showSystemMessage('无法获取诗词类型和风格信息', 'error');
+            showPoetrySystemMessage('无法获取诗词类型和风格信息', 'error');
             return;
         }
         
@@ -5671,7 +5701,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // Show error message
                 if (poetryEmptyState) poetryEmptyState.classList.remove('hidden');
-                showSystemMessage(`无法生成${poetryType}的${poetryStyle}风格诗词，请稍后再试`, 'error');
+                showPoetrySystemMessage(`无法生成${poetryType}的${poetryStyle}风格诗词，请稍后再试`, 'error');
             }
         } catch (error) {
             console.error('Error generating poems:', error);
@@ -5683,7 +5713,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Show error message
             if (poetryEmptyState) poetryEmptyState.classList.remove('hidden');
-            showSystemMessage('生成诗词时出错，请稍后再试', 'error');
+            showPoetrySystemMessage('生成诗词时出错，请稍后再试', 'error');
         }
     }
     
@@ -5692,10 +5722,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(event) {
         if (event.target && event.target.id === 'learn-poetry-button') {
             console.log('Learn poetry button clicked via delegation');
-            // Get fresh references to the select elements
-            const currentTypeSelect = document.getElementById('poetry-type-select');
-            const currentStyleSelect = document.getElementById('poetry-style-select');
-            handleLearnPoetryClick(currentTypeSelect, currentStyleSelect);
+            handleLearnPoetryClick();
         }
     });
     
