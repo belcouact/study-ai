@@ -5500,6 +5500,8 @@ document.addEventListener('DOMContentLoaded', function() {
             let complexityLevel = "简单";
             let vocabularyLevel = "基础";
             let explanationDetail = "详细";
+            let examplePoems = "";
+            let wordCount = "20-40字";
             
             // Adjust complexity based on school level
             if (school === "小学") {
@@ -5507,19 +5509,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     complexityLevel = "非常简单";
                     vocabularyLevel = "最基础";
                     explanationDetail = "非常详细且通俗易懂";
+                    wordCount = "20-30字";
+                    examplePoems = "如《静夜思》《春晓》《悯农》等简短易懂的诗";
                 } else {
                     complexityLevel = "简单";
                     vocabularyLevel = "基础";
                     explanationDetail = "详细且通俗易懂";
+                    wordCount = "30-40字";
+                    examplePoems = "如《登鹳雀楼》《游子吟》《咏柳》等小学课本中的经典诗";
                 }
             } else if (school === "初中") {
                 complexityLevel = "中等";
                 vocabularyLevel = "适中";
                 explanationDetail = "较详细";
+                wordCount = "40-60字";
+                examplePoems = "如《望岳》《送元二使安西》《茅屋为秋风所破歌》等初中课本中的经典诗";
             } else if (school === "高中") {
                 complexityLevel = "适当";
                 vocabularyLevel = "丰富";
                 explanationDetail = "深入";
+                wordCount = "不限";
+                examplePoems = "如《蜀相》《琵琶行》《念奴娇·赤壁怀古》等高中课本中的经典诗";
             }
             
             // Modify the prompt to handle "任意" style
@@ -5535,13 +5545,23 @@ document.addEventListener('DOMContentLoaded', function() {
             const prompt = `请为${school}${grade}的学生推荐5首著名的古代${poetryType}，${stylePrompt}。
             请选择中国文学史上最著名、最经典的作品，这些作品应该是真实存在的古代诗词，不要创作新的内容。
             
-            考虑到学生是${school}${grade}的水平：
-            - 请选择难度${complexityLevel}、词汇量${vocabularyLevel}的诗词
+            【重要】这些诗词必须严格符合${school}${grade}学生的认知水平和学习需求：
+            1. 诗词长度：优先选择${wordCount}左右的诗词，${examplePoems}
+            2. 难度要求：选择难度${complexityLevel}、词汇量${vocabularyLevel}的诗词
+            3. 内容要求：主题积极向上，意境清晰，适合${school}${grade}学生理解和背诵
+            4. 教育价值：具有明确的情感表达和思想内涵，能够引发学生共鸣
+            
+            针对不同学龄段的具体要求：
+            - 小学低年级(1-3年级)：选择字数少、节奏感强、内容生动形象的诗词，如《静夜思》《春晓》
+            - 小学高年级(4-6年级)：选择意境优美、主题明确的诗词，如《望庐山瀑布》《黄鹤楼送孟浩然之广陵》
+            - 初中：选择思想内涵较丰富、艺术手法有特色的诗词，如《望岳》《茅屋为秋风所破歌》
+            - 高中：选择思想深度和艺术价值较高的诗词，如《蜀相》《琵琶行》《念奴娇·赤壁怀古》
+            
+            解释和赏析要求：
             - 解释要${explanationDetail}，使用适合${school}${grade}学生理解的语言
             - 背景介绍要有趣且与学生的知识水平相符
-            - 对于小学生，尽量选择朗朗上口、意境明确的诗词
-            - 对于初中生，可以选择稍有深度但主题明确的作品
-            - 对于高中生，可以选择有一定思想深度的经典作品
+            - 赏析要重点解释难词难句，并用${school}${grade}学生能理解的现代语言翻译原文
+            - 分析要点明诗词的意境、情感和艺术特色，但避免过于学术化的术语
             
             每首诗都应包含以下内容：
             1. 题目
