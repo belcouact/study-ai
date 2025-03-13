@@ -5176,6 +5176,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 poetryStyleSelect.remove(0);
             }
             
+            // Always add "任意" option first
+            const anyOption = document.createElement('option');
+            anyOption.value = '任意';
+            anyOption.textContent = '任意';
+            poetryStyleSelect.appendChild(anyOption);
+            
             // Add new options based on selected type
             let styles = [];
             
@@ -5195,7 +5201,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 poetryStyleSelect.appendChild(option);
             });
             
-            console.log('Updated poetry style options:', styles);
+            console.log('Updated poetry style options:', ['任意', ...styles]);
         }
         
         // Add event listener for poetry type change
@@ -5516,9 +5522,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 explanationDetail = "深入";
             }
             
+            // Modify the prompt to handle "任意" style
+            let stylePrompt = '';
+            if (poetryStyle === '任意') {
+                stylePrompt = `风格不限`;
+            } else {
+                stylePrompt = `风格为${poetryStyle}`;
+            }
+            
             // Prepare the prompt for the API - specifically requesting famous ancient poems
             // with consideration for the student's educational level
-            const prompt = `请为${school}${grade}的学生推荐5首著名的古代${poetryType}，风格为${poetryStyle}。
+            const prompt = `请为${school}${grade}的学生推荐5首著名的古代${poetryType}，${stylePrompt}。
             请选择中国文学史上最著名、最经典的作品，这些作品应该是真实存在的古代诗词，不要创作新的内容。
             
             考虑到学生是${school}${grade}的水平：
@@ -5534,7 +5548,7 @@ document.addEventListener('DOMContentLoaded', function() {
             2. 作者（必须是真实的历史人物）
             3. 原文（必须是原始的古代诗词文本）
             4. 创作背景（包括历史背景和创作缘由的详细介绍，适合${school}${grade}学生理解的深度）
-            5. 赏析（重点解释难词难句，便于学生更好的理解，同时介绍诗词曲的艺术特色和文学价值，使用${school}${grade}学生能理解的语言）
+            5. 赏析（逐句解释翻译，同时指出难词难句，同时介绍诗词曲的艺术特色和文学价值，使用${school}${grade}学生能理解的语言）
             
             请以JSON格式返回，格式如下：
             [
