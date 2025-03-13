@@ -3961,48 +3961,44 @@ function getSimplifiedContextSummary() {
 
 // Initialize the application
 function init() {
-    console.log('Initializing application...');
+    console.log('Initializing application');
     
-    // Setup event listeners
+    // Cache DOM elements
+    const contentArea = document.querySelector('.content-area');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const leftPanel = document.querySelector('.left-panel');
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const poetryButton = document.getElementById('poetry-button');
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    const poetryContainer = document.getElementById('poetry-container');
+    
+    // Initialize the school and grade dropdowns in the sidebar
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    if (schoolSelect) {
+        // Populate grade options based on the default school
+        populateSidebarGradeOptions(schoolSelect.value);
+        
+        // Add event listener to update grade options when school changes
+        schoolSelect.addEventListener('change', function() {
+            populateSidebarGradeOptions(this.value);
+        });
+    }
+    
+    // Set up event listeners
     setupEventListeners();
     
-    // Populate sidebar options based on selected school
-    const selectedSchool = elements.schoolSelectSidebar.value;
-    if (selectedSchool) {
-        populateSidebarGradeOptions(selectedSchool);
-    }
+    // Initialize poetry dropdowns
+    initializePoetryDropdowns();
     
-    // Initialize empty state for quiz creation
+    // Set up chat buttons
+    setupChatButtons();
+    
+    // Initialize empty state
     initializeEmptyState();
     
-    // IMPORTANT: Directly add event listener to poetry button
-    const poetryButton = document.getElementById('poetry-button');
-    if (poetryButton) {
-        console.log('Adding direct click event listener to poetry button');
-        poetryButton.addEventListener('click', function() {
-            console.log('Poetry button clicked directly');
-            // Hide all panels
-            document.getElementById('qa-panel').classList.add('hidden');
-            document.getElementById('create-panel').classList.add('hidden');
-            
-            // Show poetry panel
-            const poetryPanel = document.getElementById('poetry-panel');
-            if (poetryPanel) {
-                poetryPanel.classList.remove('hidden');
-                console.log('Poetry panel is now visible');
-            } else {
-                console.error('Poetry panel element not found');
-            }
-            
-            // Update active states
-            document.getElementById('qa-button').classList.remove('active');
-            document.getElementById('create-button').classList.remove('active');
-            poetryButton.classList.add('active');
-        });
-    } else {
-        console.error('Poetry button not found during init');
-    }
-    
+    // Log initialization complete
     console.log('Application initialized');
 }
 
@@ -5116,6 +5112,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const schoolSelect = document.getElementById('school-select-sidebar');
         const gradeSelect = document.getElementById('grade-select-sidebar');
         
+        if (schoolSelect) {
+            // First, populate the grade options based on the current school
+            populateSidebarGradeOptions(schoolSelect.value);
+            
+            // Add event listener to school select to update grade options
+            schoolSelect.addEventListener('change', function() {
+                populateSidebarGradeOptions(this.value);
+            });
+        }
+        
         if (schoolSelect && gradeSelect && subjectSelect) {
             // Populate subject options based on school
             const school = schoolSelect.value;
@@ -5142,7 +5148,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Get values from the form
                 const school = schoolSelect ? schoolSelect.value : '';
-                const grade = gradeSelect ? gradeSelect.options[gradeSelect.selectedIndex].text : '';
+                const grade = gradeSelect ? gradeSelect.options[gradeSelect.selectedIndex]?.text || '' : '';
                 const subject = subjectSelect ? subjectSelect.value : '';
                 const semester = semesterSelect ? semesterSelect.value : '上学期';
                 const difficulty = difficultySelect ? difficultySelect.value : '中等';
@@ -5152,6 +5158,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 handleGenerateQuestionsClick(school, grade, subject, semester, difficulty, questionCount);
             });
         }
+    }
+    
+    // Function to populate grade options in the sidebar based on school
+    function populateSidebarGradeOptions(school) {
+        console.log('Populating sidebar grade options for school:', school);
+        const gradeSelect = document.getElementById('grade-select-sidebar');
+        
+        if (!gradeSelect) {
+            console.error('Grade select element not found');
+            return;
+        }
+        
+        // Clear existing options
+        while (gradeSelect.options.length > 0) {
+            gradeSelect.remove(0);
+        }
+        
+        // Add new options based on school
+        let grades = [];
+        
+        if (school === '小学') {
+            grades = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+        } else if (school === '初中') {
+            grades = ['初一', '初二', '初三'];
+        } else if (school === '高中') {
+            grades = ['高一', '高二', '高三'];
+        }
+        
+        // Add options to select
+        grades.forEach(grade => {
+            const option = document.createElement('option');
+            option.value = grade;
+            option.textContent = grade;
+            gradeSelect.appendChild(option);
+        });
+        
+        console.log('Populated grade options:', grades);
     }
     
     // Function to populate subject options based on school
