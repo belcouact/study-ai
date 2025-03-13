@@ -5479,3 +5479,350 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry functionality initialized');
 });
+
+// Add this code at the end of the file, replacing the previous fix
+
+// Fix for poetry functionality
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Poetry functionality initializing...');
+    
+    // Get the poetry type and style select elements
+    const poetryTypeSelect = document.getElementById('poetry-type-select');
+    const poetryStyleSelect = document.getElementById('poetry-style-select');
+    
+    if (poetryTypeSelect && poetryStyleSelect) {
+        console.log('Found poetry type and style selects');
+        
+        // Function to update style options based on selected type
+        function updatePoetryStyleOptions() {
+            const poetryType = poetryTypeSelect.value;
+            console.log('Updating poetry style options for type:', poetryType);
+            
+            // Clear existing options
+            while (poetryStyleSelect.options.length > 0) {
+                poetryStyleSelect.remove(0);
+            }
+            
+            // Add new options based on selected type
+            let styles = [];
+            
+            if (poetryType === '唐诗') {
+                styles = ['山水', '边塞', '浪漫', '现实'];
+            } else if (poetryType === '宋词') {
+                styles = ['婉约', '豪放'];
+            } else if (poetryType === '元曲') {
+                styles = ['杂居', '散曲'];
+            }
+            
+            // Add options to select
+            styles.forEach(style => {
+                const option = document.createElement('option');
+                option.value = style;
+                option.textContent = style;
+                poetryStyleSelect.appendChild(option);
+            });
+            
+            console.log('Updated poetry style options:', styles);
+        }
+        
+        // Add event listener for poetry type change
+        poetryTypeSelect.addEventListener('change', updatePoetryStyleOptions);
+        
+        // Initialize style options based on default type
+        updatePoetryStyleOptions();
+    } else {
+        console.error('Poetry type or style select not found');
+    }
+    
+    // Get all containers
+    const poetryContainer = document.getElementById('poetry-container');
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    
+    // Get all buttons
+    const poetryButton = document.getElementById('poetry-button');
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    
+    // Function to handle tab switching
+    function handleTabSwitch(activeContainer, activeButton) {
+        console.log('Switching to tab:', activeButton ? activeButton.textContent : 'unknown');
+        
+        // Hide all containers first
+        if (qaContainer) qaContainer.classList.add('hidden');
+        if (createContainer) createContainer.classList.add('hidden');
+        if (poetryContainer) poetryContainer.classList.add('hidden');
+        
+        // Reset active states
+        if (qaButton) qaButton.classList.remove('active');
+        if (createButton) createButton.classList.remove('active');
+        if (poetryButton) poetryButton.classList.remove('active');
+        
+        // Set active button
+        if (activeButton) activeButton.classList.add('active');
+        
+        // Show active container
+        if (activeContainer) {
+            activeContainer.classList.remove('hidden');
+            console.log('Container is now visible:', activeContainer.id);
+        }
+    }
+    
+    // Add event listeners to buttons
+    if (qaButton) {
+        qaButton.addEventListener('click', function() {
+            console.log('QA button clicked');
+            handleTabSwitch(qaContainer, qaButton);
+        });
+    }
+    
+    if (createButton) {
+        createButton.addEventListener('click', function() {
+            console.log('Create button clicked');
+            handleTabSwitch(createContainer, createButton);
+        });
+    }
+    
+    if (poetryButton) {
+        poetryButton.addEventListener('click', function() {
+            console.log('Poetry button clicked');
+            handleTabSwitch(poetryContainer, poetryButton);
+        });
+    }
+    
+    // Initialize with QA container
+    handleTabSwitch(qaContainer, qaButton);
+    
+    // Global state for poems
+    const poemState = {
+        poems: [],
+        currentIndex: 0
+    };
+    
+    // Function to display the current poem
+    function displayCurrentPoem() {
+        if (!poemState.poems || poemState.poems.length === 0) {
+            console.error('No poems available to display');
+            return;
+        }
+        
+        const poem = poemState.poems[poemState.currentIndex];
+        
+        // Get poem elements
+        const poemTitle = document.querySelector('.poem-title');
+        const poemAuthor = document.querySelector('.poem-author');
+        const poemContent = document.querySelector('.poem-content');
+        const poemBackground = document.querySelector('.poem-background');
+        const poemExplanation = document.querySelector('.poem-explanation');
+        const poemCounter = document.querySelector('.poem-counter');
+        
+        // Display poem data
+        if (poemTitle) poemTitle.textContent = poem.title;
+        if (poemAuthor) poemAuthor.textContent = poem.author;
+        if (poemContent) poemContent.innerHTML = poem.content.replace(/\n/g, '<br>');
+        if (poemBackground) poemBackground.innerHTML = poem.background;
+        if (poemExplanation) poemExplanation.innerHTML = poem.explanation;
+        if (poemCounter) poemCounter.textContent = `${poemState.currentIndex + 1} / ${poemState.poems.length}`;
+        
+        // Update navigation buttons
+        updatePoemNavigationButtons();
+    }
+    
+    // Function to update navigation buttons
+    function updatePoemNavigationButtons() {
+        const prevButton = document.getElementById('prev-poem-button');
+        const nextButton = document.getElementById('next-poem-button');
+        
+        if (prevButton) {
+            prevButton.disabled = poemState.currentIndex === 0;
+        }
+        
+        if (nextButton) {
+            nextButton.disabled = poemState.currentIndex === poemState.poems.length - 1;
+        }
+    }
+    
+    // Add event listeners for navigation buttons
+    const prevPoemButton = document.getElementById('prev-poem-button');
+    const nextPoemButton = document.getElementById('next-poem-button');
+    
+    if (prevPoemButton) {
+        prevPoemButton.addEventListener('click', function() {
+            console.log('Previous poem button clicked');
+            if (poemState.currentIndex > 0) {
+                poemState.currentIndex--;
+                displayCurrentPoem();
+            }
+        });
+    }
+    
+    if (nextPoemButton) {
+        nextPoemButton.addEventListener('click', function() {
+            console.log('Next poem button clicked');
+            if (poemState.currentIndex < poemState.poems.length - 1) {
+                poemState.currentIndex++;
+                displayCurrentPoem();
+            }
+        });
+    }
+    
+    // Add event listener to Learn Poetry button
+    const learnPoetryButton = document.getElementById('learn-poetry-button');
+    if (learnPoetryButton) {
+        learnPoetryButton.addEventListener('click', async function() {
+            console.log('Learn poetry button clicked');
+            
+            // Get user's educational context
+            const schoolSelect = document.getElementById('school-select-sidebar');
+            const gradeSelect = document.getElementById('grade-select-sidebar');
+            
+            if (!schoolSelect || !gradeSelect) {
+                showSystemMessage('无法获取学校和年级信息', 'error');
+                return;
+            }
+            
+            const school = schoolSelect.value;
+            const grade = gradeSelect.options[gradeSelect.selectedIndex].text;
+            
+            if (!school || !grade) {
+                showSystemMessage('请先选择学校和年级', 'warning');
+                return;
+            }
+            
+            // Get poetry type and style
+            const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
+            const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
+            
+            console.log(`Generating poems for: ${school} ${grade}, Type: ${poetryType}, Style: ${poetryStyle}`);
+            
+            // Show loading state
+            const poetryEmptyState = document.getElementById('poetry-empty-state');
+            const poetryDisplay = document.getElementById('poetry-display');
+            
+            if (poetryEmptyState) poetryEmptyState.classList.add('hidden');
+            if (poetryDisplay) poetryDisplay.classList.add('hidden');
+            
+            // Create and show loading indicator
+            let loadingIndicator = document.getElementById('poetry-loading');
+            if (!loadingIndicator) {
+                loadingIndicator = document.createElement('div');
+                loadingIndicator.id = 'poetry-loading';
+                loadingIndicator.innerHTML = `
+                    <div class="spinner"></div>
+                    <p>正在查找适合${school}${grade}学生的${poetryType}，风格为${poetryStyle}...</p>
+                `;
+                loadingIndicator.style.display = 'flex';
+                loadingIndicator.style.flexDirection = 'column';
+                loadingIndicator.style.alignItems = 'center';
+                loadingIndicator.style.justifyContent = 'center';
+                loadingIndicator.style.padding = '3rem';
+                
+                const poetryContent = document.querySelector('.poetry-content');
+                if (poetryContent) {
+                    poetryContent.appendChild(loadingIndicator);
+                }
+            } else {
+                loadingIndicator.style.display = 'flex';
+            }
+            
+            try {
+                // Prepare the prompt for the API
+                const prompt = `请为${school}${grade}的学生生成5首${poetryType}，风格为${poetryStyle}。
+                每首诗都应包含以下内容：
+                1. 题目
+                2. 作者
+                3. 原文
+                4. 创作背景
+                5. 赏析
+                
+                请以JSON格式返回，格式如下：
+                [
+                  {
+                    "title": "诗词标题",
+                    "author": "作者",
+                    "content": "诗词原文",
+                    "background": "创作背景",
+                    "explanation": "赏析"
+                  },
+                  ...
+                ]`;
+                
+                // Call the API
+                const response = await fetchAIResponse(prompt);
+                console.log('API response received');
+                
+                // Parse the response to extract the poems
+                let poems = [];
+                try {
+                    // Try to find JSON in the response
+                    const jsonMatch = response.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                    if (jsonMatch) {
+                        poems = JSON.parse(jsonMatch[0]);
+                    } else {
+                        throw new Error('No JSON found in response');
+                    }
+                } catch (parseError) {
+                    console.error('Error parsing poems from response:', parseError);
+                    
+                    // Fallback: Try to extract structured content
+                    const sections = response.split(/(?=\d+\.\s*题目[:：])/);
+                    
+                    for (let i = 1; i < sections.length; i++) {
+                        const section = sections[i];
+                        
+                        const titleMatch = section.match(/题目[:：]\s*(.+?)(?=\n|$)/);
+                        const authorMatch = section.match(/作者[:：]\s*(.+?)(?=\n|$)/);
+                        const contentMatch = section.match(/原文[:：]\s*([\s\S]+?)(?=\n\d+\.\s*创作背景[:：]|$)/);
+                        const backgroundMatch = section.match(/创作背景[:：]\s*([\s\S]+?)(?=\n\d+\.\s*赏析[:：]|$)/);
+                        const explanationMatch = section.match(/赏析[:：]\s*([\s\S]+?)(?=\n\d+\.\s*题目[:：]|$)/);
+                        
+                        if (titleMatch && authorMatch && contentMatch) {
+                            poems.push({
+                                title: titleMatch[1].trim(),
+                                author: authorMatch[1].trim(),
+                                content: contentMatch[1].trim(),
+                                background: backgroundMatch ? backgroundMatch[1].trim() : "暂无背景信息",
+                                explanation: explanationMatch ? explanationMatch[1].trim() : "暂无赏析"
+                            });
+                        }
+                    }
+                }
+                
+                // Remove loading indicator
+                if (loadingIndicator) {
+                    loadingIndicator.style.display = 'none';
+                }
+                
+                if (poems.length > 0) {
+                    // Store poems in state
+                    poemState.poems = poems;
+                    poemState.currentIndex = 0;
+                    
+                    // Display poems
+                    if (poetryDisplay) poetryDisplay.classList.remove('hidden');
+                    displayCurrentPoem();
+                } else {
+                    // Show error message
+                    if (poetryEmptyState) poetryEmptyState.classList.remove('hidden');
+                    showSystemMessage(`无法生成${poetryType}的${poetryStyle}风格诗词，请稍后再试`, 'error');
+                }
+            } catch (error) {
+                console.error('Error generating poems:', error);
+                
+                // Remove loading indicator
+                if (loadingIndicator) {
+                    loadingIndicator.style.display = 'none';
+                }
+                
+                // Show error message
+                if (poetryEmptyState) poetryEmptyState.classList.remove('hidden');
+                showSystemMessage('生成诗词时出错，请稍后再试', 'error');
+            }
+        });
+        console.log('Added event listener to learn poetry button');
+    } else {
+        console.error('Learn poetry button not found');
+    }
+    
+    console.log('Poetry functionality initialized');
+});
