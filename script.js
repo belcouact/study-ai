@@ -5081,7 +5081,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             author: "王维",
                             content: "空山新雨后，\n天气晚来秋。\n明月松间照，\n清泉石上流。\n竹喧归浣女，\n莲动下渔舟。\n随意春芳歇，\n王孙自可留。",
                             background: "这首诗是唐代诗人王维隐居辋川别墅时所作，描写了秋天傍晚山中的景色。",
-                            explanation: "这首诗描绘了一幅秋天傍晚山中的美丽图画，意境清幽，画面感强，被誉为"诗中有画"的代表作。"
+                            explanation: "这首诗描绘了一幅秋天傍晚山中的美丽图画，意境清幽，画面感强，被誉为\"诗中有画\"的代表作。"
                         }
                     ];
                 } else if (poetryStyle === '边塞') {
@@ -5125,7 +5125,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             author: "马致远",
                             content: "枯藤老树昏鸦，\n小桥流水人家，\n古道西风瘦马。\n夕阳西下，\n断肠人在天涯。",
                             background: "这首曲是元代戏曲家马致远所作，描写了一幅凄凉的秋日黄昏景象。",
-                            explanation: "这首小令描绘了一幅凄凉的秋日黄昏景象，语言精炼，意境凄凉，被誉为"秋思之祖"。"
+                            explanation: "这首小令描绘了一幅凄凉的秋日黄昏景象，语言精炼，意境凄凉，被誉为\"秋思之祖\"。"
                         }
                     ];
                 } else if (poetryStyle === '散曲') {
@@ -5172,4 +5172,85 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     console.log('Poetry tab functionality initialized');
+});
+
+// Add this code at the end of the file
+
+// Fix for poetry type and style association
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the poetry type and style select elements
+    const poetryTypeSelect = document.getElementById('poetry-type-select');
+    const poetryStyleSelect = document.getElementById('poetry-style-select');
+    
+    if (poetryTypeSelect && poetryStyleSelect) {
+        console.log('Found poetry type and style selects');
+        
+        // Function to update style options based on selected type
+        function updatePoetryStyleOptions() {
+            const poetryType = poetryTypeSelect.value;
+            console.log('Updating poetry style options for type:', poetryType);
+            
+            // Clear existing options
+            while (poetryStyleSelect.options.length > 0) {
+                poetryStyleSelect.remove(0);
+            }
+            
+            // Add new options based on selected type
+            let styles = [];
+            
+            if (poetryType === '唐诗') {
+                styles = ['山水', '边塞', '浪漫', '现实'];
+            } else if (poetryType === '宋词') {
+                styles = ['婉约', '豪放'];
+            } else if (poetryType === '元曲') {
+                styles = ['杂居', '散曲'];
+            }
+            
+            // Add options to select
+            styles.forEach(style => {
+                const option = document.createElement('option');
+                option.value = style;
+                option.textContent = style;
+                poetryStyleSelect.appendChild(option);
+            });
+            
+            console.log('Updated poetry style options:', styles);
+        }
+        
+        // Add event listener for poetry type change
+        poetryTypeSelect.addEventListener('change', updatePoetryStyleOptions);
+        
+        // Initialize style options based on default type
+        updatePoetryStyleOptions();
+    } else {
+        console.error('Poetry type or style select not found');
+    }
+    
+    // Fix for poetry button click
+    const poetryButton = document.getElementById('poetry-button');
+    const poetryContainer = document.getElementById('poetry-container');
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    
+    if (poetryButton && poetryContainer) {
+        poetryButton.addEventListener('click', function() {
+            console.log('Poetry button clicked (direct handler)');
+            
+            // Hide other containers
+            if (qaContainer) qaContainer.classList.add('hidden');
+            if (createContainer) createContainer.classList.add('hidden');
+            
+            // Show poetry container
+            poetryContainer.classList.remove('hidden');
+            
+            // Update active state
+            document.querySelectorAll('.panel-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            poetryButton.classList.add('active');
+            
+            console.log('Poetry container is now visible');
+        });
+        console.log('Added direct event listener to poetry button');
+    }
 });
