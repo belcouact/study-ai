@@ -5376,3 +5376,85 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Application initializing...');
     init();
 });
+
+// Global state for poetry functionality
+let poemState = {
+    poems: [],
+    currentIndex: 0
+};
+
+// Poetry-specific system message function
+function showPoetrySystemMessage(message, type = 'info') {
+    const poetryContainer = document.getElementById('poetry-container');
+    if (!poetryContainer) return;
+    
+    const existingMessage = poetryContainer.querySelector('.system-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `system-message ${type}`;
+    messageDiv.textContent = message;
+    
+    const poetryContent = poetryContainer.querySelector('.poetry-content');
+    if (poetryContent) {
+        poetryContainer.insertBefore(messageDiv, poetryContent);
+    } else {
+        poetryContainer.appendChild(messageDiv);
+    }
+}
+
+// ... existing code ...
+
+async function handleLearnPoetryClick() {
+    try {
+        const poetryTypeSelect = document.getElementById('poetry-type');
+        const poetryStyleSelect = document.getElementById('poetry-style');
+        
+        if (!poetryTypeSelect || !poetryStyleSelect) {
+            showPoetrySystemMessage('Poetry selectors not found', 'error');
+            return;
+        }
+
+        const selectedType = poetryTypeSelect.value;
+        const selectedStyle = poetryStyleSelect.value;
+
+        if (!selectedType || !selectedStyle) {
+            showPoetrySystemMessage('Please select both poetry type and style', 'error');
+            return;
+        }
+
+        showPoetrySystemMessage('Generating poems...', 'info');
+        
+        // Rest of the function remains the same
+        // ... existing code ...
+    } catch (error) {
+        console.error('Error generating poems:', error);
+        showPoetrySystemMessage('Error generating poems: ' + error.message, 'error');
+    }
+}
+
+// ... existing code ...
+
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing code ...
+    
+    // Direct event listener for learn poetry button
+    const learnPoetryButton = document.getElementById('learn-poetry-button');
+    if (learnPoetryButton) {
+        learnPoetryButton.addEventListener('click', handleLearnPoetryClick);
+    }
+    
+    // Remove delegation listener - commented out to show what was removed
+    /*
+    document.addEventListener('click', function(event) {
+        if (event.target && event.target.id === 'learn-poetry-button') {
+            console.log('Learn poetry button clicked via delegation');
+            handleLearnPoetryClick();
+        }
+    });
+    */
+    
+    // ... existing code ...
+});
