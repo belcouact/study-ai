@@ -5474,6 +5474,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             explanation: "这首词表达了词人对丈夫的思念之情，语言优美，情感真挚，是婉约词的代表作。"
                         }
                     ];
+                } else if (poetryStyle === '豪放') {
+                    mockPoems = [
+                        {
+                            title: "念奴娇·赤壁怀古",
+                            author: "苏轼",
+                            content: "大江东去，浪淘尽，千古风流人物。\n故垒西边，人道是，三国周郎赤壁。\n乱石穿空，惊涛拍岸，卷起千堆雪。\n江山如画，一时多少豪杰。\n\n遥想公瑾当年，小乔初嫁了，雄姿英发。\n羽扇纶巾，谈笑间，樯橹灰飞烟灭。\n故国神游，多情应笑我，早生华发。\n人生如梦，一尊还酹江月。",
+                            background: "这首词是宋代文学家苏轼游览赤壁时所作，抒发了对历史人物和事件的感慨。",
+                            explanation: "这首词抒发了词人对历史人物和事件的感慨。上片描绘了赤壁的壮丽景色和历史背景；下片追忆了三国时期周瑜的英姿和赤壁之战的辉煌，同时也表达了词人对人生短暂的感慨。全词气势磅礴，意境开阔，是豪放词的代表作。"
+                        }
+                    ];
                 }
             } else if (poetryType === '元曲') {
                 if (poetryStyle === '杂居') {
@@ -5484,6 +5494,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             content: "枯藤老树昏鸦，\n小桥流水人家，\n古道西风瘦马。\n夕阳西下，\n断肠人在天涯。",
                             background: "这首曲是元代戏曲家马致远所作，描写了一幅凄凉的秋日黄昏景象。",
                             explanation: "这首小令描绘了一幅凄凉的秋日黄昏景象，语言精炼，意境凄凉，被誉为\"秋思之祖\"。"
+                        }
+                    ];
+                } else if (poetryStyle === '散曲') {
+                    mockPoems = [
+                        {
+                            title: "折桂令·春情",
+                            author: "关汉卿",
+                            content: "春情难拘，\n和风解愠，\n香醪消凝。\n天与人兮，\n云与帝兮，\n今何在兮，\n共饮长江水。",
+                            background: "这首散曲是元代戏曲家关汉卿所作，描写了春天的美好景象和诗人的愉悦心情。",
+                            explanation: "这首散曲描写了春天的美好景象和诗人的愉悦心情，语言优美，意境清新。"
                         }
                     ];
                 }
