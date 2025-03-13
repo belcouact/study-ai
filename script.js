@@ -2,8 +2,8 @@
 let currentApiFunction = 'chat';
 let currentModel = 'deepseek-r1';
 
-// Define poemState globally so it's available to all functions
-let poemState = {
+// Global state declaration - at the very top of the file, before any functions
+window.poemState = {
     poems: [],
     currentIndex: 0
 };
