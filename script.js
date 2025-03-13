@@ -5635,3 +5635,37 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Application initialized');
 });
+
+function updatePoetryStyleOptions(poetryType) {
+    console.log('Updating poetry style options for type:', poetryType);
+    
+    const poetryStyleSelect = document.getElementById('poetry-style');
+    if (!poetryStyleSelect) {
+        console.error('Poetry style select not found');
+        return;
+    }
+    
+    // Clear existing options
+    poetryStyleSelect.innerHTML = '';
+    
+    // Add new options based on poetry type
+    let styleOptions = [];
+    
+    if (poetryType === '唐诗') {
+        styleOptions = ['山水', '边塞', '浪漫', '现实'];
+    } else if (poetryType === '宋词') {
+        styleOptions = ['婉约', '豪放', '民间'];
+    } else if (poetryType === '元曲') {
+        styleOptions = ['小令', '散曲', '杂剧'];
+    }
+    
+    // Add options to select
+    styleOptions.forEach(style => {
+        const option = document.createElement('option');
+        option.value = style;
+        option.textContent = style;
+        poetryStyleSelect.appendChild(option);
+    });
+    
+    console.log('Updated poetry style options:', styleOptions);
+}
