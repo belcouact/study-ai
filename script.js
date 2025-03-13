@@ -5276,6 +5276,22 @@ document.addEventListener('DOMContentLoaded', function() {
             contentArea.appendChild(poetryContainer);
             if (poetryButton) poetryButton.classList.add('active');
             console.log('Poetry container added to content area');
+            
+            // After switching to poetry tab, add event listener to learn poetry button
+            setTimeout(() => {
+                const learnPoetryButton = document.getElementById('learn-poetry-button');
+                if (learnPoetryButton) {
+                    // Remove any existing event listeners
+                    const newButton = learnPoetryButton.cloneNode(true);
+                    learnPoetryButton.parentNode.replaceChild(newButton, learnPoetryButton);
+                    
+                    // Add new event listener
+                    newButton.addEventListener('click', function() {
+                        console.log('Learn poetry button clicked');
+                        handleLearnPoetryClick();
+                    });
+                }
+            }, 100);
         }
     }
     
@@ -5298,26 +5314,6 @@ document.addEventListener('DOMContentLoaded', function() {
         poetryButton.addEventListener('click', function() {
             console.log('Poetry button clicked');
             handleTabSwitch('poetry');
-            
-            // After switching to poetry tab, add event listener to learn poetry button
-            setTimeout(() => {
-                const learnPoetryButton = document.getElementById('learn-poetry-button');
-                if (learnPoetryButton) {
-                    // Remove any existing event listeners
-                    learnPoetryButton.replaceWith(learnPoetryButton.cloneNode(true));
-                    
-                    // Get the fresh reference after cloning
-                    const freshButton = document.getElementById('learn-poetry-button');
-                    
-                    // Add new event listener
-                    if (freshButton) {
-                        console.log('Adding fresh event listener to learn poetry button');
-                        freshButton.addEventListener('click', function() {
-                            handleLearnPoetryClick(poetryTypeSelect, poetryStyleSelect);
-                        });
-                    }
-                }
-            }, 100);
         });
     }
     
@@ -5415,7 +5411,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Function to handle learn poetry button click
-    async function handleLearnPoetryClick(typeSelect, styleSelect) {
+    async function handleLearnPoetryClick() {
         console.log('Learn poetry button clicked - function invoked');
         
         // Get user's educational context
@@ -5436,9 +5432,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Get poetry type and style from the main panel selects (not sidebar)
-        // Use the passed in references or get fresh ones if not provided
-        const currentTypeSelect = typeSelect || document.getElementById('poetry-type-select');
-        const currentStyleSelect = styleSelect || document.getElementById('poetry-style-select');
+        // Get fresh references to avoid stale data
+        const currentTypeSelect = document.getElementById('poetry-type-select');
+        const currentStyleSelect = document.getElementById('poetry-style-select');
         
         if (!currentTypeSelect || !currentStyleSelect) {
             console.error('Poetry type or style select not found');
@@ -5678,17 +5674,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // IMPORTANT: Add a direct click handler for the learn poetry button
-    // This is a backup in case the event listener added during tab switching doesn't work
-    document.addEventListener('click', function(event) {
-        if (event.target && event.target.id === 'learn-poetry-button') {
-            console.log('Learn poetry button clicked via delegation');
-            // Get fresh references to the select elements
-            const currentTypeSelect = document.getElementById('poetry-type-select');
-            const currentStyleSelect = document.getElementById('poetry-style-select');
-            handleLearnPoetryClick(currentTypeSelect, currentStyleSelect);
-        }
-    });
+    // IMPORTANT: Removing the delegation event listener to avoid duplicate API calls
     
     console.log('Poetry functionality initialized');
 });
