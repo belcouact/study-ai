@@ -5360,8 +5360,62 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize the application when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Application initializing...');
-    init();
+    console.log('DOM loaded, initializing application...');
+
+    // Create main content area if it doesn't exist
+    let mainContent = document.querySelector('.main-content');
+    if (!mainContent) {
+        console.log('Creating main content area...');
+        mainContent = document.createElement('div');
+        mainContent.className = 'main-content';
+        
+        // Find app container and left panel
+        const appContainer = document.querySelector('.app-container');
+        const leftPanel = document.querySelector('.left-panel');
+        
+        if (appContainer && leftPanel) {
+            // Insert main content after left panel
+            leftPanel.insertAdjacentElement('afterend', mainContent);
+            console.log('Main content area created and inserted');
+        } else {
+            console.error('Could not find app container or left panel');
+            return;
+        }
+    }
+
+    // Initialize containers in main content
+    const containers = ['qa', 'create', 'poetry'];
+    containers.forEach(type => {
+        let container = document.getElementById(`${type}-container`);
+        if (!container) {
+            container = document.createElement('div');
+            container.id = `${type}-container`;
+            container.className = 'container';
+            container.style.display = 'none';
+            mainContent.appendChild(container);
+        }
+    });
+
+    // Set up poetry button event listener
+    const poetryButton = document.querySelector('#poetry-button');
+    if (poetryButton) {
+        // Remove any existing listeners
+        const newButton = poetryButton.cloneNode(true);
+        poetryButton.parentNode.replaceChild(newButton, poetryButton);
+        
+        newButton.addEventListener('click', () => {
+            console.log('Poetry button clicked - single handler');
+            handleTabSwitch('poetry');
+        });
+    }
+
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Start with QA container
+    handleTabSwitch('qa');
+    
+    console.log('Application initialization complete');
 });
 
 // Global state for poetry functionality
