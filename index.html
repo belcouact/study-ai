@@ -171,7 +171,7 @@
             </div>
             
             <!-- Poetry Container -->
-            <div id="poetry-container" class="container">
+            <div id="poetry-container" class="container" style="display: none;">
                 <div class="poetry-header">
                     <div class="poetry-controls">
                         <div class="poetry-selectors">
@@ -186,6 +186,7 @@
                             <div class="selector-group">
                                 <label for="poetry-style-select">风格</label>
                                 <select id="poetry-style-select" class="poetry-select">
+                                    <option value="任意">任意</option>
                                     <option value="山水">山水</option>
                                     <option value="边塞">边塞</option>
                                     <option value="浪漫">浪漫</option>
@@ -232,5 +233,37 @@
     </div>
     <!-- Load script at the end with defer -->
     <script src="script.js" defer></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // This runs before any other initialization
+        const poetryContainer = document.getElementById('poetry-container');
+        if (poetryContainer) {
+            // First hide it to prevent flash
+            poetryContainer.style.display = 'none';
+            
+            // Store it in a global variable for later use
+            window.removedPoetryContainer = poetryContainer.cloneNode(true);
+            
+            // Remove it from the DOM
+            if (poetryContainer.parentNode) {
+                poetryContainer.parentNode.removeChild(poetryContainer);
+            }
+        }
+        
+        // Initialize with QA container only
+        const qaContainer = document.getElementById('qa-container');
+        const qaButton = document.getElementById('qa-button');
+        
+        if (qaButton) {
+            qaButton.classList.add('active');
+        }
+        
+        // Make sure the create container is also hidden
+        const createContainer = document.getElementById('create-container');
+        if (createContainer && createContainer.parentNode) {
+            createContainer.parentNode.removeChild(createContainer);
+        }
+    }, { once: true }); // Ensure this only runs once
+    </script>
 </body>
 </html> 

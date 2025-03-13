@@ -5725,3 +5725,119 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry functionality initialized');
 });
+
+// Add this at the end of the file, just before the closing </script> tag
+// Ensure poetry container is removed on initial page load
+document.addEventListener('DOMContentLoaded', function() {
+    // This runs before any other initialization
+    const poetryContainer = document.getElementById('poetry-container');
+    if (poetryContainer) {
+        // First hide it to prevent flash
+        poetryContainer.style.display = 'none';
+        
+        // Store it in a global variable for later use
+        window.removedPoetryContainer = poetryContainer.cloneNode(true);
+        
+        // Remove it from the DOM
+        if (poetryContainer.parentNode) {
+            poetryContainer.parentNode.removeChild(poetryContainer);
+        }
+    }
+    
+    // Initialize with QA container only
+    const qaContainer = document.getElementById('qa-container');
+    const qaButton = document.getElementById('qa-button');
+    
+    if (qaButton) {
+        qaButton.classList.add('active');
+    }
+    
+    // Make sure the create container is also hidden
+    const createContainer = document.getElementById('create-container');
+    if (createContainer && createContainer.parentNode) {
+        createContainer.parentNode.removeChild(createContainer);
+    }
+}, { once: true }); // Ensure this only runs once
+
+// Modify the handleTabSwitch function to use the stored poetry container
+function handleTabSwitch(containerType) {
+    console.log('Switching to tab:', containerType);
+    
+    const contentArea = document.querySelector('.content-area');
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    let poetryContainer = document.getElementById('poetry-container');
+    
+    // First, remove all containers from DOM to ensure clean state
+    if (qaContainer && qaContainer.parentNode) {
+        qaContainer.parentNode.removeChild(qaContainer);
+    }
+    
+    if (createContainer && createContainer.parentNode) {
+        createContainer.parentNode.removeChild(createContainer);
+    }
+    
+    if (poetryContainer && poetryContainer.parentNode) {
+        poetryContainer.parentNode.removeChild(poetryContainer);
+    }
+    
+    // Reset active states
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const poetryButton = document.getElementById('poetry-button');
+    
+    if (qaButton) qaButton.classList.remove('active');
+    if (createButton) createButton.classList.remove('active');
+    if (poetryButton) poetryButton.classList.remove('active');
+    
+    // Add only the appropriate container to the content area
+    if (containerType === 'qa' && qaContainer && contentArea) {
+        contentArea.appendChild(qaContainer);
+        if (qaButton) qaButton.classList.add('active');
+        console.log('QA container added to content area');
+        
+        // Ensure poetry container is not present
+        const existingPoetryContainer = document.getElementById('poetry-container');
+        if (existingPoetryContainer && existingPoetryContainer.parentNode) {
+            existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
+        }
+    } else if (containerType === 'create' && createContainer && contentArea) {
+        contentArea.appendChild(createContainer);
+        if (createButton) createButton.classList.add('active');
+        console.log('Create container added to content area');
+        
+        // Ensure poetry container is not present
+        const existingPoetryContainer = document.getElementById('poetry-container');
+        if (existingPoetryContainer && existingPoetryContainer.parentNode) {
+            existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
+        }
+    } else if (containerType === 'poetry' && contentArea) {
+        // If poetry container doesn't exist in the DOM, recreate it from the stored version
+        if (!poetryContainer && window.removedPoetryContainer) {
+            poetryContainer = window.removedPoetryContainer.cloneNode(true);
+            poetryContainer.style.display = ''; // Reset display style
+        }
+        
+        if (poetryContainer) {
+            contentArea.appendChild(poetryContainer);
+            if (poetryButton) poetryButton.classList.add('active');
+            console.log('Poetry container added to content area');
+            
+            // After switching to poetry tab, add event listener to learn poetry button
+            setTimeout(() => {
+                const learnPoetryButton = document.getElementById('learn-poetry-button');
+                if (learnPoetryButton) {
+                    // Remove any existing event listeners
+                    const newButton = learnPoetryButton.cloneNode(true);
+                    learnPoetryButton.parentNode.replaceChild(newButton, learnPoetryButton);
+                    
+                    // Add new event listener
+                    newButton.addEventListener('click', function() {
+                        console.log('Learn poetry button clicked');
+                        handleLearnPoetryClick();
+                    });
+                }
+            }, 100);
+        }
+    }
+}
