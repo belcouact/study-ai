@@ -5352,7 +5352,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const poem = poemState.poems[poemState.currentIndex];
-        console.log('Displaying poem:', poem);
+        console.log('Displaying poem:', poem, 'Current index:', poemState.currentIndex);
         
         // Get poem elements
         const poemTitle = document.querySelector('.poem-title');
@@ -5400,18 +5400,58 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (prevButton) {
             prevButton.disabled = poemState.currentIndex === 0;
+            console.log('Prev button disabled:', prevButton.disabled);
         }
         
         if (nextButton) {
             nextButton.disabled = poemState.currentIndex === poemState.poems.length - 1;
+            console.log('Next button disabled:', nextButton.disabled);
         }
     }
     
-    // Add event listeners for navigation buttons using event delegation
+    // Improved direct event listeners for navigation buttons
+    function setupPoemNavigationButtons() {
+        console.log('Setting up poem navigation buttons');
+        
+        // Remove any existing event listeners by cloning and replacing
+        const prevButton = document.getElementById('prev-poem-button');
+        const nextButton = document.getElementById('next-poem-button');
+        
+        if (prevButton) {
+            const newPrevButton = prevButton.cloneNode(true);
+            prevButton.parentNode.replaceChild(newPrevButton, prevButton);
+            
+            newPrevButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                console.log('Previous poem button clicked directly');
+                if (poemState.currentIndex > 0) {
+                    poemState.currentIndex--;
+                    displayCurrentPoem();
+                }
+            });
+        }
+        
+        if (nextButton) {
+            const newNextButton = nextButton.cloneNode(true);
+            nextButton.parentNode.replaceChild(newNextButton, nextButton);
+            
+            newNextButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                console.log('Next poem button clicked directly');
+                if (poemState.currentIndex < poemState.poems.length - 1) {
+                    poemState.currentIndex++;
+                    displayCurrentPoem();
+                }
+            });
+        }
+    }
+    
+    // Add event listeners for navigation buttons using event delegation as a backup
     document.addEventListener('click', function(event) {
         // Handle previous poem button
-        if (event.target && event.target.id === 'prev-poem-button') {
-            console.log('Previous poem button clicked');
+        if (event.target && (event.target.id === 'prev-poem-button' || 
+            (event.target.parentElement && event.target.parentElement.id === 'prev-poem-button'))) {
+            console.log('Previous poem button clicked via delegation');
             if (poemState.currentIndex > 0) {
                 poemState.currentIndex--;
                 displayCurrentPoem();
@@ -5419,8 +5459,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Handle next poem button
-        if (event.target && event.target.id === 'next-poem-button') {
-            console.log('Next poem button clicked');
+        if (event.target && (event.target.id === 'next-poem-button' || 
+            (event.target.parentElement && event.target.parentElement.id === 'next-poem-button'))) {
+            console.log('Next poem button clicked via delegation');
             if (poemState.currentIndex < poemState.poems.length - 1) {
                 poemState.currentIndex++;
                 displayCurrentPoem();
@@ -5568,7 +5609,7 @@ document.addEventListener('DOMContentLoaded', function() {
             2. 作者（必须是真实的历史人物）
             3. 原文（必须是原始的古代诗词文本）
             4. 创作背景（包括历史背景和创作缘由的详细介绍，适合${school}${grade}学生理解的深度）
-            5. 赏析（逐句解释翻译，同时指出难词难句，同时介绍诗词曲的艺术特色和文学价值，使用${school}${grade}学生能理解的语言）
+            5. 赏析（逐句解释翻译，同时指出难词难句，用现代语言描述诗词曲描述的画面和故事，并介绍诗词曲的艺术特色和文学价值，使用${school}${grade}学生能理解的语言）
             
             请以JSON格式返回，格式如下：
             [
@@ -5736,6 +5777,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Display poems
                 if (poetryDisplay) poetryDisplay.classList.remove('hidden');
                 displayCurrentPoem();
+                
+                // Set up navigation buttons after poems are loaded
+                setTimeout(() => {
+                    setupPoemNavigationButtons();
+                }, 100);
             } else {
                 // Show error message
                 if (poetryEmptyState) poetryEmptyState.classList.remove('hidden');
