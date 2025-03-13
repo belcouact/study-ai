@@ -5113,7 +5113,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             author: "苏轼",
                             content: "大江东去，浪淘尽，千古风流人物。\n故垒西边，人道是，三国周郎赤壁。\n乱石穿空，惊涛拍岸，卷起千堆雪。\n江山如画，一时多少豪杰。\n\n遥想公瑾当年，小乔初嫁了，雄姿英发。\n羽扇纶巾，谈笑间，樯橹灰飞烟灭。\n故国神游，多情应笑我，早生华发。\n人生如梦，一尊还酹江月。",
                             background: "这首词是宋代文学家苏轼游览赤壁时所作，抒发了对历史人物和事件的感慨。",
-                            explanation: "这首词抒发了词人对历史人物和事件的感慨，气势磅礴，意境开阔，是豪放词的代表作。"
+                            explanation: "这首词抒发了词人对历史人物和事件的感慨。上片描绘了赤壁的壮丽景色和历史背景；下片追忆了三国时期周瑜的英姿和赤壁之战的辉煌，同时也表达了词人对人生短暂的感慨。全词气势磅礴，意境开阔，是豪放词的代表作。"
                         }
                     ];
                 }
@@ -5607,6 +5607,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const poem = poemState.poems[poemState.currentIndex];
+        console.log('Displaying poem:', poem);
         
         // Get poem elements
         const poemTitle = document.querySelector('.poem-title');
@@ -5616,13 +5617,32 @@ document.addEventListener('DOMContentLoaded', function() {
         const poemExplanation = document.querySelector('.poem-explanation');
         const poemCounter = document.querySelector('.poem-counter');
         
-        // Display poem data
-        if (poemTitle) poemTitle.textContent = poem.title;
-        if (poemAuthor) poemAuthor.textContent = poem.author;
-        if (poemContent) poemContent.innerHTML = poem.content.replace(/\n/g, '<br>');
-        if (poemBackground) poemBackground.innerHTML = poem.background;
-        if (poemExplanation) poemExplanation.innerHTML = poem.explanation;
-        if (poemCounter) poemCounter.textContent = `${poemState.currentIndex + 1} / ${poemState.poems.length}`;
+        // Display poem data with null checks
+        if (poemTitle) poemTitle.textContent = poem.title || '无标题';
+        if (poemAuthor) poemAuthor.textContent = poem.author || '佚名';
+        
+        // Handle content with null check
+        if (poemContent) {
+            if (poem.content) {
+                poemContent.innerHTML = poem.content.replace ? poem.content.replace(/\n/g, '<br>') : poem.content;
+            } else {
+                poemContent.innerHTML = '无内容';
+            }
+        }
+        
+        // Handle background with null check
+        if (poemBackground) {
+            poemBackground.innerHTML = poem.background || '无背景信息';
+        }
+        
+        // Handle explanation with null check
+        if (poemExplanation) {
+            poemExplanation.innerHTML = poem.explanation || '无赏析';
+        }
+        
+        if (poemCounter) {
+            poemCounter.textContent = `${poemState.currentIndex + 1} / ${poemState.poems.length}`;
+        }
         
         // Update navigation buttons
         updatePoemNavigationButtons();
@@ -5748,26 +5768,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 ]`;
                 
                 // Call the API
-                const response = await fetchAIResponse(prompt);
-                console.log('API response received:', typeof response);
+                const apiResponse = await fetchAIResponse(prompt);
+                console.log('API response:', apiResponse);
                 
                 // Extract text content from the response
                 let responseText = '';
-                if (typeof response === 'string') {
-                    responseText = response;
-                } else if (response && typeof response === 'object') {
+                if (typeof apiResponse === 'string') {
+                    responseText = apiResponse;
+                } else if (apiResponse && typeof apiResponse === 'object') {
                     // Try to extract content from response object
-                    if (response.content) {
-                        responseText = response.content;
-                    } else if (response.text) {
-                        responseText = response.text;
-                    } else if (response.message) {
-                        responseText = response.message;
-                    } else if (response.data) {
-                        responseText = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
+                    if (apiResponse.choices && apiResponse.choices.length > 0 && apiResponse.choices[0].message) {
+                        responseText = apiResponse.choices[0].message.content || '';
+                    } else if (apiResponse.content) {
+                        responseText = apiResponse.content;
+                    } else if (apiResponse.text) {
+                        responseText = apiResponse.text;
+                    } else if (apiResponse.message) {
+                        responseText = apiResponse.message;
+                    } else if (apiResponse.data) {
+                        responseText = typeof apiResponse.data === 'string' ? apiResponse.data : JSON.stringify(apiResponse.data);
                     } else {
                         // Last resort: stringify the entire response
-                        responseText = JSON.stringify(response);
+                        responseText = JSON.stringify(apiResponse);
                     }
                 } else {
                     throw new Error('Unexpected response format');
@@ -5873,6 +5895,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     }
                 }
+                
+                // Validate poem objects
+                poems = poems.map(poem => {
+                    return {
+                        title: poem.title || '无标题',
+                        author: poem.author || '佚名',
+                        content: poem.content || '无内容',
+                        background: poem.background || '无背景信息',
+                        explanation: poem.explanation || '无赏析'
+                    };
+                });
                 
                 // Remove loading indicator
                 if (loadingIndicator) {
