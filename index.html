@@ -5,9 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Study Assistant by Alex</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Add MathJax for rendering math formulas -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://polyfill.io">
+    <!-- Load critical CSS first -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <!-- Add MathJax for rendering math formulas with defer -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
@@ -83,10 +88,10 @@
                 
                 <!-- External AI Services -->
                 <div class="external-services">
-                    <a href="https://yuanbao.tencent.com/chat/naQivTmsDa" target="_blank" class="external-button">
+                    <a href="https://yuanbao.tencent.com/chat/naQivTmsDa" target="_blank" rel="noopener" class="external-button">
                         <i class="fas fa-external-link-alt"></i> 腾讯元宝
                     </a>
-                    <a href="https://tongyi.aliyun.com/qianwen/" target="_blank" class="external-button">
+                    <a href="https://tongyi.aliyun.com/qianwen/" target="_blank" rel="noopener" class="external-button">
                         <i class="fas fa-external-link-alt"></i> 通义千问
                     </a>
                 </div>
@@ -102,7 +107,7 @@
         </div>
         
         <!-- Sidebar Toggle Button -->
-        <button id="sidebar-toggle" class="sidebar-toggle">
+        <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
             <i class="fas fa-chevron-left"></i>
         </button>
         
@@ -158,36 +163,14 @@
                 </div>
                 
                 <!-- Navigation controls moved to the bottom -->
-                <div class="navigation-controls" style="
-                    display: flex;
-                    justify-content: space-between;
-                    margin-top: 20px;
-                    padding: 15px;
-                    background: white;
-                    border-radius: 12px;
-                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-                ">
-                    <button id="prev-question-button" class="nav-button" disabled style="
-                        background-color: #4299e1;
-                        color: white;
-                        border: none;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        transition: all 0.2s ease;
-                    ">上一题</button>
-                    
-                    <button id="next-question-button" class="nav-button" disabled style="
-                        background-color: #4299e1;
-                        color: white;
-                        border: none;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        transition: all 0.2s ease;
-                    ">下一题</button>
+                <div class="navigation-controls">
+                    <button id="prev-question-button" class="nav-button" disabled>上一题</button>
+                    <button id="next-question-button" class="nav-button" disabled>下一题</button>
                 </div>
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+    <!-- Load script at the end with defer -->
+    <script src="script.js" defer></script>
 </body>
 </html> 
