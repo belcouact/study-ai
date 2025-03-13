@@ -820,9 +820,7 @@ button:active {
 }
 
 /* Poetry panel specific styles */
-.poetry-config-frame {
-    border-left: 3px solid var(--poetry-accent);
-}
+/* Removing the poetry-config-frame style since we removed that section */
 
 #poetry-container {
     display: flex;

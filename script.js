@@ -5312,7 +5312,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Add new event listener
                     if (freshButton) {
                         console.log('Adding fresh event listener to learn poetry button');
-                        freshButton.addEventListener('click', handleLearnPoetryClick);
+                        freshButton.addEventListener('click', function() {
+                            handleLearnPoetryClick(poetryTypeSelect, poetryStyleSelect);
+                        });
                     }
                 }
             }, 100);
@@ -5413,7 +5415,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Function to handle learn poetry button click
-    async function handleLearnPoetryClick() {
+    async function handleLearnPoetryClick(typeSelect, styleSelect) {
         console.log('Learn poetry button clicked - function invoked');
         
         // Get user's educational context
@@ -5434,8 +5436,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Get poetry type and style from the main panel selects (not sidebar)
-        const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
-        const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
+        // Use the passed in references or get fresh ones if not provided
+        const currentTypeSelect = typeSelect || document.getElementById('poetry-type-select');
+        const currentStyleSelect = styleSelect || document.getElementById('poetry-style-select');
+        
+        if (!currentTypeSelect || !currentStyleSelect) {
+            console.error('Poetry type or style select not found');
+            showSystemMessage('无法获取诗词类型和风格信息', 'error');
+            return;
+        }
+        
+        const poetryType = currentTypeSelect.value;
+        const poetryStyle = currentStyleSelect.value;
         
         console.log(`Generating poems for: ${school} ${grade}, Type: ${poetryType}, Style: ${poetryStyle}`);
         
@@ -5671,7 +5683,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(event) {
         if (event.target && event.target.id === 'learn-poetry-button') {
             console.log('Learn poetry button clicked via delegation');
-            handleLearnPoetryClick();
+            // Get fresh references to the select elements
+            const currentTypeSelect = document.getElementById('poetry-type-select');
+            const currentStyleSelect = document.getElementById('poetry-style-select');
+            handleLearnPoetryClick(currentTypeSelect, currentStyleSelect);
         }
     });
     
