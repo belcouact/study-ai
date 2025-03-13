@@ -4395,195 +4395,256 @@ function getSimplifiedContextSummary() {
 
 // ... existing code ...
 
-    // Handle Learn Poetry button click
+    // Function to handle learn poetry button click
     async function handleLearnPoetryClick() {
         console.log('Learn poetry button clicked');
         
-        const school = elements.schoolSelectSidebar.value;
-        const grade = elements.gradeSelectSidebar.value;
-        const poetryType = elements.poetryTypeSelect.value;
-        const poetryStyle = elements.poetryStyleSelect.value;
+        // Get user's educational context
+        const schoolSelect = document.getElementById('school-select-sidebar');
+        const gradeSelect = document.getElementById('grade-select-sidebar');
         
-        console.log(`Generating poems for: ${school} ${grade}, Type: ${poetryType}, Style: ${poetryStyle}`);
+        if (!schoolSelect || !gradeSelect) {
+            showSystemMessage('无法获取学校和年级信息', 'error');
+            return;
+        }
+        
+        const school = schoolSelect.value;
+        const grade = gradeSelect.options[gradeSelect.selectedIndex].text;
         
         if (!school || !grade) {
             showSystemMessage('请先选择学校和年级', 'warning');
             return;
         }
         
+        // Get poetry type and style
+        const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
+        const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
+        
+        console.log(`Generating poems for: ${school} ${grade}, Type: ${poetryType}, Style: ${poetryStyle}`);
+        
         // Show loading state
-        elements.poetryEmptyState.classList.add('hidden');
-        elements.poetryDisplay.classList.add('hidden');
+        const poetryEmptyState = document.getElementById('poetry-empty-state');
+        const poetryDisplay = document.getElementById('poetry-display');
         
-        const loadingIndicator = document.createElement('div');
-        loadingIndicator.id = 'poetry-loading';
-        loadingIndicator.innerHTML = `
-            <div class="spinner"></div>
-            <p>正在查找适合的${poetryType}，风格为${poetryStyle}...</p>
-        `;
-        loadingIndicator.style.display = 'flex';
-        loadingIndicator.style.flexDirection = 'column';
-        loadingIndicator.style.alignItems = 'center';
-        loadingIndicator.style.justifyContent = 'center';
-        loadingIndicator.style.padding = '3rem';
+        if (poetryEmptyState) poetryEmptyState.classList.add('hidden');
+        if (poetryDisplay) poetryDisplay.classList.add('hidden');
         
-        elements.poetryContainer.querySelector('.poetry-content').appendChild(loadingIndicator);
+        // Create and show loading indicator
+        let loadingIndicator = document.getElementById('poetry-loading');
+        if (!loadingIndicator) {
+            loadingIndicator = document.createElement('div');
+            loadingIndicator.id = 'poetry-loading';
+            loadingIndicator.innerHTML = `
+                <div class="spinner"></div>
+                <p>正在查找适合${school}${grade}学生的经典${poetryType}，风格为${poetryStyle}...</p>
+            `;
+            loadingIndicator.style.display = 'flex';
+            loadingIndicator.style.flexDirection = 'column';
+            loadingIndicator.style.alignItems = 'center';
+            loadingIndicator.style.justifyContent = 'center';
+            loadingIndicator.style.padding = '3rem';
+            
+            const poetryContent = document.querySelector('.poetry-content');
+            if (poetryContent) {
+                poetryContent.appendChild(loadingIndicator);
+            }
+        } else {
+            loadingIndicator.style.display = 'flex';
+        }
         
         try {
-            // For testing purposes, let's create some mock data based on the selected type and style
-            // In a real application, you would call the API here
-            let mockPoems = [];
+            // Prepare the prompt for the API - specifically requesting famous ancient poems
+            const prompt = `请为${school}${grade}的学生推荐5首著名的古代${poetryType}，风格为${poetryStyle}。
+            请选择中国文学史上最著名、最经典的作品，这些作品应该是真实存在的古代诗词，不要创作新的内容。
             
-            if (poetryType === '唐诗') {
-                if (poetryStyle === '山水') {
-                    mockPoems = [
-                        {
-                            title: "望庐山瀑布",
-                            author: "李白",
-                            content: "日照香炉生紫烟，\n遥看瀑布挂前川。\n飞流直下三千尺，\n疑是银河落九天。",
-                            background: "这首诗是唐代诗人李白游览庐山时所作，描写了庐山瀑布的壮观景象。庐山位于今江西省九江市，是中国著名的风景名胜区。",
-                            explanation: "这首诗生动地描绘了庐山瀑布的壮丽景象。首句\"日照香炉生紫烟\"，写阳光照射下的香炉峰云雾缭绕；次句\"遥看瀑布挂前川\"，写远望瀑布如同一条白练挂在山前；三四句\"飞流直下三千尺，疑是银河落九天\"，用夸张的手法描写瀑布飞泻而下的壮观景象，如同银河从天而降。全诗想象丰富，气势磅礴，表现了诗人对自然的热爱和赞美。"
-                        },
-                        {
-                            title: "山居秋暝",
-                            author: "王维",
-                            content: "空山新雨后，\n天气晚来秋。\n明月松间照，\n清泉石上流。\n竹喧归浣女，\n莲动下渔舟。\n随意春芳歇，\n王孙自可留。",
-                            background: "这首诗是唐代诗人王维隐居辋川别墅时所作，描写了秋天傍晚山中的景色。王维（701年-761年），字摩诘，号摩诘居士，唐代著名诗人、画家，被后人誉为\"诗佛\"。",
-                            explanation: "这首诗描绘了一幅秋天傍晚山中的美丽图画。首联\"空山新雨后，天气晚来秋\"，写雨后秋天傍晚的山中景色；颔联\"明月松间照，清泉石上流\"，写月光透过松林照射下来，清泉在石头上流淌；颈联\"竹喧归浣女，莲动下渔舟\"，写浣纱女在竹林中归来的声音，渔船划过荷塘的景象；尾联\"随意春芳歇，王孙自可留\"，表达了诗人安于隐居山林的心境。全诗意境清幽，画面感强，被誉为\"诗中有画\"的代表作。"
-                        },
-                        {
-                            title: "江雪",
-                            author: "柳宗元",
-                            content: "千山鸟飞绝，\n万径人踪灭。\n孤舟蓑笠翁，\n独钓寒江雪。",
-                            background: "这首诗是唐代诗人柳宗元被贬永州时所作，描写了冬天江上雪景。柳宗元（773年-819年），字子厚，唐代著名文学家、思想家，与韩愈共同倡导古文运动，被后人称为\"唐宋八大家\"之一。",
-                            explanation: "这首诗描绘了一幅冬天江上雪景图。首句\"千山鸟飞绝\"，写大雪覆盖的山上看不到飞鸟；次句\"万径人踪灭\"，写雪中的小路上看不到人的足迹；三四句\"孤舟蓑笠翁，独钓寒江雪\"，写一位穿着蓑衣戴着斗笠的老人，独自在寒冷的江上垂钓的景象。全诗意境冷寂，画面简洁而有力，表现了诗人被贬后的孤独心境。"
-                        },
-                        {
-                            title: "峨眉山月歌",
-                            author: "李白",
-                            content: "峨眉山月半轮秋，\n影入平羌江水流。\n夜发清溪向三峡，\n思君不见下渝州。",
-                            background: "这首诗是唐代诗人李白游览峨眉山时所作，描写了峨眉山的月色和诗人的思乡之情。峨眉山位于今四川省峨眉山市，是中国著名的佛教名山。",
-                            explanation: "这首诗描绘了峨眉山的月色和诗人的思乡之情。首句\"峨眉山月半轮秋\"，写峨眉山上的秋月如同半轮；次句\"影入平羌江水流\"，写月影倒映在平羌江水中；三四句\"夜发清溪向三峡，思君不见下渝州\"，写诗人夜晚从清溪出发前往三峡，思念远方的朋友，但无法见面。全诗意境优美，情感真挚，表现了诗人对友人的思念之情。"
-                        },
-                        {
-                            title: "终南山",
-                            author: "王维",
-                            content: "太乙近天都，\n连山接海隅。\n白云回望合，\n青霭入看无。\n分野中峰变，\n阴晴众壑殊。\n欲投人处宿，\n隔水问樵夫。",
-                            background: "这首诗是唐代诗人王维游览终南山时所作，描写了终南山的壮丽景色。终南山位于今陕西省西安市南部，是中国著名的道教名山。",
-                            explanation: "这首诗描绘了终南山的壮丽景色。首联\"太乙近天都，连山接海隅\"，写终南山高耸入云，连绵不断；颔联\"白云回望合，青霭入看无\"，写山中云雾变幻的景象；颈联\"分野中峰变，阴晴众壑殊\"，写山峰和山谷的不同景色；尾联\"欲投人处宿，隔水问樵夫\"，写诗人想找个地方住宿，隔着水问樵夫。全诗意境开阔，画面丰富，表现了诗人对自然的热爱和赞美。"
-                        }
-                    ];
-                } else if (poetryStyle === '边塞') {
-                    mockPoems = [
-                        {
-                            title: "出塞",
-                            author: "王昌龄",
-                            content: "秦时明月汉时关，\n万里长征人未还。\n但使龙城飞将在，\n不教胡马度阴山。",
-                            background: "这首诗是唐代诗人王昌龄所作，描写了边塞战争的场景和诗人对国家安危的关切。王昌龄（698年-757年），字少伯，唐代著名边塞诗人，被后人称为\"七绝圣手\"。",
-                            explanation: "这首诗表达了诗人对国家安危的关切。首句\"秦时明月汉时关\"，写边关的悠久历史；次句\"万里长征人未还\"，写出征将士尚未归来；三四句\"但使龙城飞将在，不教胡马度阴山\"，表达了诗人希望有像汉代名将李广那样的英雄保卫边疆的愿望。全诗气势雄浑，情感真挚，表现了诗人的爱国情怀。"
-                        }
-                        // Add more border-themed Tang poems here
-                    ];
-                } else if (poetryStyle === '浪漫') {
-                    mockPoems = [
-                        {
-                            title: "将进酒",
-                            author: "李白",
-                            content: "君不见，黄河之水天上来，奔流到海不复回。\n君不见，高堂明镜悲白发，朝如青丝暮成雪。\n人生得意须尽欢，莫使金樽空对月。\n天生我材必有用，千金散尽还复来。\n烹羊宰牛且为乐，会须一饮三百杯。\n岑夫子，丹丘生，将进酒，杯莫停。\n与君歌一曲，请君为我倾耳听。\n钟鼓馔玉不足贵，但愿长醉不复醒。\n古来圣贤皆寂寞，惟有饮者留其名。\n陈王昔时宴平乐，斗酒十千恣欢谑。\n主人何为言少钱，径须沽取对君酌。\n五花马，千金裘，呼儿将出换美酒，与尔同销万古愁。",
-                            background: "这首诗是唐代诗人李白所作，表达了诗人及时行乐、放浪形骸的人生态度。李白（701年-762年），字太白，号青莲居士，唐代伟大的浪漫主义诗人，被后人誉为\"诗仙\"。",
-                            explanation: "这首诗表达了诗人及时行乐、放浪形骸的人生态度。诗人以黄河之水和人的白发为喻，说明时光流逝不可挽回，人生短暂，应当及时行乐。诗中\"人生得意须尽欢，莫使金樽空对月\"、\"古来圣贤皆寂寞，惟有饮者留其名\"等名句，表达了诗人豪放不羁的性格和对生活的热爱。全诗气势磅礴，情感奔放，是李白浪漫主义诗歌的代表作。"
-                        }
-                        // Add more romantic Tang poems here
-                    ];
-                } else if (poetryStyle === '现实') {
-                    mockPoems = [
-                        {
-                            title: "新安吏",
-                            author: "杜甫",
-                            content: "客行新安道，喧呼闻点兵。\n借问新安吏，县小更无丁。\n府帖昨夜下，次选中男行。\n中男绝短小，何以守王城？\n肥男有母送，瘦男独伶俜。\n白水暮东流，青山犹哭声。\n莫自使眼枯，收汝泪纵横。\n眼枯即见骨，天地终无情。\n我军取相州，日夕望其平。\n岂意贼难料，归军星散营。\n就粮近故垒，练卒依旧京。\n掘壕不到水，牧马役亦轻。\n况乃王师顺，抚养甚分明。\n送行勿泣血，仆射如父兄。",
-                            background: "这首诗是唐代诗人杜甫所作，描写了安史之乱时期征兵的悲惨场景。杜甫（712年-770年），字子美，唐代伟大的现实主义诗人，被后人誉为\"诗圣\"。",
-                            explanation: "这首诗描写了安史之乱时期征兵的悲惨场景。诗人通过描写新安县征兵的情景，揭示了战争给人民带来的痛苦。诗中\"中男绝短小，何以守王城\"、\"肥男有母送，瘦男独伶俜\"等句，生动地描绘了被征兵者的形象和家人的悲痛。全诗真实反映了战争时期的社会现实，表现了诗人对人民疾苦的深切同情。"
-                        }
-                        // Add more realistic Tang poems here
-                    ];
+            每首诗都应包含以下内容：
+            1. 题目
+            2. 作者（必须是真实的历史人物）
+            3. 原文（必须是原始的古代诗词文本）
+            4. 创作背景（包括历史背景和创作缘由）
+            5. 赏析（包括艺术特色和文学价值）
+            
+            请以JSON格式返回，格式如下：
+            [
+              {
+                "title": "诗词标题",
+                "author": "作者",
+                "content": "诗词原文",
+                "background": "创作背景",
+                "explanation": "赏析"
+              },
+              ...
+            ]`;
+            
+            // Call the API
+            const apiResponse = await fetchAIResponse(prompt);
+            console.log('API response received');
+            
+            // Extract text content from the response
+            let responseText = '';
+            if (typeof apiResponse === 'string') {
+                responseText = apiResponse;
+            } else if (apiResponse && typeof apiResponse === 'object') {
+                // Try to extract content from response object
+                if (apiResponse.choices && apiResponse.choices.length > 0 && apiResponse.choices[0].message) {
+                    responseText = apiResponse.choices[0].message.content || '';
+                } else if (apiResponse.content) {
+                    responseText = apiResponse.content;
+                } else if (apiResponse.text) {
+                    responseText = apiResponse.text;
+                } else if (apiResponse.message) {
+                    responseText = apiResponse.message;
+                } else if (apiResponse.data) {
+                    responseText = typeof apiResponse.data === 'string' ? apiResponse.data : JSON.stringify(apiResponse.data);
+                } else {
+                    // Last resort: stringify the entire response
+                    responseText = JSON.stringify(apiResponse);
                 }
-            } else if (poetryType === '宋词') {
-                if (poetryStyle === '婉约') {
-                    mockPoems = [
-                        {
-                            title: "一剪梅",
-                            author: "李清照",
-                            content: "红藕香残玉簟秋。\n轻解罗裳，独上兰舟。\n云中谁寄锦书来？\n雁字回时，月满西楼。\n\n花自飘零水自流。\n一种相思，两处闲愁。\n此情无计可消除，\n才下眉头，却上心头。",
-                            background: "这首词是宋代女词人李清照所作，表达了词人对丈夫的思念之情。李清照（1084年-约1155年），号易安居士，宋代著名女词人，婉约词派代表人物。",
-                            explanation: "这首词表达了词人对丈夫的思念之情。上片写词人在秋天独自乘船，期待收到丈夫的来信，但只见大雁飞回，月亮已经升起；下片写相思之情无法排解，刚从眉头舒展，又浮上心头。全词语言优美，情感真挚，是婉约词的代表作。"
-                        }
-                        // Add more gentle Song lyrics here
-                    ];
-                } else if (poetryStyle === '豪放') {
-                    mockPoems = [
-                        {
-                            title: "念奴娇·赤壁怀古",
-                            author: "苏轼",
-                            content: "大江东去，浪淘尽，千古风流人物。\n故垒西边，人道是，三国周郎赤壁。\n乱石穿空，惊涛拍岸，卷起千堆雪。\n江山如画，一时多少豪杰。\n\n遥想公瑾当年，小乔初嫁了，雄姿英发。\n羽扇纶巾，谈笑间，樯橹灰飞烟灭。\n故国神游，多情应笑我，早生华发。\n人生如梦，一尊还酹江月。",
-                            background: "这首词是宋代文学家苏轼游览赤壁时所作，抒发了对历史人物和事件的感慨。苏轼（1037年-1101年），字子瞻，号东坡居士，宋代著名文学家、书画家，豪放词派代表人物。",
-                            explanation: "这首词抒发了词人对历史人物和事件的感慨。上片描绘了赤壁的壮丽景色和历史背景；下片追忆了三国时期周瑜的英姿和赤壁之战的辉煌，同时也表达了词人对人生短暂的感慨。全词气势磅礴，意境开阔，是豪放词的代表作。"
-                        }
-                        // Add more bold Song lyrics here
-                    ];
+            } else {
+                throw new Error('Unexpected response format');
+            }
+            
+            console.log('Extracted response text:', responseText.substring(0, 100) + '...');
+            
+            // Parse the response to extract the poems
+            let poems = [];
+            try {
+                // First try: direct JSON parse if the response is already JSON
+                try {
+                    if (responseText.trim().startsWith('[') && responseText.trim().endsWith(']')) {
+                        poems = JSON.parse(responseText);
+                        console.log('Parsed JSON directly');
+                    } else {
+                        throw new Error('Response is not direct JSON');
+                    }
+                } catch (directParseError) {
+                    console.log('Direct JSON parse failed, trying to extract JSON from text');
+                    
+                    // Second try: find JSON in the response text
+                    const jsonMatch = responseText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                    if (jsonMatch) {
+                        poems = JSON.parse(jsonMatch[0]);
+                        console.log('Extracted and parsed JSON from text');
+                    } else {
+                        throw new Error('No JSON found in response');
+                    }
                 }
-            } else if (poetryType === '元曲') {
-                if (poetryStyle === '杂居') {
-                    mockPoems = [
-                        {
-                            title: "天净沙·秋思",
-                            author: "马致远",
-                            content: "枯藤老树昏鸦，\n小桥流水人家，\n古道西风瘦马。\n夕阳西下，\n断肠人在天涯。",
-                            background: "这首曲是元代戏曲家马致远所作，描写了一幅凄凉的秋日黄昏景象。马致远（约1250年-约1321年），元代著名戏曲家，被后人称为\"曲状元\"。",
-                            explanation: "这首小令描绘了一幅凄凉的秋日黄昏景象。\"枯藤老树昏鸦，小桥流水人家，古道西风瘦马\"三句，勾勒出一幅荒凉的秋景图；\"夕阳西下，断肠人在天涯\"两句，点明了行人在异乡的孤独和思乡之情。全曲语言精炼，意境凄凉，被誉为\"秋思之祖\"。"
+            } catch (parseError) {
+                console.error('Error parsing poems from response:', parseError);
+                
+                // Fallback: Try to extract structured content
+                console.log('Trying to extract structured content');
+                const sections = responseText.split(/(?=\d+\.\s*题目[:：])/);
+                console.log('Found', sections.length - 1, 'potential poem sections');
+                
+                for (let i = 1; i < sections.length; i++) {
+                    const section = sections[i];
+                    
+                    const titleMatch = section.match(/题目[:：]\s*(.+?)(?=\n|$)/);
+                    const authorMatch = section.match(/作者[:：]\s*(.+?)(?=\n|$)/);
+                    const contentMatch = section.match(/原文[:：]\s*([\s\S]+?)(?=\n\d+\.\s*创作背景[:：]|$)/);
+                    const backgroundMatch = section.match(/创作背景[:：]\s*([\s\S]+?)(?=\n\d+\.\s*赏析[:：]|$)/);
+                    const explanationMatch = section.match(/赏析[:：]\s*([\s\S]+?)(?=\n\d+\.\s*题目[:：]|$)/);
+                    
+                    if (titleMatch && authorMatch && contentMatch) {
+                        poems.push({
+                            title: titleMatch[1].trim(),
+                            author: authorMatch[1].trim(),
+                            content: contentMatch[1].trim(),
+                            background: backgroundMatch ? backgroundMatch[1].trim() : "暂无背景信息",
+                            explanation: explanationMatch ? explanationMatch[1].trim() : "暂无赏析"
+                        });
+                    }
+                }
+                
+                // If still no poems, try one more approach with a different pattern
+                if (poems.length === 0) {
+                    console.log('Trying alternative parsing approach');
+                    
+                    // Look for numbered poems (1. 2. 3. etc.)
+                    const poemSections = responseText.split(/(?=\d+\.)/);
+                    
+                    for (let i = 1; i < poemSections.length; i++) {
+                        const section = poemSections[i];
+                        
+                        // Extract what we can
+                        const titleMatch = section.match(/(?:题目[:：]|《(.+?)》)/);
+                        const authorMatch = section.match(/(?:作者[:：]|[\(（](.+?)[\)）])/);
+                        
+                        // If we found at least a title, create a basic poem entry
+                        if (titleMatch) {
+                            const title = titleMatch[1] || titleMatch[0].replace(/题目[:：]/, '').trim();
+                            const author = authorMatch ? (authorMatch[1] || authorMatch[0].replace(/作者[:：]/, '').trim()) : "未知";
+                            
+                            // Get the rest of the content
+                            const contentStart = section.indexOf(titleMatch[0]) + titleMatch[0].length;
+                            let content = section.substring(contentStart).trim();
+                            
+                            // Basic poem with what we could extract
+                            poems.push({
+                                title: title,
+                                author: author,
+                                content: content,
+                                background: "暂无背景信息",
+                                explanation: "暂无赏析"
+                            });
                         }
-                        // Add more Yuan mixed-residence songs here
-                    ];
-                } else if (poetryStyle === '散曲') {
-                    mockPoems = [
-                        {
-                            title: "折桂令·春情",
-                            author: "关汉卿",
-                            content: "春情难拘，\n和风解愠，\n香醪消凝。\n天与人兮，\n云与帝兮，\n今何在兮，\n共饮长江水。\n\n醉后不知天在水，\n满船清梦压星河。\n鹤汀凫渚，\n穿花蛱蝶，\n粉蝶游蜂，\n冷蝉抱枝，\n青蛙啼草。\n\n人间有味是清欢，\n人间有味是清欢。",
-                            background: "这首散曲是元代戏曲家关汉卿所作，描写了春天的美好景象和诗人的愉悦心情。关汉卿（约1210年-约1300年），元代著名戏曲家，被后人称为\"元曲四大家\"之首。",
-                            explanation: "这首散曲描写了春天的美好景象和诗人的愉悦心情。曲中描绘了春天的和风、美酒，以及各种生物在春天的活动，表达了诗人对春天的喜爱和对生活的热爱。全曲语言优美，意境清新，表现了诗人豁达乐观的人生态度。"
-                        }
-                        // Add more Yuan individual songs here
-                    ];
+                    }
+                }
+                
+                // Last resort: if we still have no poems, create a single poem from the entire response
+                if (poems.length === 0 && responseText.length > 0) {
+                    console.log('Creating fallback poem from entire response');
+                    poems.push({
+                        title: `${poetryType}·${poetryStyle}`,
+                        author: "古代诗人",
+                        content: responseText.substring(0, 200), // Take first 200 chars as content
+                        background: "这是根据您的要求查找的内容，但解析遇到了困难。",
+                        explanation: "由于解析困难，无法提供完整赏析。请尝试重新生成。"
+                    });
                 }
             }
             
-            // Use mock data for now
-            state.poems = mockPoems;
-            state.currentPoemIndex = 0;
+            // Validate poem objects
+            poems = poems.map(poem => {
+                return {
+                    title: poem.title || '无标题',
+                    author: poem.author || '佚名',
+                    content: poem.content || '无内容',
+                    background: poem.background || '无背景信息',
+                    explanation: poem.explanation || '无赏析'
+                };
+            });
             
             // Remove loading indicator
-            const loadingElement = document.getElementById('poetry-loading');
-            if (loadingElement) {
-                loadingElement.remove();
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
             }
             
-            if (state.poems.length > 0) {
+            if (poems.length > 0) {
+                console.log('Successfully parsed', poems.length, 'poems');
+                // Store poems in state
+                poemState.poems = poems;
+                poemState.currentIndex = 0;
+                
                 // Display poems
-                elements.poetryDisplay.classList.remove('hidden');
+                if (poetryDisplay) poetryDisplay.classList.remove('hidden');
                 displayCurrentPoem();
-                updatePoemNavigationButtons();
             } else {
                 // Show error message
-                elements.poetryEmptyState.classList.remove('hidden');
+                if (poetryEmptyState) poetryEmptyState.classList.remove('hidden');
                 showSystemMessage(`无法生成${poetryType}的${poetryStyle}风格诗词，请稍后再试`, 'error');
             }
         } catch (error) {
             console.error('Error generating poems:', error);
-            const loadingElement = document.getElementById('poetry-loading');
-            if (loadingElement) {
-                loadingElement.remove();
+            
+            // Remove loading indicator
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
             }
-            elements.poetryEmptyState.classList.remove('hidden');
+            
+            // Show error message
+            if (poetryEmptyState) poetryEmptyState.classList.remove('hidden');
             showSystemMessage('生成诗词时出错，请稍后再试', 'error');
         }
     }
