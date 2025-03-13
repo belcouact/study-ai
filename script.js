@@ -5749,23 +5749,62 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Call the API
                 const response = await fetchAIResponse(prompt);
-                console.log('API response received');
+                console.log('API response received:', typeof response);
+                
+                // Extract text content from the response
+                let responseText = '';
+                if (typeof response === 'string') {
+                    responseText = response;
+                } else if (response && typeof response === 'object') {
+                    // Try to extract content from response object
+                    if (response.content) {
+                        responseText = response.content;
+                    } else if (response.text) {
+                        responseText = response.text;
+                    } else if (response.message) {
+                        responseText = response.message;
+                    } else if (response.data) {
+                        responseText = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
+                    } else {
+                        // Last resort: stringify the entire response
+                        responseText = JSON.stringify(response);
+                    }
+                } else {
+                    throw new Error('Unexpected response format');
+                }
+                
+                console.log('Extracted response text:', responseText.substring(0, 100) + '...');
                 
                 // Parse the response to extract the poems
                 let poems = [];
                 try {
-                    // Try to find JSON in the response
-                    const jsonMatch = response.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                    if (jsonMatch) {
-                        poems = JSON.parse(jsonMatch[0]);
-                    } else {
-                        throw new Error('No JSON found in response');
+                    // First try: direct JSON parse if the response is already JSON
+                    try {
+                        if (responseText.trim().startsWith('[') && responseText.trim().endsWith(']')) {
+                            poems = JSON.parse(responseText);
+                            console.log('Parsed JSON directly');
+                        } else {
+                            throw new Error('Response is not direct JSON');
+                        }
+                    } catch (directParseError) {
+                        console.log('Direct JSON parse failed, trying to extract JSON from text');
+                        
+                        // Second try: find JSON in the response text
+                        const jsonMatch = responseText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                        if (jsonMatch) {
+                            poems = JSON.parse(jsonMatch[0]);
+                            console.log('Extracted and parsed JSON from text');
+                        } else {
+                            throw new Error('No JSON found in response');
+                        }
                     }
                 } catch (parseError) {
                     console.error('Error parsing poems from response:', parseError);
                     
                     // Fallback: Try to extract structured content
-                    const sections = response.split(/(?=\d+\.\s*题目[:：])/);
+                    console.log('Trying to extract structured content');
+                    const sections = responseText.split(/(?=\d+\.\s*题目[:：])/);
+                    console.log('Found', sections.length - 1, 'potential poem sections');
                     
                     for (let i = 1; i < sections.length; i++) {
                         const section = sections[i];
@@ -5786,6 +5825,53 @@ document.addEventListener('DOMContentLoaded', function() {
                             });
                         }
                     }
+                    
+                    // If still no poems, try one more approach with a different pattern
+                    if (poems.length === 0) {
+                        console.log('Trying alternative parsing approach');
+                        
+                        // Look for numbered poems (1. 2. 3. etc.)
+                        const poemSections = responseText.split(/(?=\d+\.)/);
+                        
+                        for (let i = 1; i < poemSections.length; i++) {
+                            const section = poemSections[i];
+                            
+                            // Extract what we can
+                            const titleMatch = section.match(/(?:题目[:：]|《(.+?)》)/);
+                            const authorMatch = section.match(/(?:作者[:：]|[\(（](.+?)[\)）])/);
+                            
+                            // If we found at least a title, create a basic poem entry
+                            if (titleMatch) {
+                                const title = titleMatch[1] || titleMatch[0].replace(/题目[:：]/, '').trim();
+                                const author = authorMatch ? (authorMatch[1] || authorMatch[0].replace(/作者[:：]/, '').trim()) : "未知";
+                                
+                                // Get the rest of the content
+                                const contentStart = section.indexOf(titleMatch[0]) + titleMatch[0].length;
+                                let content = section.substring(contentStart).trim();
+                                
+                                // Basic poem with what we could extract
+                                poems.push({
+                                    title: title,
+                                    author: author,
+                                    content: content,
+                                    background: "暂无背景信息",
+                                    explanation: "暂无赏析"
+                                });
+                            }
+                        }
+                    }
+                    
+                    // Last resort: if we still have no poems, create a single poem from the entire response
+                    if (poems.length === 0 && responseText.length > 0) {
+                        console.log('Creating fallback poem from entire response');
+                        poems.push({
+                            title: `${poetryType}·${poetryStyle}`,
+                            author: "AI生成",
+                            content: responseText.substring(0, 200), // Take first 200 chars as content
+                            background: "这是AI根据您的要求生成的内容。",
+                            explanation: "由于解析困难，无法提供完整赏析。请尝试重新生成。"
+                        });
+                    }
                 }
                 
                 // Remove loading indicator
@@ -5794,6 +5880,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 if (poems.length > 0) {
+                    console.log('Successfully parsed', poems.length, 'poems');
                     // Store poems in state
                     poemState.poems = poems;
                     poemState.currentIndex = 0;
