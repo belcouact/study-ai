@@ -4397,7 +4397,7 @@ function getSimplifiedContextSummary() {
 
     // Function to handle learn poetry button click
     async function handleLearnPoetryClick() {
-        console.log('Learn poetry button clicked');
+        console.log('Learn poetry button clicked - function invoked');
         
         // Get user's educational context
         const schoolSelect = document.getElementById('school-select-sidebar');
@@ -4416,9 +4416,18 @@ function getSimplifiedContextSummary() {
             return;
         }
         
-        // Get poetry type and style
-        const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
-        const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
+        // Get poetry type and style from the main panel selects (not sidebar)
+        const currentTypeSelect = document.getElementById('poetry-type-select');
+        const currentStyleSelect = document.getElementById('poetry-style-select');
+        
+        if (!currentTypeSelect || !currentStyleSelect) {
+            console.error('Poetry type or style select not found');
+            showSystemMessage('无法获取诗词类型和风格信息', 'error');
+            return;
+        }
+        
+        const poetryType = currentTypeSelect.value;
+        const poetryStyle = currentStyleSelect.value;
         
         console.log(`Generating poems for: ${school} ${grade}, Type: ${poetryType}, Style: ${poetryStyle}`);
         
