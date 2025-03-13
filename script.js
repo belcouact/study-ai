@@ -4696,3 +4696,175 @@ function setupEventListeners() {
     }
     
     if (createButton) {
+        createButton.addEventListener('click', function() {
+            switchPanel('create-panel');
+        });
+    }
+}
+
+// Add this code at the end of the file to ensure it runs after everything else
+
+// Poetry Tab Functionality - Self-contained implementation
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Poetry tab functionality initializing...');
+    
+    // Get the poetry button and panel
+    const poetryButton = document.getElementById('poetry-button');
+    const poetryPanel = document.getElementById('poetry-panel');
+    const qaPanel = document.getElementById('qa-panel');
+    const createPanel = document.getElementById('create-panel');
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    
+    // Log what we found
+    console.log('Poetry elements found:', {
+        poetryButton: !!poetryButton,
+        poetryPanel: !!poetryPanel,
+        qaPanel: !!qaPanel,
+        createPanel: !!createPanel
+    });
+    
+    // Add direct event listener to poetry button
+    if (poetryButton) {
+        poetryButton.addEventListener('click', function(event) {
+            console.log('Poetry button clicked (direct handler)');
+            
+            // Hide other panels
+            if (qaPanel) qaPanel.classList.add('hidden');
+            if (createPanel) createPanel.classList.add('hidden');
+            
+            // Show poetry panel
+            if (poetryPanel) {
+                poetryPanel.classList.remove('hidden');
+                console.log('Poetry panel is now visible');
+            } else {
+                console.error('Poetry panel not found');
+            }
+            
+            // Update active states
+            if (qaButton) qaButton.classList.remove('active');
+            if (createButton) createButton.classList.remove('active');
+            poetryButton.classList.add('active');
+            
+            // Prevent default behavior
+            event.preventDefault();
+        });
+        console.log('Direct event listener added to poetry button');
+    } else {
+        console.error('Poetry button not found');
+    }
+    
+    // Add event listener to Learn Poetry button
+    const learnPoetryButton = document.getElementById('learn-poetry-button');
+    if (learnPoetryButton) {
+        learnPoetryButton.addEventListener('click', function() {
+            console.log('Learn poetry button clicked (direct handler)');
+            
+            // Mock data for testing
+            const mockPoems = [
+                {
+                    title: "望庐山瀑布",
+                    author: "李白",
+                    content: "日照香炉生紫烟，\n遥看瀑布挂前川。\n飞流直下三千尺，\n疑是银河落九天。",
+                    background: "这首诗是唐代诗人李白游览庐山时所作，描写了庐山瀑布的壮观景象。",
+                    explanation: "这首诗生动地描绘了庐山瀑布的壮丽景象，表现了诗人对自然的热爱和赞美。"
+                },
+                {
+                    title: "静夜思",
+                    author: "李白",
+                    content: "床前明月光，\n疑是地上霜。\n举头望明月，\n低头思故乡。",
+                    background: "这首诗是唐代诗人李白所作，表达了诗人思乡之情。",
+                    explanation: "这首诗通过月光和霜的联想，表达了诗人对故乡的思念之情。"
+                }
+            ];
+            
+            // Get poetry display elements
+            const poetryEmptyState = document.getElementById('poetry-empty-state');
+            const poetryDisplay = document.getElementById('poetry-display');
+            const poemTitle = document.getElementById('poem-title');
+            const poemAuthor = document.getElementById('poem-author');
+            const poemContent = document.getElementById('poem-content');
+            const poemBackground = document.getElementById('poem-background');
+            const poemExplanation = document.getElementById('poem-explanation');
+            const poemCounter = document.getElementById('poem-counter');
+            
+            // Hide empty state and show display
+            if (poetryEmptyState) poetryEmptyState.classList.add('hidden');
+            if (poetryDisplay) poetryDisplay.classList.remove('hidden');
+            
+            // Display the first poem
+            if (poemTitle) poemTitle.textContent = mockPoems[0].title;
+            if (poemAuthor) poemAuthor.textContent = mockPoems[0].author;
+            if (poemContent) poemContent.innerHTML = mockPoems[0].content.replace(/\n/g, '<br>');
+            if (poemBackground) poemBackground.innerHTML = mockPoems[0].background;
+            if (poemExplanation) poemExplanation.innerHTML = mockPoems[0].explanation;
+            if (poemCounter) poemCounter.textContent = `1 / ${mockPoems.length}`;
+            
+            console.log('Mock poem displayed');
+        });
+        console.log('Direct event listener added to learn poetry button');
+    }
+    
+    // Add event listeners for navigation buttons
+    const prevPoemButton = document.getElementById('prev-poem-button');
+    const nextPoemButton = document.getElementById('next-poem-button');
+    
+    if (prevPoemButton) {
+        prevPoemButton.addEventListener('click', function() {
+            console.log('Previous poem button clicked');
+        });
+    }
+    
+    if (nextPoemButton) {
+        nextPoemButton.addEventListener('click', function() {
+            console.log('Next poem button clicked');
+        });
+    }
+    
+    // Add event listener for poetry type dropdown
+    const poetryTypeSelect = document.getElementById('poetry-type');
+    const poetryStyleSelect = document.getElementById('poetry-style');
+    
+    if (poetryTypeSelect && poetryStyleSelect) {
+        poetryTypeSelect.addEventListener('change', function() {
+            const poetryType = poetryTypeSelect.value;
+            console.log('Poetry type changed to:', poetryType);
+            
+            // Clear existing options
+            while (poetryStyleSelect.options.length > 0) {
+                poetryStyleSelect.remove(0);
+            }
+            
+            // Add new options based on selected type
+            if (poetryType === '唐诗') {
+                const styles = ['山水', '边塞', '浪漫', '现实'];
+                styles.forEach(style => {
+                    const option = document.createElement('option');
+                    option.value = style;
+                    option.textContent = style;
+                    poetryStyleSelect.appendChild(option);
+                });
+            } else if (poetryType === '宋词') {
+                const styles = ['婉约', '豪放'];
+                styles.forEach(style => {
+                    const option = document.createElement('option');
+                    option.value = style;
+                    option.textContent = style;
+                    poetryStyleSelect.appendChild(option);
+                });
+            } else if (poetryType === '元曲') {
+                const styles = ['杂居', '散曲'];
+                styles.forEach(style => {
+                    const option = document.createElement('option');
+                    option.value = style;
+                    option.textContent = style;
+                    poetryStyleSelect.appendChild(option);
+                });
+            }
+            
+            console.log('Updated poetry style options');
+        });
+    }
+    
+    console.log('Poetry tab functionality initialized');
+});
