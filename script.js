@@ -5290,6 +5290,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (existingPoetryContainer && existingPoetryContainer.parentNode) {
                 existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
             }
+            
+            // Set up the test configuration controls
+            setupTestControls();
         } else if (containerType === 'poetry' && poetryContainer && contentArea) {
             contentArea.appendChild(poetryContainer);
             if (poetryButton) poetryButton.classList.add('active');
@@ -5787,3 +5790,159 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry functionality initialized');
 });
+
+// ... existing code ...
+
+    // Function to set up test controls
+    function setupTestControls() {
+        console.log('Setting up test controls');
+        
+        // Get the subject select element from the top of the page
+        const subjectSelect = document.getElementById('subject-select');
+        const semesterSelect = document.getElementById('semester-select');
+        const difficultySelect = document.getElementById('difficulty-select');
+        const questionCountSelect = document.getElementById('question-count-select');
+        const generateQuestionsButton = document.getElementById('generate-questions-button');
+        
+        // Get the school and grade from the sidebar
+        const schoolSelect = document.getElementById('school-select-sidebar');
+        const gradeSelect = document.getElementById('grade-select-sidebar');
+        
+        if (schoolSelect && gradeSelect && subjectSelect) {
+            // Populate subject options based on school
+            const school = schoolSelect.value;
+            populateSubjectOptions(school, subjectSelect);
+            
+            // Add event listener to school select to update subject options
+            schoolSelect.addEventListener('change', function() {
+                const school = this.value;
+                populateSubjectOptions(school, subjectSelect);
+            });
+        }
+        
+        // Add event listener to generate questions button
+        if (generateQuestionsButton) {
+            // Remove any existing event listeners
+            const newButton = generateQuestionsButton.cloneNode(true);
+            if (generateQuestionsButton.parentNode) {
+                generateQuestionsButton.parentNode.replaceChild(newButton, generateQuestionsButton);
+            }
+            
+            // Add new event listener
+            newButton.addEventListener('click', function() {
+                console.log('Generate questions button clicked');
+                
+                // Get values from the form
+                const school = schoolSelect ? schoolSelect.value : '';
+                const grade = gradeSelect ? gradeSelect.options[gradeSelect.selectedIndex].text : '';
+                const subject = subjectSelect ? subjectSelect.value : '';
+                const semester = semesterSelect ? semesterSelect.value : '上学期';
+                const difficulty = difficultySelect ? difficultySelect.value : '中等';
+                const questionCount = questionCountSelect ? questionCountSelect.value : '5';
+                
+                // Call the function to generate questions
+                handleGenerateQuestionsClick(school, grade, subject, semester, difficulty, questionCount);
+            });
+        }
+    }
+    
+    // Function to populate subject options based on school
+    function populateSubjectOptions(school, subjectSelect) {
+        if (!subjectSelect) return;
+        
+        // Clear existing options
+        while (subjectSelect.options.length > 0) {
+            subjectSelect.remove(0);
+        }
+        
+        // Add new options based on school
+        let subjects = [];
+        
+        if (school === '小学') {
+            subjects = ['语文', '数学', '英语', '科学', '道德与法治'];
+        } else if (school === '初中') {
+            subjects = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'];
+        } else if (school === '高中') {
+            subjects = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+        }
+        
+        // Add options to select
+        subjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            subjectSelect.appendChild(option);
+        });
+    }
+    
+    // Function to handle generate questions button click
+    async function handleGenerateQuestionsClick(school, grade, subject, semester, difficulty, questionCount) {
+        console.log(`Generating questions for: ${school} ${grade} ${subject}, ${semester}, ${difficulty}, ${questionCount} questions`);
+        
+        // Show loading state
+        const emptyState = document.getElementById('empty-state');
+        const questionsDisplayContainer = document.getElementById('questions-display-container');
+        
+        if (emptyState) emptyState.classList.add('hidden');
+        
+        // Show loading indicator
+        showLoadingIndicator();
+        
+        try {
+            // Prepare the prompt for the API
+            const prompt = `请为${school}${grade}的学生出${questionCount}道${subject}${semester}的${difficulty}难度选择题。
+            每道题应包含题目和4个选项(A, B, C, D)，以及正确答案和详细解析。
+            请以JSON格式返回，格式如下：
+            [
+              {
+                "question": "题目内容",
+                "options": {
+                  "A": "选项A内容",
+                  "B": "选项B内容",
+                  "C": "选项C内容",
+                  "D": "选项D内容"
+                },
+                "answer": "正确选项字母",
+                "explanation": "详细解析"
+              },
+              ...
+            ]`;
+            
+            // Call the API
+            const apiResponse = await fetchAIResponse(prompt);
+            console.log('API response received');
+            
+            // Parse the response to extract the questions
+            const questions = parseQuestionsFromResponse(apiResponse);
+            
+            // Hide loading indicator
+            hideLoadingIndicator();
+            
+            if (questions.length > 0) {
+                console.log('Successfully parsed', questions.length, 'questions');
+                // Store questions in state
+                state.questions = questions;
+                state.currentQuestionIndex = 0;
+                state.userAnswers = new Array(questions.length).fill(null);
+                
+                // Display questions
+                if (questionsDisplayContainer) questionsDisplayContainer.classList.remove('hidden');
+                displayCurrentQuestion();
+                setupNavigationButtons();
+            } else {
+                // Show error message
+                if (emptyState) emptyState.classList.remove('hidden');
+                showSystemMessage('无法生成题目，请稍后再试', 'error');
+            }
+        } catch (error) {
+            console.error('Error generating questions:', error);
+            
+            // Hide loading indicator
+            hideLoadingIndicator();
+            
+            // Show error message
+            if (emptyState) emptyState.classList.remove('hidden');
+            showSystemMessage('生成题目时出错，请稍后再试', 'error');
+        }
+    }
+// ... existing code ...
