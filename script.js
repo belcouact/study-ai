@@ -5264,53 +5264,40 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to handle tab switching
     function handleTabSwitch(containerType) {
-        console.log('Switching to tab:', containerType);
+        console.log('Switching to container type:', containerType);
         
-        // Remove all containers from DOM
-        if (qaContainer && qaContainer.parentNode) {
-            qaContainer.parentNode.removeChild(qaContainer);
-        }
-        
-        if (createContainer && createContainer.parentNode) {
-            createContainer.parentNode.removeChild(createContainer);
-        }
-        
-        if (poetryContainer && poetryContainer.parentNode) {
+        // Always check for and remove poetry container first when switching to non-poetry tabs
+        const poetryContainer = document.getElementById('poetry-container');
+        if (containerType !== 'poetry' && poetryContainer && poetryContainer.parentNode) {
+            console.log('Removing poetry container from DOM');
             poetryContainer.parentNode.removeChild(poetryContainer);
         }
-        
-        // Reset active states
-        if (qaButton) qaButton.classList.remove('active');
-        if (createButton) createButton.classList.remove('active');
-        if (poetryButton) poetryButton.classList.remove('active');
-        
-        // Add the appropriate container to the content area
-        if (containerType === 'qa' && qaContainer && contentArea) {
-            contentArea.appendChild(qaContainer);
-            if (qaButton) qaButton.classList.add('active');
-            console.log('QA container added to content area');
-            
-            // Ensure poetry container is not in the DOM
-            const poetryContainerCheck = document.getElementById('poetry-container');
-            if (poetryContainerCheck && poetryContainerCheck.parentNode) {
-                poetryContainerCheck.parentNode.removeChild(poetryContainerCheck);
-                console.log('Poetry container removed from QA page');
+
+        // Hide all containers first
+        const containers = document.querySelectorAll('.container');
+        containers.forEach(container => {
+            container.style.display = 'none';
+        });
+
+        // Show the selected container
+        const selectedContainer = document.getElementById(`${containerType}-container`);
+        if (selectedContainer) {
+            selectedContainer.style.display = 'block';
+        }
+
+        // Update active state of tab buttons
+        const buttons = document.querySelectorAll('.tab-button');
+        buttons.forEach(button => {
+            button.classList.remove('active');
+            if (button.getAttribute('data-container') === containerType) {
+                button.classList.add('active');
             }
-        } else if (containerType === 'create' && createContainer && contentArea) {
-            contentArea.appendChild(createContainer);
-            if (createButton) createButton.classList.add('active');
-            console.log('Create container added to content area');
-            
-            // Ensure poetry container is not in the DOM
-            const poetryContainerCheck = document.getElementById('poetry-container');
-            if (poetryContainerCheck && poetryContainerCheck.parentNode) {
-                poetryContainerCheck.parentNode.removeChild(poetryContainerCheck);
-                console.log('Poetry container removed from Create page');
-            }
-        } else if (containerType === 'poetry' && poetryContainer && contentArea) {
-            contentArea.appendChild(poetryContainer);
-            if (poetryButton) poetryButton.classList.add('active');
-            console.log('Poetry container added to content area');
+        });
+
+        // Special handling for poetry tab
+        if (containerType === 'poetry') {
+            console.log('Switching to poetry tab');
+            initializePoetryPanel();
         }
     }
     
