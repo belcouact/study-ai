@@ -636,6 +636,7 @@ button:active {
     box-shadow: var(--shadow);
     transition: all var(--transition-speed) ease;
     width: 100%;
+    margin-bottom: 20px;
     flex: 1;
 }
 
@@ -791,80 +792,6 @@ button:active {
     padding: 20px;
     height: auto;
     min-height: calc(100vh - 60px);
-    gap: 20px;
-}
-
-/* Test configuration at the top of the test page */
-.test-configuration {
-    background-color: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    margin-bottom: 20px;
-}
-
-.test-config-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: flex-end;
-}
-
-.test-configuration .dropdown-container {
-    display: flex;
-    flex-direction: column;
-    min-width: 120px;
-    margin-bottom: 0;
-}
-
-.test-configuration .dropdown-container label {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--text-color);
-    margin-bottom: 5px;
-    width: auto;
-}
-
-.test-configuration .dropdown-container select {
-    padding: 8px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background-color: white;
-    color: var(--text-color);
-    font-size: 0.9rem;
-}
-
-.test-configuration .primary-button {
-    background-color: var(--secondary-color);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 20px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    height: 38px;
-    white-space: nowrap;
-}
-
-.test-configuration .primary-button:hover {
-    background-color: #2980b9;
-}
-
-@media (max-width: 768px) {
-    .test-config-row {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .test-configuration .dropdown-container {
-        width: 100%;
-    }
-    
-    .test-configuration .primary-button {
-        width: 100%;
-        margin-top: 10px;
-    }
 }
 
 /* Loading indicator for tests */
