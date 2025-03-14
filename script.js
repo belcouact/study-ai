@@ -1142,8 +1142,23 @@ async function handleGenerateQuestionsClick() {
     
     try {
         // Get educational context
-        const context = getSimplifiedEducationalContext();
-        console.log('Educational context:', context);
+        const contextObj = getSimplifiedEducationalContext();
+        console.log('Educational context:', contextObj);
+        
+        // Format the context properly
+        let contextStr = '';
+        if (contextObj && typeof contextObj === 'object') {
+            if (contextObj.school) contextStr += `学校: ${contextObj.school}`;
+            if (contextObj.grade) contextStr += `, 年级: ${contextObj.grade}`;
+            if (contextObj.subject) contextStr += `, 学科: ${contextObj.subject}`;
+            
+            // If we have curriculum info, add it
+            if (contextObj.curriculum) contextStr += `, 课程: ${contextObj.curriculum}`;
+        } else {
+            contextStr = '小学一年级';
+        }
+        
+        console.log('Formatted context:', contextStr);
         
         // Get the number of questions
         const numQuestions = document.getElementById('num-questions')?.value || 5;
@@ -1159,7 +1174,7 @@ async function handleGenerateQuestionsClick() {
         
         // Prepare the prompt
         const prompt = `请根据以下教育背景为学生生成${numQuestions}道${difficulty}难度的${questionType}，主题是"${topic}"。
-教育背景：${context}
+教育背景：${contextStr}
 
 请确保题目格式如下：
 1. 每个题目必须包含题干和选项（如果是选择题）
@@ -3592,52 +3607,36 @@ function getCurriculumInfo(school, grade, subject) {
 
 // Add a new function to get simplified educational context (school and grade only)
 function getSimplifiedEducationalContext() {
-    console.log('Getting simplified educational context');
-    
-    // Initialize with default values
-    let school = '未指定学校类型';
-    let grade = '未指定年级';
-    
-    // Get all select elements in the document
-    const allSelects = document.querySelectorAll('select');
-    
-    // Scan through all selects to find our dropdowns
-    allSelects.forEach(select => {
-        const id = select.id || '';
-        const name = select.name || '';
-        const value = select.value;
+    try {
+        // Get the selected school
+        const schoolSelect = document.getElementById('school-select') || document.getElementById('school-select-sidebar');
+        const school = schoolSelect ? schoolSelect.value : '小学';
         
-        // Check if this is a school dropdown
-        if (id.includes('school') || name.includes('school')) {
-            if (value && value !== 'none') {
-                try {
-                    school = select.options[select.selectedIndex].text;
-                } catch (e) {
-                    // Map values to text
-                    const schoolMap = {
-                        'primary': '小学',
-                        'middle': '初中',
-                        'high': '高中'
-                    };
-                    school = schoolMap[value] || value;
-                }
-            }
-        }
+        // Get the selected grade
+        const gradeSelect = document.getElementById('grade-select') || document.getElementById('grade-select-sidebar');
+        const grade = gradeSelect ? gradeSelect.value : '一年级';
         
-        // Check if this is a grade dropdown
-        if (id.includes('grade') || name.includes('grade')) {
-            if (value && value !== 'none') {
-                try {
-                    grade = select.options[select.selectedIndex].text;
-                } catch (e) {
-                    grade = value;
-                }
-            }
-        }
-    });
-    
-    console.log('Simplified educational context:', { school, grade });
-    return { school, grade };
+        // Get the selected subject
+        const subjectSelect = document.getElementById('subject-select') || document.getElementById('subject-select-sidebar');
+        const subject = subjectSelect ? subjectSelect.value : '语文';
+        
+        // Get curriculum info
+        const curriculumInfo = getCurriculumInfo(school, grade, subject);
+        
+        return {
+            school,
+            grade,
+            subject,
+            curriculum: curriculumInfo
+        };
+    } catch (error) {
+        console.error('Error getting educational context:', error);
+        return {
+            school: '小学',
+            grade: '一年级',
+            subject: '语文'
+        };
+    }
 }
 
 // Add a new function to get simplified context summary (school and grade only)
