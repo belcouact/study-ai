@@ -49,6 +49,42 @@
                     </div>
                     
                     <!-- Test Configuration Frame -->
+                    <div class="sidebar-frame">
+                        <h3 class="frame-title">测验</h3>
+                        <div class="frame-content">
+                            <div class="dropdown-container">
+                                <label for="subject-select-sidebar">科目</label>
+                                <select id="subject-select-sidebar" name="subject">
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                            </div>
+                            
+                            <div class="dropdown-container">
+                                <label for="semester-select-sidebar">学期</label>
+                                <select id="semester-select-sidebar" name="semester">
+                                    <option value="上学期">上学期</option>
+                                    <option value="下学期">下学期</option>
+                                </select>
+                            </div>
+                            
+                            <div class="dropdown-container">
+                                <label for="difficulty-select-sidebar">难度</label>
+                                <select id="difficulty-select-sidebar" name="difficulty">
+                                    <option value="容易">容易</option>
+                                    <option value="中等">中等</option>
+                                    <option value="偏难">偏难</option>
+                                </select>
+                            </div>
+                            
+                            <div class="dropdown-container">
+                                <label for="question-count-select-sidebar">题数</label>
+                                <select id="question-count-select-sidebar" name="questionCount">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- External AI Services -->
@@ -106,45 +142,6 @@
             
             <!-- Create Questions Container (initially hidden) -->
             <div id="create-container" class="container hidden">
-                <!-- Test Configuration moved from sidebar to top of test page -->
-                <div class="test-config-header">
-                    <div class="test-config-controls">
-                        <div class="dropdown-container">
-                            <label for="subject-select-sidebar">科目</label>
-                            <select id="subject-select-sidebar" name="subject">
-                                <!-- Options will be populated dynamically -->
-                            </select>
-                        </div>
-                        
-                        <div class="dropdown-container">
-                            <label for="semester-select-sidebar">学期</label>
-                            <select id="semester-select-sidebar" name="semester">
-                                <option value="上学期">上学期</option>
-                                <option value="下学期">下学期</option>
-                            </select>
-                        </div>
-                        
-                        <div class="dropdown-container">
-                            <label for="difficulty-select-sidebar">难度</label>
-                            <select id="difficulty-select-sidebar" name="difficulty">
-                                <option value="容易">容易</option>
-                                <option value="中等">中等</option>
-                                <option value="偏难">偏难</option>
-                            </select>
-                        </div>
-                        
-                        <div class="dropdown-container">
-                            <label for="question-count-select-sidebar">题数</label>
-                            <select id="question-count-select-sidebar" name="questionCount">
-                                <option value="5">5</option>
-                                <option value="10">10</option>
-                            </select>
-                        </div>
-                        
-                        <button id="generate-questions-button" class="primary-button">出题</button>
-                    </div>
-                </div>
-                
                 <!-- Questions display container moved to the top -->
                 <div id="questions-display-container" class="questions-display-container hidden">
                     <!-- Empty state message -->
