@@ -2,6 +2,16 @@
 let currentApiFunction = 'chat';
 let currentModel = 'deepseek-r1';
 
+// Global state object to manage application state
+const state = {
+    questions: [],
+    currentQuestionIndex: 0,
+    userAnswers: [],
+    poems: [],
+    currentPoemIndex: 0,
+    isInitialized: false
+};
+
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
     console.log('Parsing questions from response');
@@ -457,6 +467,12 @@ function displayAnswer(selectedValue) {
 function updateNavigationButtons() {
     console.log('Updating navigation buttons');
     
+    // Ensure state object exists
+    if (typeof state === 'undefined') {
+        console.error('State object is not defined');
+        return;
+    }
+    
     const prevButton = document.getElementById('prev-question-button');
     const nextButton = document.getElementById('next-question-button');
     
@@ -467,32 +483,26 @@ function updateNavigationButtons() {
         // Disable next button if on last question
         nextButton.disabled = state.currentQuestionIndex === state.questions.length - 1;
         
-        // Add event listeners if not already added
-        if (!prevButton.hasClickListener) {
-            prevButton.addEventListener('click', function() {
-                if (state.currentQuestionIndex > 0) {
-                    state.currentQuestionIndex--;
-                    displayCurrentQuestion();
-                }
-            });
-            prevButton.hasClickListener = true;
-        }
-        
-        if (!nextButton.hasClickListener) {
-            nextButton.addEventListener('click', function() {
-                if (state.currentQuestionIndex < state.questions.length - 1) {
-                    state.currentQuestionIndex++;
-                    displayCurrentQuestion();
-                }
-            });
-            nextButton.hasClickListener = true;
-        }
+        console.log('Navigation buttons updated:', {
+            prevDisabled: prevButton.disabled,
+            nextDisabled: nextButton.disabled,
+            currentIndex: state.currentQuestionIndex,
+            totalQuestions: state.questions.length
+        });
+    } else {
+        console.warn('Navigation buttons not found');
     }
 }
 
 // Function to set up navigation buttons
 function setupNavigationButtons() {
     console.log('Setting up navigation buttons');
+    
+    // Ensure state object exists
+    if (typeof state === 'undefined') {
+        console.error('State object is not defined');
+        return;
+    }
     
     const prevButton = document.getElementById('prev-question-button');
     const nextButton = document.getElementById('next-question-button');
@@ -530,6 +540,10 @@ function setupNavigationButtons() {
         // Update button states
         newPrevButton.disabled = state.currentQuestionIndex === 0;
         newNextButton.disabled = state.currentQuestionIndex === state.questions.length - 1;
+        
+        console.log('Navigation buttons set up successfully');
+    } else {
+        console.warn('Navigation buttons not found');
     }
 }
 
@@ -1107,7 +1121,7 @@ function handleGenerateQuestionsClick() {
 
 示例格式：
 题目：[题目内容]
-A. [选项A内容]
+A. [选项A内容] 
 B. [选项B内容] 
 C. [选项C内容]
 D. [选项D内容]
@@ -1362,116 +1376,53 @@ function hideLoadingIndicator() {
 function setupNavigationButtons() {
     console.log('Setting up navigation buttons');
     
+    // Ensure state object exists
+    if (typeof state === 'undefined') {
+        console.error('State object is not defined');
+        return;
+    }
+    
     const prevButton = document.getElementById('prev-question-button');
     const nextButton = document.getElementById('next-question-button');
     
-    // Create navigation controls if they don't exist
-    let navigationControls = document.querySelector('.navigation-controls');
-    if (!navigationControls) {
-        navigationControls = document.createElement('div');
-        navigationControls.className = 'navigation-controls';
-        navigationControls.style.cssText = `
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 20px 0;
-            width: 100%;
-            flex-wrap: wrap;
-            gap: 10px;
-        `;
-        
-        const questionsDisplayContainer = document.getElementById('questions-display-container');
-        if (questionsDisplayContainer) {
-            questionsDisplayContainer.appendChild(navigationControls);
-        }
-    }
-    
-    // Create prev button if it doesn't exist
-    if (!prevButton) {
-        const newPrevButton = document.createElement('button');
-        newPrevButton.id = 'prev-question-button';
-        newPrevButton.className = 'nav-button';
-        newPrevButton.innerHTML = '&larr; 上一题';
-        newPrevButton.style.cssText = `
-            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
-            font-size: clamp(14px, 3.5vw, 16px);
-            border-radius: 8px;
-            margin: clamp(5px, 2vw, 10px);
-            background-color: #edf2f7;
-            color: #4a5568;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        `;
-        
-        newPrevButton.addEventListener('click', function() {
-            if (window.currentQuestionIndex > 0) {
-                window.currentQuestionIndex--;
-                displayCurrentQuestion();
-                updateNavigationButtons();
-            }
-        });
-        
-        navigationControls.appendChild(newPrevButton);
-    } else {
+    if (prevButton && nextButton) {
         // Remove any existing event listeners
         const newPrevButton = prevButton.cloneNode(true);
-        prevButton.parentNode.replaceChild(newPrevButton, prevButton);
-        
-        // Add new event listener
-        newPrevButton.addEventListener('click', function() {
-            if (window.currentQuestionIndex > 0) {
-                window.currentQuestionIndex--;
-                displayCurrentQuestion();
-                updateNavigationButtons();
-            }
-        });
-    }
-    
-    // Create next button if it doesn't exist
-    if (!nextButton) {
-        const newNextButton = document.createElement('button');
-        newNextButton.id = 'next-question-button';
-        newNextButton.className = 'nav-button';
-        newNextButton.innerHTML = '下一题 &rarr;';
-        newNextButton.style.cssText = `
-            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
-            font-size: clamp(14px, 3.5vw, 16px);
-            border-radius: 8px;
-            margin: clamp(5px, 2vw, 10px);
-            background-color: #4299e1;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        `;
-        
-        newNextButton.addEventListener('click', function() {
-            if (window.questions && window.currentQuestionIndex < window.questions.length - 1) {
-                window.currentQuestionIndex++;
-                displayCurrentQuestion();
-                updateNavigationButtons();
-            }
-        });
-        
-        navigationControls.appendChild(newNextButton);
-    } else {
-        // Remove any existing event listeners
         const newNextButton = nextButton.cloneNode(true);
-        nextButton.parentNode.replaceChild(newNextButton, nextButton);
         
-        // Add new event listener
-        newNextButton.addEventListener('click', function() {
-            if (window.questions && window.currentQuestionIndex < window.questions.length - 1) {
-                window.currentQuestionIndex++;
+        if (prevButton.parentNode) {
+            prevButton.parentNode.replaceChild(newPrevButton, prevButton);
+        }
+        
+        if (nextButton.parentNode) {
+            nextButton.parentNode.replaceChild(newNextButton, nextButton);
+        }
+        
+        // Add new event listeners
+        newPrevButton.addEventListener('click', function() {
+            console.log('Previous button clicked');
+            if (state.currentQuestionIndex > 0) {
+                state.currentQuestionIndex--;
                 displayCurrentQuestion();
-                updateNavigationButtons();
             }
         });
+        
+        newNextButton.addEventListener('click', function() {
+            console.log('Next button clicked');
+            if (state.currentQuestionIndex < state.questions.length - 1) {
+                state.currentQuestionIndex++;
+                displayCurrentQuestion();
+            }
+        });
+        
+        // Update button states
+        newPrevButton.disabled = state.currentQuestionIndex === 0;
+        newNextButton.disabled = state.currentQuestionIndex === state.questions.length - 1;
+        
+        console.log('Navigation buttons set up successfully');
+    } else {
+        console.warn('Navigation buttons not found');
     }
-    
-    // Update button states
-    updateNavigationButtons();
 }
 
 // Function to set up option selection buttons
@@ -5427,3 +5378,31 @@ function showSystemMessage(message, type = 'info') {
     }
 }
 // ... existing code ...
+
+// Initialize the application when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded');
+    
+    // Initialize state if not already initialized
+    if (!state.isInitialized) {
+        state.questions = [];
+        state.currentQuestionIndex = 0;
+        state.userAnswers = [];
+        state.poems = [];
+        state.currentPoemIndex = 0;
+        state.isInitialized = true;
+        
+        console.log('State initialized:', state);
+    }
+    
+    // Initialize the application
+    init();
+    
+    // Set up navigation buttons if they exist
+    const prevButton = document.getElementById('prev-question-button');
+    const nextButton = document.getElementById('next-question-button');
+    
+    if (prevButton && nextButton) {
+        setupNavigationButtons();
+    }
+});
