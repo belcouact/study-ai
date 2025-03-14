@@ -3653,7 +3653,7 @@ function setupChatButtons() {
     console.log('Setting up chat buttons');
     
     // Inspect dropdowns to debug the issue
-    inspectDropdowns();
+    // inspectDropdowns();
     
     // First, ensure the chat interface exists and get references to its elements
     const chatElements = createChatInterface();
