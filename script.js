@@ -5269,74 +5269,86 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to handle generate questions button click
     async function handleGenerateQuestionsClick(school, grade, subject, semester, difficulty, questionCount) {
-        console.log(`Generating questions for: ${school} ${grade} ${subject}, ${semester}, ${difficulty}, ${questionCount} questions`);
+        console.log('Generating questions with parameters:', { school, grade, subject, semester, difficulty, questionCount });
         
-        // Show loading state
+        // Get the test loading indicator and questions container
+        const testLoadingIndicator = document.getElementById('test-loading-indicator');
+        const questionsContainer = document.getElementById('questions-display-container');
         const emptyState = document.getElementById('empty-state');
-        const questionsDisplayContainer = document.getElementById('questions-display-container');
         
-        if (emptyState) emptyState.classList.add('hidden');
-        
-        // Show loading indicator
-        showLoadingIndicator();
+        if (!testLoadingIndicator || !questionsContainer) {
+            console.error('Test elements not found');
+            return;
+        }
         
         try {
-            // Prepare the prompt for the API
-            const prompt = `请为${school}${grade}的学生出${questionCount}道${subject}${semester}的${difficulty}难度选择题。
-            每道题应包含题目和4个选项(A, B, C, D)，以及正确答案和详细解析。
-            请以JSON格式返回，格式如下：
-            [
-              {
-                "question": "题目内容",
-                "options": {
-                  "A": "选项A内容",
-                  "B": "选项B内容",
-                  "C": "选项C内容",
-                  "D": "选项D内容"
-                },
-                "answer": "正确选项字母",
-                "explanation": "详细解析"
-              },
-              ...
-            ]`;
+            // Show loading indicator
+            testLoadingIndicator.classList.remove('hidden');
             
-            // Call the API
-            const apiResponse = await fetchAIResponse(prompt);
-            console.log('API response received');
-            
-            // Parse the response to extract the questions
-            const questions = parseQuestionsFromResponse(apiResponse);
-            
-            // Hide loading indicator
-            hideLoadingIndicator();
-            
-            if (questions && questions.length > 0) {
-                console.log('Successfully parsed', questions.length, 'questions');
-                // Store questions in state
-                state.questions = questions;
-                state.currentQuestionIndex = 0;
-                state.userAnswers = new Array(questions.length).fill(null);
-                
-                // Display questions
-                if (questionsDisplayContainer) questionsDisplayContainer.classList.remove('hidden');
-                displayCurrentQuestion();
-                setupNavigationButtons();
-            } else {
-                // Show error message
-                if (emptyState) emptyState.classList.remove('hidden');
-                showSystemMessage('无法生成题目，请稍后再试', 'error');
+            // Hide questions container and empty state
+            questionsContainer.classList.add('hidden');
+            if (emptyState) {
+                emptyState.classList.add('hidden');
             }
+            
+            // Prepare the prompt
+            const prompt = `请为${school}${grade}学生出${questionCount}道${difficulty}难度的${subject}${semester}选择题，每道题有4个选项(A,B,C,D)，并提供答案和解析。请以JSON格式返回，格式为：
+            {
+                "questions": [
+                    {
+                        "question": "题目内容",
+                        "options": {
+                            "A": "选项A内容",
+                            "B": "选项B内容",
+                            "C": "选项C内容",
+                            "D": "选项D内容"
+                        },
+                        "answer": "正确选项字母",
+                        "explanation": "解析内容"
+                    },
+                    ...
+                ]
+            }`;
+            
+            // Fetch the response
+            const response = await fetchAIResponse(prompt);
+            
+            // Parse the questions from the response
+            const questions = parseQuestionsFromResponse(response);
+            
+            if (!questions || questions.length === 0) {
+                throw new Error('No questions generated');
+            }
+            
+            // Store the questions in the state
+            state.questions = questions;
+            state.currentQuestionIndex = 0;
+            state.userAnswers = new Array(questions.length).fill(null);
+            
+            // Display the first question
+            displayCurrentQuestion();
+            
+            // Show the questions container
+            questionsContainer.classList.remove('hidden');
+            
+            // Update navigation buttons
+            updateNavigationButtons();
+            
+            console.log('Questions generated successfully:', questions);
         } catch (error) {
             console.error('Error generating questions:', error);
-            
-            // Hide loading indicator
-            hideLoadingIndicator();
-            
-            // Show error message
-            if (emptyState) emptyState.classList.remove('hidden');
             showSystemMessage('生成题目时出错，请稍后再试', 'error');
+            
+            // Show empty state
+            if (emptyState) {
+                emptyState.classList.remove('hidden');
+            }
+        } finally {
+            // Hide loading indicator
+            testLoadingIndicator.classList.add('hidden');
         }
     }
+
 // ... existing code ...
 
 // Function to format math expressions in text
@@ -5521,3 +5533,206 @@ document.addEventListener('DOMContentLoaded', function() {
         setupNavigationButtons();
     }
 });
+
+// ... existing code ...
+
+// Add the missing getSimplifiedEducationalContext function
+function getSimplifiedEducationalContext() {
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    const gradeSelect = document.getElementById('grade-select-sidebar');
+    
+    if (!schoolSelect || !gradeSelect) {
+        console.warn('Educational context elements not found');
+        return '小学一年级'; // Default fallback
+    }
+    
+    const school = schoolSelect.value || '小学';
+    const grade = gradeSelect.value || '一年级';
+    
+    return `${school}${grade}`;
+}
+
+// Fix the submit button click handler to properly find the output container
+function setupChatButtons() {
+    console.log('Setting up chat buttons');
+    const chatInput = document.getElementById('user-input');
+    const submitButton = document.getElementById('submit-button');
+    const optimizeButton = document.getElementById('optimize-button');
+    
+    if (!chatInput || !submitButton || !optimizeButton) {
+        console.error('Chat interface elements not found');
+        return;
+    }
+    
+    // Get the output container
+    const outputContainer = document.querySelector('.output-container');
+    const outputElement = document.getElementById('output');
+    
+    if (!outputContainer || !outputElement) {
+        console.error('Output container or output element not found');
+        return;
+    }
+    
+    // Set up the submit button
+    submitButton.addEventListener('click', async function() {
+        const question = chatInput.value.trim();
+        if (!question) {
+            showSystemMessage('请输入问题', 'warning');
+            return;
+        }
+        
+        try {
+            // Show loading indicator
+            showLoadingIndicator();
+            
+            // Get educational context
+            const educationalContext = getSimplifiedEducationalContext();
+            console.log('Educational context:', educationalContext);
+            
+            // Submit the question
+            await handleSubmitQuestion(question);
+            
+            // Clear the input
+            chatInput.value = '';
+        } catch (error) {
+            console.error('Error submitting question:', error);
+            showSystemMessage('获取回答时出错，请稍后再试', 'error');
+        } finally {
+            // Hide loading indicator
+            hideLoadingIndicator();
+        }
+    });
+    
+    // Set up the optimize button
+    optimizeButton.addEventListener('click', function() {
+        // Optimize button functionality
+        // ...
+    });
+    
+    // Allow submitting with Enter key
+    chatInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            submitButton.click();
+        }
+    });
+}
+
+// Fix the handleSubmitQuestion function to properly update the output
+async function handleSubmitQuestion(question) {
+    console.log('Handling question submission:', question);
+    
+    // Get the output element
+    const outputElement = document.getElementById('output');
+    if (!outputElement) {
+        console.error('Output element not found');
+        return;
+    }
+    
+    try {
+        // Get educational context
+        const educationalContext = getSimplifiedEducationalContext();
+        
+        // Prepare the prompt
+        const prompt = `作为一位${educationalContext}学生的AI助教，请回答以下问题：\n\n${question}`;
+        
+        // Fetch the response
+        const response = await fetchAIResponse(prompt);
+        
+        // Extract the content
+        const content = extractContentFromResponse(response);
+        
+        // Format the content
+        const formattedContent = formatContentForDisplay(content);
+        
+        // Update the output
+        outputElement.innerHTML = formattedContent;
+        
+        // Render math expressions if needed
+        if (window.MathJax && content.includes('$')) {
+            window.MathJax.typeset();
+        }
+    } catch (error) {
+        console.error('Error handling question:', error);
+        throw error;
+    }
+}
+
+// Fix the showLoadingIndicator function
+function showLoadingIndicator() {
+    console.log('Showing loading indicator');
+    
+    // Get the loading element
+    let loadingElement = document.getElementById('loading');
+    
+    // If loading element doesn't exist, create it
+    if (!loadingElement) {
+        console.log('Loading element not found, creating new one');
+        
+        // Get the output container
+        const outputContainer = document.querySelector('.output-container');
+        if (!outputContainer) {
+            console.error('Output container not found');
+            return;
+        }
+        
+        // Create the loading element
+        loadingElement = document.createElement('div');
+        loadingElement.id = 'loading';
+        loadingElement.className = 'hidden';
+        loadingElement.innerHTML = `
+            <div class="spinner"></div>
+            <p>Thinking...</p>
+        `;
+        
+        // Add it to the output container
+        outputContainer.insertBefore(loadingElement, outputContainer.firstChild);
+    }
+    
+    // Show the loading indicator
+    loadingElement.classList.remove('hidden');
+}
+
+// Fix the hideLoadingIndicator function
+function hideLoadingIndicator() {
+    console.log('Hiding loading indicator');
+    
+    // Get the loading element
+    const loadingElement = document.getElementById('loading');
+    
+    // If loading element exists, hide it
+    if (loadingElement) {
+        loadingElement.classList.add('hidden');
+    }
+}
+
+// Make sure init function calls setupChatButtons
+function init() {
+    console.log('Initializing application');
+    
+    // Initialize state if not already initialized
+    if (!window.state || !window.state.isInitialized) {
+        initializeState();
+    }
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Set up chat buttons
+    setupChatButtons();
+    
+    // Initialize dropdowns
+    initializePoetryDropdowns();
+    setupTestControls();
+    
+    // Set up navigation buttons
+    const prevButton = document.getElementById('prev-question-button');
+    const nextButton = document.getElementById('next-question-button');
+    
+    if (prevButton && nextButton) {
+        setupNavigationButtons();
+    }
+    
+    console.log('Application initialized');
+}
+// ... existing code ...

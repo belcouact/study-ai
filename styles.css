@@ -630,6 +630,7 @@ button:active {
     width: 100%;
     margin-bottom: 20px;
     flex: 1;
+    order: 2;
 }
 
 #question-navigation {
@@ -753,6 +754,7 @@ button:active {
     background: white;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    order: 3;
 }
 
 .nav-button {
@@ -827,6 +829,28 @@ button:active {
     padding: 20px;
     height: auto;
     min-height: calc(100vh - 60px);
+    position: relative;
+}
+
+/* Fixed test header */
+.test-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Test content layout */
+.test-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
 }
 
 /* Loading indicator for tests */
@@ -842,6 +866,7 @@ button:active {
     margin: 20px auto;
     width: 80%;
     max-width: 500px;
+    order: 1;
 }
 
 .spinner-icon {
