@@ -4655,45 +4655,42 @@ function getSimplifiedContextSummary() {
 function init() {
     console.log('Initializing application...');
     
-    // Setup event listeners
-    setupEventListeners();
+    // Initialize sidebar
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const leftPanel = document.querySelector('.left-panel');
+    const contentArea = document.querySelector('.content-area');
     
-    // Populate sidebar options based on selected school
-    const selectedSchool = elements.schoolSelectSidebar.value;
-    if (selectedSchool) {
-        populateSidebarGradeOptions(selectedSchool);
+    if (sidebarToggle && leftPanel && contentArea) {
+        sidebarToggle.addEventListener('click', function() {
+            leftPanel.classList.toggle('hidden');
+            contentArea.classList.toggle('full-width');
+            sidebarToggle.classList.toggle('collapsed');
+        });
     }
     
-    // Initialize empty state for quiz creation
+    // Initialize form layout
+    initializeFormLayout();
+    
+    // Setup navigation buttons
+    setupNavigationButtons();
+    
+    // Setup option buttons
+    setupOptionButtons();
+    
+    // Setup optimize and submit buttons
+    setupOptimizeAndSubmitButtons();
+    
+    // Setup generate questions button - update to use the new button ID
+    const generateQuestionsButton = document.getElementById('generate-questions-button');
+    if (generateQuestionsButton) {
+        generateQuestionsButton.addEventListener('click', handleGenerateQuestionsClick);
+    }
+    
+    // Initialize empty state
     initializeEmptyState();
     
-    // IMPORTANT: Directly add event listener to poetry button
-    const poetryButton = document.getElementById('poetry-button');
-    if (poetryButton) {
-        console.log('Adding direct click event listener to poetry button');
-        poetryButton.addEventListener('click', function() {
-            console.log('Poetry button clicked directly');
-            // Hide all panels
-            document.getElementById('qa-panel').classList.add('hidden');
-            document.getElementById('create-panel').classList.add('hidden');
-            
-            // Show poetry panel
-            const poetryPanel = document.getElementById('poetry-panel');
-            if (poetryPanel) {
-                poetryPanel.classList.remove('hidden');
-                console.log('Poetry panel is now visible');
-            } else {
-                console.error('Poetry panel element not found');
-            }
-            
-            // Update active states
-            document.getElementById('qa-button').classList.remove('active');
-            document.getElementById('create-button').classList.remove('active');
-            poetryButton.classList.add('active');
-        });
-    } else {
-        console.error('Poetry button not found during init');
-    }
+    // Setup event listeners
+    setupEventListeners();
     
     console.log('Application initialized');
 }
