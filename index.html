@@ -52,7 +52,37 @@
                     <div class="sidebar-frame">
                         <h3 class="frame-title">测验</h3>
                         <div class="frame-content">
-                            <!-- Removing the dropdowns from here as they will be moved to the top of the test page -->
+                            <div class="dropdown-container">
+                                <label for="subject-select-sidebar">科目</label>
+                                <select id="subject-select-sidebar" name="subject">
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                            </div>
+                            
+                            <div class="dropdown-container">
+                                <label for="semester-select-sidebar">学期</label>
+                                <select id="semester-select-sidebar" name="semester">
+                                    <option value="上学期">上学期</option>
+                                    <option value="下学期">下学期</option>
+                                </select>
+                            </div>
+                            
+                            <div class="dropdown-container">
+                                <label for="difficulty-select-sidebar">难度</label>
+                                <select id="difficulty-select-sidebar" name="difficulty">
+                                    <option value="容易">容易</option>
+                                    <option value="中等">中等</option>
+                                    <option value="偏难">偏难</option>
+                                </select>
+                            </div>
+                            
+                            <div class="dropdown-container">
+                                <label for="question-count-select-sidebar">题数</label>
+                                <select id="question-count-select-sidebar" name="questionCount">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -112,50 +142,13 @@
             
             <!-- Create Questions Container (initially hidden) -->
             <div id="create-container" class="container hidden">
-                <!-- Test configuration controls moved to the top of the page -->
-                <div class="test-header">
-                    <div class="test-controls">
-                        <div class="test-selectors">
-                            <div class="selector-group">
-                                <label for="subject-select">科目</label>
-                                <select id="subject-select" class="test-select">
-                                    <!-- Options will be populated dynamically -->
-                                </select>
-                            </div>
-                            <div class="selector-group">
-                                <label for="semester-select">学期</label>
-                                <select id="semester-select" class="test-select">
-                                    <option value="上学期">上学期</option>
-                                    <option value="下学期">下学期</option>
-                                </select>
-                            </div>
-                            <div class="selector-group">
-                                <label for="difficulty-select">难度</label>
-                                <select id="difficulty-select" class="test-select">
-                                    <option value="容易">容易</option>
-                                    <option value="中等">中等</option>
-                                    <option value="偏难">偏难</option>
-                                </select>
-                            </div>
-                            <div class="selector-group">
-                                <label for="question-count-select">题数</label>
-                                <select id="question-count-select" class="test-select">
-                                    <option value="5">5</option>
-                                    <option value="10">10</option>
-                                </select>
-                            </div>
-                            <button id="generate-questions-button" class="primary-button test-button">出题</button>
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- Questions display container moved to the top -->
                 <div id="questions-display-container" class="questions-display-container hidden">
                     <!-- Empty state message -->
                     <div id="empty-state" class="empty-state">
                         <i class="fas fa-book-open empty-state-icon"></i>
                         <h3>准备好开始测验了吗？</h3>
-                        <p>选择学校类型、年级、学期、科目、难度和题数，然后点击"出题"按钮生成题目。</p>
+                        <p>使用左侧边栏选择学校类型、年级、学期、科目、难度和题数，然后点击"出题"按钮生成题目。</p>
                     </div>
                     
                     <!-- Question content will be dynamically inserted here -->

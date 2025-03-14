@@ -2,212 +2,156 @@
 let currentApiFunction = 'chat';
 let currentModel = 'deepseek-r1';
 
-// Global state object to manage application state
-const state = {
-    questions: [],
-    currentQuestionIndex: 0,
-    userAnswers: [],
-    poems: [],
-    currentPoemIndex: 0,
-    isInitialized: false
-};
-
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
-    console.log('Parsing questions from response');
+    console.log('Parsing questions from response:', response);
     
-    if (!response) {
-        console.error('Response is empty');
+    // Extract content from the API response
+    const content = extractContentFromResponse(response);
+    if (!content) {
+        console.error('No content found in response');
         return [];
     }
     
-    try {
-        // Check if response is already an object (not a string)
-        if (typeof response === 'object' && response !== null) {
-            console.log('Response is an object, checking for valid structure');
+    console.log('Extracted content:', content);
+    const parsedQuestions = [];
+    
+    // Check if the content already contains "题目：" marker
+    let contentToProcess = content;
+    if (!content.includes('题目：') && !content.startsWith('题目')) {
+        // If not, add it to make parsing consistent
+        contentToProcess = '题目：' + content;
+    }
+    
+    // Split the content by "题目："
+    const questionBlocks = contentToProcess.split(/题目：/).filter(block => block.trim());
+    console.log(`Found ${questionBlocks.length} question blocks`);
+    
+    if (questionBlocks.length === 0) {
+        // If no question blocks found with standard format, try alternative parsing
+        console.log('Attempting alternative parsing method');
+        
+        // Look for numbered questions like "1." or "Question 1:"
+        const altQuestionBlocks = content.split(/\d+[\.\:]\s+/).filter(block => block.trim());
+        
+        if (altQuestionBlocks.length > 0) {
+            console.log(`Found ${altQuestionBlocks.length} alternative question blocks`);
             
-            // Check if it's an array of questions
-            if (Array.isArray(response)) {
-                console.log('Response is an array, validating questions');
-                
-                // Validate each question
-                const validQuestions = response.filter(q => {
-                    const isValid = q && q.question && q.options && q.answer && q.explanation;
-                    if (!isValid) {
-                        console.log('Skipping question with missing fields:', q);
-                    }
-                    return isValid;
-                });
-                
-                if (validQuestions.length > 0) {
-                    console.log('Successfully parsed', validQuestions.length, 'questions:', validQuestions);
-                    return validQuestions;
-                }
-            }
-            
-            // Check if it has a choices property (API response format)
-            if (response.choices && Array.isArray(response.choices) && response.choices.length > 0) {
-                console.log('Response has choices array, extracting content');
-                
-                // Extract content from the first choice
-                let content = '';
-                
-                if (response.choices[0].message && response.choices[0].message.content) {
-                    content = response.choices[0].message.content;
-                } else if (response.choices[0].text) {
-                    content = response.choices[0].text;
-                } else if (response.choices[0].content) {
-                    content = response.choices[0].content;
-                }
-                
-                if (content) {
-                    console.log('Extracted content from choices:', content);
+            for (const block of altQuestionBlocks) {
+                try {
+                    // Try to extract choices, answer and explanation with more flexible patterns
+                    const lines = block.split('\n').map(line => line.trim()).filter(line => line);
                     
-                    // Try to parse JSON from the content
-                    try {
-                        // Look for JSON array in the content
-                        const jsonRegex = /\[\s*\{.*\}\s*\]/s;
-                        const match = content.match(jsonRegex);
-                        
-                        if (match) {
-                            const jsonStr = match[0];
-                            const jsonData = JSON.parse(jsonStr);
-                            
-                            if (Array.isArray(jsonData)) {
-                                const validQuestions = jsonData.filter(q => {
-                                    const isValid = q && q.question && q.options && q.answer && q.explanation;
-                                    if (!isValid) {
-                                        console.log('Skipping question with missing fields:', q);
-                                    }
-                                    return isValid;
-                                });
-                                
-                                if (validQuestions.length > 0) {
-                                    console.log('Successfully parsed', validQuestions.length, 'questions from extracted JSON:', validQuestions);
-                                    return validQuestions;
-                                }
-                            }
-                        } else {
-                            // Try to parse the entire content as JSON
-                            const jsonData = JSON.parse(content);
-                            
-                            if (Array.isArray(jsonData)) {
-                                const validQuestions = jsonData.filter(q => {
-                                    const isValid = q && q.question && q.options && q.answer && q.explanation;
-                                    if (!isValid) {
-                                        console.log('Skipping question with missing fields:', q);
-                                    }
-                                    return isValid;
-                                });
-                                
-                                if (validQuestions.length > 0) {
-                                    console.log('Successfully parsed', validQuestions.length, 'questions from content JSON:', validQuestions);
-                                    return validQuestions;
-                                }
-                            }
+                    if (lines.length < 5) continue; // Need at least question + 4 choices
+                    
+                    const questionText = lines[0];
+                    let choiceA = '', choiceB = '', choiceC = '', choiceD = '';
+                    let answer = '';
+                    let explanation = '';
+                    
+                    // Look for choices
+                    for (let i = 1; i < lines.length; i++) {
+                        const line = lines[i];
+                        if (line.startsWith('A') || line.startsWith('A.') || line.startsWith('(A)')) {
+                            choiceA = line.replace(/^A\.?\s*|\(A\)\s*/, '');
+                        } else if (line.startsWith('B') || line.startsWith('B.') || line.startsWith('(B)')) {
+                            choiceB = line.replace(/^B\.?\s*|\(B\)\s*/, '');
+                        } else if (line.startsWith('C') || line.startsWith('C.') || line.startsWith('(C)')) {
+                            choiceC = line.replace(/^C\.?\s*|\(C\)\s*/, '');
+                        } else if (line.startsWith('D') || line.startsWith('D.') || line.startsWith('(D)')) {
+                            choiceD = line.replace(/^D\.?\s*|\(D\)\s*/, '');
+                        } else if (line.includes('答案') || line.toLowerCase().includes('answer')) {
+                            answer = line.match(/[A-D]/)?.[0] || '';
+                        } else if (line.includes('解析') || line.toLowerCase().includes('explanation')) {
+                            explanation = lines.slice(i).join('\n');
+                            break;
                         }
-                    } catch (jsonParseError) {
-                        console.error('Error parsing JSON from content:', jsonParseError);
                     }
-                }
-            }
-        } else if (typeof response === 'string') {
-            // First, try to parse the entire response as JSON
-            try {
-                const jsonData = JSON.parse(response);
-                if (Array.isArray(jsonData)) {
-                    console.log('Response is a valid JSON array');
                     
-                    // Validate each question
-                    const validQuestions = jsonData.filter(q => {
-                        const isValid = q && q.question && q.options && q.answer && q.explanation;
-                        if (!isValid) {
-                            console.log('Skipping question with missing fields:', q);
-                        }
-                        return isValid;
-                    });
-                    
-                    if (validQuestions.length > 0) {
-                        console.log('Successfully parsed', validQuestions.length, 'questions:', validQuestions);
-                        return validQuestions;
+                    if (questionText && (choiceA || choiceB || choiceC || choiceD)) {
+                        parsedQuestions.push({
+                            questionText: `题目：${questionText}`,
+                            choices: {
+                                A: choiceA || '选项A',
+                                B: choiceB || '选项B',
+                                C: choiceC || '选项C',
+                                D: choiceD || '选项D'
+                            },
+                            answer: answer || 'A',
+                            explanation: explanation || '无解析'
+                        });
                     }
-                } else if (jsonData.questions && Array.isArray(jsonData.questions)) {
-                    // Sometimes the API returns { questions: [...] }
-                    console.log('Response contains a questions array');
-                    
-                    const validQuestions = jsonData.questions.filter(q => {
-                        const isValid = q && q.question && q.options && q.answer && q.explanation;
-                        if (!isValid) {
-                            console.log('Skipping question with missing fields:', q);
-                        }
-                        return isValid;
-                    });
-                    
-                    if (validQuestions.length > 0) {
-                        console.log('Successfully parsed', validQuestions.length, 'questions:', validQuestions);
-                        return validQuestions;
-                    }
-                }
-            } catch (jsonParseError) {
-                console.log('Response is not a valid JSON, trying to extract JSON from text');
-                
-                // If direct JSON parsing fails, try to extract JSON from the text
-                const jsonRegex = /\[\s*\{.*\}\s*\]/s;
-                const match = response.match(jsonRegex);
-                
-                if (match) {
-                    try {
-                        const jsonStr = match[0];
-                        const jsonData = JSON.parse(jsonStr);
-                        
-                        if (Array.isArray(jsonData)) {
-                            const validQuestions = jsonData.filter(q => {
-                                const isValid = q && q.question && q.options && q.answer && q.explanation;
-                                if (!isValid) {
-                                    console.log('Skipping question with missing fields:', q);
-                                }
-                                return isValid;
-                            });
-                            
-                            if (validQuestions.length > 0) {
-                                console.log('Successfully parsed', validQuestions.length, 'questions from extracted JSON:', validQuestions);
-                                return validQuestions;
-                            }
-                        }
-                    } catch (extractError) {
-                        console.error('Failed to parse extracted JSON:', extractError);
-                    }
+                } catch (error) {
+                    console.error('Error parsing alternative question block:', error, block);
                 }
             }
         }
-        
-        // If all else fails, create a default question
-        console.log('No questions could be parsed, creating a default question');
-        return [{
-            question: "无法解析API返回的题目，这是一个示例题目。1+1=?",
-            options: {
-                "A": "1",
-                "B": "2",
-                "C": "3",
-                "D": "4"
-            },
-            answer: "B",
-            explanation: "1+1=2，所以答案是B。"
-        }];
-    } catch (error) {
-        console.error('Error parsing questions:', error);
-        return [{
-            question: "解析题目时出错，这是一个示例题目。1+1=?",
-            options: {
-                "A": "1",
-                "B": "2",
-                "C": "3",
-                "D": "4"
-            },
-            answer: "B",
-            explanation: "1+1=2，所以答案是B。"
-        }];
     }
+    
+    // Standard parsing for normal format
+    for (const block of questionBlocks) {
+        try {
+            console.log('Processing question block:', block.substring(0, 100) + '...');
+            
+            // Extract question text
+            const questionText = block.split(/[A-D]\.|\n答案：|\n解析：/)[0].trim();
+            console.log('Extracted question text:', questionText);
+            
+            // Extract choices
+            const choiceA = block.match(/A\.(.*?)(?=B\.|$)/s)?.[1]?.trim() || '';
+            const choiceB = block.match(/B\.(.*?)(?=C\.|$)/s)?.[1]?.trim() || '';
+            const choiceC = block.match(/C\.(.*?)(?=D\.|$)/s)?.[1]?.trim() || '';
+            const choiceD = block.match(/D\.(.*?)(?=\n答案：|$)/s)?.[1]?.trim() || '';
+            
+            console.log('Extracted choices:', { A: choiceA, B: choiceB, C: choiceC, D: choiceD });
+            
+            // Extract answer
+            const answer = block.match(/答案：([A-D])/)?.[1] || '';
+            console.log('Extracted answer:', answer);
+            
+            // Extract explanation
+            const explanation = block.match(/解析：([\s\S]*?)(?=题目：|$)/)?.[1]?.trim() || '';
+            console.log('Extracted explanation:', explanation.substring(0, 100) + '...');
+            
+            if (!questionText || !answer) {
+                console.warn('Skipping question with missing text or answer');
+                continue;
+            }
+            
+            parsedQuestions.push({
+                questionText: `题目：${questionText}`,
+                choices: {
+                    A: choiceA || '选项A未提供',
+                    B: choiceB || '选项B未提供',
+                    C: choiceC || '选项C未提供',
+                    D: choiceD || '选项D未提供'
+                },
+                answer: answer,
+                explanation: explanation || '无解析'
+            });
+        } catch (error) {
+            console.error('Error parsing question block:', error, block);
+        }
+    }
+    
+    // If we still have no questions, create a default one to prevent errors
+    if (parsedQuestions.length === 0) {
+        console.warn('No questions could be parsed, creating a default question');
+        parsedQuestions.push({
+            questionText: '题目：无法解析API返回的题目，这是一个默认题目',
+            choices: {
+                A: '选项A',
+                B: '选项B',
+                C: '选项C',
+                D: '选项D'
+            },
+            answer: 'A',
+            explanation: '由于API返回格式问题，无法解析题目。这是一个默认解析。'
+        });
+    }
+    
+    console.log(`Successfully parsed ${parsedQuestions.length} questions:`, parsedQuestions);
+    return parsedQuestions;
 }
 
 // Global function to fetch AI response for question generation
@@ -266,49 +210,40 @@ function extractContentFromResponse(data) {
     console.log('Extracting content from response:', data);
     
     try {
-        // Check if data is a string
-        if (typeof data === 'string') {
-            return data;
-        }
-        
-        // Check if data is an object with choices array (OpenAI format)
-        if (data && data.choices && Array.isArray(data.choices) && data.choices.length > 0) {
-            const choice = data.choices[0];
-            
-            // Check for different response formats
-            if (choice.message && choice.message.content) {
-                return choice.message.content;
-            } else if (choice.text) {
-                return choice.text;
-            } else if (choice.content) {
-                return choice.content;
+        // Handle different API response formats
+        if (data.choices && data.choices[0]) {
+            if (data.choices[0].message && data.choices[0].message.content) {
+                // OpenAI-like format
+                return data.choices[0].message.content;
+            } else if (data.choices[0].content) {
+                // Deepseek format
+                return data.choices[0].content;
             }
-        }
-        
-        // Check for DeepSeek API format
-        if (data && data.choices && Array.isArray(data.choices) && data.choices.length > 0) {
-            const choice = data.choices[0];
-            if (choice.message && choice.message.content) {
-                return choice.message.content;
-            }
-        }
-        
-        // Alternative format check (DeepSeek specific)
-        if (data && data.response) {
+        } else if (data.response) {
+            // Simple API format
             return data.response;
+        } else if (data.content) {
+            // Direct content format
+            return data.content;
+        } else if (typeof data === 'string') {
+            // Already a string
+            return data;
+        } else {
+            // Try to find content in the response
+            const possibleContentFields = ['text', 'answer', 'result', 'output', 'generated_text'];
+            for (const field of possibleContentFields) {
+                if (data[field]) {
+                    return data[field];
+                }
+            }
+            
+            // If all else fails, stringify the entire response
+            console.warn('Could not extract content from response, using stringified response');
+            return JSON.stringify(data);
         }
-        
-        // Check for message property directly
-        if (data && data.message && typeof data.message.content === 'string') {
-            return data.message.content;
-        }
-        
-        // Last resort: stringify the entire response
-        console.warn('Could not extract content using standard methods, returning stringified data');
-        return JSON.stringify(data);
     } catch (error) {
         console.error('Error extracting content from response:', error);
-        return 'Error processing response';
+        return '';
     }
 }
 
@@ -435,301 +370,849 @@ function showResultsPopup() {
 
 // Function to display the current question
 function displayCurrentQuestion() {
-    console.log('Displaying current question');
+    console.log('displayCurrentQuestion called', window.currentQuestionIndex);
+    console.log('Questions array:', window.questions);
     
-    // Check if questions exist
-    if (!state.questions || state.questions.length === 0) {
+    if (!window.questions || window.questions.length === 0) {
         console.error('No questions available to display');
         return;
     }
     
-    // Get current question
-    const currentQuestion = state.questions[state.currentQuestionIndex];
-    if (!currentQuestion) {
-        console.error('Current question is undefined');
+    const question = window.questions[window.currentQuestionIndex];
+    
+    if (!question) {
+        console.error('No question found at index', window.currentQuestionIndex);
         return;
     }
     
-    console.log('Current question:', currentQuestion);
+    console.log('Current question:', question);
+
+    // Make sure the questions display container is visible
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    if (questionsDisplayContainer) {
+        questionsDisplayContainer.classList.remove('hidden');
+        
+        // Hide the empty state if it exists
+        const emptyState = document.getElementById('empty-state');
+        if (emptyState) {
+            emptyState.classList.add('hidden');
+        }
+        
+        // Hide the loading indicator if it exists
+        const loadingIndicator = document.getElementById('test-loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
+    } else {
+        console.error('Questions display container not found in displayCurrentQuestion');
+        return;
+    }
+
+    // Check if all questions are answered
+    const allQuestionsAnswered = window.userAnswers && 
+                               window.userAnswers.length === window.questions.length && 
+                               window.userAnswers.every(answer => answer !== null);
+
+    // Show completion status if all questions are answered
+    if (allQuestionsAnswered) {
+        displayCompletionStatus();
+    }
     
-    // Update question counter
+    // Update question counter with responsive styling
     const questionCounter = document.getElementById('question-counter');
     if (questionCounter) {
-        questionCounter.textContent = `问题 ${state.currentQuestionIndex + 1} / ${state.questions.length}`;
+        questionCounter.style.cssText = `
+            font-size: clamp(14px, 2.5vw, 16px);
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: #edf2f7;
+            border-radius: 20px;
+            display: inline-block;
+            width: fit-content;
+        `;
+        questionCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
+        console.log('Updated question counter:', questionCounter.textContent);
+    } else {
+        console.error('Question counter element not found');
+        // Create it if it doesn't exist
+        const newCounter = document.createElement('div');
+        newCounter.id = 'question-counter';
+        newCounter.className = 'question-counter';
+        newCounter.style.cssText = `
+            font-size: clamp(14px, 2.5vw, 16px);
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: #edf2f7;
+            border-radius: 20px;
+            display: inline-block;
+            width: fit-content;
+        `;
+        newCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
+        questionsDisplayContainer.appendChild(newCounter);
     }
     
-    // Display question text
+    // Format and display question text with responsive styling
     const questionText = document.getElementById('question-text');
     if (questionText) {
-        questionText.innerHTML = formatMathExpressions(currentQuestion.question);
+        questionText.style.cssText = `
+            font-size: clamp(16px, 4vw, 18px);
+            color: #2d3748;
+            line-height: 1.6;
+            margin-bottom: clamp(15px, 4vw, 25px);
+            padding: clamp(15px, 4vw, 20px);
+            background: #f8f9fa;
+            border-radius: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        `;
+        // Remove "题目：" prefix if it exists
+        let displayText = question.questionText;
+        if (displayText.startsWith('题目：')) {
+            displayText = displayText.substring(3);
+        }
+        
+        // Apply enhanced math formatting
+        questionText.innerHTML = formatMathExpressions(displayText);
+        console.log('Updated question text:', displayText);
+    } else {
+        console.error('Question text element not found');
+        // Create it if it doesn't exist
+        const newText = document.createElement('div');
+        newText.id = 'question-text';
+        newText.className = 'question-text';
+        newText.style.cssText = `
+            font-size: clamp(16px, 4vw, 18px);
+            color: #2d3748;
+            line-height: 1.6;
+            margin-bottom: clamp(15px, 4vw, 25px);
+            padding: clamp(15px, 4vw, 20px);
+            background: #f8f9fa;
+            border-radius: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        `;
+        let displayText = question.questionText;
+        if (displayText.startsWith('题目：')) {
+            displayText = displayText.substring(3);
+        }
+        newText.innerHTML = formatMathExpressions(displayText);
+        questionsDisplayContainer.appendChild(newText);
     }
     
-    // Display choices
+    // Create responsive grid for choices with 2x2 layout
     const choicesContainer = document.getElementById('choices-container');
     if (choicesContainer) {
-        choicesContainer.innerHTML = '';
+        console.log('Choices container found, updating with choices:', question.choices);
         
-        // Check if options exist and are in the expected format
-        if (currentQuestion.options) {
-            const options = currentQuestion.options;
+        choicesContainer.innerHTML = `
+            <div class="choices-grid" style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: clamp(8px, 2vw, 20px);
+                margin: 25px 0;
+                width: 100%;
+            ">
+                ${['A', 'B', 'C', 'D'].map(letter => `
+                    <div class="choice-cell" data-value="${letter}" style="
+                        padding: clamp(10px, 2vw, 15px);
+                        border: 2px solid #e2e8f0;
+                        border-radius: 12px;
+                        background-color: white;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        user-select: none;
+                        -webkit-tap-highlight-color: transparent;
+                    ">
+                        <div class="choice-indicator" style="
+                            width: 28px;
+                            height: 28px;
+                            border-radius: 50%;
+                            background: #edf2f7;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: 500;
+                            color: #4a5568;
+                            flex-shrink: 0;
+                        ">${letter}</div>
+                        <div class="choice-text" style="
+                            flex: 1;
+                            font-size: clamp(14px, 2.5vw, 16px);
+                            color: #2d3748;
+                            line-height: 1.5;
+                        ">${formatMathExpressions(question.choices[letter])}</div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="submit-button-container" style="
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+                width: 100%;
+            ">
+                <button id="submit-answer-button" style="
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    font-weight: 500;
+                    background-color: #4299e1;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+                    opacity: 0.7;
+                    pointer-events: none;
+                ">提交答案</button>
+            </div>
+        `;
+
+        // Add enhanced interaction effects for choice cells
+        const choiceCells = choicesContainer.querySelectorAll('.choice-cell');
+        const submitButton = document.getElementById('submit-answer-button');
+        let selectedCell = null;
+        let selectedValue = null;
+
+        choiceCells.forEach(cell => {
+            const indicator = cell.querySelector('.choice-indicator');
             
-            // Create choice items
-            Object.keys(options).forEach(key => {
-                const choiceItem = document.createElement('div');
-                choiceItem.className = 'choice-item';
-                
-                // Add selected class if this option was previously selected
-                if (state.userAnswers[state.currentQuestionIndex] === key) {
-                    choiceItem.classList.add('selected');
+            // Function to update cell styles
+            const updateCellStyles = (cell, isSelected) => {
+                cell.style.borderColor = isSelected ? '#4299e1' : '#e2e8f0';
+                cell.style.backgroundColor = isSelected ? '#ebf8ff' : 'white';
+                cell.querySelector('.choice-indicator').style.backgroundColor = isSelected ? '#4299e1' : '#edf2f7';
+                cell.querySelector('.choice-indicator').style.color = isSelected ? 'white' : '#4a5568';
+            };
+            
+            // Click handling with single choice enforcement
+            cell.addEventListener('click', () => {
+                if (selectedCell) {
+                    updateCellStyles(selectedCell, false);
                 }
+                selectedCell = cell;
+                selectedValue = cell.dataset.value;
+                updateCellStyles(cell, true);
                 
-                const radio = document.createElement('input');
-                radio.type = 'radio';
-                radio.name = 'question-choice';
-                radio.id = `choice-${key}`;
-                radio.value = key;
-                
-                // Check if this option was previously selected
-                if (state.userAnswers[state.currentQuestionIndex] === key) {
-                    radio.checked = true;
+                // Enable submit button
+                if (submitButton) {
+                    submitButton.style.opacity = '1';
+                    submitButton.style.pointerEvents = 'auto';
                 }
-                
-                const label = document.createElement('label');
-                label.htmlFor = `choice-${key}`;
-                label.innerHTML = `${key}. ${formatMathExpressions(options[key])}`;
-                
-                choiceItem.appendChild(radio);
-                choiceItem.appendChild(label);
-                choicesContainer.appendChild(choiceItem);
-                
-                // Add event listener to radio button
-                radio.addEventListener('change', function() {
-                    if (this.checked) {
-                        // Remove selected class from all choice items
-                        document.querySelectorAll('.choice-item').forEach(item => {
-                            item.classList.remove('selected');
-                        });
-                        
-                        // Add selected class to this choice item
-                        choiceItem.classList.add('selected');
-                        
-                        // Save user's answer
-                        state.userAnswers[state.currentQuestionIndex] = key;
-                        
-                        // Enable submit button if it exists
-                        const submitButton = document.getElementById('submit-answer-button');
-                        if (submitButton) {
-                            submitButton.disabled = false;
-                        } else {
-                            // Create submit button if it doesn't exist
-                            createSubmitButton();
-                        }
-                    }
-                });
-                
-                // Add click event to the entire choice item
-                choiceItem.addEventListener('click', function(e) {
-                    // Prevent clicking on the radio button itself from triggering this
-                    if (e.target !== radio) {
-                        radio.checked = true;
-                        
-                        // Trigger the change event
-                        const changeEvent = new Event('change');
-                        radio.dispatchEvent(changeEvent);
-                    }
-                });
             });
             
-            // Create submit button if user has already selected an answer
-            if (state.userAnswers[state.currentQuestionIndex]) {
-                createSubmitButton();
+            // Touch and hover effects
+            cell.addEventListener('touchstart', () => {
+                if (cell !== selectedCell) {
+                    cell.style.backgroundColor = '#f7fafc';
+                }
+            }, { passive: true });
+            
+            cell.addEventListener('touchend', () => {
+                if (cell !== selectedCell) {
+                    cell.style.backgroundColor = 'white';
+                }
+            }, { passive: true });
+            
+            cell.addEventListener('mouseover', () => {
+                if (cell !== selectedCell) {
+                    cell.style.borderColor = '#cbd5e0';
+                    cell.style.backgroundColor = '#f7fafc';
+                    cell.style.transform = 'translateY(-1px)';
+                }
+            });
+            
+            cell.addEventListener('mouseout', () => {
+                if (cell !== selectedCell) {
+                    cell.style.borderColor = '#e2e8f0';
+                    cell.style.backgroundColor = 'white';
+                    cell.style.transform = 'none';
+                }
+            });
+
+            // Set initial state if answer exists
+            if (window.userAnswers && window.userAnswers[window.currentQuestionIndex] === cell.dataset.value) {
+                selectedCell = cell;
+                selectedValue = cell.dataset.value;
+                updateCellStyles(cell, true);
+                
+                // Enable submit button if answer already selected
+                if (submitButton) {
+                    submitButton.style.opacity = '1';
+                    submitButton.style.pointerEvents = 'auto';
+                }
             }
-        } else {
-            console.error('Question options are missing or in an unexpected format');
-            choicesContainer.innerHTML = '<div class="error-message">选项加载失败</div>';
+        });
+        
+        // Add submit button functionality
+        if (submitButton) {
+            submitButton.addEventListener('click', () => {
+                if (selectedValue) {
+                    // Save the answer
+                    window.userAnswers[window.currentQuestionIndex] = selectedValue;
+                    
+                    // Show the answer container
+                    displayAnswer(selectedValue);
+                    
+                    // Check if all questions are answered
+                    const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
+                                               window.userAnswers.every(answer => answer !== null);
+                    
+                    // Show completion status if all questions are answered
+                    if (allQuestionsAnswered) {
+                        displayCompletionStatus();
+                    }
+                }
+            });
+        }
+        
+        console.log('Choice cells set up:', choiceCells.length);
+    } else {
+        console.error('Choices container element not found');
+        // Create it if it doesn't exist
+        const newChoices = document.createElement('div');
+        newChoices.id = 'choices-container';
+        newChoices.className = 'choices-container';
+        newChoices.innerHTML = `
+            <div class="choices-grid" style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: clamp(8px, 2vw, 20px);
+                margin: 25px 0;
+                width: 100%;
+            ">
+                ${['A', 'B', 'C', 'D'].map(letter => `
+                    <div class="choice-cell" data-value="${letter}" style="
+                        padding: clamp(10px, 2vw, 15px);
+                        border: 2px solid #e2e8f0;
+                        border-radius: 12px;
+                        background-color: white;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        user-select: none;
+                        -webkit-tap-highlight-color: transparent;
+                    ">
+                        <div class="choice-indicator" style="
+                            width: 28px;
+                            height: 28px;
+                            border-radius: 50%;
+                            background: #edf2f7;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: 500;
+                            color: #4a5568;
+                            flex-shrink: 0;
+                        ">${letter}</div>
+                        <div class="choice-text" style="
+                            flex: 1;
+                            font-size: clamp(14px, 2.5vw, 16px);
+                            color: #2d3748;
+                            line-height: 1.5;
+                        ">${formatMathExpressions(question.choices[letter])}</div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="submit-button-container" style="
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+                width: 100%;
+            ">
+                <button id="submit-answer-button" style="
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    font-weight: 500;
+                    background-color: #4299e1;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+                    opacity: 0.7;
+                    pointer-events: none;
+                ">提交答案</button>
+            </div>
+        `;
+        questionsDisplayContainer.appendChild(newChoices);
+        
+        // Add event listeners to the newly created choice cells
+        const choiceCells = newChoices.querySelectorAll('.choice-cell');
+        const submitButton = document.getElementById('submit-answer-button');
+        let selectedValue = null;
+        
+        choiceCells.forEach(cell => {
+            cell.addEventListener('click', function() {
+                // Update UI to show this cell as selected
+                choiceCells.forEach(c => {
+                    c.style.borderColor = '#e2e8f0';
+                    c.style.backgroundColor = 'white';
+                    c.querySelector('.choice-indicator').style.backgroundColor = '#edf2f7';
+                    c.querySelector('.choice-indicator').style.color = '#4a5568';
+                });
+                
+                this.style.borderColor = '#4299e1';
+                this.style.backgroundColor = '#ebf8ff';
+                this.querySelector('.choice-indicator').style.backgroundColor = '#4299e1';
+                this.querySelector('.choice-indicator').style.color = 'white';
+                
+                // Store selected value
+                selectedValue = this.dataset.value;
+                
+                // Enable submit button
+                if (submitButton) {
+                    submitButton.style.opacity = '1';
+                    submitButton.style.pointerEvents = 'auto';
+                }
+            });
+        });
+        
+        // Add submit button functionality
+        if (submitButton) {
+            submitButton.addEventListener('click', function() {
+                if (selectedValue) {
+                    // Save the answer
+                    window.userAnswers[window.currentQuestionIndex] = selectedValue;
+                    
+                    // Show answer and explanation
+                    displayAnswer(selectedValue);
+                    
+                    // Check if all questions are answered
+                    const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
+                                               window.userAnswers.every(answer => answer !== null);
+                    
+                    // Show completion status if all questions are answered
+                    if (allQuestionsAnswered) {
+                        displayCompletionStatus();
+                    }
+                }
+            });
         }
     }
     
-    // Hide answer container initially
-    const answerContainer = document.getElementById('answer-container');
-    if (answerContainer) {
-        // If user has already answered this question and seen the answer, show the answer
-        if (state.userAnswers[state.currentQuestionIndex] && state.answersShown && state.answersShown[state.currentQuestionIndex]) {
-            displayAnswer(state.userAnswers[state.currentQuestionIndex]);
-        } else {
+    // Function to display answer and explanation
+    function displayAnswer(selectedValue) {
+        // Create or get the answer container
+        let answerContainer = document.getElementById('answer-container');
+        if (!answerContainer) {
+            answerContainer = document.createElement('div');
+            answerContainer.id = 'answer-container';
+            answerContainer.className = 'answer-container';
+            answerContainer.style.cssText = `
+                margin-top: clamp(20px, 5vw, 30px);
+                padding: clamp(15px, 4vw, 25px);
+                border-radius: 12px;
+                background-color: white;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                width: 100%;
+                box-sizing: border-box;
+                animation: fadeIn 0.3s ease;
+            `;
+            questionsDisplayContainer.appendChild(answerContainer);
+        }
+        
+        answerContainer.classList.remove('hidden');
+        
+        // Check if answer is correct
+        const correctAnswer = question.answer;
+        const isCorrect = selectedValue === correctAnswer;
+        
+        // Create or update the answer result
+        let answerResult = document.getElementById('answer-result');
+        if (!answerResult) {
+            answerResult = document.createElement('div');
+            answerResult.id = 'answer-result';
+            answerResult.className = 'answer-result';
+            answerContainer.appendChild(answerResult);
+        }
+        
+        answerResult.style.cssText = `
+            font-size: 18px;
+            font-weight: 500;
+            color: ${isCorrect ? '#48bb78' : '#e53e3e'};
+            margin-bottom: 20px;
+            padding: 15px;
+            background: ${isCorrect ? '#f0fff4' : '#fff5f5'};
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        `;
+        
+        const resultText = isCorrect 
+            ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 正确！答案是：${correctAnswer}`
+            : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> 错误。正确答案是：${correctAnswer}`;
+        
+        answerResult.innerHTML = formatMathExpressions(resultText);
+        
+        // Create or update the explanation
+        let answerExplanation = document.getElementById('answer-explanation');
+        if (!answerExplanation) {
+            answerExplanation = document.createElement('div');
+            answerExplanation.id = 'answer-explanation';
+            answerExplanation.className = 'answer-explanation';
+            answerContainer.appendChild(answerExplanation);
+        }
+        
+        answerExplanation.style.cssText = `
+            font-size: 16px;
+            color: #4a5568;
+            line-height: 1.8;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            white-space: pre-wrap;
+        `;
+        answerExplanation.innerHTML = formatMathExpressions(question.explanation);
+        
+        // Disable the submit button after submission
+        const submitButton = document.getElementById('submit-answer-button');
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.style.opacity = '0.5';
+            submitButton.style.pointerEvents = 'none';
+            submitButton.textContent = '已提交';
+        }
+        
+        // Render math expressions
+        if (window.MathJax) {
+            window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+        }
+    }
+    
+    // Style the answer container when showing results
+    if (window.userAnswers && window.userAnswers[window.currentQuestionIndex]) {
+        const answerContainer = document.getElementById('answer-container');
+        if (answerContainer) {
+            answerContainer.classList.remove('hidden');
+            answerContainer.style.cssText = `
+                margin-top: clamp(20px, 5vw, 30px);
+                padding: clamp(15px, 4vw, 25px);
+                border-radius: 12px;
+                background-color: white;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                width: 100%;
+                box-sizing: border-box;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            const selectedAnswer = window.userAnswers[window.currentQuestionIndex];
+            const correctAnswer = question.answer;
+            const isCorrect = selectedAnswer === correctAnswer;
+            
+            // Style the result section
+            const answerResult = document.getElementById('answer-result');
+            if (answerResult) {
+                answerResult.style.cssText = `
+                    font-size: 18px;
+                    font-weight: 500;
+                    color: ${isCorrect ? '#48bb78' : '#e53e3e'};
+                    margin-bottom: 20px;
+                    padding: 15px;
+                    background: ${isCorrect ? '#f0fff4' : '#fff5f5'};
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                `;
+                
+                const resultText = isCorrect 
+                    ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 正确！答案是：${correctAnswer}`
+                    : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> 错误。正确答案是：${correctAnswer}`;
+                
+                answerResult.innerHTML = formatMathExpressions(resultText);
+            }
+            
+            // Style the explanation section
+            const answerExplanation = document.getElementById('answer-explanation');
+            if (answerExplanation) {
+                answerExplanation.style.cssText = `
+                    font-size: 16px;
+                    color: #4a5568;
+                    line-height: 1.8;
+                    margin-top: 20px;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                    white-space: pre-wrap;
+                `;
+                answerExplanation.innerHTML = formatMathExpressions(question.explanation);
+            }
+            
+            // Disable the submit button if already submitted
+            const submitButton = document.getElementById('submit-answer-button');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.style.opacity = '0.5';
+                submitButton.style.pointerEvents = 'none';
+                submitButton.textContent = '已提交';
+            }
+        }
+    } else {
+        const answerContainer = document.getElementById('answer-container');
+        if (answerContainer) {
             answerContainer.classList.add('hidden');
         }
     }
     
-    // Update navigation buttons
-    updateNavigationButtons();
-}
-
-// Function to create submit button
-function createSubmitButton() {
-    // Check if submit button already exists
-    let submitButton = document.getElementById('submit-answer-button');
+    // Ensure create container has enough space and smooth scrolling
+    const createContainer = document.getElementById('create-container');
+    if (createContainer) {
+        createContainer.style.cssText = `
+            min-height: 100vh;
+            height: auto;
+            padding: clamp(15px, 4vw, 30px);
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            background: transparent;
+            border-radius: 16px;
+            box-shadow: none;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            margin: 0 auto;
+        `;
+    }
     
-    if (!submitButton) {
-        // Get the choices container
-        const choicesContainer = document.getElementById('choices-container');
-        
-        if (choicesContainer) {
-            // Create submit button
-            submitButton = document.createElement('button');
-            submitButton.id = 'submit-answer-button';
-            submitButton.className = 'submit-answer-button';
-            submitButton.textContent = '提交答案';
+    // Render math expressions
+    if (window.MathJax) {
+        window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+    } else {
+        // If MathJax is not loaded, try to load it
+        if (!document.getElementById('mathjax-script')) {
+            const script = document.createElement('script');
+            script.id = 'mathjax-script';
+            script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+            script.async = true;
+            document.head.appendChild(script);
             
-            // Disable button if no answer is selected
-            submitButton.disabled = !state.userAnswers[state.currentQuestionIndex];
-            
-            // Add event listener to submit button
-            submitButton.addEventListener('click', function() {
-                // Display the answer
-                displayAnswer(state.userAnswers[state.currentQuestionIndex]);
+            script.onload = function() {
+                window.MathJax = {
+                    tex: {
+                        inlineMath: [['\\(', '\\)']],
+                        displayMath: [['\\[', '\\]']]
+                    },
+                    svg: {
+                        fontCache: 'global'
+                    }
+                };
                 
-                // Mark this question as answered and shown
-                if (!state.answersShown) {
-                    state.answersShown = [];
-                }
-                state.answersShown[state.currentQuestionIndex] = true;
-                
-                // Disable the submit button
-                this.disabled = true;
-            });
-            
-            // Add submit button after choices container
-            choicesContainer.insertAdjacentElement('afterend', submitButton);
+                // Typeset the math after MathJax is loaded
+                window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+            };
         }
     }
     
-    return submitButton;
+    console.log('displayCurrentQuestion completed');
 }
 
-// Function to display the answer and explanation
-function displayAnswer(selectedValue) {
-    console.log('Displaying answer for selected value:', selectedValue);
+// Function to format math expressions
+function formatMathExpressions(text) {
+    if (!text) return '';
     
-    const currentQuestion = state.questions[state.currentQuestionIndex];
-    if (!currentQuestion) {
-        console.error('Current question is undefined');
-        return;
+    // Don't process text that already contains properly formatted LaTeX
+    if (text.includes('\\(') && text.includes('\\)')) {
+        return text;
     }
     
-    const answerContainer = document.getElementById('answer-container');
-    const answerResult = document.getElementById('answer-result');
-    const answerExplanation = document.getElementById('answer-explanation');
+    // Replace LaTeX-style expressions with proper LaTeX delimiters
+    // This handles expressions like \( g' = \frac{GM}{(R+h)^2} \)
+    text = text.replace(/\\\( (.*?) \\\)/g, '\\($1\\)');
     
-    if (answerContainer && answerResult && answerExplanation) {
-        // Show the answer container
-        answerContainer.classList.remove('hidden');
-        
-        // Check if the selected answer is correct
-        const isCorrect = selectedValue === currentQuestion.answer;
-        
-        // Display result
-        answerResult.innerHTML = isCorrect 
-            ? `<div class="correct-answer">✓ 正确！答案是 ${currentQuestion.answer}。</div>`
-            : `<div class="incorrect-answer">✗ 错误。正确答案是 ${currentQuestion.answer}。</div>`;
-        
-        // Display explanation
-        answerExplanation.innerHTML = `<div class="explanation-title">解析：</div>
-            <div class="explanation-content">${formatMathExpressions(currentQuestion.explanation)}</div>`;
-        
-        // Highlight the correct answer
-        document.querySelectorAll('.choice-item').forEach(item => {
-            const radio = item.querySelector('input[type="radio"]');
-            if (radio && radio.value === currentQuestion.answer) {
-                item.classList.add('correct-answer');
-            } else if (radio && radio.value === selectedValue && selectedValue !== currentQuestion.answer) {
-                item.classList.add('incorrect-answer');
-            }
-        });
-    }
+    // Replace simple math expressions with LaTeX
+    text = text.replace(/\b(\d+[+\-*/]\d+)\b/g, '\\($1\\)');
+    
+    // Replace fractions written as a/b
+    text = text.replace(/(\d+)\/(\d+)/g, '\\(\\frac{$1}{$2}\\)');
+    
+    // Replace powers written as a^b
+    text = text.replace(/(\d+)\^(\d+)/g, '\\($1^{$2}\\)');
+    
+    // Replace square roots
+    text = text.replace(/sqrt\(([^)]+)\)/g, '\\(\\sqrt{$1}\\)');
+    
+    // Replace existing LaTeX delimiters
+    text = text.replace(/\$\$(.*?)\$\$/g, '\\[$1\\]');
+    text = text.replace(/\$(.*?)\$/g, '\\($1\\)');
+    
+    return text;
 }
 
-// Function to update navigation buttons
+// Global function to update navigation buttons
 function updateNavigationButtons() {
-    console.log('Updating navigation buttons');
-    
-    // Ensure state object exists
-    if (typeof state === 'undefined') {
-        console.error('State object is not defined');
-        return;
-    }
+    console.log('updateNavigationButtons called', window.currentQuestionIndex, window.questions ? window.questions.length : 0);
     
     const prevButton = document.getElementById('prev-question-button');
     const nextButton = document.getElementById('next-question-button');
     
+    if (prevButton) {
+        prevButton.disabled = !window.questions || window.currentQuestionIndex <= 0;
+    }
+    
+    if (nextButton) {
+        nextButton.disabled = !window.questions || window.currentQuestionIndex >= window.questions.length - 1;
+    }
+
+    // Update navigation buttons for mobile
     if (prevButton && nextButton) {
-        // Disable prev button if on first question
-        prevButton.disabled = state.currentQuestionIndex === 0;
+        const buttonStyle = `
+            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            border-radius: 8px;
+            margin: clamp(5px, 2vw, 10px);
+        `;
+        prevButton.style.cssText += buttonStyle;
+        nextButton.style.cssText += buttonStyle;
+    }
+    
+    // Check if all questions are answered and display completion status
+    if (window.userAnswers && window.questions) {
+        const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
+                                   window.userAnswers.every(answer => answer !== null);
         
-        // Disable next button if on last question
-        nextButton.disabled = state.currentQuestionIndex === state.questions.length - 1;
-        
-        console.log('Navigation buttons updated:', {
-            prevDisabled: prevButton.disabled,
-            nextDisabled: nextButton.disabled,
-            currentIndex: state.currentQuestionIndex,
-            totalQuestions: state.questions.length
-        });
-    } else {
-        console.warn('Navigation buttons not found');
+        if (allQuestionsAnswered) {
+            displayCompletionStatus();
+        }
     }
 }
 
-// Function to set up navigation buttons
-function setupNavigationButtons() {
-    console.log('Setting up navigation buttons');
+// Function to display completion status and score in navigation section
+function displayCompletionStatus() {
+    // Calculate score
+    let correctCount = 0;
+    window.userAnswers.forEach((answer, index) => {
+        if (answer === window.questions[index].answer) {
+            correctCount++;
+        }
+    });
+    const scorePercentage = (correctCount / window.questions.length) * 100;
     
-    // Ensure state object exists
-    if (typeof state === 'undefined') {
-        console.error('State object is not defined');
-        return;
+    // Get or create navigation controls
+    let navigationControls = document.querySelector('.navigation-controls');
+    if (!navigationControls) {
+        navigationControls = document.createElement('div');
+        navigationControls.className = 'navigation-controls';
+        navigationControls.style.cssText = `
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            width: 100%;
+            flex-wrap: wrap;
+        `;
+        
+        const questionsDisplayContainer = document.getElementById('questions-display-container');
+        if (questionsDisplayContainer) {
+            questionsDisplayContainer.appendChild(navigationControls);
+        }
     }
     
-    const prevButton = document.getElementById('prev-question-button');
-    const nextButton = document.getElementById('next-question-button');
-    
-    if (prevButton && nextButton) {
-        // Remove any existing event listeners
-        const newPrevButton = prevButton.cloneNode(true);
-        const newNextButton = nextButton.cloneNode(true);
+    // Check if completion status already exists
+    let completionStatus = document.getElementById('completion-status');
+    if (!completionStatus) {
+        // Create completion status element
+        completionStatus = document.createElement('div');
+        completionStatus.id = 'completion-status';
+        completionStatus.style.cssText = `
+            background-color: #ebf8ff;
+            border: 1px solid #4299e1;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin: 0 15px 15px 15px;
+            text-align: center;
+            color: #2b6cb0;
+            font-weight: 500;
+            font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+            animation: fadeIn 0.5s ease;
+        `;
         
-        if (prevButton.parentNode) {
-            prevButton.parentNode.replaceChild(newPrevButton, prevButton);
+        // Add completion message
+        const completionMessage = document.createElement('div');
+        completionMessage.style.cssText = `
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c5282;
+            margin-bottom: 5px;
+        `;
+        completionMessage.textContent = '测试完成！';
+        completionStatus.appendChild(completionMessage);
+        
+        // Add score information
+        const scoreInfo = document.createElement('div');
+        scoreInfo.style.cssText = `
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        `;
+        
+        const totalQuestions = document.createElement('span');
+        totalQuestions.textContent = `总题数: ${window.questions.length}`;
+        
+        const correctAnswers = document.createElement('span');
+        correctAnswers.textContent = `正确: ${correctCount}`;
+        
+        const scorePercent = document.createElement('span');
+        scorePercent.textContent = `正确率: ${scorePercentage.toFixed(1)}%`;
+        
+        scoreInfo.appendChild(totalQuestions);
+        scoreInfo.appendChild(correctAnswers);
+        scoreInfo.appendChild(scorePercent);
+        completionStatus.appendChild(scoreInfo);
+        
+        // Add evaluation button
+        const evaluateButton = document.createElement('button');
+        evaluateButton.textContent = '成绩评估';
+        evaluateButton.style.cssText = `
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        `;
+        evaluateButton.addEventListener('click', handleEvaluateClick);
+        completionStatus.appendChild(evaluateButton);
+        
+        // Insert completion status between navigation buttons
+        const prevButton = document.getElementById('prev-question-button');
+        if (prevButton && prevButton.parentNode === navigationControls) {
+            navigationControls.insertBefore(completionStatus, prevButton.nextSibling);
+        } else {
+            navigationControls.appendChild(completionStatus);
         }
         
-        if (nextButton.parentNode) {
-            nextButton.parentNode.replaceChild(newNextButton, nextButton);
-        }
-        
-        // Add new event listeners
-        newPrevButton.addEventListener('click', function() {
-            console.log('Previous button clicked');
-            if (state.currentQuestionIndex > 0) {
-                state.currentQuestionIndex--;
-                displayCurrentQuestion();
+        // Add fadeIn animation
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
             }
-        });
-        
-        newNextButton.addEventListener('click', function() {
-            console.log('Next button clicked');
-            if (state.currentQuestionIndex < state.questions.length - 1) {
-                state.currentQuestionIndex++;
-                displayCurrentQuestion();
-            }
-        });
-        
-        // Update button states
-        newPrevButton.disabled = state.currentQuestionIndex === 0;
-        newNextButton.disabled = state.currentQuestionIndex === state.questions.length - 1;
-        
-        console.log('Navigation buttons set up successfully');
-    } else {
-        console.warn('Navigation buttons not found');
+        `;
+        document.head.appendChild(styleElement);
     }
 }
 
@@ -1307,7 +1790,7 @@ function handleGenerateQuestionsClick() {
 
 示例格式：
 题目：[题目内容]
-A. [选项A内容] 
+A. [选项A内容]
 B. [选项B内容] 
 C. [选项C内容]
 D. [选项D内容]
@@ -1468,176 +1951,210 @@ D. [选项D内容]
 
 // Function to show loading indicator with spinning icon
 function showLoadingIndicator() {
-    console.log('Showing loading indicator');
+    // Get the questions display container
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    if (!questionsDisplayContainer) {
+        console.error('Questions display container not found in showLoadingIndicator');
+        return;
+    }
     
-    // Get the active panel
-    const activePanel = document.querySelector('.panel-button.active');
-    const panelType = activePanel ? activePanel.id.replace('-button', '') : 'qa';
+    // Hide empty state if it exists
+    const emptyState = document.getElementById('empty-state');
+    if (emptyState) {
+        emptyState.classList.add('hidden');
+    }
     
-    console.log('Active panel:', panelType);
-    
-    if (panelType === 'qa') {
-        // For QA panel - use the existing loading element
-        const loadingElement = document.getElementById('loading');
+    // Create loading indicator if it doesn't exist
+    let loadingIndicator = document.getElementById('test-loading-indicator');
+    if (!loadingIndicator) {
+        loadingIndicator = document.createElement('div');
+        loadingIndicator.id = 'test-loading-indicator';
+        loadingIndicator.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin: 20px auto;
+            width: 80%;
+            max-width: 500px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+        `;
         
-        if (loadingElement) {
-            loadingElement.classList.remove('hidden');
-            console.log('QA loading indicator shown');
-        } else {
-            console.error('QA loading element not found');
-            
-            // Try to create a loading element
-            const outputContainer = document.querySelector('.output-container');
-            if (outputContainer) {
-                const newLoadingElement = document.createElement('div');
-                newLoadingElement.id = 'loading';
-                newLoadingElement.innerHTML = `
-                    <div class="spinner"></div>
-                    <p>Thinking...</p>
-                `;
-                
-                // Add the hidden class initially
-                newLoadingElement.classList.add('hidden');
-                
-                // Insert at the beginning of the output container
-                outputContainer.insertBefore(newLoadingElement, outputContainer.firstChild);
-                
-                // Now show it
-                newLoadingElement.classList.remove('hidden');
-                console.log('Created and showed new QA loading indicator');
+        // Create spinning icon
+        const spinnerIcon = document.createElement('div');
+        spinnerIcon.className = 'spinner-icon';
+        spinnerIcon.style.cssText = `
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #4299e1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        `;
+        
+        // Create loading text
+        const loadingText = document.createElement('div');
+        loadingText.textContent = 'Thinking...';
+        loadingText.style.cssText = `
+            font-size: 18px;
+            color: #4a5568;
+            font-weight: 500;
+        `;
+        
+        // Add spinner animation
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
             }
-        }
-    } else if (panelType === 'create') {
-        // For test panel
-        let loadingElement = document.getElementById('test-loading-indicator');
+        `;
+        document.head.appendChild(styleElement);
         
-        if (!loadingElement) {
-            // Create a loading element
-            const createContainer = document.getElementById('create-container');
-            
-            if (createContainer) {
-                loadingElement = document.createElement('div');
-                loadingElement.id = 'test-loading-indicator';
-                loadingElement.className = 'test-loading-indicator';
-                loadingElement.innerHTML = `
-                    <div class="spinner-icon"></div>
-                    <p>正在生成题目，请稍候...</p>
-                `;
-                
-                // Add to the create container
-                createContainer.appendChild(loadingElement);
-                console.log('Created new test loading indicator');
-            } else {
-                console.error('Create container not found');
-                return;
-            }
-        }
+        // Assemble loading indicator
+        loadingIndicator.appendChild(spinnerIcon);
+        loadingIndicator.appendChild(loadingText);
         
-        // Show the loading element
-        loadingElement.classList.remove('hidden');
-        console.log('Test loading indicator shown');
-    } else if (panelType === 'poetry') {
-        // For poetry panel
-        let loadingElement = document.getElementById('poetry-loading');
-        
-        if (!loadingElement) {
-            // Create a loading element
-            const poetryContent = document.querySelector('.poetry-content');
-            
-            if (poetryContent) {
-                loadingElement = document.createElement('div');
-                loadingElement.id = 'poetry-loading';
-                loadingElement.className = 'poetry-loading';
-                loadingElement.innerHTML = `
-                    <div class="spinner"></div>
-                    <p>正在生成诗词，请稍候...</p>
-                `;
-                
-                // Add to the poetry content
-                poetryContent.appendChild(loadingElement);
-                console.log('Created new poetry loading indicator');
-            } else {
-                console.error('Poetry content not found');
-                return;
-            }
-        }
-        
-        // Show the loading element
-        loadingElement.classList.remove('hidden');
-        console.log('Poetry loading indicator shown');
+        // Add to container without clearing its contents
+        questionsDisplayContainer.style.position = 'relative';
+        questionsDisplayContainer.appendChild(loadingIndicator);
+        questionsDisplayContainer.classList.remove('hidden');
+    } else {
+        loadingIndicator.style.display = 'flex';
     }
 }
 
 // Function to hide loading indicator
 function hideLoadingIndicator() {
-    console.log('Hiding loading indicator');
-    
-    // Hide all possible loading indicators
-    const loadingElements = [
-        document.getElementById('loading'),
-        document.getElementById('test-loading-indicator'),
-        document.getElementById('poetry-loading')
-    ];
-    
-    loadingElements.forEach(element => {
-        if (element) {
-            element.classList.add('hidden');
-            console.log(`Hidden loading indicator: ${element.id}`);
-        }
-    });
+    const loadingIndicator = document.getElementById('test-loading-indicator');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = 'none';
+    }
 }
 
 // Function to set up navigation button event listeners
 function setupNavigationButtons() {
     console.log('Setting up navigation buttons');
     
-    // Ensure state object exists
-    if (typeof state === 'undefined') {
-        console.error('State object is not defined');
-        return;
-    }
-    
     const prevButton = document.getElementById('prev-question-button');
     const nextButton = document.getElementById('next-question-button');
     
-    if (prevButton && nextButton) {
+    // Create navigation controls if they don't exist
+    let navigationControls = document.querySelector('.navigation-controls');
+    if (!navigationControls) {
+        navigationControls = document.createElement('div');
+        navigationControls.className = 'navigation-controls';
+        navigationControls.style.cssText = `
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 10px;
+        `;
+        
+        const questionsDisplayContainer = document.getElementById('questions-display-container');
+        if (questionsDisplayContainer) {
+            questionsDisplayContainer.appendChild(navigationControls);
+        }
+    }
+    
+    // Create prev button if it doesn't exist
+    if (!prevButton) {
+        const newPrevButton = document.createElement('button');
+        newPrevButton.id = 'prev-question-button';
+        newPrevButton.className = 'nav-button';
+        newPrevButton.innerHTML = '&larr; 上一题';
+        newPrevButton.style.cssText = `
+            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            border-radius: 8px;
+            margin: clamp(5px, 2vw, 10px);
+            background-color: #edf2f7;
+            color: #4a5568;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        `;
+        
+        newPrevButton.addEventListener('click', function() {
+            if (window.currentQuestionIndex > 0) {
+                window.currentQuestionIndex--;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+        
+        navigationControls.appendChild(newPrevButton);
+    } else {
         // Remove any existing event listeners
         const newPrevButton = prevButton.cloneNode(true);
-        const newNextButton = nextButton.cloneNode(true);
+        prevButton.parentNode.replaceChild(newPrevButton, prevButton);
         
-        if (prevButton.parentNode) {
-            prevButton.parentNode.replaceChild(newPrevButton, prevButton);
-        }
-        
-        if (nextButton.parentNode) {
-            nextButton.parentNode.replaceChild(newNextButton, nextButton);
-        }
-        
-        // Add new event listeners
+        // Add new event listener
         newPrevButton.addEventListener('click', function() {
-            console.log('Previous button clicked');
-            if (state.currentQuestionIndex > 0) {
-                state.currentQuestionIndex--;
+            if (window.currentQuestionIndex > 0) {
+                window.currentQuestionIndex--;
                 displayCurrentQuestion();
+                updateNavigationButtons();
             }
         });
+    }
+    
+    // Create next button if it doesn't exist
+    if (!nextButton) {
+        const newNextButton = document.createElement('button');
+        newNextButton.id = 'next-question-button';
+        newNextButton.className = 'nav-button';
+        newNextButton.innerHTML = '下一题 &rarr;';
+        newNextButton.style.cssText = `
+            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            border-radius: 8px;
+            margin: clamp(5px, 2vw, 10px);
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        `;
         
         newNextButton.addEventListener('click', function() {
-            console.log('Next button clicked');
-            if (state.currentQuestionIndex < state.questions.length - 1) {
-                state.currentQuestionIndex++;
+            if (window.questions && window.currentQuestionIndex < window.questions.length - 1) {
+                window.currentQuestionIndex++;
                 displayCurrentQuestion();
+                updateNavigationButtons();
             }
         });
         
-        // Update button states
-        newPrevButton.disabled = state.currentQuestionIndex === 0;
-        newNextButton.disabled = state.currentQuestionIndex === state.questions.length - 1;
-        
-        console.log('Navigation buttons set up successfully');
+        navigationControls.appendChild(newNextButton);
     } else {
-        console.warn('Navigation buttons not found');
+        // Remove any existing event listeners
+        const newNextButton = nextButton.cloneNode(true);
+        nextButton.parentNode.replaceChild(newNextButton, nextButton);
+        
+        // Add new event listener
+        newNextButton.addEventListener('click', function() {
+            if (window.questions && window.currentQuestionIndex < window.questions.length - 1) {
+                window.currentQuestionIndex++;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
     }
+    
+    // Update button states
+    updateNavigationButtons();
 }
 
 // Function to set up option selection buttons
@@ -1701,79 +2218,33 @@ window.extractContentFromResponse = extractContentFromResponse;
 
 // Function to show system messages
 function showSystemMessage(message, type = 'info') {
-    console.log(`Showing system message: ${message} (${type})`);
-    
-    // Create message element
     const messageElement = document.createElement('div');
     messageElement.className = `system-message ${type}`;
     messageElement.textContent = message;
     
-    // Find the output element
-    const outputElement = document.getElementById('output');
+    // Get the questions display container
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
     
-    if (outputElement) {
-        // Insert at the beginning of the output
-        if (outputElement.firstChild) {
-            outputElement.insertBefore(messageElement, outputElement.firstChild);
-        } else {
-            outputElement.appendChild(messageElement);
-        }
-        
-        // Remove after 5 seconds
+    // Create status container if it doesn't exist
+    let statusContainer = document.getElementById('status-container');
+    if (!statusContainer) {
+        statusContainer = document.createElement('div');
+        statusContainer.id = 'status-container';
+        statusContainer.className = 'status-container';
+        questionsDisplayContainer.insertBefore(statusContainer, questionsDisplayContainer.firstChild);
+    }
+    
+    // Clear previous messages
+    statusContainer.innerHTML = '';
+    
+    // Add new message
+    statusContainer.appendChild(messageElement);
+    
+    // Auto-remove after 5 seconds for non-error messages
+    if (type !== 'error') {
         setTimeout(() => {
-            if (messageElement.parentNode) {
-                messageElement.parentNode.removeChild(messageElement);
-            }
+            messageElement.remove();
         }, 5000);
-    } else {
-        console.error('Output element not found');
-        
-        // Try to find an alternative container based on the active panel
-        const activePanel = document.querySelector('.panel-button.active');
-        const panelType = activePanel ? activePanel.id.replace('-button', '') : '';
-        
-        let alternativeContainer = null;
-        
-        if (panelType === 'qa') {
-            alternativeContainer = document.querySelector('.output-container');
-        } else if (panelType === 'create') {
-            alternativeContainer = document.getElementById('create-container');
-        } else if (panelType === 'poetry') {
-            alternativeContainer = document.querySelector('.poetry-content');
-        }
-        
-        if (alternativeContainer) {
-            // Add the message to the alternative container
-            alternativeContainer.appendChild(messageElement);
-            
-            // Remove after 5 seconds
-            setTimeout(() => {
-                if (messageElement.parentNode) {
-                    messageElement.parentNode.removeChild(messageElement);
-                }
-            }, 5000);
-            
-            console.log(`Added system message to alternative container for ${panelType} panel`);
-        } else {
-            // Last resort: add to body
-            document.body.appendChild(messageElement);
-            
-            // Style for floating message
-            messageElement.style.position = 'fixed';
-            messageElement.style.top = '20px';
-            messageElement.style.left = '50%';
-            messageElement.style.transform = 'translateX(-50%)';
-            messageElement.style.zIndex = '9999';
-            
-            // Remove after 5 seconds
-            setTimeout(() => {
-                if (messageElement.parentNode) {
-                    messageElement.parentNode.removeChild(messageElement);
-                }
-            }, 5000);
-            
-            console.log('Added system message to body as floating message');
-        }
     }
 }
 
@@ -2824,31 +3295,151 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupChatButtons() {
     console.log('Setting up chat buttons');
     
-    // Check if chat buttons are already set up
-    if (window.chatButtonsInitialized) {
-        console.log('Chat buttons already initialized, skipping setup');
+    // First, ensure the chat interface exists
+    createChatInterface();
+    
+    // Now get the chat input and response area
+    const chatInput = document.getElementById('chat-input');
+    const chatResponse = document.getElementById('chat-response');
+    
+    if (!chatInput || !chatResponse) {
+        console.error('Chat input or response area not found even after creation');
         return;
     }
     
-    // Get chat elements
-    const chatInput = document.getElementById('user-input');
-    const chatOutput = document.getElementById('output');
+    // Set up optimize button
     const optimizeButton = document.getElementById('optimize-button');
-    const submitButton = document.getElementById('submit-button');
-    
-    // Check if all elements exist
-    if (!chatInput || !chatOutput || !optimizeButton || !submitButton) {
-        console.error('Chat elements not found');
-        return;
+    if (optimizeButton) {
+        optimizeButton.addEventListener('click', function() {
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+            return;
+        }
+        
+            // Get educational context from sidebar
+            const educationalContext = getEducationalContext();
+            
+            // Show loading state
+            optimizeButton.disabled = true;
+            optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
+            
+            // Prepare the prompt for optimization with educational context
+            const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值：
+
+教育背景：
+${educationalContext}
+
+原始问题：${questionText}
+
+请返回优化后的问题，使其更适合上述教育背景的学生，保持原始意图但使其更加清晰、准确和有教育意义。
+优化时请考虑学生的认知水平、课程要求和教育阶段，使问题更有针对性。`;
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the optimized question
+                    const optimizedContent = extractContentFromResponse(response);
+                    
+                    // Update the chat input with the optimized question
+                    chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
+                    
+                    // Focus the input and move cursor to end
+                    chatInput.focus();
+                    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+            
+            // Show success message
+                    showSystemMessage('问题已根据教育背景成功优化！', 'success');
+                })
+                .catch(error => {
+            console.error('Error optimizing question:', error);
+                    showSystemMessage('优化问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    optimizeButton.disabled = false;
+                    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+                });
+        });
     }
     
-    // Set up event listeners for the buttons
-    setupButtonEventListeners(chatInput, chatOutput, optimizeButton, submitButton);
-    
-    // Mark chat buttons as initialized
-    window.chatButtonsInitialized = true;
-    
-    console.log('Chat buttons set up successfully');
+    // Set up submit button
+    const submitButton = document.getElementById('submit-button');
+    if (submitButton) {
+        submitButton.addEventListener('click', function() {
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+            return;
+        }
+        
+            // Get educational context from sidebar
+            const educationalContext = getEducationalContext();
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+            chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
+            
+            // Prepare the prompt for the AI with educational context
+            const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
+
+教育背景：
+${educationalContext}
+
+问题：${questionText}
+
+请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
+如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平和课程要求。
+如果可能，请提供一些例子或应用场景来帮助理解。`;
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the AI response
+                    const aiResponse = extractContentFromResponse(response);
+                    
+                    // Format the response with MathJax
+                    const formattedResponse = formatMathExpressions(aiResponse);
+                    
+                    // Get context summary for display
+                    const contextSummary = getContextSummary();
+                    
+                    // Display the response with educational context
+                    chatResponse.innerHTML = `
+                        <div class="response-header">
+                            <i class="fas fa-robot"></i> AI 助手回答
+                            ${contextSummary ? `<span class="context-badge">${contextSummary}</span>` : ''}
+                        </div>
+                        <div class="response-content">
+                            ${formattedResponse}
+                        </div>
+                    `;
+                    
+                    // Render MathJax in the response
+                    if (window.MathJax) {
+                        MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting question:', error);
+                    chatResponse.innerHTML = `
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            抱歉，处理您的问题时出现了错误。请重试。
+            </div>
+        `;
+                    showSystemMessage('提交问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
+                });
+        });
+    }
 }
 
 // Function to get educational context from any available dropdowns in the document
@@ -3394,255 +3985,335 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Add the missing setupButtonEventListeners function
 function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, submitButton) {
-    console.log('Setting up button event listeners with new implementation');
+    console.log('Setting up button event listeners');
     
-    // Track if event listeners are already set up
-    if (window.eventListenersInitialized) {
-        console.log('Event listeners already initialized, skipping setup');
-        return;
-    }
-    
-    if (!chatInput || !chatResponse || !optimizeButton || !submitButton) {
-        console.error('Required elements not found for setting up button event listeners');
-        return;
-    }
-    
-    // Create new button elements to replace the old ones (removes existing event listeners)
-    const newOptimizeButton = optimizeButton.cloneNode(true);
-    const newSubmitButton = submitButton.cloneNode(true);
-    
-    // Replace the old buttons with the new ones
-    if (optimizeButton.parentNode) {
+    // Set up optimize button
+    if (optimizeButton) {
+        // Remove any existing event listeners
+        const newOptimizeButton = optimizeButton.cloneNode(true);
         optimizeButton.parentNode.replaceChild(newOptimizeButton, optimizeButton);
-    }
-    
-    if (submitButton.parentNode) {
-        submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
-    }
-    
-    // Submit button event listener
-    newSubmitButton.addEventListener('click', async function(event) {
-        // Prevent default action and stop propagation
-        event.preventDefault();
-        event.stopPropagation();
+        optimizeButton = newOptimizeButton;
         
-        console.log('Submit button clicked');
-        
-        const question = chatInput.value.trim();
-        
-        if (question === '') {
-            showSystemMessage('请输入问题', 'error');
-            return;
-        }
-        
-        // Get the loading element
-        let loadingElement = document.getElementById('loading');
-        
-        // If loading element doesn't exist, create it
-        if (!loadingElement) {
-            console.log('Loading element not found, creating new one');
-            const outputContainer = document.querySelector('.output-container');
+        optimizeButton.addEventListener('click', function() {
+            const questionText = chatInput.value.trim();
             
-            if (outputContainer) {
-                loadingElement = document.createElement('div');
-                loadingElement.id = 'loading';
-                loadingElement.innerHTML = `
-                    <div class="spinner"></div>
-                    <p>Thinking...</p>
-                `;
-                
-                // Add to the output container
-                outputContainer.insertBefore(loadingElement, outputContainer.firstChild);
-                console.log('Created new loading element');
-            } else {
-                console.error('Output container not found');
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+                return;
             }
-        }
-        
-        // Show loading indicator
-        if (loadingElement) {
-            loadingElement.classList.remove('hidden');
-            console.log('Loading indicator shown');
-        }
-        
-        try {
-            // Get educational context
-            const educationalContext = getSimplifiedEducationalContext();
-            console.log('Educational context:', educationalContext);
             
-            // Prepare the prompt
+            // Get simplified educational context (school and grade only)
+            const { school, grade } = getSimplifiedEducationalContext();
+            
+            // Show loading state
+            optimizeButton.disabled = true;
+            optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
+            
+            // Prepare the prompt for optimization with simplified educational context
+            const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值：
+
+教育背景：
+学校类型：${school}
+年级：${grade}
+
+原始问题：${questionText}
+
+请返回优化后的问题，使其更适合上述教育背景的学生，保持原始意图但使其更加清晰、准确和有教育意义。
+优化时请考虑学生的认知水平和教育阶段，使问题更有针对性。`;
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the optimized question
+                    const optimizedContent = extractContentFromResponse(response);
+                    
+                    // Update the chat input with the optimized question
+                    chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
+                    
+                    // Focus the input and move cursor to end
+                    chatInput.focus();
+                    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+                    
+                    // Show success message
+                    showSystemMessage('问题已根据教育背景成功优化！', 'success');
+                })
+                .catch(error => {
+                    console.error('Error optimizing question:', error);
+                    showSystemMessage('优化问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    optimizeButton.disabled = false;
+                    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+                });
+        });
+    }
+    
+    // Set up submit button
+    if (submitButton) {
+        // Remove any existing event listeners
+        const newSubmitButton = submitButton.cloneNode(true);
+        submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
+        submitButton = newSubmitButton;
+        
+        submitButton.addEventListener('click', function() {
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+                return;
+            }
+            
+            // Get simplified educational context (school and grade only)
+            const { school, grade } = getSimplifiedEducationalContext();
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+            chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
+            
+            // Prepare the prompt for the AI with simplified educational context
             const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
 
-${educationalContext}
+教育背景：
+学校类型：${school}
+年级：${grade}
 
-问题：${question}
+问题：${questionText}
 
 请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
 如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平。
-如果可能，请提供一些例子或应用场景来帮助理解。
-请使用段落、标题和列表等格式来组织你的回答，使其更易于阅读。`;
-            
-            console.log('Fetching AI response with prompt:', prompt);
+如果可能，请提供一些例子或应用场景来帮助理解。`;
             
             // Call the API
-            const response = await fetchAIResponse(prompt);
-            console.log('API response received:', response);
-            
-            // Extract content from response
-            const content = extractContentFromResponse(response);
-            console.log('Extracted content:', content);
-            
-            // Hide loading indicator
-            if (loadingElement) {
-                loadingElement.classList.add('hidden');
-                console.log('Loading indicator hidden');
-            }
-            
-            // Display the response
-            if (chatResponse) {
-                // Create a new message element
-                const messageElement = document.createElement('div');
-                messageElement.className = 'ai-message';
-                
-                // Format the content with math expressions and improve readability
-                const formattedContent = formatContentForDisplay(content);
-                messageElement.innerHTML = formattedContent;
-                
-                // Add the message to the output
-                chatResponse.appendChild(messageElement);
-                
-                // Scroll to the bottom of the output
-                chatResponse.scrollTop = chatResponse.scrollHeight;
-                
-                // Clear the input
-                chatInput.value = '';
-            }
-        } catch (error) {
-            console.error('Error submitting question:', error);
-            
-            // Hide loading indicator
-            if (loadingElement) {
-                loadingElement.classList.add('hidden');
-                console.log('Loading indicator hidden after error');
-            }
-            
-            // Show error message
-            try {
-                showSystemMessage('获取回答时出错，请稍后再试', 'error');
-            } catch (e) {
-                console.error('Error showing system message:', e);
-                
-                // Fallback error display
-                const errorElement = document.createElement('div');
-                errorElement.className = 'system-message error';
-                errorElement.textContent = '获取回答时出错，请稍后再试';
-                chatResponse.appendChild(errorElement);
-            }
-        }
-    });
-    
-    // Optimize button event listener
-    newOptimizeButton.addEventListener('click', async function(event) {
-        // Prevent default action and stop propagation
-        event.preventDefault();
-        event.stopPropagation();
-        
-        console.log('Optimize button clicked');
-        
-        const question = chatInput.value.trim();
-        
-        if (question === '') {
-            showSystemMessage('请输入问题以优化', 'error');
-            return;
-        }
-        
-        // Add optimizing class to button
-        newOptimizeButton.classList.add('optimizing');
-        newOptimizeButton.textContent = '优化中...';
-        
-        try {
-            // Prepare the prompt for optimization
-            const prompt = `请优化以下问题，使其更加清晰、具体，并包含足够的上下文信息，以便AI能够提供更好的回答：
-
-问题：${question}
-
-请返回优化后的问题，不需要任何额外的解释。`;
-            
-            // Call the API
-            const response = await fetchAIResponse(prompt);
-            
-            // Extract content from response
-            const content = extractContentFromResponse(response);
-            
-            // Parse the optimized question
-            const optimizedQuestion = parseOptimizedQuestion(content);
-            
-            // Update the input with the optimized question
-            chatInput.value = optimizedQuestion;
-            
-            // Focus on the input
-            chatInput.focus();
-            
-            // Show success message
-            showSystemMessage('问题已优化', 'success');
-        } catch (error) {
-            console.error('Error optimizing question:', error);
-            
-            // Show error message
-            showSystemMessage('优化问题时出错，请稍后再试', 'error');
-        } finally {
-            // Remove optimizing class from button
-            newOptimizeButton.classList.remove('optimizing');
-            newOptimizeButton.textContent = '优化问题';
-        }
-    });
-    
-    // Enter key event listener for input
-    chatInput.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            newSubmitButton.click();
-        }
-    });
-    
-    // Mark event listeners as initialized
-    window.eventListenersInitialized = true;
-    
-    console.log('Button event listeners set up successfully');
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the AI response
+                    const aiResponse = extractContentFromResponse(response);
+                    
+                    // Format the response with MathJax
+                    const formattedResponse = formatMathExpressions(aiResponse);
+                    
+                    // Get simplified context summary for display
+                    const contextSummary = getSimplifiedContextSummary();
+                    
+                    // Display the response with educational context
+                    chatResponse.innerHTML = `
+                        <div class="response-header">
+                            <i class="fas fa-robot"></i> AI 助手回答
+                            ${contextSummary ? `<span class="context-badge">${contextSummary}</span>` : ''}
+                        </div>
+                        <div class="response-content">
+                            ${formattedResponse}
+                </div>
+            `;
+                    
+                    // Render MathJax in the response
+                    if (window.MathJax) {
+                        MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting question:', error);
+                    chatResponse.innerHTML = `
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            抱歉，处理您的问题时出现了错误。请重试。
+                        </div>
+                    `;
+                    showSystemMessage('提交问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
+                });
+        });
+    }
 }
 
-// Function to format content for better display
-function formatContentForDisplay(content) {
-    if (!content) return '';
+// Function to get curriculum information based on school, grade and subject
+function getCurriculumInfo(school, grade, subject) {
+    // Default curriculum info
+    let curriculumInfo = '根据中国教育大纲标准提供适合的回答。';
     
-    // First, apply math formatting
-    let formattedContent = formatMathExpressions(content);
-    
-    // Convert markdown-style headers to HTML
-    formattedContent = formattedContent.replace(/^# (.*?)$/gm, '<h1>$1</h1>');
-    formattedContent = formattedContent.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
-    formattedContent = formattedContent.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
-    
-    // Convert markdown-style lists to HTML
-    formattedContent = formattedContent.replace(/^- (.*?)$/gm, '<li>$1</li>');
-    formattedContent = formattedContent.replace(/^(\d+)\. (.*?)$/gm, '<li>$2</li>');
-    
-    // Wrap consecutive list items in ul/ol tags
-    formattedContent = formattedContent.replace(/(<li>.*?<\/li>)\n(<li>.*?<\/li>)/gs, '<ul>$1$2</ul>');
-    
-    // Convert markdown-style emphasis to HTML
-    formattedContent = formattedContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    formattedContent = formattedContent.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    
-    // Convert line breaks to paragraphs
-    formattedContent = formattedContent.replace(/\n\n/g, '</p><p>');
-    
-    // Wrap the content in a paragraph if it's not already
-    if (!formattedContent.startsWith('<')) {
-        formattedContent = '<p>' + formattedContent + '</p>';
+    // Primary school curriculum info
+    if (school.includes('小学')) {
+        curriculumInfo = '根据小学教育大纲，注重基础知识的讲解，使用简单易懂的语言，多用具体例子，避免抽象概念。';
+        
+        if (subject.includes('数学')) {
+            if (grade.includes('一年级') || grade.includes('二年级')) {
+                curriculumInfo += '一二年级数学主要包括20以内的加减法、100以内的加减法、认识图形、认识时间等基础内容。';
+            } else if (grade.includes('三年级') || grade.includes('四年级')) {
+                curriculumInfo += '三四年级数学主要包括乘除法、分数初步、小数初步、面积、周长等内容。';
+            } else if (grade.includes('五年级') || grade.includes('六年级')) {
+                curriculumInfo += '五六年级数学主要包括分数四则运算、小数四则运算、比例、百分数、统计等内容。';
+            }
+        } else if (subject.includes('语文')) {
+            curriculumInfo += '小学语文注重汉字识记、阅读理解、写作基础等能力培养。';
+        } else if (subject.includes('英语')) {
+            curriculumInfo += '小学英语注重基础词汇、简单句型和日常交流用语的学习。';
+        } else if (subject.includes('科学')) {
+            curriculumInfo += '小学科学注重培养观察能力和好奇心，了解自然现象和简单科学原理。';
+        }
+    }
+    // Middle school curriculum info
+    else if (school.includes('初中')) {
+        curriculumInfo = '根据初中教育大纲，注重系统性知识的讲解，可以引入一定的抽象概念，但需要配合例子说明。';
+        
+        if (subject.includes('数学')) {
+            if (grade.includes('初一')) {
+                curriculumInfo += '初一数学主要包括有理数、整式、一元一次方程、几何初步等内容。';
+            } else if (grade.includes('初二')) {
+                curriculumInfo += '初二数学主要包括二元一次方程组、不等式、相似三角形、勾股定理等内容。';
+            } else if (grade.includes('初三')) {
+                curriculumInfo += '初三数学主要包括一元二次方程、二次函数、圆、概率初步等内容。';
+            }
+        } else if (subject.includes('物理')) {
+            curriculumInfo += '初中物理注重基本概念、基本规律的理解和简单应用，包括力学、热学、光学、电学等基础内容。';
+        } else if (subject.includes('化学')) {
+            curriculumInfo += '初中化学注重基本概念、元素性质、化学反应等基础内容的学习。';
+        } else if (subject.includes('生物')) {
+            curriculumInfo += '初中生物注重生物的基本结构、功能和分类，以及生态系统的基本概念。';
+        }
+    }
+    // High school curriculum info
+    else if (school.includes('高中')) {
+        curriculumInfo = '根据高中教育大纲，可以使用较为抽象的概念和复杂的理论，注重知识的系统性和应用能力的培养。';
+        
+        if (subject.includes('数学')) {
+            if (grade.includes('高一')) {
+                curriculumInfo += '高一数学主要包括集合、函数、三角函数、平面向量等内容。';
+            } else if (grade.includes('高二')) {
+                curriculumInfo += '高二数学主要包括立体几何、概率统计、数列、导数等内容。';
+            } else if (grade.includes('高三')) {
+                curriculumInfo += '高三数学主要是对高中数学知识的综合复习和应用，注重解题技巧和方法。';
+            }
+        } else if (subject.includes('物理')) {
+            curriculumInfo += '高中物理包括力学、热学、电磁学、原子物理等内容，注重理论与实验的结合。';
+        } else if (subject.includes('化学')) {
+            curriculumInfo += '高中化学包括化学反应原理、元素化学、有机化学等内容，注重微观结构与宏观性质的联系。';
+        } else if (subject.includes('生物')) {
+            curriculumInfo += '高中生物包括分子与细胞、遗传与进化、稳态与环境等内容，注重生命活动的分子基础。';
+        }
     }
     
-    return formattedContent;
+    return curriculumInfo;
+}
+
+// Add a new function to get simplified educational context (school and grade only)
+function getSimplifiedEducationalContext() {
+    console.log('Getting simplified educational context');
+    
+    // Initialize with default values
+    let school = '未指定学校类型';
+    let grade = '未指定年级';
+    
+    // Get all select elements in the document
+    const allSelects = document.querySelectorAll('select');
+    
+    // Scan through all selects to find our dropdowns
+    allSelects.forEach(select => {
+        const id = select.id || '';
+        const name = select.name || '';
+        const value = select.value;
+        
+        // Check if this is a school dropdown
+        if (id.includes('school') || name.includes('school')) {
+            if (value && value !== 'none') {
+                try {
+                    school = select.options[select.selectedIndex].text;
+                } catch (e) {
+                    // Map values to text
+                    const schoolMap = {
+                        'primary': '小学',
+                        'middle': '初中',
+                        'high': '高中'
+                    };
+                    school = schoolMap[value] || value;
+                }
+            }
+        }
+        
+        // Check if this is a grade dropdown
+        if (id.includes('grade') || name.includes('grade')) {
+            if (value && value !== 'none') {
+                try {
+                    grade = select.options[select.selectedIndex].text;
+                } catch (e) {
+                    grade = value;
+                }
+            }
+        }
+    });
+    
+    console.log('Simplified educational context:', { school, grade });
+    return { school, grade };
+}
+
+// Add a new function to get simplified context summary (school and grade only)
+function getSimplifiedContextSummary() {
+    // Initialize with default values
+    let school = '';
+    let grade = '';
+    let hasValues = false;
+    
+    // Get all select elements in the document
+    const allSelects = document.querySelectorAll('select');
+    
+    // Scan through all selects to find our dropdowns
+    allSelects.forEach(select => {
+        const id = select.id || '';
+        const name = select.name || '';
+        const value = select.value;
+        
+        // Check if this is a school dropdown
+        if (id.includes('school') || name.includes('school')) {
+            if (value && value !== 'none') {
+                try {
+                    school = select.options[select.selectedIndex].text;
+                } catch (e) {
+                    // Map values to text
+                    const schoolMap = {
+                        'primary': '小学',
+                        'middle': '初中',
+                        'high': '高中'
+                    };
+                    school = schoolMap[value] || value;
+                }
+                hasValues = true;
+            }
+        }
+        
+        // Check if this is a grade dropdown
+        if (id.includes('grade') || name.includes('grade')) {
+            if (value && value !== 'none') {
+                try {
+                    grade = select.options[select.selectedIndex].text;
+                } catch (e) {
+                    grade = value;
+                }
+                hasValues = true;
+            }
+        }
+    });
+    
+    if (!hasValues) {
+        return '';
+    }
+    
+    let summary = '';
+    
+    if (school) {
+        summary += school;
+    }
+    
+    if (grade) {
+        if (summary) summary += ' · ';
+        summary += grade;
+    }
+    
+    return summary;
 }
 
 // ... existing code ...
@@ -3738,7 +4409,7 @@ function formatContentForDisplay(content) {
         }
         
         const school = schoolSelect.value;
-        const grade = gradeSelect.options[gradeSelect.selectedIndex]?.text;
+        const grade = gradeSelect.options[gradeSelect.selectedIndex].text;
         
         if (!school || !grade) {
             showSystemMessage('请先选择学校和年级', 'warning');
@@ -3982,64 +4653,48 @@ function formatContentForDisplay(content) {
 
 // Initialize the application
 function init() {
-    console.log('Initializing application');
+    console.log('Initializing application...');
     
-    // Check if application is already initialized
-    if (window.appInitialized) {
-        console.log('Application already initialized, skipping initialization');
-        return;
-    }
-    
-    // Cache DOM elements
-    const contentArea = document.querySelector('.content-area');
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const leftPanel = document.querySelector('.left-panel');
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    const poetryButton = document.getElementById('poetry-button');
-    const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
-    const poetryContainer = document.getElementById('poetry-container');
-    
-    // Store references in global scope for later use
-    window.contentArea = contentArea;
-    window.sidebarToggle = sidebarToggle;
-    window.leftPanel = leftPanel;
-    window.qaButton = qaButton;
-    window.createButton = createButton;
-    window.poetryButton = poetryButton;
-    window.qaContainer = qaContainer;
-    window.createContainer = createContainer;
-    window.poetryContainer = poetryContainer;
-    
-    // Initialize the school and grade dropdowns in the sidebar
-    const schoolSelect = document.getElementById('school-select-sidebar');
-    if (schoolSelect) {
-        // Populate grade options based on the default school
-        populateSidebarGradeOptions(schoolSelect.value);
-        
-        // Add event listener to update grade options when school changes
-        schoolSelect.addEventListener('change', function() {
-            populateSidebarGradeOptions(this.value);
-        });
-    }
-    
-    // Set up event listeners
+    // Setup event listeners
     setupEventListeners();
     
-    // Initialize poetry dropdowns
-    initializePoetryDropdowns();
+    // Populate sidebar options based on selected school
+    const selectedSchool = elements.schoolSelectSidebar.value;
+    if (selectedSchool) {
+        populateSidebarGradeOptions(selectedSchool);
+    }
     
-    // Set up chat buttons (only once)
-    setupChatButtons();
-    
-    // Initialize empty state
+    // Initialize empty state for quiz creation
     initializeEmptyState();
     
-    // Mark application as initialized
-    window.appInitialized = true;
+    // IMPORTANT: Directly add event listener to poetry button
+    const poetryButton = document.getElementById('poetry-button');
+    if (poetryButton) {
+        console.log('Adding direct click event listener to poetry button');
+        poetryButton.addEventListener('click', function() {
+            console.log('Poetry button clicked directly');
+            // Hide all panels
+            document.getElementById('qa-panel').classList.add('hidden');
+            document.getElementById('create-panel').classList.add('hidden');
+            
+            // Show poetry panel
+            const poetryPanel = document.getElementById('poetry-panel');
+            if (poetryPanel) {
+                poetryPanel.classList.remove('hidden');
+                console.log('Poetry panel is now visible');
+            } else {
+                console.error('Poetry panel element not found');
+            }
+            
+            // Update active states
+            document.getElementById('qa-button').classList.remove('active');
+            document.getElementById('create-button').classList.remove('active');
+            poetryButton.classList.add('active');
+        });
+    } else {
+        console.error('Poetry button not found during init');
+    }
     
-    // Log initialization complete
     console.log('Application initialized');
 }
 
@@ -4635,9 +5290,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (existingPoetryContainer && existingPoetryContainer.parentNode) {
                 existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
             }
-            
-            // Set up the test configuration controls
-            setupTestControls();
         } else if (containerType === 'poetry' && poetryContainer && contentArea) {
             contentArea.appendChild(poetryContainer);
             if (poetryButton) poetryButton.classList.add('active');
@@ -5135,1014 +5787,3 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry functionality initialized');
 });
-
-// ... existing code ...
-
-    // Function to set up test controls
-    function setupTestControls() {
-        console.log('Setting up test controls');
-        
-        // Get the subject select element from the top of the page
-        const subjectSelect = document.getElementById('subject-select');
-        const semesterSelect = document.getElementById('semester-select');
-        const difficultySelect = document.getElementById('difficulty-select');
-        const questionCountSelect = document.getElementById('question-count-select');
-        const generateQuestionsButton = document.getElementById('generate-questions-button');
-        
-        // Get the school and grade from the sidebar
-        const schoolSelect = document.getElementById('school-select-sidebar');
-        const gradeSelect = document.getElementById('grade-select-sidebar');
-        
-        if (schoolSelect) {
-            // First, populate the grade options based on the current school
-            populateSidebarGradeOptions(schoolSelect.value);
-            
-            // Add event listener to school select to update grade options
-            schoolSelect.addEventListener('change', function() {
-                populateSidebarGradeOptions(this.value);
-            });
-        }
-        
-        if (schoolSelect && gradeSelect && subjectSelect) {
-            // Populate subject options based on school
-            const school = schoolSelect.value;
-            populateSubjectOptions(school, subjectSelect);
-            
-            // Add event listener to school select to update subject options
-            schoolSelect.addEventListener('change', function() {
-                const school = this.value;
-                populateSubjectOptions(school, subjectSelect);
-            });
-        }
-        
-        // Add event listener to generate questions button
-        if (generateQuestionsButton) {
-            // Remove any existing event listeners
-            const newButton = generateQuestionsButton.cloneNode(true);
-            if (generateQuestionsButton.parentNode) {
-                generateQuestionsButton.parentNode.replaceChild(newButton, generateQuestionsButton);
-            }
-            
-            // Add new event listener
-            newButton.addEventListener('click', function() {
-                console.log('Generate questions button clicked');
-                
-                // Get values from the form
-                const school = schoolSelect ? schoolSelect.value : '';
-                const grade = gradeSelect ? gradeSelect.options[gradeSelect.selectedIndex]?.text || '' : '';
-                const subject = subjectSelect ? subjectSelect.value : '';
-                const semester = semesterSelect ? semesterSelect.value : '上学期';
-                const difficulty = difficultySelect ? difficultySelect.value : '中等';
-                const questionCount = questionCountSelect ? questionCountSelect.value : '5';
-                
-                // Call the function to generate questions
-                handleGenerateQuestionsClick(school, grade, subject, semester, difficulty, questionCount);
-            });
-        }
-    }
-    
-    // Function to populate grade options in the sidebar based on school
-    function populateSidebarGradeOptions(school) {
-        console.log('Populating sidebar grade options for school:', school);
-        const gradeSelect = document.getElementById('grade-select-sidebar');
-        
-        if (!gradeSelect) {
-            console.error('Grade select element not found');
-            return;
-        }
-        
-        // Clear existing options
-        while (gradeSelect.options.length > 0) {
-            gradeSelect.remove(0);
-        }
-        
-        // Add new options based on school
-        let grades = [];
-        
-        if (school === '小学') {
-            grades = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-        } else if (school === '初中') {
-            grades = ['初一', '初二', '初三'];
-        } else if (school === '高中') {
-            grades = ['高一', '高二', '高三'];
-        }
-        
-        // Add options to select
-        grades.forEach(grade => {
-            const option = document.createElement('option');
-            option.value = grade;
-            option.textContent = grade;
-            gradeSelect.appendChild(option);
-        });
-        
-        console.log('Populated grade options:', grades);
-    }
-    
-    // Function to populate subject options based on school
-    function populateSubjectOptions(school, subjectSelect) {
-        if (!subjectSelect) return;
-        
-        // Clear existing options
-        while (subjectSelect.options.length > 0) {
-            subjectSelect.remove(0);
-        }
-        
-        // Add new options based on school
-        let subjects = [];
-        
-        if (school === '小学') {
-            subjects = ['语文', '数学', '英语', '科学'];
-        } else if (school === '初中') {
-            subjects = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'];
-        } else if (school === '高中') {
-            subjects = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-        }
-        
-        // Add options to select
-        subjects.forEach(subject => {
-            const option = document.createElement('option');
-            option.value = subject;
-            option.textContent = subject;
-            subjectSelect.appendChild(option);
-        });
-    }
-    
-    // Function to handle generate questions button click
-    async function handleGenerateQuestionsClick(school, grade, subject, semester, difficulty, questionCount) {
-        console.log('Generating questions with parameters:', { school, grade, subject, semester, difficulty, questionCount });
-        
-        // Get the test loading indicator and questions container
-        const testLoadingIndicator = document.getElementById('test-loading-indicator');
-        const questionsContainer = document.getElementById('questions-display-container');
-        const emptyState = document.getElementById('empty-state');
-        
-        if (!testLoadingIndicator || !questionsContainer) {
-            console.error('Test elements not found');
-            
-            // Try to find the create container and check if it's visible
-            const createContainer = document.getElementById('create-container');
-            if (!createContainer || createContainer.classList.contains('hidden')) {
-                console.log('Switching to test tab first');
-                handleTabSwitch('create');
-                
-                // Try again after switching tabs
-                setTimeout(() => {
-                    handleGenerateQuestionsClick(school, grade, subject, semester, difficulty, questionCount);
-                }, 100);
-                return;
-            }
-            
-            return;
-        }
-        
-        try {
-            // Show loading indicator
-            testLoadingIndicator.classList.remove('hidden');
-            
-            // Hide questions container and empty state
-            questionsContainer.classList.add('hidden');
-            if (emptyState) {
-                emptyState.classList.add('hidden');
-            }
-            
-            // Prepare the prompt
-            const prompt = `请为${school}${grade}学生出${questionCount}道${difficulty}难度的${subject}${semester}选择题，每道题有4个选项(A,B,C,D)，并提供答案和解析。请以JSON格式返回，格式为：
-            {
-                "questions": [
-                    {
-                        "question": "题目内容",
-                        "options": {
-                            "A": "选项A内容",
-                            "B": "选项B内容",
-                            "C": "选项C内容",
-                            "D": "选项D内容"
-                        },
-                        "answer": "正确选项字母",
-                        "explanation": "解析内容"
-                    },
-                    ...
-                ]
-            }`;
-            
-            // Fetch the response
-            const response = await fetchAIResponse(prompt);
-            
-            // Parse the questions from the response
-            const questions = parseQuestionsFromResponse(response);
-            
-            if (!questions || questions.length === 0) {
-                throw new Error('No questions generated');
-            }
-            
-            // Store the questions in the state
-            state.questions = questions;
-            state.currentQuestionIndex = 0;
-            state.userAnswers = new Array(questions.length).fill(null);
-            
-            // Display the first question
-            displayCurrentQuestion();
-            
-            // Show the questions container
-            questionsContainer.classList.remove('hidden');
-            
-            // Update navigation buttons
-            updateNavigationButtons();
-            
-            console.log('Questions generated successfully:', questions);
-        } catch (error) {
-            console.error('Error generating questions:', error);
-            showSystemMessage('生成题目时出错，请稍后再试', 'error');
-            
-            // Show empty state
-            if (emptyState) {
-                emptyState.classList.remove('hidden');
-            }
-        } finally {
-            // Hide loading indicator
-            testLoadingIndicator.classList.add('hidden');
-        }
-    }
-
-// ... existing code ...
-
-// Function to format math expressions in text
-function formatMathExpressions(text) {
-    if (!text) return '';
-    
-    // Replace inline math expressions (surrounded by $ signs)
-    let formattedText = text.replace(/\$([^$]+)\$/g, '<span class="math-inline">$1</span>');
-    
-    // Replace display math expressions (surrounded by $$ signs)
-    formattedText = formattedText.replace(/\$\$([^$]+)\$\$/g, '<div class="math-display">$1</div>');
-    
-    return formattedText;
-}
-
-// ... existing code ...
-
-// Function to handle question submission
-async function handleSubmitQuestion(question) {
-    console.log('Submitting question:', question);
-    
-    if (!question || question.trim() === '') {
-        showSystemMessage('请输入问题', 'error');
-        return;
-    }
-    
-    // Get the loading element
-    let loadingElement = document.getElementById('loading');
-    
-    // If loading element doesn't exist, create it
-    if (!loadingElement) {
-        console.log('Loading element not found in handleSubmitQuestion, creating new one');
-        const outputContainer = document.querySelector('.output-container');
-        
-        if (outputContainer) {
-            loadingElement = document.createElement('div');
-            loadingElement.id = 'loading';
-            loadingElement.innerHTML = `
-                <div class="spinner"></div>
-                <p>Thinking...</p>
-            `;
-            
-            // Add to the output container
-            outputContainer.insertBefore(loadingElement, outputContainer.firstChild);
-            console.log('Created new loading element in handleSubmitQuestion');
-        } else {
-            console.error('Output container not found in handleSubmitQuestion');
-        }
-    }
-    
-    // Show loading indicator
-    if (loadingElement) {
-        loadingElement.classList.remove('hidden');
-        console.log('Loading indicator shown in handleSubmitQuestion');
-    }
-    
-    try {
-        // Get educational context
-        const educationalContext = getSimplifiedEducationalContext();
-        console.log('Educational context in handleSubmitQuestion:', educationalContext);
-        
-        // Prepare the prompt
-        const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
-
-${educationalContext}
-
-问题：${question}
-
-请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
-如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平。
-如果可能，请提供一些例子或应用场景来帮助理解。
-请使用段落、标题和列表等格式来组织你的回答，使其更易于阅读。`;
-        
-        console.log('Fetching AI response with prompt in handleSubmitQuestion:', prompt);
-        
-        // Call the API
-        const response = await fetchAIResponse(prompt);
-        console.log('API response in handleSubmitQuestion:', response);
-        
-        // Extract content from response
-        const content = extractContentFromResponse(response);
-        console.log('Extracted content in handleSubmitQuestion:', content);
-        
-        // Hide loading indicator
-        if (loadingElement) {
-            loadingElement.classList.add('hidden');
-            console.log('Loading indicator hidden in handleSubmitQuestion');
-        }
-        
-        // Display the response
-        const outputElement = document.getElementById('output');
-        if (outputElement) {
-            // Create a new message element
-            const messageElement = document.createElement('div');
-            messageElement.className = 'ai-message';
-            
-            // Format the content with math expressions and improve readability
-            const formattedContent = formatContentForDisplay(content);
-            messageElement.innerHTML = formattedContent;
-            
-            // Add the message to the output
-            outputElement.appendChild(messageElement);
-            
-            // Scroll to the bottom of the output
-            outputElement.scrollTop = outputElement.scrollHeight;
-        }
-    } catch (error) {
-        console.error('Error submitting question in handleSubmitQuestion:', error);
-        
-        // Hide loading indicator
-        if (loadingElement) {
-            loadingElement.classList.add('hidden');
-            console.log('Loading indicator hidden after error in handleSubmitQuestion');
-        }
-        
-        // Show error message
-        const outputElement = document.getElementById('output');
-        if (outputElement) {
-            showSystemMessage('获取回答时出错，请稍后再试', 'error');
-        }
-    }
-}
-
-// ... existing code ...
-
-// Function to show system message
-function showSystemMessage(message, type = 'info') {
-    console.log(`Showing system message: ${message} (${type})`);
-    
-    // Create message element
-    const messageElement = document.createElement('div');
-    messageElement.className = `system-message ${type}`;
-    messageElement.textContent = message;
-    
-    // Find the output element
-    const outputElement = document.getElementById('output');
-    
-    if (outputElement) {
-        // Insert at the beginning of the output
-        if (outputElement.firstChild) {
-            outputElement.insertBefore(messageElement, outputElement.firstChild);
-        } else {
-            outputElement.appendChild(messageElement);
-        }
-        
-        // Remove after 5 seconds
-        setTimeout(() => {
-            if (messageElement.parentNode) {
-                messageElement.parentNode.removeChild(messageElement);
-            }
-        }, 5000);
-    } else {
-        console.error('Output element not found');
-    }
-}
-// ... existing code ...
-
-// Initialize the application when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded');
-    
-    // Initialize state if not already initialized
-    if (!state.isInitialized) {
-        state.questions = [];
-        state.currentQuestionIndex = 0;
-        state.userAnswers = [];
-        state.poems = [];
-        state.currentPoemIndex = 0;
-        state.isInitialized = true;
-        
-        console.log('State initialized:', state);
-    }
-    
-    // Initialize the application (only once)
-    init();
-    
-    // Set up navigation buttons if they exist
-    const prevButton = document.getElementById('prev-question-button');
-    const nextButton = document.getElementById('next-question-button');
-    
-    if (prevButton && nextButton) {
-        setupNavigationButtons();
-    }
-});
-
-// ... existing code ...
-
-// Add the missing getSimplifiedEducationalContext function
-function getSimplifiedEducationalContext() {
-    const schoolSelect = document.getElementById('school-select-sidebar');
-    const gradeSelect = document.getElementById('grade-select-sidebar');
-    
-    if (!schoolSelect || !gradeSelect) {
-        console.warn('Educational context elements not found');
-        return '小学一年级'; // Default fallback
-    }
-    
-    const school = schoolSelect.value || '小学';
-    const grade = gradeSelect.value || '一年级';
-    
-    return `${school}${grade}`;
-}
-
-// Fix the submit button click handler to properly find the output container
-function setupChatButtons() {
-    console.log('Setting up chat buttons');
-    const chatInput = document.getElementById('user-input');
-    const submitButton = document.getElementById('submit-button');
-    const optimizeButton = document.getElementById('optimize-button');
-    
-    if (!chatInput || !submitButton || !optimizeButton) {
-        console.error('Chat interface elements not found');
-        return;
-    }
-    
-    // Get the output container
-    const outputContainer = document.querySelector('.output-container');
-    const outputElement = document.getElementById('output');
-    
-    if (!outputContainer || !outputElement) {
-        console.error('Output container or output element not found');
-        return;
-    }
-    
-    // Set up the submit button
-    submitButton.addEventListener('click', async function() {
-        const question = chatInput.value.trim();
-        if (!question) {
-            showSystemMessage('请输入问题', 'warning');
-            return;
-        }
-        
-        try {
-            // Show loading indicator
-            showLoadingIndicator();
-            
-            // Get educational context
-            const educationalContext = getSimplifiedEducationalContext();
-            console.log('Educational context:', educationalContext);
-            
-            // Submit the question
-            await handleSubmitQuestion(question);
-            
-            // Clear the input
-            chatInput.value = '';
-        } catch (error) {
-            console.error('Error submitting question:', error);
-            showSystemMessage('获取回答时出错，请稍后再试', 'error');
-        } finally {
-            // Hide loading indicator
-            hideLoadingIndicator();
-        }
-    });
-    
-    // Set up the optimize button
-    optimizeButton.addEventListener('click', function() {
-        // Optimize button functionality
-        // ...
-    });
-    
-    // Allow submitting with Enter key
-    chatInput.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            submitButton.click();
-        }
-    });
-}
-
-// Fix the handleSubmitQuestion function to properly update the output
-async function handleSubmitQuestion(question) {
-    console.log('Handling question submission:', question);
-    
-    // Get the output element
-    const outputElement = document.getElementById('output');
-    if (!outputElement) {
-        console.error('Output element not found');
-        return;
-    }
-    
-    try {
-        // Get educational context
-        const educationalContext = getSimplifiedEducationalContext();
-        
-        // Prepare the prompt
-        const prompt = `作为一位${educationalContext}学生的AI助教，请回答以下问题：\n\n${question}`;
-        
-        // Fetch the response
-        const response = await fetchAIResponse(prompt);
-        
-        // Extract the content
-        const content = extractContentFromResponse(response);
-        
-        // Format the content
-        const formattedContent = formatContentForDisplay(content);
-        
-        // Update the output
-        outputElement.innerHTML = formattedContent;
-        
-        // Render math expressions if needed
-        if (window.MathJax && content.includes('$')) {
-            window.MathJax.typeset();
-        }
-    } catch (error) {
-        console.error('Error handling question:', error);
-        throw error;
-    }
-}
-
-// Fix the showLoadingIndicator function
-function showLoadingIndicator() {
-    console.log('Showing loading indicator');
-    
-    // Get the loading element
-    let loadingElement = document.getElementById('loading');
-    
-    // If loading element doesn't exist, create it
-    if (!loadingElement) {
-        console.log('Loading element not found, creating new one');
-        
-        // Get the output container
-        const outputContainer = document.querySelector('.output-container');
-        if (!outputContainer) {
-            console.error('Output container not found');
-            return;
-        }
-        
-        // Create the loading element
-        loadingElement = document.createElement('div');
-        loadingElement.id = 'loading';
-        loadingElement.className = 'hidden';
-        loadingElement.innerHTML = `
-            <div class="spinner"></div>
-            <p>Thinking...</p>
-        `;
-        
-        // Add it to the output container
-        outputContainer.insertBefore(loadingElement, outputContainer.firstChild);
-    }
-    
-    // Show the loading indicator
-    loadingElement.classList.remove('hidden');
-}
-
-// Fix the hideLoadingIndicator function
-function hideLoadingIndicator() {
-    console.log('Hiding loading indicator');
-    
-    // Get the loading element
-    const loadingElement = document.getElementById('loading');
-    
-    // If loading element exists, hide it
-    if (loadingElement) {
-        loadingElement.classList.add('hidden');
-    }
-}
-
-// Make sure init function calls setupChatButtons
-function init() {
-    console.log('Initializing application');
-    
-    // Initialize state if not already initialized
-    if (!window.state || !window.state.isInitialized) {
-        initializeState();
-    }
-    
-    // Set up event listeners
-    setupEventListeners();
-    
-    // Set up chat buttons
-    setupChatButtons();
-    
-    // Initialize dropdowns
-    initializePoetryDropdowns();
-    setupTestControls();
-    
-    // Set up navigation buttons
-    const prevButton = document.getElementById('prev-question-button');
-    const nextButton = document.getElementById('next-question-button');
-    
-    if (prevButton && nextButton) {
-        setupNavigationButtons();
-    }
-    
-    console.log('Application initialized');
-}
-// ... existing code ...
-
-// Add the missing initializeState function
-function initializeState() {
-    console.log('Initializing state');
-    
-    // Initialize the state object if it doesn't exist
-    if (!window.state) {
-        window.state = {};
-    }
-    
-    // Initialize state properties
-    state.questions = [];
-    state.currentQuestionIndex = 0;
-    state.userAnswers = [];
-    state.poems = [];
-    state.currentPoemIndex = 0;
-    state.isInitialized = true;
-    
-    console.log('State initialized:', state);
-}
-
-// Fix the handleTabSwitch function to properly handle poetry panel
-function handleTabSwitch(containerType) {
-    console.log('Switching to tab:', containerType);
-    
-    // Get all containers
-    const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
-    const poetryContainer = document.getElementById('poetry-container');
-    
-    // Get all buttons
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    const poetryButton = document.getElementById('poetry-button');
-    
-    // Hide all containers
-    if (qaContainer) qaContainer.classList.add('hidden');
-    if (createContainer) createContainer.classList.add('hidden');
-    if (poetryContainer) poetryContainer.classList.add('hidden');
-    
-    // Remove active class from all buttons
-    if (qaButton) qaButton.classList.remove('active');
-    if (createButton) createButton.classList.remove('active');
-    if (poetryButton) poetryButton.classList.remove('active');
-    
-    // Get the content area
-    const contentArea = document.querySelector('.content-area');
-    if (!contentArea) {
-        console.error('Content area not found');
-        return;
-    }
-    
-    // Show the selected container and activate the button
-    if (containerType === 'qa') {
-        if (!qaContainer) {
-            console.log('QA container not found, creating it');
-            const newQaContainer = document.createElement('div');
-            newQaContainer.id = 'qa-container';
-            newQaContainer.className = 'container';
-            newQaContainer.innerHTML = `
-                <div class="chat-container">
-                    <div class="input-container">
-                        <div class="welcome-message">你好，我是你的AI老师，有什么我可以帮你的吗？</div>
-                        <textarea id="user-input" placeholder="请输入你的问题..."></textarea>
-                        <div class="button-container">
-                            <div class="right-controls">
-                                <button id="optimize-button" title="优化您的问题以获得更好的回答">优化问题</button>
-                                <button id="submit-button">提交问题</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="output-container">
-                        <div id="loading" class="hidden">
-                            <div class="spinner"></div>
-                            <p>Thinking...</p>
-                        </div>
-                        <div id="output">
-                            <!-- Output will appear here -->
-                        </div>
-                    </div>
-                </div>
-            `;
-            contentArea.appendChild(newQaContainer);
-            console.log('QA container added to content area');
-            
-            // Set up chat buttons
-            setupChatButtons();
-        } else {
-            qaContainer.classList.remove('hidden');
-        }
-        if (qaButton) qaButton.classList.add('active');
-    } else if (containerType === 'create') {
-        if (!createContainer) {
-            console.log('Create container not found, creating it');
-            const newCreateContainer = document.createElement('div');
-            newCreateContainer.id = 'create-container';
-            newCreateContainer.className = 'container';
-            newCreateContainer.innerHTML = `
-                <!-- Test configuration controls fixed at the top of the page -->
-                <div class="test-header">
-                    <div class="test-controls">
-                        <div class="test-selectors">
-                            <div class="selector-group">
-                                <label for="subject-select">科目</label>
-                                <select id="subject-select" class="test-select">
-                                    <!-- Options will be populated dynamically -->
-                                </select>
-                            </div>
-                            <div class="selector-group">
-                                <label for="semester-select">学期</label>
-                                <select id="semester-select" class="test-select">
-                                    <option value="上学期">上学期</option>
-                                    <option value="下学期">下学期</option>
-                                </select>
-                            </div>
-                            <div class="selector-group">
-                                <label for="difficulty-select">难度</label>
-                                <select id="difficulty-select" class="test-select">
-                                    <option value="容易">容易</option>
-                                    <option value="中等">中等</option>
-                                    <option value="偏难">偏难</option>
-                                </select>
-                            </div>
-                            <div class="selector-group">
-                                <label for="question-count-select">题数</label>
-                                <select id="question-count-select" class="test-select">
-                                    <option value="5">5</option>
-                                    <option value="10">10</option>
-                                </select>
-                            </div>
-                            <button id="generate-questions-button" class="primary-button test-button">出题</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Test content wrapper -->
-                <div class="test-content">
-                    <!-- Loading indicator -->
-                    <div id="test-loading-indicator" class="hidden">
-                        <div class="spinner-icon"></div>
-                        <p>正在生成题目，请稍候...</p>
-                    </div>
-                    
-                    <!-- Questions display container -->
-                    <div id="questions-display-container" class="questions-display-container hidden">
-                        <!-- Empty state message -->
-                        <div id="empty-state" class="empty-state">
-                            <i class="fas fa-book-open empty-state-icon"></i>
-                            <h3>准备好开始测验了吗？</h3>
-                            <p>选择学校类型、年级、学期、科目、难度和题数，然后点击"出题"按钮生成题目。</p>
-                        </div>
-                        
-                        <!-- Question content will be dynamically inserted here -->
-                        <div id="question-counter" class="question-counter"></div>
-                        <div id="question-text" class="question-text"></div>
-                        <div id="choices-container" class="choices-container"></div>
-                        
-                        <!-- Answer container -->
-                        <div id="answer-container" class="answer-container hidden">
-                            <div id="answer-result" class="answer-result"></div>
-                            <div id="answer-explanation" class="answer-explanation"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Navigation controls -->
-                    <div class="navigation-controls">
-                        <button id="prev-question-button" class="nav-button" disabled>上一题</button>
-                        <button id="next-question-button" class="nav-button" disabled>下一题</button>
-                    </div>
-                </div>
-            `;
-            contentArea.appendChild(newCreateContainer);
-            console.log('Create container added to content area');
-            
-            // Set up test controls
-            setupTestControls();
-        } else {
-            createContainer.classList.remove('hidden');
-        }
-        if (createButton) createButton.classList.add('active');
-    } else if (containerType === 'poetry') {
-        if (!poetryContainer) {
-            console.log('Poetry container not found, creating it');
-            const newPoetryContainer = document.createElement('div');
-            newPoetryContainer.id = 'poetry-container';
-            newPoetryContainer.className = 'container';
-            newPoetryContainer.innerHTML = `
-                <div class="poetry-header">
-                    <div class="poetry-controls">
-                        <div class="poetry-selectors">
-                            <div class="selector-group">
-                                <label for="poetry-type-select">类型</label>
-                                <select id="poetry-type-select" class="poetry-select">
-                                    <option value="唐诗">唐诗</option>
-                                    <option value="宋词">宋词</option>
-                                    <option value="元曲">元曲</option>
-                                </select>
-                            </div>
-                            <div class="selector-group">
-                                <label for="poetry-style-select">风格</label>
-                                <select id="poetry-style-select" class="poetry-select">
-                                    <option value="任意">任意</option>
-                                    <option value="山水">山水</option>
-                                    <option value="边塞">边塞</option>
-                                    <option value="浪漫">浪漫</option>
-                                    <option value="现实">现实</option>
-                                </select>
-                            </div>
-                            <button id="learn-poetry-button" class="primary-button poetry-button">学习诗词</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="poetry-content">
-                    <div id="poetry-empty-state" class="empty-state">
-                        <i class="fas fa-book-open empty-state-icon"></i>
-                        <h3>开始学习古诗词</h3>
-                        <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成适合您学习阶段的诗词。</p>
-                    </div>
-                    <div id="poetry-display" class="hidden">
-                        <div class="poem-navigation">
-                            <button id="prev-poem-button" class="poem-nav-button" disabled>
-                                <i class="fas fa-arrow-left"></i>
-                            </button>
-                            <span class="poem-counter">1 / 5</span>
-                            <button id="next-poem-button" class="poem-nav-button">
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
-                        <div class="poem-display">
-                            <h2 class="poem-title"></h2>
-                            <p class="poem-author"></p>
-                            <div class="poem-content"></div>
-                            <div class="poem-section">
-                                <h3>创作背景</h3>
-                                <div class="poem-background"></div>
-                            </div>
-                            <div class="poem-section">
-                                <h3>赏析</h3>
-                                <div class="poem-explanation"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            contentArea.appendChild(newPoetryContainer);
-            console.log('Poetry container added to content area');
-            
-            // Initialize poetry dropdowns
-            initializePoetryDropdowns();
-            
-            // Set up poetry event listeners
-            const learnPoetryButton = document.getElementById('learn-poetry-button');
-            if (learnPoetryButton) {
-                learnPoetryButton.addEventListener('click', handleLearnPoetryClick);
-                console.log('Learn poetry button event listener added');
-            }
-            
-            // Set up poem navigation buttons
-            setupPoemNavigationButtons();
-        } else {
-            poetryContainer.classList.remove('hidden');
-        }
-        if (poetryButton) poetryButton.classList.add('active');
-    }
-}
-
-// Fix the handleGenerateQuestionsClick function to properly find test elements
-async function handleGenerateQuestionsClick(school, grade, subject, semester, difficulty, questionCount) {
-    console.log('Generating questions with parameters:', { school, grade, subject, semester, difficulty, questionCount });
-    
-    // Get the test loading indicator and questions container
-    const testLoadingIndicator = document.getElementById('test-loading-indicator');
-    const questionsContainer = document.getElementById('questions-display-container');
-    const emptyState = document.getElementById('empty-state');
-    
-    if (!testLoadingIndicator || !questionsContainer) {
-        console.error('Test elements not found');
-        
-        // Try to find the create container and check if it's visible
-        const createContainer = document.getElementById('create-container');
-        if (!createContainer || createContainer.classList.contains('hidden')) {
-            console.log('Switching to test tab first');
-            handleTabSwitch('create');
-            
-            // Try again after switching tabs
-            setTimeout(() => {
-                handleGenerateQuestionsClick(school, grade, subject, semester, difficulty, questionCount);
-            }, 100);
-            return;
-        }
-        
-        return;
-    }
-    
-    try {
-        // Show loading indicator
-        testLoadingIndicator.classList.remove('hidden');
-        
-        // Hide questions container and empty state
-        questionsContainer.classList.add('hidden');
-        if (emptyState) {
-            emptyState.classList.add('hidden');
-        }
-        
-        // Prepare the prompt
-        const prompt = `请为${school}${grade}学生出${questionCount}道${difficulty}难度的${subject}${semester}选择题，每道题有4个选项(A,B,C,D)，并提供答案和解析。请以JSON格式返回，格式为：
-        {
-            "questions": [
-                {
-                    "question": "题目内容",
-                    "options": {
-                        "A": "选项A内容",
-                        "B": "选项B内容",
-                        "C": "选项C内容",
-                        "D": "选项D内容"
-                    },
-                    "answer": "正确选项字母",
-                    "explanation": "解析内容"
-                },
-                ...
-            ]
-        }`;
-        
-        // Fetch the response
-        const response = await fetchAIResponse(prompt);
-        
-        // Parse the questions from the response
-        const questions = parseQuestionsFromResponse(response);
-        
-        if (!questions || questions.length === 0) {
-            throw new Error('No questions generated');
-        }
-        
-        // Store the questions in the state
-        state.questions = questions;
-        state.currentQuestionIndex = 0;
-        state.userAnswers = new Array(questions.length).fill(null);
-        
-        // Display the first question
-        displayCurrentQuestion();
-        
-        // Show the questions container
-        questionsContainer.classList.remove('hidden');
-        
-        // Update navigation buttons
-        updateNavigationButtons();
-        
-        console.log('Questions generated successfully:', questions);
-    } catch (error) {
-        console.error('Error generating questions:', error);
-        showSystemMessage('生成题目时出错，请稍后再试', 'error');
-        
-        // Show empty state
-        if (emptyState) {
-            emptyState.classList.remove('hidden');
-        }
-    } finally {
-        // Hide loading indicator
-        testLoadingIndicator.classList.add('hidden');
-    }
-}
-
-// Fix the initializePoetryDropdowns function to handle the school reference error
-function initializePoetryDropdowns() {
-    console.log('Poetry functionality initializing...');
-    
-    // Get the poetry type and style selects
-    const poetryTypeSelect = document.getElementById('poetry-type-select');
-    const poetryStyleSelect = document.getElementById('poetry-style-select');
-    
-    if (!poetryTypeSelect || !poetryStyleSelect) {
-        console.error('Poetry select elements not found');
-        return;
-    }
-    
-    console.log('Found poetry type and style selects');
-    
-    // Update style options based on the selected type
-    updatePoetryStyleOptions(poetryTypeSelect.value);
-    
-    // Add event listener to type select to update style options
-    poetryTypeSelect.addEventListener('change', function() {
-        console.log('Poetry type changed to:', this.value);
-        updatePoetryStyleOptions(this.value);
-    });
-    
-    // Get the learn poetry button
-    const learnPoetryButton = document.getElementById('learn-poetry-button');
-    if (learnPoetryButton) {
-        learnPoetryButton.addEventListener('click', handleLearnPoetryClick);
-        console.log('Learn poetry button event listener added');
-    }
-    
-    console.log('Poetry functionality initialized');
-}
