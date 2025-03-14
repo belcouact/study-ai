@@ -1282,93 +1282,120 @@ D. [选项D内容]
 
 // Function to show loading indicator with spinning icon
 function showLoadingIndicator() {
-    // Get the questions display container
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    if (!questionsDisplayContainer) {
-        console.error('Questions display container not found in showLoadingIndicator');
-        return;
-    }
+    console.log('Showing loading indicator');
     
-    // Hide empty state if it exists
-    const emptyState = document.getElementById('empty-state');
-    if (emptyState) {
-        emptyState.classList.add('hidden');
-    }
+    // Get the active panel
+    const activePanel = document.querySelector('.panel-button.active');
+    const panelType = activePanel ? activePanel.id.replace('-button', '') : 'qa';
     
-    // Create loading indicator if it doesn't exist
-    let loadingIndicator = document.getElementById('test-loading-indicator');
-    if (!loadingIndicator) {
-        loadingIndicator = document.createElement('div');
-        loadingIndicator.id = 'test-loading-indicator';
-        loadingIndicator.style.cssText = `
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            margin: 20px auto;
-            width: 80%;
-            max-width: 500px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 100;
-        `;
+    console.log('Active panel:', panelType);
+    
+    // Get the appropriate loading element based on the panel
+    let loadingElement;
+    
+    if (panelType === 'qa') {
+        // For QA panel
+        loadingElement = document.getElementById('loading');
+    } else if (panelType === 'create') {
+        // For test panel
+        loadingElement = document.getElementById('test-loading-indicator');
         
-        // Create spinning icon
-        const spinnerIcon = document.createElement('div');
-        spinnerIcon.className = 'spinner-icon';
-        spinnerIcon.style.cssText = `
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e2e8f0;
-            border-top: 4px solid #4299e1;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        `;
-        
-        // Create loading text
-        const loadingText = document.createElement('div');
-        loadingText.textContent = 'Thinking...';
-        loadingText.style.cssText = `
-            font-size: 18px;
-            color: #4a5568;
-            font-weight: 500;
-        `;
-        
-        // Add spinner animation
-        const styleElement = document.createElement('style');
-        styleElement.textContent = `
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
+        // If test loading indicator doesn't exist, create it
+        if (!loadingElement) {
+            const questionsContainer = document.getElementById('questions-display-container');
+            
+            if (questionsContainer) {
+                loadingElement = document.createElement('div');
+                loadingElement.id = 'test-loading-indicator';
+                loadingElement.innerHTML = `
+                    <div class="spinner-icon"></div>
+                    <p>正在生成题目，请稍候...</p>
+                `;
+                
+                // Insert before questions container
+                questionsContainer.parentNode.insertBefore(loadingElement, questionsContainer);
+            } else {
+                console.warn('Questions display container not found');
+                
+                // Try to find create container as fallback
+                const createContainer = document.getElementById('create-container');
+                if (createContainer) {
+                    loadingElement = document.createElement('div');
+                    loadingElement.id = 'test-loading-indicator';
+                    loadingElement.innerHTML = `
+                        <div class="spinner-icon"></div>
+                        <p>正在生成题目，请稍候...</p>
+                    `;
+                    
+                    // Append to create container
+                    createContainer.appendChild(loadingElement);
+                } else {
+                    console.error('Create container not found');
+                }
             }
-        `;
-        document.head.appendChild(styleElement);
+        }
+    } else if (panelType === 'poetry') {
+        // For poetry panel
+        loadingElement = document.getElementById('poetry-loading');
         
-        // Assemble loading indicator
-        loadingIndicator.appendChild(spinnerIcon);
-        loadingIndicator.appendChild(loadingText);
-        
-        // Add to container without clearing its contents
-        questionsDisplayContainer.style.position = 'relative';
-        questionsDisplayContainer.appendChild(loadingIndicator);
-        questionsDisplayContainer.classList.remove('hidden');
+        // If poetry loading indicator doesn't exist, create it
+        if (!loadingElement) {
+            const poetryContent = document.querySelector('.poetry-content');
+            
+            if (poetryContent) {
+                loadingElement = document.createElement('div');
+                loadingElement.id = 'poetry-loading';
+                loadingElement.className = 'poetry-loading';
+                loadingElement.innerHTML = `
+                    <div class="spinner"></div>
+                    <p>正在生成诗词，请稍候...</p>
+                `;
+                
+                // Append to poetry content
+                poetryContent.appendChild(loadingElement);
+            } else {
+                console.error('Poetry content not found');
+            }
+        }
+    }
+    
+    // Show the loading element if found
+    if (loadingElement) {
+        loadingElement.classList.remove('hidden');
     } else {
-        loadingIndicator.style.display = 'flex';
+        console.warn('Loading element not found for panel:', panelType);
     }
 }
 
 // Function to hide loading indicator
 function hideLoadingIndicator() {
-    const loadingIndicator = document.getElementById('test-loading-indicator');
-    if (loadingIndicator) {
-        loadingIndicator.style.display = 'none';
+    console.log('Hiding loading indicator');
+    
+    // Get the active panel
+    const activePanel = document.querySelector('.panel-button.active');
+    const panelType = activePanel ? activePanel.id.replace('-button', '') : 'qa';
+    
+    console.log('Active panel:', panelType);
+    
+    // Get the appropriate loading element based on the panel
+    let loadingElement;
+    
+    if (panelType === 'qa') {
+        // For QA panel
+        loadingElement = document.getElementById('loading');
+    } else if (panelType === 'create') {
+        // For test panel
+        loadingElement = document.getElementById('test-loading-indicator');
+    } else if (panelType === 'poetry') {
+        // For poetry panel
+        loadingElement = document.getElementById('poetry-loading');
+    }
+    
+    // Hide the loading element if found
+    if (loadingElement) {
+        loadingElement.classList.add('hidden');
+    } else {
+        console.warn('Loading element not found for panel:', panelType);
     }
 }
 
@@ -2563,151 +2590,34 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupChatButtons() {
     console.log('Setting up chat buttons');
     
-    // First, ensure the chat interface exists
-    createChatInterface();
+    // Get chat elements
+    const chatInput = document.getElementById('user-input');
+    const chatOutput = document.getElementById('output');
+    const optimizeButton = document.getElementById('optimize-button');
+    const submitButton = document.getElementById('submit-button');
     
-    // Now get the chat input and response area
-    const chatInput = document.getElementById('chat-input');
-    const chatResponse = document.getElementById('chat-response');
-    
-    if (!chatInput || !chatResponse) {
-        console.error('Chat input or response area not found even after creation');
+    // Check if all elements exist
+    if (!chatInput || !chatOutput || !optimizeButton || !submitButton) {
+        console.error('Chat elements not found');
         return;
     }
     
-    // Set up optimize button
-    const optimizeButton = document.getElementById('optimize-button');
-    if (optimizeButton) {
-        optimizeButton.addEventListener('click', function() {
-            const questionText = chatInput.value.trim();
-            
-            if (!questionText) {
-                showSystemMessage('请先输入问题内容', 'warning');
-            return;
-        }
-        
-            // Get educational context from sidebar
-            const educationalContext = getEducationalContext();
-            
-            // Show loading state
-            optimizeButton.disabled = true;
-            optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
-            
-            // Prepare the prompt for optimization with educational context
-            const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值：
-
-教育背景：
-${educationalContext}
-
-原始问题：${questionText}
-
-请返回优化后的问题，使其更适合上述教育背景的学生，保持原始意图但使其更加清晰、准确和有教育意义。
-优化时请考虑学生的认知水平、课程要求和教育阶段，使问题更有针对性。`;
-            
-            // Call the API
-            fetchAIResponse(prompt)
-                .then(response => {
-                    // Extract the optimized question
-                    const optimizedContent = extractContentFromResponse(response);
-                    
-                    // Update the chat input with the optimized question
-                    chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
-                    
-                    // Focus the input and move cursor to end
-                    chatInput.focus();
-                    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
-            
-            // Show success message
-                    showSystemMessage('问题已根据教育背景成功优化！', 'success');
-                })
-                .catch(error => {
-            console.error('Error optimizing question:', error);
-                    showSystemMessage('优化问题时出错，请重试。', 'error');
-                })
-                .finally(() => {
-                    // Reset button state
-                    optimizeButton.disabled = false;
-                    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
-                });
-        });
+    // Remove any existing event listeners by cloning the elements
+    const newOptimizeButton = optimizeButton.cloneNode(true);
+    const newSubmitButton = submitButton.cloneNode(true);
+    
+    if (optimizeButton.parentNode) {
+        optimizeButton.parentNode.replaceChild(newOptimizeButton, optimizeButton);
     }
     
-    // Set up submit button
-    const submitButton = document.getElementById('submit-button');
-    if (submitButton) {
-        submitButton.addEventListener('click', function() {
-            const questionText = chatInput.value.trim();
-            
-            if (!questionText) {
-                showSystemMessage('请先输入问题内容', 'warning');
-            return;
-        }
-        
-            // Get educational context from sidebar
-            const educationalContext = getEducationalContext();
-            
-            // Show loading state
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
-            chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
-            
-            // Prepare the prompt for the AI with educational context
-            const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
-
-教育背景：
-${educationalContext}
-
-问题：${questionText}
-
-请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
-如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平和课程要求。
-如果可能，请提供一些例子或应用场景来帮助理解。`;
-            
-            // Call the API
-            fetchAIResponse(prompt)
-                .then(response => {
-                    // Extract the AI response
-                    const aiResponse = extractContentFromResponse(response);
-                    
-                    // Format the response with MathJax
-                    const formattedResponse = formatMathExpressions(aiResponse);
-                    
-                    // Get context summary for display
-                    const contextSummary = getContextSummary();
-                    
-                    // Display the response with educational context
-                    chatResponse.innerHTML = `
-                        <div class="response-header">
-                            <i class="fas fa-robot"></i> AI 助手回答
-                            ${contextSummary ? `<span class="context-badge">${contextSummary}</span>` : ''}
-                        </div>
-                        <div class="response-content">
-                            ${formattedResponse}
-                        </div>
-                    `;
-                    
-                    // Render MathJax in the response
-                    if (window.MathJax) {
-                        MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error submitting question:', error);
-                    chatResponse.innerHTML = `
-                        <div class="error-message">
-                            <i class="fas fa-exclamation-circle"></i>
-                            抱歉，处理您的问题时出现了错误。请重试。
-            </div>
-        `;
-                    showSystemMessage('提交问题时出错，请重试。', 'error');
-                })
-                .finally(() => {
-                    // Reset button state
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
-                });
-        });
+    if (submitButton.parentNode) {
+        submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
     }
+    
+    // Set up event listeners for the new buttons
+    setupButtonEventListeners(chatInput, chatOutput, newOptimizeButton, newSubmitButton);
+    
+    console.log('Chat buttons set up successfully');
 }
 
 // Function to get educational context from any available dropdowns in the document
