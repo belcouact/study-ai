@@ -48,28 +48,83 @@
                         </div>
                     </div>
                     
-                    <!-- Test Configuration Frame -->
-                    <div class="sidebar-frame">
-                        <h3 class="frame-title">测验</h3>
-                        <div class="frame-content">
+                    <!-- External AI Services -->
+                    <div class="external-services">
+                        <a href="https://yuanbao.tencent.com/chat/naQivTmsDa" target="_blank" rel="noopener" class="external-button">
+                            <i class="fas fa-external-link-alt"></i> 腾讯元宝
+                        </a>
+                        <a href="https://tongyi.aliyun.com/qianwen/" target="_blank" rel="noopener" class="external-button">
+                            <i class="fas fa-external-link-alt"></i> 通义千问
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Footer text -->
+                <div class="panel-footer">
+                    <p>内容提供：DeepSeek</p>
+                    <p>代码：Claude-3.7-sonnet</p>
+                    <p>编译器：Cursor</p>
+                    <p>网页部署：Github / Cloudflare</p>
+                </div>
+            </div>
+            
+            <!-- Sidebar Toggle Button -->
+            <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <!-- Right Content Area -->
+            <div class="content-area">
+                <!-- Q&A Chat Container -->
+                <div id="qa-container" class="container">
+                    <div class="chat-container">
+                        <div class="input-container">
+                            <div class="welcome-message">你好，我是你的AI老师，有什么我可以帮你的吗？</div>
+                            <textarea id="user-input" placeholder="请输入你的问题..."></textarea>
+                            <div class="button-container">
+                                <div class="right-controls">
+                                    <button id="optimize-button" title="优化您的问题以获得更好的回答">优化问题</button>
+                                    <button id="submit-button">提交问题</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="output-container">
+                            <div id="loading" class="hidden">
+                                <div class="spinner"></div>
+                                <p>Thinking...</p>
+                            </div>
+                            <div id="output">
+                                <!-- Output will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Create Questions Container (initially hidden) -->
+                <div id="create-container" class="container hidden">
+                    <!-- Test Configuration moved to the top of the test page -->
+                    <div class="test-config-header">
+                        <h3>测验配置</h3>
+                        <div class="test-config-controls">
                             <div class="dropdown-container">
-                                <label for="subject-select-sidebar">科目</label>
-                                <select id="subject-select-sidebar" name="subject">
+                                <label for="subject-select">科目</label>
+                                <select id="subject-select" name="subject">
                                     <!-- Options will be populated dynamically -->
                                 </select>
                             </div>
                             
                             <div class="dropdown-container">
-                                <label for="semester-select-sidebar">学期</label>
-                                <select id="semester-select-sidebar" name="semester">
+                                <label for="semester-select">学期</label>
+                                <select id="semester-select" name="semester">
                                     <option value="上学期">上学期</option>
                                     <option value="下学期">下学期</option>
                                 </select>
                             </div>
                             
                             <div class="dropdown-container">
-                                <label for="difficulty-select-sidebar">难度</label>
-                                <select id="difficulty-select-sidebar" name="difficulty">
+                                <label for="difficulty-select">难度</label>
+                                <select id="difficulty-select" name="difficulty">
                                     <option value="容易">容易</option>
                                     <option value="中等">中等</option>
                                     <option value="偏难">偏难</option>
@@ -77,153 +132,100 @@
                             </div>
                             
                             <div class="dropdown-container">
-                                <label for="question-count-select-sidebar">题数</label>
-                                <select id="question-count-select-sidebar" name="questionCount">
+                                <label for="question-count-select">题数</label>
+                                <select id="question-count-select" name="questionCount">
                                     <option value="5">5</option>
                                     <option value="10">10</option>
                                 </select>
                             </div>
+                            
+                            <button id="generate-questions-button" class="primary-button">出题</button>
                         </div>
+                    </div>
+                    
+                    <!-- Questions display container moved below the config -->
+                    <div id="questions-display-container" class="questions-display-container hidden">
+                        <!-- Empty state message -->
+                        <div id="empty-state" class="empty-state">
+                            <i class="fas fa-book-open empty-state-icon"></i>
+                            <h3>准备好开始测验了吗？</h3>
+                            <p>选择科目、学期、难度和题数，然后点击"出题"按钮生成题目。</p>
+                        </div>
+                        
+                        <!-- Question content will be dynamically inserted here -->
+                        <div id="question-counter" class="question-counter"></div>
+                        <div id="question-text" class="question-text"></div>
+                        <div id="choices-container" class="choices-container"></div>
+                        
+                        <!-- Answer container -->
+                        <div id="answer-container" class="answer-container hidden">
+                            <div id="answer-result" class="answer-result"></div>
+                            <div id="answer-explanation" class="answer-explanation"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation controls moved to the bottom -->
+                    <div class="navigation-controls">
+                        <button id="prev-question-button" class="nav-button" disabled>上一题</button>
+                        <button id="next-question-button" class="nav-button" disabled>下一题</button>
                     </div>
                 </div>
                 
-                <!-- External AI Services -->
-                <div class="external-services">
-                    <a href="https://yuanbao.tencent.com/chat/naQivTmsDa" target="_blank" rel="noopener" class="external-button">
-                        <i class="fas fa-external-link-alt"></i> 腾讯元宝
-                    </a>
-                    <a href="https://tongyi.aliyun.com/qianwen/" target="_blank" rel="noopener" class="external-button">
-                        <i class="fas fa-external-link-alt"></i> 通义千问
-                    </a>
-                </div>
-            </div>
-            
-            <!-- Footer text -->
-            <div class="panel-footer">
-                <p>内容提供：DeepSeek</p>
-                <p>代码：Claude-3.7-sonnet</p>
-                <p>编译器：Cursor</p>
-                <p>网页部署：Github / Cloudflare</p>
-            </div>
-        </div>
-        
-        <!-- Sidebar Toggle Button -->
-        <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        
-        <!-- Right Content Area -->
-        <div class="content-area">
-            <!-- Q&A Chat Container -->
-            <div id="qa-container" class="container">
-                <div class="chat-container">
-                    <div class="input-container">
-                        <div class="welcome-message">你好，我是你的AI老师，有什么我可以帮你的吗？</div>
-                        <textarea id="user-input" placeholder="请输入你的问题..."></textarea>
-                        <div class="button-container">
-                            <div class="right-controls">
-                                <button id="optimize-button" title="优化您的问题以获得更好的回答">优化问题</button>
-                                <button id="submit-button">提交问题</button>
+                <!-- Poetry Container -->
+                <div id="poetry-container" class="container">
+                    <div class="poetry-header">
+                        <div class="poetry-controls">
+                            <div class="poetry-selectors">
+                                <div class="selector-group">
+                                    <label for="poetry-type-select">类型</label>
+                                    <select id="poetry-type-select" class="poetry-select">
+                                        <option value="唐诗">唐诗</option>
+                                        <option value="宋词">宋词</option>
+                                        <option value="元曲">元曲</option>
+                                    </select>
+                                </div>
+                                <div class="selector-group">
+                                    <label for="poetry-style-select">风格</label>
+                                    <select id="poetry-style-select" class="poetry-select">
+                                        <option value="任意">任意</option>
+                                        <option value="山水">山水</option>
+                                        <option value="边塞">边塞</option>
+                                        <option value="浪漫">浪漫</option>
+                                        <option value="现实">现实</option>
+                                    </select>
+                                </div>
+                                <button id="learn-poetry-button" class="primary-button poetry-button">学习诗词</button>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="output-container">
-                        <div id="loading" class="hidden">
-                            <div class="spinner"></div>
-                            <p>Thinking...</p>
+                    <div class="poetry-content">
+                        <div id="poetry-empty-state" class="empty-state">
+                            <img src="assets/poetry-icon.svg" alt="Poetry Icon" class="empty-state-icon">
+                            <h3>开始学习古诗词</h3>
+                            <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成适合您学习阶段的诗词。</p>
                         </div>
-                        <div id="output">
-                            <!-- Output will appear here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Create Questions Container (initially hidden) -->
-            <div id="create-container" class="container hidden">
-                <!-- Questions display container moved to the top -->
-                <div id="questions-display-container" class="questions-display-container hidden">
-                    <!-- Empty state message -->
-                    <div id="empty-state" class="empty-state">
-                        <i class="fas fa-book-open empty-state-icon"></i>
-                        <h3>准备好开始测验了吗？</h3>
-                        <p>使用左侧边栏选择学校类型、年级、学期、科目、难度和题数，然后点击"出题"按钮生成题目。</p>
-                    </div>
-                    
-                    <!-- Question content will be dynamically inserted here -->
-                    <div id="question-counter" class="question-counter"></div>
-                    <div id="question-text" class="question-text"></div>
-                    <div id="choices-container" class="choices-container"></div>
-                    
-                    <!-- Answer container -->
-                    <div id="answer-container" class="answer-container hidden">
-                        <div id="answer-result" class="answer-result"></div>
-                        <div id="answer-explanation" class="answer-explanation"></div>
-                    </div>
-                </div>
-                
-                <!-- Navigation controls moved to the bottom -->
-                <div class="navigation-controls">
-                    <button id="prev-question-button" class="nav-button" disabled>上一题</button>
-                    <button id="next-question-button" class="nav-button" disabled>下一题</button>
-                </div>
-            </div>
-            
-            <!-- Poetry Container -->
-            <div id="poetry-container" class="container">
-                <div class="poetry-header">
-                    <div class="poetry-controls">
-                        <div class="poetry-selectors">
-                            <div class="selector-group">
-                                <label for="poetry-type-select">类型</label>
-                                <select id="poetry-type-select" class="poetry-select">
-                                    <option value="唐诗">唐诗</option>
-                                    <option value="宋词">宋词</option>
-                                    <option value="元曲">元曲</option>
-                                </select>
+                        <div id="poetry-display" class="hidden">
+                            <div class="poem-navigation">
+                                <button id="prev-poem-button" class="poem-nav-button" disabled>
+                                    <i class="fas fa-arrow-left"></i>
+                                </button>
+                                <span class="poem-counter">1 / 5</span>
+                                <button id="next-poem-button" class="poem-nav-button">
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
                             </div>
-                            <div class="selector-group">
-                                <label for="poetry-style-select">风格</label>
-                                <select id="poetry-style-select" class="poetry-select">
-                                    <option value="任意">任意</option>
-                                    <option value="山水">山水</option>
-                                    <option value="边塞">边塞</option>
-                                    <option value="浪漫">浪漫</option>
-                                    <option value="现实">现实</option>
-                                </select>
-                            </div>
-                            <button id="learn-poetry-button" class="primary-button poetry-button">学习诗词</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="poetry-content">
-                    <div id="poetry-empty-state" class="empty-state">
-                        <img src="assets/poetry-icon.svg" alt="Poetry Icon" class="empty-state-icon">
-                        <h3>开始学习古诗词</h3>
-                        <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成适合您学习阶段的诗词。</p>
-                    </div>
-                    <div id="poetry-display" class="hidden">
-                        <div class="poem-navigation">
-                            <button id="prev-poem-button" class="poem-nav-button" disabled>
-                                <i class="fas fa-arrow-left"></i>
-                            </button>
-                            <span class="poem-counter">1 / 5</span>
-                            <button id="next-poem-button" class="poem-nav-button">
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
-                        <div class="poem-display">
-                            <h2 class="poem-title"></h2>
-                            <p class="poem-author"></p>
-                            <div class="poem-content"></div>
-                            <div class="poem-section">
-                                <h3>创作背景</h3>
-                                <div class="poem-background"></div>
-                            </div>
-                            <div class="poem-section">
-                                <h3>赏析</h3>
-                                <div class="poem-explanation"></div>
+                            <div class="poem-display">
+                                <h2 class="poem-title"></h2>
+                                <p class="poem-author"></p>
+                                <div class="poem-content"></div>
+                                <div class="poem-section">
+                                    <h3>创作背景</h3>
+                                    <div class="poem-background"></div>
+                                </div>
+                                <div class="poem-section">
+                                    <h3>赏析</h3>
+                                    <div class="poem-explanation"></div>
+                                </div>
                             </div>
                         </div>
                     </div>

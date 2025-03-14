@@ -794,6 +794,88 @@ button:active {
     min-height: calc(100vh - 60px);
 }
 
+/* Test Configuration Header */
+.test-config-header {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.test-config-header h3 {
+    margin: 0 0 1rem 0;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.test-config-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+.test-config-controls .dropdown-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0;
+}
+
+.test-config-controls .dropdown-container label {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    font-weight: 500;
+    width: auto;
+    min-width: 40px;
+}
+
+.test-config-controls .dropdown-container select {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: white;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    min-width: 100px;
+}
+
+.test-config-controls .primary-button {
+    margin-left: auto;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.test-config-controls .primary-button:hover {
+    background-color: #2980b9;
+}
+
+@media (max-width: 768px) {
+    .test-config-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .test-config-controls .dropdown-container {
+        width: 100%;
+    }
+    
+    .test-config-controls .primary-button {
+        margin-left: 0;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+}
+
 /* Loading indicator for tests */
 #test-loading-indicator {
     display: flex;
