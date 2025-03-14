@@ -478,6 +478,11 @@ function displayCurrentQuestion() {
                 const choiceItem = document.createElement('div');
                 choiceItem.className = 'choice-item';
                 
+                // Add selected class if this option was previously selected
+                if (state.userAnswers[state.currentQuestionIndex] === key) {
+                    choiceItem.classList.add('selected');
+                }
+                
                 const radio = document.createElement('input');
                 radio.type = 'radio';
                 radio.name = 'question-choice';
@@ -500,17 +505,45 @@ function displayCurrentQuestion() {
                 // Add event listener to radio button
                 radio.addEventListener('change', function() {
                     if (this.checked) {
+                        // Remove selected class from all choice items
+                        document.querySelectorAll('.choice-item').forEach(item => {
+                            item.classList.remove('selected');
+                        });
+                        
+                        // Add selected class to this choice item
+                        choiceItem.classList.add('selected');
+                        
                         // Save user's answer
                         state.userAnswers[state.currentQuestionIndex] = key;
                         
-                        // Show answer if this is the first time selecting an option
-                        const answerContainer = document.getElementById('answer-container');
-                        if (answerContainer && answerContainer.classList.contains('hidden')) {
-                            displayAnswer(key);
+                        // Enable submit button if it exists
+                        const submitButton = document.getElementById('submit-answer-button');
+                        if (submitButton) {
+                            submitButton.disabled = false;
+                        } else {
+                            // Create submit button if it doesn't exist
+                            createSubmitButton();
                         }
                     }
                 });
+                
+                // Add click event to the entire choice item
+                choiceItem.addEventListener('click', function(e) {
+                    // Prevent clicking on the radio button itself from triggering this
+                    if (e.target !== radio) {
+                        radio.checked = true;
+                        
+                        // Trigger the change event
+                        const changeEvent = new Event('change');
+                        radio.dispatchEvent(changeEvent);
+                    }
+                });
             });
+            
+            // Create submit button if user has already selected an answer
+            if (state.userAnswers[state.currentQuestionIndex]) {
+                createSubmitButton();
+            }
         } else {
             console.error('Question options are missing or in an unexpected format');
             choicesContainer.innerHTML = '<div class="error-message">选项加载失败</div>';
@@ -520,8 +553,8 @@ function displayCurrentQuestion() {
     // Hide answer container initially
     const answerContainer = document.getElementById('answer-container');
     if (answerContainer) {
-        // If user has already answered this question, show the answer
-        if (state.userAnswers[state.currentQuestionIndex]) {
+        // If user has already answered this question and seen the answer, show the answer
+        if (state.userAnswers[state.currentQuestionIndex] && state.answersShown && state.answersShown[state.currentQuestionIndex]) {
             displayAnswer(state.userAnswers[state.currentQuestionIndex]);
         } else {
             answerContainer.classList.add('hidden');
@@ -530,6 +563,48 @@ function displayCurrentQuestion() {
     
     // Update navigation buttons
     updateNavigationButtons();
+}
+
+// Function to create submit button
+function createSubmitButton() {
+    // Check if submit button already exists
+    let submitButton = document.getElementById('submit-answer-button');
+    
+    if (!submitButton) {
+        // Get the choices container
+        const choicesContainer = document.getElementById('choices-container');
+        
+        if (choicesContainer) {
+            // Create submit button
+            submitButton = document.createElement('button');
+            submitButton.id = 'submit-answer-button';
+            submitButton.className = 'submit-answer-button';
+            submitButton.textContent = '提交答案';
+            
+            // Disable button if no answer is selected
+            submitButton.disabled = !state.userAnswers[state.currentQuestionIndex];
+            
+            // Add event listener to submit button
+            submitButton.addEventListener('click', function() {
+                // Display the answer
+                displayAnswer(state.userAnswers[state.currentQuestionIndex]);
+                
+                // Mark this question as answered and shown
+                if (!state.answersShown) {
+                    state.answersShown = [];
+                }
+                state.answersShown[state.currentQuestionIndex] = true;
+                
+                // Disable the submit button
+                this.disabled = true;
+            });
+            
+            // Add submit button after choices container
+            choicesContainer.insertAdjacentElement('afterend', submitButton);
+        }
+    }
+    
+    return submitButton;
 }
 
 // Function to display the answer and explanation
@@ -561,6 +636,16 @@ function displayAnswer(selectedValue) {
         // Display explanation
         answerExplanation.innerHTML = `<div class="explanation-title">解析：</div>
             <div class="explanation-content">${formatMathExpressions(currentQuestion.explanation)}</div>`;
+        
+        // Highlight the correct answer
+        document.querySelectorAll('.choice-item').forEach(item => {
+            const radio = item.querySelector('input[type="radio"]');
+            if (radio && radio.value === currentQuestion.answer) {
+                item.classList.add('correct-answer');
+            } else if (radio && radio.value === selectedValue && selectedValue !== currentQuestion.answer) {
+                item.classList.add('incorrect-answer');
+            }
+        });
     }
 }
 
@@ -3351,32 +3436,33 @@ function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, subm
         }
         
         // Get the loading element
-        const loadingElement = document.getElementById('loading');
+        let loadingElement = document.getElementById('loading');
+        
+        // If loading element doesn't exist, create it
+        if (!loadingElement) {
+            console.log('Loading element not found, creating new one');
+            const outputContainer = document.querySelector('.output-container');
+            
+            if (outputContainer) {
+                loadingElement = document.createElement('div');
+                loadingElement.id = 'loading';
+                loadingElement.innerHTML = `
+                    <div class="spinner"></div>
+                    <p>Thinking...</p>
+                `;
+                
+                // Add to the output container
+                outputContainer.insertBefore(loadingElement, outputContainer.firstChild);
+                console.log('Created new loading element');
+            } else {
+                console.error('Output container not found');
+            }
+        }
         
         // Show loading indicator
         if (loadingElement) {
             loadingElement.classList.remove('hidden');
             console.log('Loading indicator shown');
-        } else {
-            console.error('Loading element not found');
-            
-            // Try to create a loading element
-            const outputContainer = document.querySelector('.output-container');
-            if (outputContainer) {
-                const newLoadingElement = document.createElement('div');
-                newLoadingElement.id = 'loading';
-                newLoadingElement.innerHTML = `
-                    <div class="spinner"></div>
-                    <p>Thinking...</p>
-                `;
-                
-                // Insert at the beginning of the output container
-                outputContainer.insertBefore(newLoadingElement, outputContainer.firstChild);
-                
-                // Now show it
-                newLoadingElement.classList.remove('hidden');
-                console.log('Created and showed new loading indicator');
-            }
         }
         
         try {
@@ -3393,7 +3479,8 @@ ${educationalContext}
 
 请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
 如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平。
-如果可能，请提供一些例子或应用场景来帮助理解。`;
+如果可能，请提供一些例子或应用场景来帮助理解。
+请使用段落、标题和列表等格式来组织你的回答，使其更易于阅读。`;
             
             console.log('Fetching AI response with prompt:', prompt);
             
@@ -3417,12 +3504,9 @@ ${educationalContext}
                 const messageElement = document.createElement('div');
                 messageElement.className = 'ai-message';
                 
-                // Format the content with math expressions if the function exists
-                if (typeof formatMathExpressions === 'function') {
-                    messageElement.innerHTML = formatMathExpressions(content);
-                } else {
-                    messageElement.textContent = content;
-                }
+                // Format the content with math expressions and improve readability
+                const formattedContent = formatContentForDisplay(content);
+                messageElement.innerHTML = formattedContent;
                 
                 // Add the message to the output
                 chatResponse.appendChild(messageElement);
@@ -3527,164 +3611,38 @@ ${educationalContext}
     console.log('Button event listeners set up successfully');
 }
 
-// Function to get curriculum information based on school, grade and subject
-function getCurriculumInfo(school, grade, subject) {
-    // Default curriculum info
-    let curriculumInfo = '根据中国教育大纲标准提供适合的回答。';
+// Function to format content for better display
+function formatContentForDisplay(content) {
+    if (!content) return '';
     
-    // Primary school curriculum info
-    if (school.includes('小学')) {
-        curriculumInfo = '根据小学教育大纲，注重基础知识的讲解，使用简单易懂的语言，多用具体例子，避免抽象概念。';
-        
-        if (subject.includes('数学')) {
-            if (grade.includes('一年级') || grade.includes('二年级')) {
-                curriculumInfo += '一二年级数学主要包括20以内的加减法、100以内的加减法、认识图形、认识时间等基础内容。';
-            } else if (grade.includes('三年级') || grade.includes('四年级')) {
-                curriculumInfo += '三四年级数学主要包括乘除法、分数初步、小数初步、面积、周长等内容。';
-            } else if (grade.includes('五年级') || grade.includes('六年级')) {
-                curriculumInfo += '五六年级数学主要包括分数四则运算、小数四则运算、比例、百分数、统计等内容。';
-            }
-        } else if (subject.includes('语文')) {
-            curriculumInfo += '小学语文注重汉字识记、阅读理解、写作基础等能力培养。';
-        } else if (subject.includes('英语')) {
-            curriculumInfo += '小学英语注重基础词汇、简单句型和日常交流用语的学习。';
-        } else if (subject.includes('科学')) {
-            curriculumInfo += '小学科学注重培养观察能力和好奇心，了解自然现象和简单科学原理。';
-        }
-    }
-    // Middle school curriculum info
-    else if (school.includes('初中')) {
-        curriculumInfo = '根据初中教育大纲，注重系统性知识的讲解，可以引入一定的抽象概念，但需要配合例子说明。';
-        
-        if (subject.includes('数学')) {
-            if (grade.includes('初一')) {
-                curriculumInfo += '初一数学主要包括有理数、整式、一元一次方程、几何初步等内容。';
-            } else if (grade.includes('初二')) {
-                curriculumInfo += '初二数学主要包括二元一次方程组、不等式、相似三角形、勾股定理等内容。';
-            } else if (grade.includes('初三')) {
-                curriculumInfo += '初三数学主要包括一元二次方程、二次函数、圆、概率初步等内容。';
-            }
-        } else if (subject.includes('物理')) {
-            curriculumInfo += '初中物理注重基本概念、基本规律的理解和简单应用，包括力学、热学、光学、电学等基础内容。';
-        } else if (subject.includes('化学')) {
-            curriculumInfo += '初中化学注重基本概念、元素性质、化学反应等基础内容的学习。';
-        } else if (subject.includes('生物')) {
-            curriculumInfo += '初中生物注重生物的基本结构、功能和分类，以及生态系统的基本概念。';
-        }
-    }
-    // High school curriculum info
-    else if (school.includes('高中')) {
-        curriculumInfo = '根据高中教育大纲，可以使用较为抽象的概念和复杂的理论，注重知识的系统性和应用能力的培养。';
-        
-        if (subject.includes('数学')) {
-            if (grade.includes('高一')) {
-                curriculumInfo += '高一数学主要包括集合、函数、三角函数、平面向量等内容。';
-            } else if (grade.includes('高二')) {
-                curriculumInfo += '高二数学主要包括立体几何、概率统计、数列、导数等内容。';
-            } else if (grade.includes('高三')) {
-                curriculumInfo += '高三数学主要是对高中数学知识的综合复习和应用，注重解题技巧和方法。';
-            }
-        } else if (subject.includes('物理')) {
-            curriculumInfo += '高中物理包括力学、热学、电磁学、原子物理等内容，注重理论与实验的结合。';
-        } else if (subject.includes('化学')) {
-            curriculumInfo += '高中化学包括化学反应原理、元素化学、有机化学等内容，注重微观结构与宏观性质的联系。';
-        } else if (subject.includes('生物')) {
-            curriculumInfo += '高中生物包括分子与细胞、遗传与进化、稳态与环境等内容，注重生命活动的分子基础。';
-        }
+    // First, apply math formatting
+    let formattedContent = formatMathExpressions(content);
+    
+    // Convert markdown-style headers to HTML
+    formattedContent = formattedContent.replace(/^# (.*?)$/gm, '<h1>$1</h1>');
+    formattedContent = formattedContent.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
+    formattedContent = formattedContent.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
+    
+    // Convert markdown-style lists to HTML
+    formattedContent = formattedContent.replace(/^- (.*?)$/gm, '<li>$1</li>');
+    formattedContent = formattedContent.replace(/^(\d+)\. (.*?)$/gm, '<li>$2</li>');
+    
+    // Wrap consecutive list items in ul/ol tags
+    formattedContent = formattedContent.replace(/(<li>.*?<\/li>)\n(<li>.*?<\/li>)/gs, '<ul>$1$2</ul>');
+    
+    // Convert markdown-style emphasis to HTML
+    formattedContent = formattedContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    formattedContent = formattedContent.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Convert line breaks to paragraphs
+    formattedContent = formattedContent.replace(/\n\n/g, '</p><p>');
+    
+    // Wrap the content in a paragraph if it's not already
+    if (!formattedContent.startsWith('<')) {
+        formattedContent = '<p>' + formattedContent + '</p>';
     }
     
-    return curriculumInfo;
-}
-
-// Add a new function to get simplified educational context (school and grade only)
-function getSimplifiedEducationalContext() {
-    console.log('Getting simplified educational context');
-    
-    // Get school and grade from sidebar
-    const schoolSelect = document.getElementById('school-select-sidebar');
-    const gradeSelect = document.getElementById('grade-select-sidebar');
-    
-    if (!schoolSelect || !gradeSelect) {
-        console.error('School or grade select elements not found');
-        return '教育背景：\n未指定';
-    }
-    
-    const school = schoolSelect.value;
-    const grade = gradeSelect.options[gradeSelect.selectedIndex]?.text || '';
-    
-    console.log('Educational context:', { school, grade });
-    
-    // Format the educational context as a string
-    const educationalContext = `教育背景：
-学校类型：${school}
-年级：${grade}`;
-    
-    return educationalContext;
-}
-
-// Add a new function to get simplified context summary (school and grade only)
-function getSimplifiedContextSummary() {
-    // Initialize with default values
-    let school = '';
-    let grade = '';
-    let hasValues = false;
-    
-    // Get all select elements in the document
-    const allSelects = document.querySelectorAll('select');
-    
-    // Scan through all selects to find our dropdowns
-    allSelects.forEach(select => {
-        const id = select.id || '';
-        const name = select.name || '';
-        const value = select.value;
-        
-        // Check if this is a school dropdown
-        if (id.includes('school') || name.includes('school')) {
-            if (value && value !== 'none') {
-                try {
-                    school = select.options[select.selectedIndex].text;
-                } catch (e) {
-                    // Map values to text
-                    const schoolMap = {
-                        'primary': '小学',
-                        'middle': '初中',
-                        'high': '高中'
-                    };
-                    school = schoolMap[value] || value;
-                }
-                hasValues = true;
-            }
-        }
-        
-        // Check if this is a grade dropdown
-        if (id.includes('grade') || name.includes('grade')) {
-            if (value && value !== 'none') {
-                try {
-                    grade = select.options[select.selectedIndex].text;
-                } catch (e) {
-                    grade = value;
-                }
-                hasValues = true;
-            }
-        }
-    });
-    
-    if (!hasValues) {
-        return '';
-    }
-    
-    let summary = '';
-    
-    if (school) {
-        summary += school;
-    }
-    
-    if (grade) {
-        if (summary) summary += ' · ';
-        summary += grade;
-    }
-    
-    return summary;
+    return formattedContent;
 }
 
 // ... existing code ...
@@ -3780,7 +3738,7 @@ function getSimplifiedContextSummary() {
         }
         
         const school = schoolSelect.value;
-        const grade = gradeSelect.options[gradeSelect.selectedIndex].text;
+        const grade = gradeSelect.options[gradeSelect.selectedIndex]?.text;
         
         if (!school || !grade) {
             showSystemMessage('请先选择学校和年级', 'warning');
@@ -5406,32 +5364,33 @@ async function handleSubmitQuestion(question) {
     }
     
     // Get the loading element
-    const loadingElement = document.getElementById('loading');
+    let loadingElement = document.getElementById('loading');
+    
+    // If loading element doesn't exist, create it
+    if (!loadingElement) {
+        console.log('Loading element not found in handleSubmitQuestion, creating new one');
+        const outputContainer = document.querySelector('.output-container');
+        
+        if (outputContainer) {
+            loadingElement = document.createElement('div');
+            loadingElement.id = 'loading';
+            loadingElement.innerHTML = `
+                <div class="spinner"></div>
+                <p>Thinking...</p>
+            `;
+            
+            // Add to the output container
+            outputContainer.insertBefore(loadingElement, outputContainer.firstChild);
+            console.log('Created new loading element in handleSubmitQuestion');
+        } else {
+            console.error('Output container not found in handleSubmitQuestion');
+        }
+    }
     
     // Show loading indicator
     if (loadingElement) {
         loadingElement.classList.remove('hidden');
         console.log('Loading indicator shown in handleSubmitQuestion');
-    } else {
-        console.error('Loading element not found in handleSubmitQuestion');
-        
-        // Try to create a loading element
-        const outputContainer = document.querySelector('.output-container');
-        if (outputContainer) {
-            const newLoadingElement = document.createElement('div');
-            newLoadingElement.id = 'loading';
-            newLoadingElement.innerHTML = `
-                <div class="spinner"></div>
-                <p>Thinking...</p>
-            `;
-            
-            // Insert at the beginning of the output container
-            outputContainer.insertBefore(newLoadingElement, outputContainer.firstChild);
-            
-            // Now show it
-            newLoadingElement.classList.remove('hidden');
-            console.log('Created and showed new loading indicator in handleSubmitQuestion');
-        }
     }
     
     try {
@@ -5448,7 +5407,8 @@ ${educationalContext}
 
 请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
 如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平。
-如果可能，请提供一些例子或应用场景来帮助理解。`;
+如果可能，请提供一些例子或应用场景来帮助理解。
+请使用段落、标题和列表等格式来组织你的回答，使其更易于阅读。`;
         
         console.log('Fetching AI response with prompt in handleSubmitQuestion:', prompt);
         
@@ -5473,8 +5433,9 @@ ${educationalContext}
             const messageElement = document.createElement('div');
             messageElement.className = 'ai-message';
             
-            // Format the content with math expressions
-            messageElement.innerHTML = formatMathExpressions(content);
+            // Format the content with math expressions and improve readability
+            const formattedContent = formatContentForDisplay(content);
+            messageElement.innerHTML = formattedContent;
             
             // Add the message to the output
             outputElement.appendChild(messageElement);
