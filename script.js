@@ -1290,56 +1290,72 @@ function showLoadingIndicator() {
     
     console.log('Active panel:', panelType);
     
-    // Get the appropriate loading element based on the panel
-    let loadingElement;
-    
     if (panelType === 'qa') {
-        // For QA panel
-        loadingElement = document.getElementById('loading');
+        // For QA panel - use the existing loading element
+        const loadingElement = document.getElementById('loading');
+        
+        if (loadingElement) {
+            loadingElement.classList.remove('hidden');
+            console.log('QA loading indicator shown');
+        } else {
+            console.error('QA loading element not found');
+            
+            // Try to create a loading element
+            const outputContainer = document.querySelector('.output-container');
+            if (outputContainer) {
+                const newLoadingElement = document.createElement('div');
+                newLoadingElement.id = 'loading';
+                newLoadingElement.innerHTML = `
+                    <div class="spinner"></div>
+                    <p>Thinking...</p>
+                `;
+                
+                // Add the hidden class initially
+                newLoadingElement.classList.add('hidden');
+                
+                // Insert at the beginning of the output container
+                outputContainer.insertBefore(newLoadingElement, outputContainer.firstChild);
+                
+                // Now show it
+                newLoadingElement.classList.remove('hidden');
+                console.log('Created and showed new QA loading indicator');
+            }
+        }
     } else if (panelType === 'create') {
         // For test panel
-        loadingElement = document.getElementById('test-loading-indicator');
+        let loadingElement = document.getElementById('test-loading-indicator');
         
-        // If test loading indicator doesn't exist, create it
         if (!loadingElement) {
-            const questionsContainer = document.getElementById('questions-display-container');
+            // Create a loading element
+            const createContainer = document.getElementById('create-container');
             
-            if (questionsContainer) {
+            if (createContainer) {
                 loadingElement = document.createElement('div');
                 loadingElement.id = 'test-loading-indicator';
+                loadingElement.className = 'test-loading-indicator';
                 loadingElement.innerHTML = `
                     <div class="spinner-icon"></div>
                     <p>正在生成题目，请稍候...</p>
                 `;
                 
-                // Insert before questions container
-                questionsContainer.parentNode.insertBefore(loadingElement, questionsContainer);
+                // Add to the create container
+                createContainer.appendChild(loadingElement);
+                console.log('Created new test loading indicator');
             } else {
-                console.warn('Questions display container not found');
-                
-                // Try to find create container as fallback
-                const createContainer = document.getElementById('create-container');
-                if (createContainer) {
-                    loadingElement = document.createElement('div');
-                    loadingElement.id = 'test-loading-indicator';
-                    loadingElement.innerHTML = `
-                        <div class="spinner-icon"></div>
-                        <p>正在生成题目，请稍候...</p>
-                    `;
-                    
-                    // Append to create container
-                    createContainer.appendChild(loadingElement);
-                } else {
-                    console.error('Create container not found');
-                }
+                console.error('Create container not found');
+                return;
             }
         }
+        
+        // Show the loading element
+        loadingElement.classList.remove('hidden');
+        console.log('Test loading indicator shown');
     } else if (panelType === 'poetry') {
         // For poetry panel
-        loadingElement = document.getElementById('poetry-loading');
+        let loadingElement = document.getElementById('poetry-loading');
         
-        // If poetry loading indicator doesn't exist, create it
         if (!loadingElement) {
+            // Create a loading element
             const poetryContent = document.querySelector('.poetry-content');
             
             if (poetryContent) {
@@ -1351,19 +1367,18 @@ function showLoadingIndicator() {
                     <p>正在生成诗词，请稍候...</p>
                 `;
                 
-                // Append to poetry content
+                // Add to the poetry content
                 poetryContent.appendChild(loadingElement);
+                console.log('Created new poetry loading indicator');
             } else {
                 console.error('Poetry content not found');
+                return;
             }
         }
-    }
-    
-    // Show the loading element if found
-    if (loadingElement) {
+        
+        // Show the loading element
         loadingElement.classList.remove('hidden');
-    } else {
-        console.warn('Loading element not found for panel:', panelType);
+        console.log('Poetry loading indicator shown');
     }
 }
 
@@ -1371,32 +1386,19 @@ function showLoadingIndicator() {
 function hideLoadingIndicator() {
     console.log('Hiding loading indicator');
     
-    // Get the active panel
-    const activePanel = document.querySelector('.panel-button.active');
-    const panelType = activePanel ? activePanel.id.replace('-button', '') : 'qa';
+    // Hide all possible loading indicators
+    const loadingElements = [
+        document.getElementById('loading'),
+        document.getElementById('test-loading-indicator'),
+        document.getElementById('poetry-loading')
+    ];
     
-    console.log('Active panel:', panelType);
-    
-    // Get the appropriate loading element based on the panel
-    let loadingElement;
-    
-    if (panelType === 'qa') {
-        // For QA panel
-        loadingElement = document.getElementById('loading');
-    } else if (panelType === 'create') {
-        // For test panel
-        loadingElement = document.getElementById('test-loading-indicator');
-    } else if (panelType === 'poetry') {
-        // For poetry panel
-        loadingElement = document.getElementById('poetry-loading');
-    }
-    
-    // Hide the loading element if found
-    if (loadingElement) {
-        loadingElement.classList.add('hidden');
-    } else {
-        console.warn('Loading element not found for panel:', panelType);
-    }
+    loadingElements.forEach(element => {
+        if (element) {
+            element.classList.add('hidden');
+            console.log(`Hidden loading indicator: ${element.id}`);
+        }
+    });
 }
 
 // Function to set up navigation button event listeners
@@ -2590,6 +2592,12 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupChatButtons() {
     console.log('Setting up chat buttons');
     
+    // Check if chat buttons are already set up
+    if (window.chatButtonsInitialized) {
+        console.log('Chat buttons already initialized, skipping setup');
+        return;
+    }
+    
     // Get chat elements
     const chatInput = document.getElementById('user-input');
     const chatOutput = document.getElementById('output');
@@ -2602,20 +2610,11 @@ function setupChatButtons() {
         return;
     }
     
-    // Remove any existing event listeners by cloning the elements
-    const newOptimizeButton = optimizeButton.cloneNode(true);
-    const newSubmitButton = submitButton.cloneNode(true);
+    // Set up event listeners for the buttons
+    setupButtonEventListeners(chatInput, chatOutput, optimizeButton, submitButton);
     
-    if (optimizeButton.parentNode) {
-        optimizeButton.parentNode.replaceChild(newOptimizeButton, optimizeButton);
-    }
-    
-    if (submitButton.parentNode) {
-        submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
-    }
-    
-    // Set up event listeners for the new buttons
-    setupButtonEventListeners(chatInput, chatOutput, newOptimizeButton, newSubmitButton);
+    // Mark chat buttons as initialized
+    window.chatButtonsInitialized = true;
     
     console.log('Chat buttons set up successfully');
 }
@@ -3163,15 +3162,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Add the missing setupButtonEventListeners function
 function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, submitButton) {
-    console.log('Setting up button event listeners');
+    console.log('Setting up button event listeners with new implementation');
+    
+    // Track if event listeners are already set up
+    if (window.eventListenersInitialized) {
+        console.log('Event listeners already initialized, skipping setup');
+        return;
+    }
     
     if (!chatInput || !chatResponse || !optimizeButton || !submitButton) {
         console.error('Required elements not found for setting up button event listeners');
         return;
     }
     
+    // Create new button elements to replace the old ones (removes existing event listeners)
+    const newOptimizeButton = optimizeButton.cloneNode(true);
+    const newSubmitButton = submitButton.cloneNode(true);
+    
+    // Replace the old buttons with the new ones
+    if (optimizeButton.parentNode) {
+        optimizeButton.parentNode.replaceChild(newOptimizeButton, optimizeButton);
+    }
+    
+    if (submitButton.parentNode) {
+        submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
+    }
+    
     // Submit button event listener
-    submitButton.addEventListener('click', async function() {
+    newSubmitButton.addEventListener('click', async function(event) {
+        // Prevent default action and stop propagation
+        event.preventDefault();
+        event.stopPropagation();
+        
+        console.log('Submit button clicked');
+        
         const question = chatInput.value.trim();
         
         if (question === '') {
@@ -3180,7 +3204,10 @@ function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, subm
         }
         
         // Show loading indicator
-        showLoadingIndicator();
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) {
+            loadingElement.classList.remove('hidden');
+        }
         
         try {
             // Get educational context
@@ -3201,14 +3228,16 @@ ${educationalContext}
             
             // Call the API
             const response = await fetchAIResponse(prompt);
-            console.log('API response:', response);
+            console.log('API response received:', response);
             
             // Extract content from response
             const content = extractContentFromResponse(response);
             console.log('Extracted content:', content);
             
             // Hide loading indicator
-            hideLoadingIndicator();
+            if (loadingElement) {
+                loadingElement.classList.add('hidden');
+            }
             
             // Display the response
             if (chatResponse) {
@@ -3236,27 +3265,33 @@ ${educationalContext}
             console.error('Error submitting question:', error);
             
             // Hide loading indicator
-            hideLoadingIndicator();
+            if (loadingElement) {
+                loadingElement.classList.add('hidden');
+            }
             
             // Show error message
-            if (chatResponse) {
-                try {
-                    showSystemMessage('获取回答时出错，请稍后再试', 'error');
-                } catch (e) {
-                    console.error('Error showing system message:', e);
-                    
-                    // Fallback error display
-                    const errorElement = document.createElement('div');
-                    errorElement.className = 'system-message error';
-                    errorElement.textContent = '获取回答时出错，请稍后再试';
-                    chatResponse.appendChild(errorElement);
-                }
+            try {
+                showSystemMessage('获取回答时出错，请稍后再试', 'error');
+            } catch (e) {
+                console.error('Error showing system message:', e);
+                
+                // Fallback error display
+                const errorElement = document.createElement('div');
+                errorElement.className = 'system-message error';
+                errorElement.textContent = '获取回答时出错，请稍后再试';
+                chatResponse.appendChild(errorElement);
             }
         }
     });
     
     // Optimize button event listener
-    optimizeButton.addEventListener('click', async function() {
+    newOptimizeButton.addEventListener('click', async function(event) {
+        // Prevent default action and stop propagation
+        event.preventDefault();
+        event.stopPropagation();
+        
+        console.log('Optimize button clicked');
+        
         const question = chatInput.value.trim();
         
         if (question === '') {
@@ -3265,8 +3300,8 @@ ${educationalContext}
         }
         
         // Add optimizing class to button
-        optimizeButton.classList.add('optimizing');
-        optimizeButton.textContent = '优化中...';
+        newOptimizeButton.classList.add('optimizing');
+        newOptimizeButton.textContent = '优化中...';
         
         try {
             // Prepare the prompt for optimization
@@ -3300,8 +3335,8 @@ ${educationalContext}
             showSystemMessage('优化问题时出错，请稍后再试', 'error');
         } finally {
             // Remove optimizing class from button
-            optimizeButton.classList.remove('optimizing');
-            optimizeButton.textContent = '优化问题';
+            newOptimizeButton.classList.remove('optimizing');
+            newOptimizeButton.textContent = '优化问题';
         }
     });
     
@@ -3309,9 +3344,14 @@ ${educationalContext}
     chatInput.addEventListener('keydown', function(event) {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
-            submitButton.click();
+            newSubmitButton.click();
         }
     });
+    
+    // Mark event listeners as initialized
+    window.eventListenersInitialized = true;
+    
+    console.log('Button event listeners set up successfully');
 }
 
 // Function to get curriculum information based on school, grade and subject
@@ -3837,6 +3877,12 @@ function getSimplifiedContextSummary() {
 function init() {
     console.log('Initializing application');
     
+    // Check if application is already initialized
+    if (window.appInitialized) {
+        console.log('Application already initialized, skipping initialization');
+        return;
+    }
+    
     // Cache DOM elements
     const contentArea = document.querySelector('.content-area');
     const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -3847,6 +3893,17 @@ function init() {
     const qaContainer = document.getElementById('qa-container');
     const createContainer = document.getElementById('create-container');
     const poetryContainer = document.getElementById('poetry-container');
+    
+    // Store references in global scope for later use
+    window.contentArea = contentArea;
+    window.sidebarToggle = sidebarToggle;
+    window.leftPanel = leftPanel;
+    window.qaButton = qaButton;
+    window.createButton = createButton;
+    window.poetryButton = poetryButton;
+    window.qaContainer = qaContainer;
+    window.createContainer = createContainer;
+    window.poetryContainer = poetryContainer;
     
     // Initialize the school and grade dropdowns in the sidebar
     const schoolSelect = document.getElementById('school-select-sidebar');
@@ -3866,11 +3923,14 @@ function init() {
     // Initialize poetry dropdowns
     initializePoetryDropdowns();
     
-    // Set up chat buttons
+    // Set up chat buttons (only once)
     setupChatButtons();
     
     // Initialize empty state
     initializeEmptyState();
+    
+    // Mark application as initialized
+    window.appInitialized = true;
     
     // Log initialization complete
     console.log('Application initialized');
@@ -5305,7 +5365,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('State initialized:', state);
     }
     
-    // Initialize the application
+    // Initialize the application (only once)
     init();
     
     // Set up navigation buttons if they exist
