@@ -6,152 +6,108 @@ let currentModel = 'deepseek-r1';
 function parseQuestionsFromResponse(response) {
     console.log('Parsing questions from response:', response);
     
-    // Extract content from the API response
-    const content = extractContentFromResponse(response);
-    if (!content) {
-        console.error('No content found in response');
-        return [];
-    }
-    
-    console.log('Extracted content:', content);
-    const parsedQuestions = [];
-    
-    // Check if the content already contains "题目：" marker
-    let contentToProcess = content;
-    if (!content.includes('题目：') && !content.startsWith('题目')) {
-        // If not, add it to make parsing consistent
-        contentToProcess = '题目：' + content;
-    }
-    
-    // Split the content by "题目："
-    const questionBlocks = contentToProcess.split(/题目：/).filter(block => block.trim());
-    console.log(`Found ${questionBlocks.length} question blocks`);
-    
-    if (questionBlocks.length === 0) {
-        // If no question blocks found with standard format, try alternative parsing
-        console.log('Attempting alternative parsing method');
+    try {
+        // Try to extract JSON from the response if it's wrapped in markdown code blocks
+        let jsonStr = response;
         
-        // Look for numbered questions like "1." or "Question 1:"
-        const altQuestionBlocks = content.split(/\d+[\.\:]\s+/).filter(block => block.trim());
+        // Check if the response contains a code block with JSON
+        const codeBlockMatch = response.match(/```(?:json)?([\s\S]*?)```/);
+        if (codeBlockMatch && codeBlockMatch[1]) {
+            jsonStr = codeBlockMatch[1].trim();
+            console.log('Extracted JSON from code block:', jsonStr);
+        }
         
-        if (altQuestionBlocks.length > 0) {
-            console.log(`Found ${altQuestionBlocks.length} alternative question blocks`);
+        // Try to parse the JSON
+        let parsedData;
+        try {
+            parsedData = JSON.parse(jsonStr);
+            console.log('Successfully parsed JSON:', parsedData);
+        } catch (jsonError) {
+            console.error('Failed to parse JSON directly:', jsonError);
             
-            for (const block of altQuestionBlocks) {
+            // Try to find and extract a JSON object from the text
+            const jsonObjectMatch = jsonStr.match(/{[\s\S]*}/);
+            if (jsonObjectMatch) {
                 try {
-                    // Try to extract choices, answer and explanation with more flexible patterns
-                    const lines = block.split('\n').map(line => line.trim()).filter(line => line);
-                    
-                    if (lines.length < 5) continue; // Need at least question + 4 choices
-                    
-                    const questionText = lines[0];
-                    let choiceA = '', choiceB = '', choiceC = '', choiceD = '';
-                    let answer = '';
-                    let explanation = '';
-                    
-                    // Look for choices
-                    for (let i = 1; i < lines.length; i++) {
-                        const line = lines[i];
-                        if (line.startsWith('A') || line.startsWith('A.') || line.startsWith('(A)')) {
-                            choiceA = line.replace(/^A\.?\s*|\(A\)\s*/, '');
-                        } else if (line.startsWith('B') || line.startsWith('B.') || line.startsWith('(B)')) {
-                            choiceB = line.replace(/^B\.?\s*|\(B\)\s*/, '');
-                        } else if (line.startsWith('C') || line.startsWith('C.') || line.startsWith('(C)')) {
-                            choiceC = line.replace(/^C\.?\s*|\(C\)\s*/, '');
-                        } else if (line.startsWith('D') || line.startsWith('D.') || line.startsWith('(D)')) {
-                            choiceD = line.replace(/^D\.?\s*|\(D\)\s*/, '');
-                        } else if (line.includes('答案') || line.toLowerCase().includes('answer')) {
-                            answer = line.match(/[A-D]/)?.[0] || '';
-                        } else if (line.includes('解析') || line.toLowerCase().includes('explanation')) {
-                            explanation = lines.slice(i).join('\n');
-                            break;
-                        }
-                    }
-                    
-                    if (questionText && (choiceA || choiceB || choiceC || choiceD)) {
-                        parsedQuestions.push({
-                            questionText: `题目：${questionText}`,
-                            choices: {
-                                A: choiceA || '选项A',
-                                B: choiceB || '选项B',
-                                C: choiceC || '选项C',
-                                D: choiceD || '选项D'
-                            },
-                            answer: answer || 'A',
-                            explanation: explanation || '无解析'
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error parsing alternative question block:', error, block);
+                    parsedData = JSON.parse(jsonObjectMatch[0]);
+                    console.log('Successfully parsed JSON from extracted object:', parsedData);
+                } catch (extractError) {
+                    console.error('Failed to parse extracted JSON object:', extractError);
                 }
             }
         }
-    }
-    
-    // Standard parsing for normal format
-    for (const block of questionBlocks) {
-        try {
-            console.log('Processing question block:', block.substring(0, 100) + '...');
+        
+        // If we have parsed data, extract the questions
+        if (parsedData && parsedData.questions && Array.isArray(parsedData.questions)) {
+            const questions = parsedData.questions.map((q, index) => {
+                // Validate the question has all required fields
+                if (!q.question || !q.options || !q.answer || !q.explanation) {
+                    console.warn(`Question ${index} is missing required fields:`, q);
+                    return null;
+                }
+                
+                // Convert options array to choices object
+                const choices = {};
+                const optionLetters = ['A', 'B', 'C', 'D'];
+                
+                if (Array.isArray(q.options)) {
+                    q.options.forEach((option, i) => {
+                        if (i < optionLetters.length) {
+                            choices[optionLetters[i]] = option;
+                        }
+                    });
+                } else {
+                    console.warn(`Question ${index} has invalid options format:`, q.options);
+                    return null;
+                }
+                
+                // Validate the answer is one of A, B, C, D
+                if (!optionLetters.includes(q.answer)) {
+                    console.warn(`Question ${index} has invalid answer:`, q.answer);
+                    return null;
+                }
+                
+                return {
+                    questionText: q.question,
+                    choices: choices,
+                    answer: q.answer,
+                    explanation: q.explanation
+                };
+            }).filter(q => q !== null);
             
-            // Extract question text
-            const questionText = block.split(/[A-D]\.|\n答案：|\n解析：/)[0].trim();
-            console.log('Extracted question text:', questionText);
-            
-            // Extract choices
-            const choiceA = block.match(/A\.(.*?)(?=B\.|$)/s)?.[1]?.trim() || '';
-            const choiceB = block.match(/B\.(.*?)(?=C\.|$)/s)?.[1]?.trim() || '';
-            const choiceC = block.match(/C\.(.*?)(?=D\.|$)/s)?.[1]?.trim() || '';
-            const choiceD = block.match(/D\.(.*?)(?=\n答案：|$)/s)?.[1]?.trim() || '';
-            
-            console.log('Extracted choices:', { A: choiceA, B: choiceB, C: choiceC, D: choiceD });
-            
-            // Extract answer
-            const answer = block.match(/答案：([A-D])/)?.[1] || '';
-            console.log('Extracted answer:', answer);
-            
-            // Extract explanation
-            const explanation = block.match(/解析：([\s\S]*?)(?=题目：|$)/)?.[1]?.trim() || '';
-            console.log('Extracted explanation:', explanation.substring(0, 100) + '...');
-            
-            if (!questionText || !answer) {
-                console.warn('Skipping question with missing text or answer');
-                continue;
+            if (questions.length > 0) {
+                console.log(`Successfully parsed ${questions.length} questions:`, questions);
+                return questions;
             }
-            
-            parsedQuestions.push({
-                questionText: `题目：${questionText}`,
-                choices: {
-                    A: choiceA || '选项A未提供',
-                    B: choiceB || '选项B未提供',
-                    C: choiceC || '选项C未提供',
-                    D: choiceD || '选项D未提供'
-                },
-                answer: answer,
-                explanation: explanation || '无解析'
-            });
-        } catch (error) {
-            console.error('Error parsing question block:', error, block);
         }
-    }
-    
-    // If we still have no questions, create a default one to prevent errors
-    if (parsedQuestions.length === 0) {
-        console.warn('No questions could be parsed, creating a default question');
-        parsedQuestions.push({
+        
+        // If we couldn't parse questions from the response, create a default question
+        console.log('No questions could be parsed, creating a default question');
+        return [{
             questionText: '题目：无法解析API返回的题目，这是一个默认题目',
             choices: {
-                A: '选项A',
-                B: '选项B',
-                C: '选项C',
-                D: '选项D'
+                'A': '请重新生成题目',
+                'B': '检查API返回格式',
+                'C': '联系技术支持',
+                'D': '尝试其他选项'
             },
             answer: 'A',
             explanation: '由于API返回格式问题，无法解析题目。这是一个默认解析。'
-        });
+        }];
+    } catch (error) {
+        console.error('Error parsing questions:', error);
+        return [{
+            questionText: '题目：解析题目时出错，这是一个默认题目',
+            choices: {
+                'A': '请重新生成题目',
+                'B': '检查API返回格式',
+                'C': '联系技术支持',
+                'D': '尝试其他选项'
+            },
+            answer: 'A',
+            explanation: '解析题目时出错。这是一个默认解析。'
+        }];
     }
-    
-    console.log(`Successfully parsed ${parsedQuestions.length} questions:`, parsedQuestions);
-    return parsedQuestions;
 }
 
 // Global function to fetch AI response for question generation
