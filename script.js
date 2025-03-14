@@ -5787,3 +5787,36 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry functionality initialized');
 });
+
+    // Initialize with QA container
+    handleTabSwitch('qa');
+    
+    // Add a function to initialize the test page
+    function initializeTestPage() {
+        // Show the empty state
+        const questionsDisplayContainer = document.getElementById('questions-display-container');
+        const emptyState = document.getElementById('empty-state');
+        
+        if (questionsDisplayContainer) {
+            questionsDisplayContainer.classList.remove('hidden');
+        }
+        
+        if (emptyState) {
+            emptyState.classList.remove('hidden');
+        }
+        
+        // Hide the navigation controls initially
+        const navigationControls = document.querySelector('.navigation-controls');
+        if (navigationControls) {
+            navigationControls.classList.add('hidden');
+        }
+        
+        console.log('Test page initialized with empty state visible');
+    }
+    
+    // Add event listener for the create button to initialize the test page
+    if (createButton) {
+        createButton.addEventListener('click', function() {
+            setTimeout(initializeTestPage, 200);
+        });
+    }
