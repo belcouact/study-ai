@@ -83,37 +83,42 @@ function parseQuestionsFromResponse(response) {
                                 });
                                 
                                 if (validQuestions.length > 0) {
-            } else if (jsonData.questions && Array.isArray(jsonData.questions)) {
-                // Sometimes the API returns { questions: [...] }
-                console.log('Response contains a questions array');
-                
-                const validQuestions = jsonData.questions.filter(q => {
-                    const isValid = q && q.question && q.options && q.answer && q.explanation;
-                    if (!isValid) {
-                        console.log('Skipping question with missing fields:', q);
+                                    console.log('Successfully parsed', validQuestions.length, 'questions from extracted JSON:', validQuestions);
+                                    return validQuestions;
+                                }
+                            }
+                        } else {
+                            // Try to parse the entire content as JSON
+                            const jsonData = JSON.parse(content);
+                            
+                            if (Array.isArray(jsonData)) {
+                                const validQuestions = jsonData.filter(q => {
+                                    const isValid = q && q.question && q.options && q.answer && q.explanation;
+                                    if (!isValid) {
+                                        console.log('Skipping question with missing fields:', q);
+                                    }
+                                    return isValid;
+                                });
+                                
+                                if (validQuestions.length > 0) {
+                                    console.log('Successfully parsed', validQuestions.length, 'questions from content JSON:', validQuestions);
+                                    return validQuestions;
+                                }
+                            }
+                        }
+                    } catch (jsonParseError) {
+                        console.error('Error parsing JSON from content:', jsonParseError);
                     }
-                    return isValid;
-                });
-                
-                if (validQuestions.length > 0) {
-                    console.log('Successfully parsed', validQuestions.length, 'questions:', validQuestions);
-                    return validQuestions;
                 }
             }
-        } catch (e) {
-            console.log('Response is not a valid JSON, trying to extract JSON from text');
-        }
-        
-        // If direct JSON parsing fails, try to extract JSON from the text
-        const jsonRegex = /\[\s*\{.*\}\s*\]/s;
-        const match = response.match(jsonRegex);
-        
-        if (match) {
+        } else if (typeof response === 'string') {
+            // First, try to parse the entire response as JSON
             try {
-                const jsonStr = match[0];
-                const jsonData = JSON.parse(jsonStr);
-                
+                const jsonData = JSON.parse(response);
                 if (Array.isArray(jsonData)) {
+                    console.log('Response is a valid JSON array');
+                    
+                    // Validate each question
                     const validQuestions = jsonData.filter(q => {
                         const isValid = q && q.question && q.options && q.answer && q.explanation;
                         if (!isValid) {
@@ -123,12 +128,56 @@ function parseQuestionsFromResponse(response) {
                     });
                     
                     if (validQuestions.length > 0) {
-                        console.log('Successfully parsed', validQuestions.length, 'questions from extracted JSON:', validQuestions);
+                        console.log('Successfully parsed', validQuestions.length, 'questions:', validQuestions);
+                        return validQuestions;
+                    }
+                } else if (jsonData.questions && Array.isArray(jsonData.questions)) {
+                    // Sometimes the API returns { questions: [...] }
+                    console.log('Response contains a questions array');
+                    
+                    const validQuestions = jsonData.questions.filter(q => {
+                        const isValid = q && q.question && q.options && q.answer && q.explanation;
+                        if (!isValid) {
+                            console.log('Skipping question with missing fields:', q);
+                        }
+                        return isValid;
+                    });
+                    
+                    if (validQuestions.length > 0) {
+                        console.log('Successfully parsed', validQuestions.length, 'questions:', validQuestions);
                         return validQuestions;
                     }
                 }
-            } catch (e) {
-                console.error('Failed to parse extracted JSON:', e);
+            } catch (jsonParseError) {
+                console.log('Response is not a valid JSON, trying to extract JSON from text');
+                
+                // If direct JSON parsing fails, try to extract JSON from the text
+                const jsonRegex = /\[\s*\{.*\}\s*\]/s;
+                const match = response.match(jsonRegex);
+                
+                if (match) {
+                    try {
+                        const jsonStr = match[0];
+                        const jsonData = JSON.parse(jsonStr);
+                        
+                        if (Array.isArray(jsonData)) {
+                            const validQuestions = jsonData.filter(q => {
+                                const isValid = q && q.question && q.options && q.answer && q.explanation;
+                                if (!isValid) {
+                                    console.log('Skipping question with missing fields:', q);
+                                }
+                                return isValid;
+                            });
+                            
+                            if (validQuestions.length > 0) {
+                                console.log('Successfully parsed', validQuestions.length, 'questions from extracted JSON:', validQuestions);
+                                return validQuestions;
+                            }
+                        }
+                    } catch (extractError) {
+                        console.error('Failed to parse extracted JSON:', extractError);
+                    }
+                }
             }
         }
         
@@ -147,7 +196,17 @@ function parseQuestionsFromResponse(response) {
         }];
     } catch (error) {
         console.error('Error parsing questions:', error);
-        return [];
+        return [{
+            question: "解析题目时出错，这是一个示例题目。1+1=?",
+            options: {
+                "A": "1",
+                "B": "2",
+                "C": "3",
+                "D": "4"
+            },
+            answer: "B",
+            explanation: "1+1=2，所以答案是B。"
+        }];
     }
 }
 
