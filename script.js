@@ -191,308 +191,55 @@ async function fetchAIResponse(prompt) {
     console.log('Fetching AI response for prompt:', prompt);
     
     try {
-        // Extract educational context from the prompt for better mock responses
-        const contextMatch = prompt.match(/教育背景：(.*?)(?:\n|$)/);
-        const context = contextMatch ? contextMatch[1].trim() : '';
-        console.log('Extracted context from prompt:', context);
+        // Show a loading message
+        showSystemMessage('正在生成内容，请稍候...', 'info');
         
-        // Extract question type and difficulty for better mock responses
-        const typeMatch = prompt.match(/(\d+)道(.*?)难度的(.*?)，/);
-        const numQuestions = typeMatch ? parseInt(typeMatch[1]) : 5;
-        const difficulty = typeMatch ? typeMatch[2] : '中等';
-        const questionType = typeMatch ? typeMatch[3] : '选择题';
+        // Get the API endpoint from the form if it exists
+        const form = document.querySelector('form');
+        const apiEndpoint = form ? form.action : '/api/chat';
         
-        console.log('Creating mock response for:', {
-            numQuestions,
-            difficulty,
-            questionType,
-            context
-        });
+        console.log('Using API endpoint:', apiEndpoint);
         
-        // In a production environment, we would make an API call here
-        // But since the API endpoint is returning 405, we'll use mock data instead
-        
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        // Create appropriate mock questions based on the context
-        let mockQuestions = [];
-        
-        // Check if we're dealing with elementary school
-        if (context.includes('小学')) {
-            if (context.includes('一年级') || context.includes('二年级')) {
-                // 1st-2nd grade questions (very simple)
-                mockQuestions = createElementaryLowerGradeQuestions(numQuestions);
-            } else if (context.includes('三年级') || context.includes('四年级')) {
-                // 3rd-4th grade questions
-                mockQuestions = createElementaryMiddleGradeQuestions(numQuestions);
-            } else {
-                // 5th-6th grade questions
-                mockQuestions = createElementaryUpperGradeQuestions(numQuestions);
-            }
-        } else if (context.includes('初中')) {
-            // Middle school questions
-            mockQuestions = createMiddleSchoolQuestions(numQuestions);
-        } else if (context.includes('高中')) {
-            // High school questions
-            mockQuestions = createHighSchoolQuestions(numQuestions);
-        } else {
-            // Default questions
-            mockQuestions = createDefaultGradeQuestions(numQuestions);
-        }
-        
-        // Format as JSON
-        const mockResponse = {
-            questions: mockQuestions
+        // Create the request payload
+        const payload = {
+            prompt: prompt,
+            max_tokens: 2000,
+            temperature: 0.7,
+            model: 'gpt-3.5-turbo'  // Use the same model as the chat interface
         };
         
-        console.log('Generated mock response:', mockResponse);
+        console.log('Sending payload:', payload);
         
-        return JSON.stringify(mockResponse);
+        // Make the API call
+        const response = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Raw API response:', data);
+        
+        // Extract the content from the response
+        const content = extractContentFromResponse(data);
+        console.log('Extracted content:', content);
+        
+        return content;
     } catch (error) {
         console.error('Error fetching AI response:', error);
         
-        // Return a simple mock response
-        return `{
-            "questions": [
-                {
-                    "text": "1+1=?",
-                    "choices": ["A. 1", "B. 2", "C. 3", "D. 4"],
-                    "answer": "B",
-                    "explanation": "1加1等于2，这是基本的加法运算。"
-                },
-                {
-                    "text": "下面哪个是红色的水果？",
-                    "choices": ["A. 香蕉", "B. 猕猴桃", "C. 苹果", "D. 蓝莓"],
-                    "answer": "C",
-                    "explanation": "苹果通常是红色的，而香蕉是黄色的，猕猴桃是绿色的，蓝莓是蓝色的。"
-                }
-            ]
-        }`;
+        // Show error message to the user
+        showSystemMessage('生成内容失败，请稍后再试', 'error');
+        
+        // Instead of returning mock data, throw the error to be handled by the caller
+        throw new Error('API request failed: ' + error.message);
     }
-}
-
-// Helper functions to create grade-appropriate questions
-function createElementaryLowerGradeQuestions(numQuestions) {
-    const questions = [
-        {
-            text: "1+1=?",
-            choices: ["A. 1", "B. 2", "C. 3", "D. 4"],
-            answer: "B",
-            explanation: "1加1等于2，这是基本的加法运算。"
-        },
-        {
-            text: "下面哪个是红色的水果？",
-            choices: ["A. 香蕉", "B. 猕猴桃", "C. 苹果", "D. 蓝莓"],
-            answer: "C",
-            explanation: "苹果通常是红色的，而香蕉是黄色的，猕猴桃是绿色的，蓝莓是蓝色的。"
-        },
-        {
-            text: "小明有3个苹果，小红给他2个苹果，小明现在有几个苹果？",
-            choices: ["A. 3个", "B. 4个", "C. 5个", "D. 6个"],
-            answer: "C",
-            explanation: "小明原来有3个苹果，小红给他2个，所以3+2=5，小明现在有5个苹果。"
-        },
-        {
-            text: "下面哪个动物有四条腿？",
-            choices: ["A. 鸟", "B. 鱼", "C. 狗", "D. 蛇"],
-            answer: "C",
-            explanation: "狗有四条腿，鸟有两条腿，鱼没有腿，蛇也没有腿。"
-        },
-        {
-            text: "10-7=?",
-            choices: ["A. 2", "B. 3", "C. 4", "D. 5"],
-            answer: "B",
-            explanation: "10减去7等于3，这是基本的减法运算。"
-        }
-    ];
-    
-    return questions.slice(0, numQuestions);
-}
-
-function createElementaryMiddleGradeQuestions(numQuestions) {
-    const questions = [
-        {
-            text: "9×7=?",
-            choices: ["A. 56", "B. 63", "C. 72", "D. 81"],
-            answer: "B",
-            explanation: "9乘以7等于63，这是乘法口诀表中的一项。"
-        },
-        {
-            text: "下面哪个是正方形的特点？",
-            choices: ["A. 有三个角", "B. 四条边不等长", "C. 四条边等长且四个角都是直角", "D. 只有两条平行边"],
-            answer: "C",
-            explanation: "正方形的特点是四条边等长且四个角都是直角。"
-        },
-        {
-            text: "一个小时有多少分钟？",
-            choices: ["A. 30分钟", "B. 45分钟", "C. 60分钟", "D. 100分钟"],
-            answer: "C",
-            explanation: "一个小时等于60分钟。"
-        },
-        {
-            text: "下面哪个是我国的首都？",
-            choices: ["A. 上海", "B. 广州", "C. 北京", "D. 深圳"],
-            answer: "C",
-            explanation: "北京是中华人民共和国的首都。"
-        },
-        {
-            text: "72÷9=?",
-            choices: ["A. 6", "B. 7", "C. 8", "D. 9"],
-            answer: "C",
-            explanation: "72除以9等于8，这是基本的除法运算。"
-        }
-    ];
-    
-    return questions.slice(0, numQuestions);
-}
-
-function createElementaryUpperGradeQuestions(numQuestions) {
-    const questions = [
-        {
-            text: "下面哪个分数最大？",
-            choices: ["A. 1/2", "B. 1/3", "C. 2/3", "D. 1/4"],
-            answer: "C",
-            explanation: "2/3 = 0.666..., 1/2 = 0.5, 1/3 = 0.333..., 1/4 = 0.25，所以2/3最大。"
-        },
-        {
-            text: "地球上最大的洋是？",
-            choices: ["A. 大西洋", "B. 太平洋", "C. 印度洋", "D. 北冰洋"],
-            answer: "B",
-            explanation: "太平洋是地球上最大的洋，面积约占地球表面的三分之一。"
-        },
-        {
-            text: "下面哪个是植物的生殖器官？",
-            choices: ["A. 叶", "B. 茎", "C. 根", "D. 花"],
-            answer: "D",
-            explanation: "花是植物的生殖器官，负责植物的繁殖。"
-        },
-        {
-            text: "一个长方形的长是8厘米，宽是5厘米，它的面积是多少平方厘米？",
-            choices: ["A. 13平方厘米", "B. 26平方厘米", "C. 40平方厘米", "D. 80平方厘米"],
-            answer: "C",
-            explanation: "长方形的面积 = 长 × 宽 = 8 × 5 = 40平方厘米。"
-        },
-        {
-            text: "下面哪个不是状态变化？",
-            choices: ["A. 冰融化", "B. 水蒸发", "C. 木材燃烧", "D. 水结冰"],
-            answer: "C",
-            explanation: "木材燃烧是化学变化，而冰融化、水蒸发和水结冰都是物理变化（状态变化）。"
-        }
-    ];
-    
-    return questions.slice(0, numQuestions);
-}
-
-function createMiddleSchoolQuestions(numQuestions) {
-    const questions = [
-        {
-            text: "下面哪个是二次函数的图像？",
-            choices: ["A. 直线", "B. 抛物线", "C. 圆", "D. 双曲线"],
-            answer: "B",
-            explanation: "二次函数的图像是抛物线。"
-        },
-        {
-            text: "下面哪个元素的化学符号是O？",
-            choices: ["A. 金", "B. 氧", "C. 铁", "D. 钠"],
-            answer: "B",
-            explanation: "氧的化学符号是O（Oxygen）。"
-        },
-        {
-            text: "下面哪个是牛顿第一定律的内容？",
-            choices: ["A. 作用力等于质量乘以加速度", "B. 物体间的引力与质量的乘积成正比，与距离的平方成反比", "C. 一个物体保持静止或匀速直线运动状态，直到外力迫使它改变这种状态", "D. 作用力和反作用力大小相等，方向相反"],
-            answer: "C",
-            explanation: "牛顿第一定律（惯性定律）：一个物体保持静止或匀速直线运动状态，直到外力迫使它改变这种状态。"
-        },
-        {
-            text: "下面哪个朝代在历史上最早？",
-            choices: ["A. 唐朝", "B. 汉朝", "C. 明朝", "D. 清朝"],
-            answer: "B",
-            explanation: "这些朝代的顺序是：汉朝（公元前202年-公元220年）、唐朝（618年-907年）、明朝（1368年-1644年）、清朝（1644年-1912年）。"
-        },
-        {
-            text: "下面哪个是正确的英语句子？",
-            choices: ["A. I am go to school.", "B. I going to school.", "C. I am going to school.", "D. I is going to school."],
-            answer: "C",
-            explanation: "\"I am going to school.\"是正确的现在进行时态表达。"
-        }
-    ];
-    
-    return questions.slice(0, numQuestions);
-}
-
-function createHighSchoolQuestions(numQuestions) {
-    const questions = [
-        {
-            text: "下面哪个是正确的三角函数恒等式？",
-            choices: ["A. sin²θ + cos²θ = 2", "B. sin²θ + cos²θ = 1", "C. sin²θ - cos²θ = 1", "D. sin²θ × cos²θ = 1"],
-            answer: "B",
-            explanation: "sin²θ + cos²θ = 1 是基本的三角函数恒等式。"
-        },
-        {
-            text: "DNA的主要组成单位是？",
-            choices: ["A. 氨基酸", "B. 脂肪酸", "C. 核苷酸", "D. 单糖"],
-            answer: "C",
-            explanation: "DNA的主要组成单位是核苷酸，而氨基酸是蛋白质的基本组成单位。"
-        },
-        {
-            text: "下面哪个反应是氧化反应？",
-            choices: ["A. 2Na + 2H₂O → 2NaOH + H₂↑", "B. CaCO₃ → CaO + CO₂↑", "C. 2H₂ + O₂ → 2H₂O", "D. NaOH + HCl → NaCl + H₂O"],
-            answer: "C",
-            explanation: "2H₂ + O₂ → 2H₂O 是氧化反应，氢被氧化。"
-        },
-        {
-            text: "下面哪部作品是鲁迅所著？",
-            choices: ["A. 《红楼梦》", "B. 《呐喊》", "C. 《三国演义》", "D. 《西游记》"],
-            answer: "B",
-            explanation: "《呐喊》是鲁迅的短篇小说集，包含《狂人日记》等作品。"
-        },
-        {
-            text: "下面哪个事件发生在第二次世界大战期间？",
-            choices: ["A. 法国大革命", "B. 珍珠港事件", "C. 古巴导弹危机", "D. 柏林墙倒塌"],
-            answer: "B",
-            explanation: "珍珠港事件发生在1941年12月7日，是第二次世界大战期间的重要事件，导致美国正式参战。"
-        }
-    ];
-    
-    return questions.slice(0, numQuestions);
-}
-
-function createDefaultGradeQuestions(numQuestions) {
-    const questions = [
-        {
-            text: "地球是第几大行星？",
-            choices: ["A. 第一大", "B. 第三大", "C. 第五大", "D. 第八大"],
-            answer: "C",
-            explanation: "地球是太阳系中第五大行星，按从大到小排序是：木星、土星、海王星、天王星、地球、金星、火星、水星。"
-        },
-        {
-            text: "下面哪个不是编程语言？",
-            choices: ["A. Python", "B. Java", "C. HTML", "D. Windows"],
-            answer: "D",
-            explanation: "Windows是操作系统，而不是编程语言。Python、Java和HTML都是编程或标记语言。"
-        },
-        {
-            text: "人体最大的器官是什么？",
-            choices: ["A. 心脏", "B. 肝脏", "C. 皮肤", "D. 大脑"],
-            answer: "C",
-            explanation: "皮肤是人体最大的器官，覆盖了整个身体表面。"
-        },
-        {
-            text: "下面哪个国家不在亚洲？",
-            choices: ["A. 日本", "B. 印度", "C. 埃及", "D. 泰国"],
-            answer: "C",
-            explanation: "埃及位于非洲东北部，而日本、印度和泰国都位于亚洲。"
-        },
-        {
-            text: "下面哪个是可再生能源？",
-            choices: ["A. 煤炭", "B. 石油", "C. 天然气", "D. 太阳能"],
-            answer: "D",
-            explanation: "太阳能是可再生能源，而煤炭、石油和天然气都是不可再生的化石燃料。"
-        }
-    ];
-    
-    return questions.slice(0, numQuestions);
 }
 
 // Function to show results popup
