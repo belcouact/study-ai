@@ -5278,6 +5278,20 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!testLoadingIndicator || !questionsContainer) {
             console.error('Test elements not found');
+            
+            // Try to find the create container and check if it's visible
+            const createContainer = document.getElementById('create-container');
+            if (!createContainer || createContainer.classList.contains('hidden')) {
+                console.log('Switching to test tab first');
+                handleTabSwitch('create');
+                
+                // Try again after switching tabs
+                setTimeout(() => {
+                    handleGenerateQuestionsClick(school, grade, subject, semester, difficulty, questionCount);
+                }, 100);
+                return;
+            }
+            
             return;
         }
         
@@ -5736,3 +5750,399 @@ function init() {
     console.log('Application initialized');
 }
 // ... existing code ...
+
+// Add the missing initializeState function
+function initializeState() {
+    console.log('Initializing state');
+    
+    // Initialize the state object if it doesn't exist
+    if (!window.state) {
+        window.state = {};
+    }
+    
+    // Initialize state properties
+    state.questions = [];
+    state.currentQuestionIndex = 0;
+    state.userAnswers = [];
+    state.poems = [];
+    state.currentPoemIndex = 0;
+    state.isInitialized = true;
+    
+    console.log('State initialized:', state);
+}
+
+// Fix the handleTabSwitch function to properly handle poetry panel
+function handleTabSwitch(containerType) {
+    console.log('Switching to tab:', containerType);
+    
+    // Get all containers
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    const poetryContainer = document.getElementById('poetry-container');
+    
+    // Get all buttons
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const poetryButton = document.getElementById('poetry-button');
+    
+    // Hide all containers
+    if (qaContainer) qaContainer.classList.add('hidden');
+    if (createContainer) createContainer.classList.add('hidden');
+    if (poetryContainer) poetryContainer.classList.add('hidden');
+    
+    // Remove active class from all buttons
+    if (qaButton) qaButton.classList.remove('active');
+    if (createButton) createButton.classList.remove('active');
+    if (poetryButton) poetryButton.classList.remove('active');
+    
+    // Get the content area
+    const contentArea = document.querySelector('.content-area');
+    if (!contentArea) {
+        console.error('Content area not found');
+        return;
+    }
+    
+    // Show the selected container and activate the button
+    if (containerType === 'qa') {
+        if (!qaContainer) {
+            console.log('QA container not found, creating it');
+            const newQaContainer = document.createElement('div');
+            newQaContainer.id = 'qa-container';
+            newQaContainer.className = 'container';
+            newQaContainer.innerHTML = `
+                <div class="chat-container">
+                    <div class="input-container">
+                        <div class="welcome-message">你好，我是你的AI老师，有什么我可以帮你的吗？</div>
+                        <textarea id="user-input" placeholder="请输入你的问题..."></textarea>
+                        <div class="button-container">
+                            <div class="right-controls">
+                                <button id="optimize-button" title="优化您的问题以获得更好的回答">优化问题</button>
+                                <button id="submit-button">提交问题</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="output-container">
+                        <div id="loading" class="hidden">
+                            <div class="spinner"></div>
+                            <p>Thinking...</p>
+                        </div>
+                        <div id="output">
+                            <!-- Output will appear here -->
+                        </div>
+                    </div>
+                </div>
+            `;
+            contentArea.appendChild(newQaContainer);
+            console.log('QA container added to content area');
+            
+            // Set up chat buttons
+            setupChatButtons();
+        } else {
+            qaContainer.classList.remove('hidden');
+        }
+        if (qaButton) qaButton.classList.add('active');
+    } else if (containerType === 'create') {
+        if (!createContainer) {
+            console.log('Create container not found, creating it');
+            const newCreateContainer = document.createElement('div');
+            newCreateContainer.id = 'create-container';
+            newCreateContainer.className = 'container';
+            newCreateContainer.innerHTML = `
+                <!-- Test configuration controls fixed at the top of the page -->
+                <div class="test-header">
+                    <div class="test-controls">
+                        <div class="test-selectors">
+                            <div class="selector-group">
+                                <label for="subject-select">科目</label>
+                                <select id="subject-select" class="test-select">
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="selector-group">
+                                <label for="semester-select">学期</label>
+                                <select id="semester-select" class="test-select">
+                                    <option value="上学期">上学期</option>
+                                    <option value="下学期">下学期</option>
+                                </select>
+                            </div>
+                            <div class="selector-group">
+                                <label for="difficulty-select">难度</label>
+                                <select id="difficulty-select" class="test-select">
+                                    <option value="容易">容易</option>
+                                    <option value="中等">中等</option>
+                                    <option value="偏难">偏难</option>
+                                </select>
+                            </div>
+                            <div class="selector-group">
+                                <label for="question-count-select">题数</label>
+                                <select id="question-count-select" class="test-select">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                </select>
+                            </div>
+                            <button id="generate-questions-button" class="primary-button test-button">出题</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Test content wrapper -->
+                <div class="test-content">
+                    <!-- Loading indicator -->
+                    <div id="test-loading-indicator" class="hidden">
+                        <div class="spinner-icon"></div>
+                        <p>正在生成题目，请稍候...</p>
+                    </div>
+                    
+                    <!-- Questions display container -->
+                    <div id="questions-display-container" class="questions-display-container hidden">
+                        <!-- Empty state message -->
+                        <div id="empty-state" class="empty-state">
+                            <i class="fas fa-book-open empty-state-icon"></i>
+                            <h3>准备好开始测验了吗？</h3>
+                            <p>选择学校类型、年级、学期、科目、难度和题数，然后点击"出题"按钮生成题目。</p>
+                        </div>
+                        
+                        <!-- Question content will be dynamically inserted here -->
+                        <div id="question-counter" class="question-counter"></div>
+                        <div id="question-text" class="question-text"></div>
+                        <div id="choices-container" class="choices-container"></div>
+                        
+                        <!-- Answer container -->
+                        <div id="answer-container" class="answer-container hidden">
+                            <div id="answer-result" class="answer-result"></div>
+                            <div id="answer-explanation" class="answer-explanation"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation controls -->
+                    <div class="navigation-controls">
+                        <button id="prev-question-button" class="nav-button" disabled>上一题</button>
+                        <button id="next-question-button" class="nav-button" disabled>下一题</button>
+                    </div>
+                </div>
+            `;
+            contentArea.appendChild(newCreateContainer);
+            console.log('Create container added to content area');
+            
+            // Set up test controls
+            setupTestControls();
+        } else {
+            createContainer.classList.remove('hidden');
+        }
+        if (createButton) createButton.classList.add('active');
+    } else if (containerType === 'poetry') {
+        if (!poetryContainer) {
+            console.log('Poetry container not found, creating it');
+            const newPoetryContainer = document.createElement('div');
+            newPoetryContainer.id = 'poetry-container';
+            newPoetryContainer.className = 'container';
+            newPoetryContainer.innerHTML = `
+                <div class="poetry-header">
+                    <div class="poetry-controls">
+                        <div class="poetry-selectors">
+                            <div class="selector-group">
+                                <label for="poetry-type-select">类型</label>
+                                <select id="poetry-type-select" class="poetry-select">
+                                    <option value="唐诗">唐诗</option>
+                                    <option value="宋词">宋词</option>
+                                    <option value="元曲">元曲</option>
+                                </select>
+                            </div>
+                            <div class="selector-group">
+                                <label for="poetry-style-select">风格</label>
+                                <select id="poetry-style-select" class="poetry-select">
+                                    <option value="任意">任意</option>
+                                    <option value="山水">山水</option>
+                                    <option value="边塞">边塞</option>
+                                    <option value="浪漫">浪漫</option>
+                                    <option value="现实">现实</option>
+                                </select>
+                            </div>
+                            <button id="learn-poetry-button" class="primary-button poetry-button">学习诗词</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="poetry-content">
+                    <div id="poetry-empty-state" class="empty-state">
+                        <i class="fas fa-book-open empty-state-icon"></i>
+                        <h3>开始学习古诗词</h3>
+                        <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成适合您学习阶段的诗词。</p>
+                    </div>
+                    <div id="poetry-display" class="hidden">
+                        <div class="poem-navigation">
+                            <button id="prev-poem-button" class="poem-nav-button" disabled>
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <span class="poem-counter">1 / 5</span>
+                            <button id="next-poem-button" class="poem-nav-button">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div class="poem-display">
+                            <h2 class="poem-title"></h2>
+                            <p class="poem-author"></p>
+                            <div class="poem-content"></div>
+                            <div class="poem-section">
+                                <h3>创作背景</h3>
+                                <div class="poem-background"></div>
+                            </div>
+                            <div class="poem-section">
+                                <h3>赏析</h3>
+                                <div class="poem-explanation"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            contentArea.appendChild(newPoetryContainer);
+            console.log('Poetry container added to content area');
+            
+            // Initialize poetry dropdowns
+            initializePoetryDropdowns();
+            
+            // Set up poetry event listeners
+            const learnPoetryButton = document.getElementById('learn-poetry-button');
+            if (learnPoetryButton) {
+                learnPoetryButton.addEventListener('click', handleLearnPoetryClick);
+                console.log('Learn poetry button event listener added');
+            }
+            
+            // Set up poem navigation buttons
+            setupPoemNavigationButtons();
+        } else {
+            poetryContainer.classList.remove('hidden');
+        }
+        if (poetryButton) poetryButton.classList.add('active');
+    }
+}
+
+// Fix the handleGenerateQuestionsClick function to properly find test elements
+async function handleGenerateQuestionsClick(school, grade, subject, semester, difficulty, questionCount) {
+    console.log('Generating questions with parameters:', { school, grade, subject, semester, difficulty, questionCount });
+    
+    // Get the test loading indicator and questions container
+    const testLoadingIndicator = document.getElementById('test-loading-indicator');
+    const questionsContainer = document.getElementById('questions-display-container');
+    const emptyState = document.getElementById('empty-state');
+    
+    if (!testLoadingIndicator || !questionsContainer) {
+        console.error('Test elements not found');
+        
+        // Try to find the create container and check if it's visible
+        const createContainer = document.getElementById('create-container');
+        if (!createContainer || createContainer.classList.contains('hidden')) {
+            console.log('Switching to test tab first');
+            handleTabSwitch('create');
+            
+            // Try again after switching tabs
+            setTimeout(() => {
+                handleGenerateQuestionsClick(school, grade, subject, semester, difficulty, questionCount);
+            }, 100);
+            return;
+        }
+        
+        return;
+    }
+    
+    try {
+        // Show loading indicator
+        testLoadingIndicator.classList.remove('hidden');
+        
+        // Hide questions container and empty state
+        questionsContainer.classList.add('hidden');
+        if (emptyState) {
+            emptyState.classList.add('hidden');
+        }
+        
+        // Prepare the prompt
+        const prompt = `请为${school}${grade}学生出${questionCount}道${difficulty}难度的${subject}${semester}选择题，每道题有4个选项(A,B,C,D)，并提供答案和解析。请以JSON格式返回，格式为：
+        {
+            "questions": [
+                {
+                    "question": "题目内容",
+                    "options": {
+                        "A": "选项A内容",
+                        "B": "选项B内容",
+                        "C": "选项C内容",
+                        "D": "选项D内容"
+                    },
+                    "answer": "正确选项字母",
+                    "explanation": "解析内容"
+                },
+                ...
+            ]
+        }`;
+        
+        // Fetch the response
+        const response = await fetchAIResponse(prompt);
+        
+        // Parse the questions from the response
+        const questions = parseQuestionsFromResponse(response);
+        
+        if (!questions || questions.length === 0) {
+            throw new Error('No questions generated');
+        }
+        
+        // Store the questions in the state
+        state.questions = questions;
+        state.currentQuestionIndex = 0;
+        state.userAnswers = new Array(questions.length).fill(null);
+        
+        // Display the first question
+        displayCurrentQuestion();
+        
+        // Show the questions container
+        questionsContainer.classList.remove('hidden');
+        
+        // Update navigation buttons
+        updateNavigationButtons();
+        
+        console.log('Questions generated successfully:', questions);
+    } catch (error) {
+        console.error('Error generating questions:', error);
+        showSystemMessage('生成题目时出错，请稍后再试', 'error');
+        
+        // Show empty state
+        if (emptyState) {
+            emptyState.classList.remove('hidden');
+        }
+    } finally {
+        // Hide loading indicator
+        testLoadingIndicator.classList.add('hidden');
+    }
+}
+
+// Fix the initializePoetryDropdowns function to handle the school reference error
+function initializePoetryDropdowns() {
+    console.log('Poetry functionality initializing...');
+    
+    // Get the poetry type and style selects
+    const poetryTypeSelect = document.getElementById('poetry-type-select');
+    const poetryStyleSelect = document.getElementById('poetry-style-select');
+    
+    if (!poetryTypeSelect || !poetryStyleSelect) {
+        console.error('Poetry select elements not found');
+        return;
+    }
+    
+    console.log('Found poetry type and style selects');
+    
+    // Update style options based on the selected type
+    updatePoetryStyleOptions(poetryTypeSelect.value);
+    
+    // Add event listener to type select to update style options
+    poetryTypeSelect.addEventListener('change', function() {
+        console.log('Poetry type changed to:', this.value);
+        updatePoetryStyleOptions(this.value);
+    });
+    
+    // Get the learn poetry button
+    const learnPoetryButton = document.getElementById('learn-poetry-button');
+    if (learnPoetryButton) {
+        learnPoetryButton.addEventListener('click', handleLearnPoetryClick);
+        console.log('Learn poetry button event listener added');
+    }
+    
+    console.log('Poetry functionality initialized');
+}
