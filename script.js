@@ -155,40 +155,49 @@ function extractContentFromResponse(data) {
     console.log('Extracting content from response:', data);
     
     try {
-        // Handle different API response formats
-        if (data.choices && data.choices[0]) {
-            if (data.choices[0].message && data.choices[0].message.content) {
-                // OpenAI-like format
-                return data.choices[0].message.content;
-            } else if (data.choices[0].content) {
-                // Deepseek format
-                return data.choices[0].content;
-            }
-        } else if (data.response) {
-            // Simple API format
-            return data.response;
-        } else if (data.content) {
-            // Direct content format
-            return data.content;
-        } else if (typeof data === 'string') {
-            // Already a string
+        // Check if data is a string
+        if (typeof data === 'string') {
             return data;
-        } else {
-            // Try to find content in the response
-            const possibleContentFields = ['text', 'answer', 'result', 'output', 'generated_text'];
-            for (const field of possibleContentFields) {
-                if (data[field]) {
-                    return data[field];
-                }
-            }
-            
-            // If all else fails, stringify the entire response
-            console.warn('Could not extract content from response, using stringified response');
-            return JSON.stringify(data);
         }
+        
+        // Check if data is an object with choices array (OpenAI format)
+        if (data && data.choices && Array.isArray(data.choices) && data.choices.length > 0) {
+            const choice = data.choices[0];
+            
+            // Check for different response formats
+            if (choice.message && choice.message.content) {
+                return choice.message.content;
+            } else if (choice.text) {
+                return choice.text;
+            } else if (choice.content) {
+                return choice.content;
+            }
+        }
+        
+        // Check for DeepSeek API format
+        if (data && data.choices && Array.isArray(data.choices) && data.choices.length > 0) {
+            const choice = data.choices[0];
+            if (choice.message && choice.message.content) {
+                return choice.message.content;
+            }
+        }
+        
+        // Alternative format check (DeepSeek specific)
+        if (data && data.response) {
+            return data.response;
+        }
+        
+        // Check for message property directly
+        if (data && data.message && typeof data.message.content === 'string') {
+            return data.message.content;
+        }
+        
+        // Last resort: stringify the entire response
+        console.warn('Could not extract content using standard methods, returning stringified data');
+        return JSON.stringify(data);
     } catch (error) {
         console.error('Error extracting content from response:', error);
-        return '';
+        return 'Error processing response';
     }
 }
 
@@ -3295,149 +3304,153 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, submitButton) {
     console.log('Setting up button event listeners');
     
-    // Set up optimize button
-    if (optimizeButton) {
-        // Remove any existing event listeners
-        const newOptimizeButton = optimizeButton.cloneNode(true);
-        optimizeButton.parentNode.replaceChild(newOptimizeButton, optimizeButton);
-        optimizeButton = newOptimizeButton;
-        
-        optimizeButton.addEventListener('click', function() {
-            const questionText = chatInput.value.trim();
-            
-            if (!questionText) {
-                showSystemMessage('请先输入问题内容', 'warning');
-                return;
-            }
-            
-            // Get simplified educational context (school and grade only)
-            const { school, grade } = getSimplifiedEducationalContext();
-            
-            // Show loading state
-            optimizeButton.disabled = true;
-            optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
-            
-            // Prepare the prompt for optimization with simplified educational context
-            const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值：
-
-教育背景：
-学校类型：${school}
-年级：${grade}
-
-原始问题：${questionText}
-
-请返回优化后的问题，使其更适合上述教育背景的学生，保持原始意图但使其更加清晰、准确和有教育意义。
-优化时请考虑学生的认知水平和教育阶段，使问题更有针对性。`;
-            
-            // Call the API
-            fetchAIResponse(prompt)
-                .then(response => {
-                    // Extract the optimized question
-                    const optimizedContent = extractContentFromResponse(response);
-                    
-                    // Update the chat input with the optimized question
-                    chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
-                    
-                    // Focus the input and move cursor to end
-                    chatInput.focus();
-                    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
-                    
-                    // Show success message
-                    showSystemMessage('问题已根据教育背景成功优化！', 'success');
-                })
-                .catch(error => {
-                    console.error('Error optimizing question:', error);
-                    showSystemMessage('优化问题时出错，请重试。', 'error');
-                })
-                .finally(() => {
-                    // Reset button state
-                    optimizeButton.disabled = false;
-                    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
-                });
-        });
+    if (!chatInput || !chatResponse || !optimizeButton || !submitButton) {
+        console.error('Required elements not found for setting up button event listeners');
+        return;
     }
     
-    // Set up submit button
-    if (submitButton) {
-        // Remove any existing event listeners
-        const newSubmitButton = submitButton.cloneNode(true);
-        submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
-        submitButton = newSubmitButton;
+    // Submit button event listener
+    submitButton.addEventListener('click', async function() {
+        const question = chatInput.value.trim();
         
-        submitButton.addEventListener('click', function() {
-            const questionText = chatInput.value.trim();
+        if (question === '') {
+            showSystemMessage('请输入问题', 'error');
+            return;
+        }
+        
+        // Show loading indicator
+        showLoadingIndicator();
+        
+        try {
+            // Get educational context
+            const educationalContext = getSimplifiedEducationalContext();
             
-            if (!questionText) {
-                showSystemMessage('请先输入问题内容', 'warning');
-                return;
-            }
-            
-            // Get simplified educational context (school and grade only)
-            const { school, grade } = getSimplifiedEducationalContext();
-            
-            // Show loading state
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
-            chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
-            
-            // Prepare the prompt for the AI with simplified educational context
+            // Prepare the prompt
             const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
 
-教育背景：
-学校类型：${school}
-年级：${grade}
+${educationalContext}
 
-问题：${questionText}
+问题：${question}
 
 请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
 如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平。
 如果可能，请提供一些例子或应用场景来帮助理解。`;
             
+            console.log('Fetching AI response with prompt:', prompt);
+            
             // Call the API
-            fetchAIResponse(prompt)
-                .then(response => {
-                    // Extract the AI response
-                    const aiResponse = extractContentFromResponse(response);
+            const response = await fetchAIResponse(prompt);
+            console.log('API response:', response);
+            
+            // Extract content from response
+            const content = extractContentFromResponse(response);
+            console.log('Extracted content:', content);
+            
+            // Hide loading indicator
+            hideLoadingIndicator();
+            
+            // Display the response
+            if (chatResponse) {
+                // Create a new message element
+                const messageElement = document.createElement('div');
+                messageElement.className = 'ai-message';
+                
+                // Format the content with math expressions if the function exists
+                if (typeof formatMathExpressions === 'function') {
+                    messageElement.innerHTML = formatMathExpressions(content);
+                } else {
+                    messageElement.textContent = content;
+                }
+                
+                // Add the message to the output
+                chatResponse.appendChild(messageElement);
+                
+                // Scroll to the bottom of the output
+                chatResponse.scrollTop = chatResponse.scrollHeight;
+                
+                // Clear the input
+                chatInput.value = '';
+            }
+        } catch (error) {
+            console.error('Error submitting question:', error);
+            
+            // Hide loading indicator
+            hideLoadingIndicator();
+            
+            // Show error message
+            if (chatResponse) {
+                try {
+                    showSystemMessage('获取回答时出错，请稍后再试', 'error');
+                } catch (e) {
+                    console.error('Error showing system message:', e);
                     
-                    // Format the response with MathJax
-                    const formattedResponse = formatMathExpressions(aiResponse);
-                    
-                    // Get simplified context summary for display
-                    const contextSummary = getSimplifiedContextSummary();
-                    
-                    // Display the response with educational context
-                    chatResponse.innerHTML = `
-                        <div class="response-header">
-                            <i class="fas fa-robot"></i> AI 助手回答
-                            ${contextSummary ? `<span class="context-badge">${contextSummary}</span>` : ''}
-                        </div>
-                        <div class="response-content">
-                            ${formattedResponse}
-                </div>
-            `;
-                    
-                    // Render MathJax in the response
-                    if (window.MathJax) {
-                        MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error submitting question:', error);
-                    chatResponse.innerHTML = `
-                        <div class="error-message">
-                            <i class="fas fa-exclamation-circle"></i>
-                            抱歉，处理您的问题时出现了错误。请重试。
-                        </div>
-                    `;
-                    showSystemMessage('提交问题时出错，请重试。', 'error');
-                })
-                .finally(() => {
-                    // Reset button state
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
-                });
-        });
-    }
+                    // Fallback error display
+                    const errorElement = document.createElement('div');
+                    errorElement.className = 'system-message error';
+                    errorElement.textContent = '获取回答时出错，请稍后再试';
+                    chatResponse.appendChild(errorElement);
+                }
+            }
+        }
+    });
+    
+    // Optimize button event listener
+    optimizeButton.addEventListener('click', async function() {
+        const question = chatInput.value.trim();
+        
+        if (question === '') {
+            showSystemMessage('请输入问题以优化', 'error');
+            return;
+        }
+        
+        // Add optimizing class to button
+        optimizeButton.classList.add('optimizing');
+        optimizeButton.textContent = '优化中...';
+        
+        try {
+            // Prepare the prompt for optimization
+            const prompt = `请优化以下问题，使其更加清晰、具体，并包含足够的上下文信息，以便AI能够提供更好的回答：
+
+问题：${question}
+
+请返回优化后的问题，不需要任何额外的解释。`;
+            
+            // Call the API
+            const response = await fetchAIResponse(prompt);
+            
+            // Extract content from response
+            const content = extractContentFromResponse(response);
+            
+            // Parse the optimized question
+            const optimizedQuestion = parseOptimizedQuestion(content);
+            
+            // Update the input with the optimized question
+            chatInput.value = optimizedQuestion;
+            
+            // Focus on the input
+            chatInput.focus();
+            
+            // Show success message
+            showSystemMessage('问题已优化', 'success');
+        } catch (error) {
+            console.error('Error optimizing question:', error);
+            
+            // Show error message
+            showSystemMessage('优化问题时出错，请稍后再试', 'error');
+        } finally {
+            // Remove optimizing class from button
+            optimizeButton.classList.remove('optimizing');
+            optimizeButton.textContent = '优化问题';
+        }
+    });
+    
+    // Enter key event listener for input
+    chatInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            submitButton.click();
+        }
+    });
 }
 
 // Function to get curriculum information based on school, grade and subject
@@ -5296,4 +5309,121 @@ document.addEventListener('DOMContentLoaded', function() {
             showSystemMessage('生成题目时出错，请稍后再试', 'error');
         }
     }
+// ... existing code ...
+
+// Function to format math expressions in text
+function formatMathExpressions(text) {
+    if (!text) return '';
+    
+    // Replace inline math expressions (surrounded by $ signs)
+    let formattedText = text.replace(/\$([^$]+)\$/g, '<span class="math-inline">$1</span>');
+    
+    // Replace display math expressions (surrounded by $$ signs)
+    formattedText = formattedText.replace(/\$\$([^$]+)\$\$/g, '<div class="math-display">$1</div>');
+    
+    return formattedText;
+}
+
+// ... existing code ...
+
+// Function to handle question submission
+async function handleSubmitQuestion(question) {
+    console.log('Submitting question:', question);
+    
+    if (!question || question.trim() === '') {
+        showSystemMessage('请输入问题', 'error');
+        return;
+    }
+    
+    // Show loading indicator
+    showLoadingIndicator();
+    
+    try {
+        // Get educational context
+        const educationalContext = getSimplifiedEducationalContext();
+        
+        // Prepare the prompt
+        const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
+
+${educationalContext}
+
+问题：${question}
+
+请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
+如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平。
+如果可能，请提供一些例子或应用场景来帮助理解。`;
+        
+        console.log('Fetching AI response with prompt:', prompt);
+        
+        // Call the API
+        const response = await fetchAIResponse(prompt);
+        console.log('API response:', response);
+        
+        // Extract content from response
+        const content = extractContentFromResponse(response);
+        console.log('Extracted content:', content);
+        
+        // Hide loading indicator
+        hideLoadingIndicator();
+        
+        // Display the response
+        const outputElement = document.getElementById('output');
+        if (outputElement) {
+            // Create a new message element
+            const messageElement = document.createElement('div');
+            messageElement.className = 'ai-message';
+            messageElement.innerHTML = formatMathExpressions(content);
+            
+            // Add the message to the output
+            outputElement.appendChild(messageElement);
+            
+            // Scroll to the bottom of the output
+            outputElement.scrollTop = outputElement.scrollHeight;
+        }
+    } catch (error) {
+        console.error('Error submitting question:', error);
+        
+        // Hide loading indicator
+        hideLoadingIndicator();
+        
+        // Show error message
+        const outputElement = document.getElementById('output');
+        if (outputElement) {
+            showSystemMessage('获取回答时出错，请稍后再试', 'error');
+        }
+    }
+}
+
+// ... existing code ...
+
+// Function to show system message
+function showSystemMessage(message, type = 'info') {
+    console.log(`Showing system message: ${message} (${type})`);
+    
+    // Create message element
+    const messageElement = document.createElement('div');
+    messageElement.className = `system-message ${type}`;
+    messageElement.textContent = message;
+    
+    // Find the output element
+    const outputElement = document.getElementById('output');
+    
+    if (outputElement) {
+        // Insert at the beginning of the output
+        if (outputElement.firstChild) {
+            outputElement.insertBefore(messageElement, outputElement.firstChild);
+        } else {
+            outputElement.appendChild(messageElement);
+        }
+        
+        // Remove after 5 seconds
+        setTimeout(() => {
+            if (messageElement.parentNode) {
+                messageElement.parentNode.removeChild(messageElement);
+            }
+        }, 5000);
+    } else {
+        console.error('Output element not found');
+    }
+}
 // ... existing code ...
