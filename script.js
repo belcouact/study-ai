@@ -5154,3 +5154,98 @@ function handleTabSwitch(containerType) {
 }
 
 // ... existing code ...
+
+// Add the missing loading indicator functions
+function showLoadingIndicator() {
+    console.log('Showing loading indicator');
+    
+    // Check if a loading indicator already exists
+    let loadingIndicator = document.querySelector('.loading-indicator');
+    
+    if (!loadingIndicator) {
+        // Create the loading indicator
+        loadingIndicator = document.createElement('div');
+        loadingIndicator.className = 'loading-indicator';
+        
+        // Create the spinner
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner';
+        
+        // Create the loading text
+        const loadingText = document.createElement('div');
+        loadingText.className = 'loading-text';
+        loadingText.textContent = '正在生成题目，请稍候...';
+        
+        // Add the spinner and text to the loading indicator
+        loadingIndicator.appendChild(spinner);
+        loadingIndicator.appendChild(loadingText);
+        
+        // Style the loading indicator
+        loadingIndicator.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+        `;
+        
+        // Style the spinner
+        spinner.style.cssText = `
+            width: 50px;
+            height: 50px;
+            border: 5px solid #e2e8f0;
+            border-top: 5px solid #4299e1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        `;
+        
+        // Add the keyframes for the spinner animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Style the loading text
+        loadingText.style.cssText = `
+            font-size: 18px;
+            color: #4a5568;
+            font-weight: 500;
+        `;
+        
+        // Add the loading indicator to the body
+        document.body.appendChild(loadingIndicator);
+    } else {
+        // Show the existing loading indicator
+        loadingIndicator.style.display = 'flex';
+    }
+}
+
+function hideLoadingIndicator() {
+    console.log('Hiding loading indicator');
+    
+    // Find the loading indicator
+    const loadingIndicator = document.querySelector('.loading-indicator');
+    
+    if (loadingIndicator) {
+        // Hide the loading indicator
+        loadingIndicator.style.display = 'none';
+        
+        // Optionally remove it from the DOM
+        if (loadingIndicator.parentNode) {
+            loadingIndicator.parentNode.removeChild(loadingIndicator);
+        }
+    }
+}
+
+// ... existing code ...
