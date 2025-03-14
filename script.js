@@ -5290,18 +5290,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (existingPoetryContainer && existingPoetryContainer.parentNode) {
                 existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
             }
-            
-            // Show empty state on test page
-            const questionsDisplayContainer = document.getElementById('questions-display-container');
-            const emptyState = document.getElementById('empty-state');
-            
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.classList.remove('hidden');
-                
-                if (emptyState) {
-                    emptyState.classList.remove('hidden');
-                }
-            }
         } else if (containerType === 'poetry' && poetryContainer && contentArea) {
             contentArea.appendChild(poetryContainer);
             if (poetryButton) poetryButton.classList.add('active');
