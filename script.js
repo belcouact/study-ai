@@ -5290,6 +5290,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (existingPoetryContainer && existingPoetryContainer.parentNode) {
                 existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
             }
+            
+            // Set up generate questions button in the new location
+            setupGenerateQuestionsButton();
         } else if (containerType === 'poetry' && poetryContainer && contentArea) {
             contentArea.appendChild(poetryContainer);
             if (poetryButton) poetryButton.classList.add('active');
@@ -5787,3 +5790,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry functionality initialized');
 });
+
+// Function to set up the generate questions button
+function setupGenerateQuestionsButton() {
+    const generateButton = document.getElementById('generate-questions-button');
+    if (generateButton) {
+        // Remove existing event listeners
+        const newButton = generateButton.cloneNode(true);
+        if (generateButton.parentNode) {
+            generateButton.parentNode.replaceChild(newButton, generateButton);
+        }
+        
+        // Add new event listener
+        newButton.addEventListener('click', function() {
+            console.log('Generate questions button clicked');
+            handleGenerateQuestionsClick();
+        });
+    } else {
+        console.error('Generate questions button not found');
+    }
+}

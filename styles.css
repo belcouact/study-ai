@@ -794,6 +794,74 @@ button:active {
     min-height: calc(100vh - 60px);
 }
 
+/* Test Configuration Header */
+.test-config-header {
+    background-color: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.test-config-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+}
+
+.test-config-controls .dropdown-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.test-config-controls .dropdown-container label {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    font-weight: 500;
+    width: auto;
+}
+
+.test-config-controls .dropdown-container select {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: white;
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.test-config-controls #generate-questions-button {
+    margin-left: auto;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.test-config-controls #generate-questions-button:hover {
+    background-color: #2980b9;
+}
+
+@media (max-width: 768px) {
+    .test-config-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .test-config-controls #generate-questions-button {
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+    }
+}
+
 /* Loading indicator for tests */
 #test-loading-indicator {
     display: flex;
