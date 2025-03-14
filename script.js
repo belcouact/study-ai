@@ -22,14 +22,16 @@ function parseQuestionsFromResponse(response) {
     }
     
     try {
-        // First, try to parse the entire response as JSON
-        try {
-            const jsonData = JSON.parse(response);
-            if (Array.isArray(jsonData)) {
-                console.log('Response is a valid JSON array');
+        // Check if response is already an object (not a string)
+        if (typeof response === 'object' && response !== null) {
+            console.log('Response is an object, checking for valid structure');
+            
+            // Check if it's an array of questions
+            if (Array.isArray(response)) {
+                console.log('Response is an array, validating questions');
                 
                 // Validate each question
-                const validQuestions = jsonData.filter(q => {
+                const validQuestions = response.filter(q => {
                     const isValid = q && q.question && q.options && q.answer && q.explanation;
                     if (!isValid) {
                         console.log('Skipping question with missing fields:', q);
@@ -41,6 +43,46 @@ function parseQuestionsFromResponse(response) {
                     console.log('Successfully parsed', validQuestions.length, 'questions:', validQuestions);
                     return validQuestions;
                 }
+            }
+            
+            // Check if it has a choices property (API response format)
+            if (response.choices && Array.isArray(response.choices) && response.choices.length > 0) {
+                console.log('Response has choices array, extracting content');
+                
+                // Extract content from the first choice
+                let content = '';
+                
+                if (response.choices[0].message && response.choices[0].message.content) {
+                    content = response.choices[0].message.content;
+                } else if (response.choices[0].text) {
+                    content = response.choices[0].text;
+                } else if (response.choices[0].content) {
+                    content = response.choices[0].content;
+                }
+                
+                if (content) {
+                    console.log('Extracted content from choices:', content);
+                    
+                    // Try to parse JSON from the content
+                    try {
+                        // Look for JSON array in the content
+                        const jsonRegex = /\[\s*\{.*\}\s*\]/s;
+                        const match = content.match(jsonRegex);
+                        
+                        if (match) {
+                            const jsonStr = match[0];
+                            const jsonData = JSON.parse(jsonStr);
+                            
+                            if (Array.isArray(jsonData)) {
+                                const validQuestions = jsonData.filter(q => {
+                                    const isValid = q && q.question && q.options && q.answer && q.explanation;
+                                    if (!isValid) {
+                                        console.log('Skipping question with missing fields:', q);
+                                    }
+                                    return isValid;
+                                });
+                                
+                                if (validQuestions.length > 0) {
             } else if (jsonData.questions && Array.isArray(jsonData.questions)) {
                 // Sometimes the API returns { questions: [...] }
                 console.log('Response contains a questions array');
@@ -1515,33 +1557,79 @@ window.extractContentFromResponse = extractContentFromResponse;
 
 // Function to show system messages
 function showSystemMessage(message, type = 'info') {
+    console.log(`Showing system message: ${message} (${type})`);
+    
+    // Create message element
     const messageElement = document.createElement('div');
     messageElement.className = `system-message ${type}`;
     messageElement.textContent = message;
     
-    // Get the questions display container
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    // Find the output element
+    const outputElement = document.getElementById('output');
     
-    // Create status container if it doesn't exist
-    let statusContainer = document.getElementById('status-container');
-    if (!statusContainer) {
-        statusContainer = document.createElement('div');
-        statusContainer.id = 'status-container';
-        statusContainer.className = 'status-container';
-        questionsDisplayContainer.insertBefore(statusContainer, questionsDisplayContainer.firstChild);
-    }
-    
-    // Clear previous messages
-    statusContainer.innerHTML = '';
-    
-    // Add new message
-    statusContainer.appendChild(messageElement);
-    
-    // Auto-remove after 5 seconds for non-error messages
-    if (type !== 'error') {
+    if (outputElement) {
+        // Insert at the beginning of the output
+        if (outputElement.firstChild) {
+            outputElement.insertBefore(messageElement, outputElement.firstChild);
+        } else {
+            outputElement.appendChild(messageElement);
+        }
+        
+        // Remove after 5 seconds
         setTimeout(() => {
-            messageElement.remove();
+            if (messageElement.parentNode) {
+                messageElement.parentNode.removeChild(messageElement);
+            }
         }, 5000);
+    } else {
+        console.error('Output element not found');
+        
+        // Try to find an alternative container based on the active panel
+        const activePanel = document.querySelector('.panel-button.active');
+        const panelType = activePanel ? activePanel.id.replace('-button', '') : '';
+        
+        let alternativeContainer = null;
+        
+        if (panelType === 'qa') {
+            alternativeContainer = document.querySelector('.output-container');
+        } else if (panelType === 'create') {
+            alternativeContainer = document.getElementById('create-container');
+        } else if (panelType === 'poetry') {
+            alternativeContainer = document.querySelector('.poetry-content');
+        }
+        
+        if (alternativeContainer) {
+            // Add the message to the alternative container
+            alternativeContainer.appendChild(messageElement);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                if (messageElement.parentNode) {
+                    messageElement.parentNode.removeChild(messageElement);
+                }
+            }, 5000);
+            
+            console.log(`Added system message to alternative container for ${panelType} panel`);
+        } else {
+            // Last resort: add to body
+            document.body.appendChild(messageElement);
+            
+            // Style for floating message
+            messageElement.style.position = 'fixed';
+            messageElement.style.top = '20px';
+            messageElement.style.left = '50%';
+            messageElement.style.transform = 'translateX(-50%)';
+            messageElement.style.zIndex = '9999';
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                if (messageElement.parentNode) {
+                    messageElement.parentNode.removeChild(messageElement);
+                }
+            }, 5000);
+            
+            console.log('Added system message to body as floating message');
+        }
     }
 }
 
@@ -3203,15 +3291,39 @@ function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, subm
             return;
         }
         
-        // Show loading indicator
+        // Get the loading element
         const loadingElement = document.getElementById('loading');
+        
+        // Show loading indicator
         if (loadingElement) {
             loadingElement.classList.remove('hidden');
+            console.log('Loading indicator shown');
+        } else {
+            console.error('Loading element not found');
+            
+            // Try to create a loading element
+            const outputContainer = document.querySelector('.output-container');
+            if (outputContainer) {
+                const newLoadingElement = document.createElement('div');
+                newLoadingElement.id = 'loading';
+                newLoadingElement.innerHTML = `
+                    <div class="spinner"></div>
+                    <p>Thinking...</p>
+                `;
+                
+                // Insert at the beginning of the output container
+                outputContainer.insertBefore(newLoadingElement, outputContainer.firstChild);
+                
+                // Now show it
+                newLoadingElement.classList.remove('hidden');
+                console.log('Created and showed new loading indicator');
+            }
         }
         
         try {
             // Get educational context
             const educationalContext = getSimplifiedEducationalContext();
+            console.log('Educational context:', educationalContext);
             
             // Prepare the prompt
             const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
@@ -3237,6 +3349,7 @@ ${educationalContext}
             // Hide loading indicator
             if (loadingElement) {
                 loadingElement.classList.add('hidden');
+                console.log('Loading indicator hidden');
             }
             
             // Display the response
@@ -3267,6 +3380,7 @@ ${educationalContext}
             // Hide loading indicator
             if (loadingElement) {
                 loadingElement.classList.add('hidden');
+                console.log('Loading indicator hidden after error');
             }
             
             // Show error message
@@ -3427,50 +3541,26 @@ function getCurriculumInfo(school, grade, subject) {
 function getSimplifiedEducationalContext() {
     console.log('Getting simplified educational context');
     
-    // Initialize with default values
-    let school = '未指定学校类型';
-    let grade = '未指定年级';
+    // Get school and grade from sidebar
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    const gradeSelect = document.getElementById('grade-select-sidebar');
     
-    // Get all select elements in the document
-    const allSelects = document.querySelectorAll('select');
+    if (!schoolSelect || !gradeSelect) {
+        console.error('School or grade select elements not found');
+        return '教育背景：\n未指定';
+    }
     
-    // Scan through all selects to find our dropdowns
-    allSelects.forEach(select => {
-        const id = select.id || '';
-        const name = select.name || '';
-        const value = select.value;
-        
-        // Check if this is a school dropdown
-        if (id.includes('school') || name.includes('school')) {
-            if (value && value !== 'none') {
-                try {
-                    school = select.options[select.selectedIndex].text;
-                } catch (e) {
-                    // Map values to text
-                    const schoolMap = {
-                        'primary': '小学',
-                        'middle': '初中',
-                        'high': '高中'
-                    };
-                    school = schoolMap[value] || value;
-                }
-            }
-        }
-        
-        // Check if this is a grade dropdown
-        if (id.includes('grade') || name.includes('grade')) {
-            if (value && value !== 'none') {
-                try {
-                    grade = select.options[select.selectedIndex].text;
-                } catch (e) {
-                    grade = value;
-                }
-            }
-        }
-    });
+    const school = schoolSelect.value;
+    const grade = gradeSelect.options[gradeSelect.selectedIndex]?.text || '';
     
-    console.log('Simplified educational context:', { school, grade });
-    return { school, grade };
+    console.log('Educational context:', { school, grade });
+    
+    // Format the educational context as a string
+    const educationalContext = `教育背景：
+学校类型：${school}
+年级：${grade}`;
+    
+    return educationalContext;
 }
 
 // Add a new function to get simplified context summary (school and grade only)
@@ -5256,12 +5346,39 @@ async function handleSubmitQuestion(question) {
         return;
     }
     
+    // Get the loading element
+    const loadingElement = document.getElementById('loading');
+    
     // Show loading indicator
-    showLoadingIndicator();
+    if (loadingElement) {
+        loadingElement.classList.remove('hidden');
+        console.log('Loading indicator shown in handleSubmitQuestion');
+    } else {
+        console.error('Loading element not found in handleSubmitQuestion');
+        
+        // Try to create a loading element
+        const outputContainer = document.querySelector('.output-container');
+        if (outputContainer) {
+            const newLoadingElement = document.createElement('div');
+            newLoadingElement.id = 'loading';
+            newLoadingElement.innerHTML = `
+                <div class="spinner"></div>
+                <p>Thinking...</p>
+            `;
+            
+            // Insert at the beginning of the output container
+            outputContainer.insertBefore(newLoadingElement, outputContainer.firstChild);
+            
+            // Now show it
+            newLoadingElement.classList.remove('hidden');
+            console.log('Created and showed new loading indicator in handleSubmitQuestion');
+        }
+    }
     
     try {
         // Get educational context
         const educationalContext = getSimplifiedEducationalContext();
+        console.log('Educational context in handleSubmitQuestion:', educationalContext);
         
         // Prepare the prompt
         const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
@@ -5274,18 +5391,21 @@ ${educationalContext}
 如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平。
 如果可能，请提供一些例子或应用场景来帮助理解。`;
         
-        console.log('Fetching AI response with prompt:', prompt);
+        console.log('Fetching AI response with prompt in handleSubmitQuestion:', prompt);
         
         // Call the API
         const response = await fetchAIResponse(prompt);
-        console.log('API response:', response);
+        console.log('API response in handleSubmitQuestion:', response);
         
         // Extract content from response
         const content = extractContentFromResponse(response);
-        console.log('Extracted content:', content);
+        console.log('Extracted content in handleSubmitQuestion:', content);
         
         // Hide loading indicator
-        hideLoadingIndicator();
+        if (loadingElement) {
+            loadingElement.classList.add('hidden');
+            console.log('Loading indicator hidden in handleSubmitQuestion');
+        }
         
         // Display the response
         const outputElement = document.getElementById('output');
@@ -5293,6 +5413,8 @@ ${educationalContext}
             // Create a new message element
             const messageElement = document.createElement('div');
             messageElement.className = 'ai-message';
+            
+            // Format the content with math expressions
             messageElement.innerHTML = formatMathExpressions(content);
             
             // Add the message to the output
@@ -5302,10 +5424,13 @@ ${educationalContext}
             outputElement.scrollTop = outputElement.scrollHeight;
         }
     } catch (error) {
-        console.error('Error submitting question:', error);
+        console.error('Error submitting question in handleSubmitQuestion:', error);
         
         // Hide loading indicator
-        hideLoadingIndicator();
+        if (loadingElement) {
+            loadingElement.classList.add('hidden');
+            console.log('Loading indicator hidden after error in handleSubmitQuestion');
+        }
         
         // Show error message
         const outputElement = document.getElementById('output');
