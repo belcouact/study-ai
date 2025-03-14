@@ -1192,7 +1192,35 @@ async function handleGenerateQuestionsClick() {
         window.questions = questions;
         window.currentQuestionIndex = 0;
         
-        // Hide the empty state
+        // Find or create the container to display questions
+        let contentArea = document.querySelector('.content-area');
+        if (!contentArea) {
+            console.log('Content area not found, looking for app container');
+            contentArea = document.querySelector('.app-container');
+            if (!contentArea) {
+                console.log('App container not found, using body');
+                contentArea = document.body;
+            }
+        }
+        
+        // Check if we're on the test page by looking for the create container
+        let createContainer = document.getElementById('create-container');
+        
+        // If create container doesn't exist, try to find it by class
+        if (!createContainer) {
+            createContainer = document.querySelector('.create-container');
+        }
+        
+        // If still not found, create it
+        if (!createContainer) {
+            console.log('Create container not found, creating it');
+            createContainer = document.createElement('div');
+            createContainer.id = 'create-container';
+            createContainer.className = 'create-container';
+            contentArea.appendChild(createContainer);
+        }
+        
+        // Hide the empty state if it exists
         const emptyState = document.getElementById('empty-state');
         if (emptyState) {
             emptyState.classList.add('hidden');
@@ -1209,15 +1237,9 @@ async function handleGenerateQuestionsClick() {
             questionsDisplayContainer.id = 'questions-display-container';
             questionsDisplayContainer.className = 'questions-display-container';
             
-            // Find the create container to append to
-            const createContainer = document.getElementById('create-container');
-            if (createContainer) {
-                createContainer.appendChild(questionsDisplayContainer);
-                console.log('Created questions display container');
-            } else {
-                console.error('Create container not found, cannot create questions display container');
-                throw new Error('Create container not found');
-            }
+            // Add to the create container
+            createContainer.appendChild(questionsDisplayContainer);
+            console.log('Created questions display container');
         }
         
         // Remove the 'hidden' class if it exists
@@ -1238,20 +1260,46 @@ async function handleGenerateQuestionsClick() {
         
         try {
             // Find a safe element to show the message in
-            const createContainer = document.getElementById('create-container');
-            if (createContainer) {
+            let container = document.getElementById('create-container');
+            
+            if (!container) {
+                container = document.querySelector('.create-container');
+            }
+            
+            if (!container) {
+                container = document.querySelector('.content-area');
+            }
+            
+            if (!container) {
+                container = document.querySelector('.app-container');
+            }
+            
+            if (!container) {
+                container = document.body;
+            }
+            
+            if (container) {
                 const errorMessage = document.createElement('div');
                 errorMessage.className = 'system-message error';
                 errorMessage.textContent = '生成题目时出错，请稍后再试';
+                errorMessage.style.cssText = `
+                    padding: 15px;
+                    margin: 15px 0;
+                    background-color: #FEE2E2;
+                    color: #B91C1C;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    text-align: center;
+                `;
                 
                 // Clear container first
-                const existingError = createContainer.querySelector('.system-message.error');
+                const existingError = container.querySelector('.system-message.error');
                 if (existingError) {
-                    createContainer.removeChild(existingError);
+                    container.removeChild(existingError);
                 }
                 
                 // Add the new error message
-                createContainer.appendChild(errorMessage);
+                container.appendChild(errorMessage);
                 
                 // Remove after 5 seconds
                 setTimeout(() => {
@@ -1260,10 +1308,12 @@ async function handleGenerateQuestionsClick() {
                     }
                 }, 5000);
             } else {
-                console.error('Cannot show error message, container not found');
+                console.error('Cannot show error message, no suitable container found');
+                alert('生成题目时出错，请稍后再试');
             }
         } catch (displayError) {
             console.error('Failed to display error message:', displayError);
+            alert('生成题目时出错，请稍后再试');
         }
     }
 }
