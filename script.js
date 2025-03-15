@@ -2,6 +2,11 @@
 let currentApiFunction = 'chat';
 let currentModel = 'deepseek-r1';
 
+// Global variables for question management
+let questionsArray = [];
+let currentQuestionIndex = 0;
+let userAnswers = [];
+
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
     console.log('Parsing questions from response:', response);
@@ -491,41 +496,124 @@ function formatMathExpressions(text) {
 }
 
 // Global function to update navigation buttons
-function updateNavigationButtons() {
-    console.log('updateNavigationButtons called', currentQuestionIndex, window.questions ? window.questions.length : 0);
+function setupNavigationButtons() {
+    console.log('Setting up navigation buttons');
     
+    // Find or create the navigation controls container
+    let navigationControls = document.querySelector('.navigation-controls');
+    if (!navigationControls) {
+        navigationControls = document.createElement('div');
+        navigationControls.className = 'navigation-controls';
+        navigationControls.style.cssText = `
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            width: 100%;
+        `;
+        
+        // Find the questions display container to append to
+        const questionsDisplayContainer = document.getElementById('questions-display-container');
+        if (questionsDisplayContainer) {
+            questionsDisplayContainer.appendChild(navigationControls);
+        } else {
+            // If questions display container doesn't exist, try to find the create container
+            const createContainer = document.getElementById('create-container');
+            if (createContainer) {
+                createContainer.appendChild(navigationControls);
+            }
+        }
+    }
+    
+    // Find existing buttons
     const prevButton = document.getElementById('prev-question-button');
     const nextButton = document.getElementById('next-question-button');
     
-    if (prevButton) {
-        prevButton.disabled = !window.questions || currentQuestionIndex <= 0;
-    }
-    
-    if (nextButton) {
-        nextButton.disabled = !window.questions || currentQuestionIndex >= window.questions.length - 1;
-    }
-
-    // Update navigation buttons for mobile
-    if (prevButton && nextButton) {
-        const buttonStyle = `
+    // Create prev button if it doesn't exist
+    if (!prevButton) {
+        const newPrevButton = document.createElement('button');
+        newPrevButton.id = 'prev-question-button';
+        newPrevButton.className = 'nav-button';
+        newPrevButton.innerHTML = '&larr; 上一题';
+        newPrevButton.style.cssText = `
             padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
             font-size: clamp(14px, 3.5vw, 16px);
             border-radius: 8px;
             margin: clamp(5px, 2vw, 10px);
+            background-color: #edf2f7;
+            color: #4a5568;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
         `;
-        prevButton.style.cssText += buttonStyle;
-        nextButton.style.cssText += buttonStyle;
+        
+        newPrevButton.addEventListener('click', function() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+        
+        navigationControls.appendChild(newPrevButton);
+    } else {
+        // Remove any existing event listeners
+        const newPrevButton = prevButton.cloneNode(true);
+        prevButton.parentNode.replaceChild(newPrevButton, prevButton);
+        
+        // Add new event listener
+        newPrevButton.addEventListener('click', function() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
     }
     
-    // Check if all questions are answered and display completion status
-    if (window.userAnswers && window.questions) {
-        const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
-                                   window.userAnswers.every(answer => answer !== null);
+    // Create next button if it doesn't exist
+    if (!nextButton) {
+        const newNextButton = document.createElement('button');
+        newNextButton.id = 'next-question-button';
+        newNextButton.className = 'nav-button';
+        newNextButton.innerHTML = '下一题 &rarr;';
+        newNextButton.style.cssText = `
+            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            border-radius: 8px;
+            margin: clamp(5px, 2vw, 10px);
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        `;
         
-        if (allQuestionsAnswered) {
-            displayCompletionStatus();
-        }
+        newNextButton.addEventListener('click', function() {
+            if (questionsArray && currentQuestionIndex < questionsArray.length - 1) {
+                currentQuestionIndex++;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+        
+        navigationControls.appendChild(newNextButton);
+    } else {
+        // Remove any existing event listeners
+        const newNextButton = nextButton.cloneNode(true);
+        nextButton.parentNode.replaceChild(newNextButton, nextButton);
+        
+        // Add new event listener
+        newNextButton.addEventListener('click', function() {
+            if (questionsArray && currentQuestionIndex < questionsArray.length - 1) {
+                currentQuestionIndex++;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
     }
+    
+    // Update button states
+    updateNavigationButtons();
 }
 
 // Function to display completion status and score in navigation section
@@ -1368,29 +1456,34 @@ function hideLoadingIndicator() {
 function setupNavigationButtons() {
     console.log('Setting up navigation buttons');
     
-    const prevButton = document.getElementById('prev-question-button');
-    const nextButton = document.getElementById('next-question-button');
-    
-    // Create navigation controls if they don't exist
+    // Find or create the navigation controls container
     let navigationControls = document.querySelector('.navigation-controls');
     if (!navigationControls) {
         navigationControls = document.createElement('div');
         navigationControls.className = 'navigation-controls';
         navigationControls.style.cssText = `
             display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 20px 0;
+            justify-content: space-between;
+            margin-top: 20px;
             width: 100%;
-            flex-wrap: wrap;
-            gap: 10px;
         `;
         
+        // Find the questions display container to append to
         const questionsDisplayContainer = document.getElementById('questions-display-container');
         if (questionsDisplayContainer) {
             questionsDisplayContainer.appendChild(navigationControls);
+        } else {
+            // If questions display container doesn't exist, try to find the create container
+            const createContainer = document.getElementById('create-container');
+            if (createContainer) {
+                createContainer.appendChild(navigationControls);
+            }
         }
     }
+    
+    // Find existing buttons
+    const prevButton = document.getElementById('prev-question-button');
+    const nextButton = document.getElementById('next-question-button');
     
     // Create prev button if it doesn't exist
     if (!prevButton) {
@@ -1453,7 +1546,7 @@ function setupNavigationButtons() {
         `;
         
         newNextButton.addEventListener('click', function() {
-            if (window.questions && currentQuestionIndex < window.questions.length - 1) {
+            if (questionsArray && currentQuestionIndex < questionsArray.length - 1) {
                 currentQuestionIndex++;
                 displayCurrentQuestion();
                 updateNavigationButtons();
@@ -1468,7 +1561,7 @@ function setupNavigationButtons() {
         
         // Add new event listener
         newNextButton.addEventListener('click', function() {
-            if (window.questions && currentQuestionIndex < window.questions.length - 1) {
+            if (questionsArray && currentQuestionIndex < questionsArray.length - 1) {
                 currentQuestionIndex++;
                 displayCurrentQuestion();
                 updateNavigationButtons();
@@ -1482,9 +1575,17 @@ function setupNavigationButtons() {
 
 // Function to set up option selection buttons
 function setupOptionButtons() {
-    console.log('Setting up option buttons');
-    
+    // Find all option buttons
     const optionButtons = document.querySelectorAll('.option-button');
+    if (!optionButtons.length) {
+        console.log('No option buttons found');
+        return;
+    }
+    
+    // Initialize userAnswers array if not already done
+    if (!userAnswers) {
+        userAnswers = new Array(questionsArray ? questionsArray.length : 0).fill(null);
+    }
     
     optionButtons.forEach(button => {
         // Remove any existing event listeners
@@ -1494,9 +1595,9 @@ function setupOptionButtons() {
         // Add new event listener
         newButton.addEventListener('click', function() {
             const option = this.getAttribute('data-option');
-            if (option && window.questions) {
+            if (option && questionsArray) {
                 // Save user's answer
-                window.userAnswers[currentQuestionIndex] = option;
+                userAnswers[currentQuestionIndex] = option;
                 
                 // Update UI to show selected option
                 document.querySelectorAll('.option-button').forEach(btn => {
@@ -1505,7 +1606,7 @@ function setupOptionButtons() {
                 this.classList.add('selected');
                 
                 // Check if answer is correct
-                const currentQuestion = window.questions[currentQuestionIndex];
+                const currentQuestion = questionsArray[currentQuestionIndex];
                 const isCorrect = option === currentQuestion.answer;
                 
                 // Show feedback
@@ -1529,7 +1630,7 @@ function setupOptionButtons() {
                 }
             }
         });
-        });
+    });
 }
 
 // Make sure the function is available globally for the inline onclick handler
