@@ -3046,7 +3046,7 @@ function initializeEmptyState() {
             
             // Create description
             const description = document.createElement('p');
-            description.textContent = '使用左侧边栏选择学校类型、年级、学期、科目、难度和题目数量，然后点击"出题"按钮生成测验题目。';
+            description.textContent = '选择科目、学期、难度和题数，然后点击"开始出题"按钮生成测验题目。';
             description.style.cssText = `
                 font-size: 16px;
                 color: #4a5568;
@@ -5829,6 +5829,7 @@ function setupTestConfigDropdowns() {
     
     // Add event listener to the generate button
     if (generateButton) {
+        console.log('Adding event listener to generate button');
         // Remove any existing event listeners
         const newButton = generateButton.cloneNode(true);
         if (generateButton.parentNode) {
@@ -5836,7 +5837,19 @@ function setupTestConfigDropdowns() {
         }
         
         // Add new event listener
-        newButton.addEventListener('click', handleGenerateQuestionsClick);
+        newButton.addEventListener('click', function(event) {
+            console.log('Generate button clicked');
+            handleGenerateQuestionsClick();
+        });
+        
+        // Also add a direct onclick attribute as a fallback
+        newButton.onclick = function() {
+            console.log('Generate button onclick triggered');
+            handleGenerateQuestionsClick();
+            return false;
+        };
+    } else {
+        console.error('Generate questions button not found');
     }
     
     // Add event listeners to school and grade selects to update subject options
@@ -5880,7 +5893,7 @@ function populateSubjectOptions(school, subjectSelect) {
 
 // Modified function to handle generate questions click
 function handleGenerateQuestionsClick() {
-    console.log('Generate questions button clicked');
+    console.log('handleGenerateQuestionsClick function called');
     
     // Get values from the form
     const schoolSelect = document.getElementById('school-select-sidebar');
@@ -5891,6 +5904,14 @@ function handleGenerateQuestionsClick() {
     const questionCountSelect = document.getElementById('question-count-select');
     
     if (!schoolSelect || !gradeSelect || !subjectSelect || !semesterSelect || !difficultySelect || !questionCountSelect) {
+        console.error('Form elements not found:', {
+            schoolSelect: !!schoolSelect,
+            gradeSelect: !!gradeSelect,
+            subjectSelect: !!subjectSelect,
+            semesterSelect: !!semesterSelect,
+            difficultySelect: !!difficultySelect,
+            questionCountSelect: !!questionCountSelect
+        });
         showSystemMessage('无法获取表单数据，请刷新页面重试', 'error');
         return;
     }
@@ -5901,6 +5922,8 @@ function handleGenerateQuestionsClick() {
     const semester = semesterSelect.value;
     const difficulty = difficultySelect.value;
     const questionCount = questionCountSelect.value;
+    
+    console.log('Form values:', { school, grade, subject, semester, difficulty, questionCount });
     
     // ... rest of the existing handleGenerateQuestionsClick function ...
 }
