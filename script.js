@@ -1743,24 +1743,30 @@ function handleGenerateQuestionsClick() {
     // Show loading indicator
     showLoadingIndicator();
     
-    // Get educational context
-    const context = getEducationalContext();
+    // Try to get educational context, but provide defaults if not available
+    let context = getEducationalContext();
     console.log('Educational context:', context);
     
-    // Validate context and provide fallback values
-    if (!context || !context.school || !context.grade || !context.subject) {
-        hideLoadingIndicator();
-        showSystemMessage('请先选择学校、年级和科目', 'warning');
-        return;
+    // If context is null, create a default context
+    if (!context) {
+        console.log('Using default educational context');
+        context = {
+            school: '小学',
+            grade: '三年级',
+            subject: '数学',
+            difficulty: '中等',
+            questionCount: 5,
+            semester: '上学期'
+        };
     }
     
     // Ensure all required values exist with fallbacks
-    const school = context.school || '未指定学校';
-    const grade = context.grade || '未指定年级';
-    const subject = context.subject || '未指定科目';
+    const school = context.school || '小学';
+    const grade = context.grade || '三年级';
+    const subject = context.subject || '数学';
     const questionCount = context.questionCount || 5;
     const difficulty = context.difficulty || '中等';
-    const semester = context.semester || '当前学期';
+    const semester = context.semester || '上学期';
     
     // Prepare the prompt with validated values
     const prompt = `请为${school}${grade}的${subject}课程创建${questionCount}道${difficulty}难度的选择题，适合${semester}学习。
