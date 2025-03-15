@@ -2,6 +2,19 @@
 let currentApiFunction = 'chat';
 let currentModel = 'deepseek-r1';
 
+// Define global state object if it doesn't exist
+if (typeof state === 'undefined') {
+    var state = {
+        questions: [],
+        currentQuestionIndex: 0,
+        userAnswers: [],
+        isLoading: false,
+        sidebarVisible: true,
+        poems: [],
+        currentPoemIndex: 0
+    };
+}
+
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
     console.log('Parsing questions from response:', response);
