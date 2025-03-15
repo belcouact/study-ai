@@ -2993,93 +2993,85 @@ function moveContentCreationToTop() {
 
 // Function to initialize empty state on the test page
 function initializeEmptyState() {
-    const createContainer = document.getElementById('create-container');
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    
-    // Only initialize empty state if no questions are loaded
-    if (!window.questions || window.questions.length === 0) {
-        // Create or get the empty state element
-        let emptyState = document.getElementById('empty-state');
-        
-        if (!emptyState) {
-            emptyState = document.createElement('div');
-            emptyState.id = 'empty-state';
-            emptyState.className = 'empty-state';
-            emptyState.style.cssText = `
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                padding: 40px 20px;
-                text-align: center;
-                background-color: white;
-                border-radius: 12px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-                margin: 20px auto;
-                max-width: 600px;
-            `;
-            
-            // Create icon
-            const icon = document.createElement('div');
-            icon.innerHTML = `
-                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#4299e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"></path>
-                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                </svg>
-            `;
-            icon.style.cssText = `
-                margin-bottom: 20px;
-                color: #4299e1;
-            `;
-            
-            // Create heading
-            const heading = document.createElement('h3');
-            heading.textContent = '准备好开始测验了吗？';
-            heading.style.cssText = `
-                font-size: 24px;
-                color: #2d3748;
-                                    margin-bottom: 15px;
-            `;
-            
-            // Create description
-            const description = document.createElement('p');
-            description.textContent = '使用左侧边栏选择学校类型、年级、学期、科目、难度和题目数量，然后点击"出题"按钮生成测验题目。';
-            description.style.cssText = `
-                font-size: 16px;
-                color: #4a5568;
-                line-height: 1.6;
-                max-width: 500px;
-            `;
-            
-            // Assemble empty state
-            emptyState.appendChild(icon);
-            emptyState.appendChild(heading);
-            emptyState.appendChild(description);
-            
-            // Add to container
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.innerHTML = '';
-                questionsDisplayContainer.appendChild(emptyState);
-                questionsDisplayContainer.classList.remove('hidden');
-            } else if (createContainer) {
-                // Create questions display container if it doesn't exist
-                const newQuestionsContainer = document.createElement('div');
-                newQuestionsContainer.id = 'questions-display-container';
-                newQuestionsContainer.className = 'questions-display-container';
-                newQuestionsContainer.appendChild(emptyState);
-                
-                createContainer.innerHTML = '';
-                createContainer.appendChild(newQuestionsContainer);
-            }
-        } else {
-            // Make sure the empty state is visible
-            emptyState.classList.remove('hidden');
-            
-            // Make sure the questions display container is visible
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.classList.remove('hidden');
-            }
+    // Only initialize empty state if we don't have questions
+    const questionsArray = window.parsedQuestions || [];
+    if (questionsArray.length > 0) {
+        // If we have questions, hide empty state
+        const emptyState = document.querySelector('.empty-state');
+        if (emptyState) {
+            emptyState.style.display = 'none';
         }
+        return;
+    }
+    
+    // Create empty state container
+    const emptyState = document.createElement('div');
+    emptyState.className = 'empty-state';
+    emptyState.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        text-align: center;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        margin: 20px auto;
+        max-width: 600px;
+    `;
+    
+    // Create icon
+    const icon = document.createElement('div');
+    icon.innerHTML = `
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#4299e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+        </svg>
+    `;
+    icon.style.cssText = `
+        margin-bottom: 20px;
+        color: #4299e1;
+    `;
+    
+    // Create heading
+    const heading = document.createElement('h3');
+    heading.textContent = '准备好开始测验了吗？';
+    heading.style.cssText = `
+        font-size: 24px;
+        color: #2d3748;
+                                    margin-bottom: 15px;
+    `;
+    
+    // Create description
+    const description = document.createElement('p');
+    description.textContent = '使用左侧边栏选择学校类型、年级、学期、科目、难度和题目数量，然后点击"出题"按钮生成测验题目。';
+    description.style.cssText = `
+        font-size: 16px;
+        color: #4a5568;
+        line-height: 1.6;
+        max-width: 500px;
+    `;
+    
+    // Assemble empty state
+    emptyState.appendChild(icon);
+    emptyState.appendChild(heading);
+    emptyState.appendChild(description);
+    
+    // Add to container
+    if (questionsDisplayContainer) {
+        questionsDisplayContainer.innerHTML = '';
+        questionsDisplayContainer.appendChild(emptyState);
+        questionsDisplayContainer.classList.remove('hidden');
+    } else if (createContainer) {
+        // Create questions display container if it doesn't exist
+        const newQuestionsContainer = document.createElement('div');
+        newQuestionsContainer.id = 'questions-display-container';
+        newQuestionsContainer.className = 'questions-display-container';
+        newQuestionsContainer.appendChild(emptyState);
+        
+        createContainer.innerHTML = '';
+        createContainer.appendChild(newQuestionsContainer);
     }
 } 
 
@@ -4696,37 +4688,36 @@ function init() {
 
 // Switch between different panels (keep this function for other buttons)
 function switchPanel(panelId) {
-    console.log('Switching to panel:', panelId);
-    
     // Hide all panels
-    const qaPanel = document.getElementById('qa-panel');
-    const createPanel = document.getElementById('create-panel');
-    const poetryPanel = document.getElementById('poetry-panel');
-    
-    if (qaPanel) qaPanel.classList.add('hidden');
-    if (createPanel) createPanel.classList.add('hidden');
-    if (poetryPanel) poetryPanel.classList.add('hidden');
+    const panels = document.querySelectorAll('.panel');
+    panels.forEach(panel => {
+        panel.style.display = 'none';
+    });
     
     // Show the selected panel
-    if (panelId === 'qa-panel' && qaPanel) {
-        qaPanel.classList.remove('hidden');
-        document.getElementById('qa-button').classList.add('active');
-        document.getElementById('create-button').classList.remove('active');
-        const poetryButton = document.getElementById('poetry-button');
-        if (poetryButton) poetryButton.classList.remove('active');
-    } else if (panelId === 'create-panel' && createPanel) {
-        createPanel.classList.remove('hidden');
-        document.getElementById('create-button').classList.add('active');
-        document.getElementById('qa-button').classList.remove('active');
-        const poetryButton = document.getElementById('poetry-button');
-        if (poetryButton) poetryButton.classList.remove('active');
-    } else if (panelId === 'poetry-panel' && poetryPanel) {
-        poetryPanel.classList.remove('hidden');
-        const poetryButton = document.getElementById('poetry-button');
-        if (poetryButton) poetryButton.classList.add('active');
-        document.getElementById('qa-button').classList.remove('active');
-        document.getElementById('create-button').classList.remove('active');
-        console.log('Poetry panel is now visible via switchPanel');
+    const selectedPanel = document.getElementById(panelId);
+    if (selectedPanel) {
+        selectedPanel.style.display = 'block';
+        
+        // Only initialize empty state when loading the page initially,
+        // not when switching tabs
+        if (panelId === 'create-panel') {
+            // Check if we already have questions to display
+            const questionsArray = window.parsedQuestions || [];
+            if (questionsArray.length > 0) {
+                // If we have questions, make sure empty state is hidden
+                const emptyState = document.querySelector('.empty-state');
+                if (emptyState) {
+                    emptyState.style.display = 'none';
+                }
+                
+                // Make sure the questions container is visible
+                const questionsContainer = document.querySelector('.questions-container');
+                if (questionsContainer) {
+                    questionsContainer.style.display = 'block';
+                }
+            }
+        }
     }
 }
 
