@@ -2218,34 +2218,31 @@ window.extractContentFromResponse = extractContentFromResponse;
 
 // Function to show system messages
 function showSystemMessage(message, type = 'info') {
+    console.log('\n', message);
+    
+    const container = document.querySelector('.questions-container');
+    if (!container) {
+        console.error('System message container not found');
+        return; // Exit the function if container doesn't exist
+    }
+    
     const messageElement = document.createElement('div');
     messageElement.className = `system-message ${type}`;
     messageElement.textContent = message;
     
-    // Get the questions display container
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    
-    // Create status container if it doesn't exist
-    let statusContainer = document.getElementById('status-container');
-    if (!statusContainer) {
-        statusContainer = document.createElement('div');
-        statusContainer.id = 'status-container';
-        statusContainer.className = 'status-container';
-        questionsDisplayContainer.insertBefore(statusContainer, questionsDisplayContainer.firstChild);
+    // Check if container has a firstChild before using insertBefore
+    if (container.firstChild) {
+        container.insertBefore(messageElement, container.firstChild);
+    } else {
+        container.appendChild(messageElement); // Use appendChild if there's no firstChild
     }
     
-    // Clear previous messages
-    statusContainer.innerHTML = '';
-    
-    // Add new message
-    statusContainer.appendChild(messageElement);
-    
-    // Auto-remove after 5 seconds for non-error messages
-    if (type !== 'error') {
-        setTimeout(() => {
+    // Auto-remove the message after 5 seconds
+    setTimeout(() => {
+        if (messageElement.parentNode) {
             messageElement.remove();
-        }, 5000);
-    }
+        }
+    }, 5000);
 }
 
 // Initialize the page with form layout
