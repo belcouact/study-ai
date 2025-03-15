@@ -156,57 +156,53 @@ function parseQuestionsFromResponse(response) {
 
 // Global function to fetch AI response for question generation
 async function fetchAIResponse(prompt) {
-    const apiUrl = 'https://d7e72b44.study-llm.pages.dev/api/chat';
+    console.log('Fetching AI response with prompt:', prompt);
     
-    // Create request payload
-    const payload = {
-        prompt: prompt,
-        max_tokens: 2000,
-        temperature: 0.7
-    };
-    
-    // Add retry logic
-    const maxRetries = 3;
-    let retryCount = 0;
-    let lastError = null;
-    
-    while (retryCount < maxRetries) {
-        try {
-            console.log(`Attempt ${retryCount + 1} to fetch AI response`);
-            
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-            
-            // Check if response is ok (status in the range 200-299)
-            if (!response.ok) {
-                const errorText = await response.text().catch(() => 'No error details available');
-                throw new Error(`API call failed with status: ${response.status}. Details: ${errorText}`);
-            }
-            
-            const data = await response.json();
-            return extractContentFromResponse(data);
-        } catch (error) {
-            console.log(`Error in fetchAIResponse (attempt ${retryCount + 1}):`, error);
-            lastError = error;
-            retryCount++;
-            
-            if (retryCount < maxRetries) {
-                // Wait before retrying (exponential backoff)
-                const waitTime = Math.pow(2, retryCount) * 1000;
-                console.log(`Waiting ${waitTime}ms before retry...`);
-                await new Promise(resolve => setTimeout(resolve, waitTime));
-            }
+    try {
+        // Show loading indicator if it exists
+        const loading = document.getElementById('loading');
+        if (loading) {
+            loading.classList.remove('hidden');
+        }
+        
+        // Make the actual API call using the current API function and model
+        const apiEndpoint = `/api/${currentApiFunction}`;
+        const response = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                messages: [
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ],
+                model: currentModel,
+                temperature: 0.7,
+                max_tokens: 2000
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API call failed with status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('API response:', data);
+        return data;
+        
+    } catch (error) {
+        console.error('Error in fetchAIResponse:', error);
+        throw error; // Re-throw the error to be handled by the caller
+    } finally {
+        // Hide loading indicator if it exists
+        const loading = document.getElementById('loading');
+        if (loading) {
+            loading.classList.add('hidden');
         }
     }
-    
-    // If we've exhausted all retries, throw the last error
-    console.error(`Failed after ${maxRetries} attempts:`, lastError);
-    throw lastError || new Error('Failed to fetch AI response after multiple attempts');
 }
 
 // Function to extract content from API response
@@ -373,60 +369,652 @@ function showResultsPopup() {
 }
 
 // Function to display the current question
-function displayCurrentQuestion(index) {
-    console.log('displayCurrentQuestion called', index);
-    console.log('Questions array:', questions);
+function displayCurrentQuestion() {
+    console.log('displayCurrentQuestion called', window.currentQuestionIndex);
+    console.log('Questions array:', window.questions);
     
-    if (!questions || questions.length === 0) {
+    if (!window.questions || window.questions.length === 0) {
         console.error('No questions available to display');
         return;
     }
     
-    currentQuestionIndex = index;
-    const question = questions[index];
-    console.log('Current question:', question);
+    const question = window.questions[window.currentQuestionIndex];
     
-    // Ensure the questions container exists
-    let questionsContainer = document.getElementById('questions-display-container');
-    if (!questionsContainer) {
-        console.log('Creating questions display container');
-        questionsContainer = document.createElement('div');
-        questionsContainer.id = 'questions-display-container';
-        
-        // Find a suitable parent to append to
-        const mainContent = document.querySelector('.main-content') || document.body;
-        mainContent.appendChild(questionsContainer);
-        
-        console.log('Questions container created and appended to DOM');
+    if (!question) {
+        console.error('No question found at index', window.currentQuestionIndex);
+        return;
     }
     
-    // Clear previous content
-    questionsContainer.innerHTML = '';
+    console.log('Current question:', question);
+
+    // Make sure the questions display container is visible
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    if (questionsDisplayContainer) {
+        questionsDisplayContainer.classList.remove('hidden');
+        
+        // Hide the empty state if it exists
+        const emptyState = document.getElementById('empty-state');
+        if (emptyState) {
+            emptyState.classList.add('hidden');
+        }
+        
+        // Hide the loading indicator if it exists
+        const loadingIndicator = document.getElementById('test-loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
+    } else {
+        console.error('Questions display container not found in displayCurrentQuestion');
+        return;
+    }
+
+    // Check if all questions are answered
+    const allQuestionsAnswered = window.userAnswers && 
+                               window.userAnswers.length === window.questions.length && 
+                               window.userAnswers.every(answer => answer !== null);
+
+    // Show completion status if all questions are answered
+    if (allQuestionsAnswered) {
+        displayCompletionStatus();
+    }
     
-    // Create and append question elements
-    const questionElement = document.createElement('div');
-    questionElement.className = 'question';
-    questionElement.innerHTML = `
-        <div class="question-text">${question.questionText}</div>
-        <div class="choices-container">
-            ${Object.entries(question.choices).map(([key, value]) => `
-                <div class="choice" data-choice="${key}">
-                    <span class="choice-letter">${key}.</span>
-                    <span class="choice-text">${value}</span>
-                </div>
-            `).join('')}
-        </div>
-    `;
+    // Update question counter with responsive styling
+    const questionCounter = document.getElementById('question-counter');
+    if (questionCounter) {
+        questionCounter.style.cssText = `
+            font-size: clamp(14px, 2.5vw, 16px);
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: #edf2f7;
+            border-radius: 20px;
+            display: inline-block;
+            width: fit-content;
+        `;
+        questionCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
+        console.log('Updated question counter:', questionCounter.textContent);
+    } else {
+        console.error('Question counter element not found');
+        // Create it if it doesn't exist
+        const newCounter = document.createElement('div');
+        newCounter.id = 'question-counter';
+        newCounter.className = 'question-counter';
+        newCounter.style.cssText = `
+            font-size: clamp(14px, 2.5vw, 16px);
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: #edf2f7;
+            border-radius: 20px;
+            display: inline-block;
+            width: fit-content;
+        `;
+        newCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
+        questionsDisplayContainer.appendChild(newCounter);
+    }
     
-    questionsContainer.appendChild(questionElement);
+    // Format and display question text with responsive styling
+    const questionText = document.getElementById('question-text');
+    if (questionText) {
+        questionText.style.cssText = `
+            font-size: clamp(16px, 4vw, 18px);
+            color: #2d3748;
+            line-height: 1.6;
+            margin-bottom: clamp(15px, 4vw, 25px);
+            padding: clamp(15px, 4vw, 20px);
+            background: #f8f9fa;
+            border-radius: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        `;
+        // Remove "题目：" prefix if it exists
+        let displayText = question.questionText;
+        if (displayText.startsWith('题目：')) {
+            displayText = displayText.substring(3);
+        }
+        
+        // Apply enhanced math formatting
+        questionText.innerHTML = formatMathExpressions(displayText);
+        console.log('Updated question text:', displayText);
+    } else {
+        console.error('Question text element not found');
+        // Create it if it doesn't exist
+        const newText = document.createElement('div');
+        newText.id = 'question-text';
+        newText.className = 'question-text';
+        newText.style.cssText = `
+            font-size: clamp(16px, 4vw, 18px);
+            color: #2d3748;
+            line-height: 1.6;
+            margin-bottom: clamp(15px, 4vw, 25px);
+            padding: clamp(15px, 4vw, 20px);
+            background: #f8f9fa;
+            border-radius: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        `;
+        let displayText = question.questionText;
+        if (displayText.startsWith('题目：')) {
+            displayText = displayText.substring(3);
+        }
+        newText.innerHTML = formatMathExpressions(displayText);
+        questionsDisplayContainer.appendChild(newText);
+    }
     
-    // Add event listeners to choices
-    const choiceElements = questionsContainer.querySelectorAll('.choice');
-    choiceElements.forEach(choice => {
-        choice.addEventListener('click', handleChoiceClick);
-    });
+    // Create responsive grid for choices with 2x2 layout
+    const choicesContainer = document.getElementById('choices-container');
+    if (choicesContainer) {
+        console.log('Choices container found, updating with choices:', question.choices);
+        
+        choicesContainer.innerHTML = `
+            <div class="choices-grid" style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: clamp(8px, 2vw, 20px);
+                margin: 25px 0;
+                width: 100%;
+            ">
+                ${['A', 'B', 'C', 'D'].map(letter => `
+                    <div class="choice-cell" data-value="${letter}" style="
+                        padding: clamp(10px, 2vw, 15px);
+                        border: 2px solid #e2e8f0;
+                        border-radius: 12px;
+                        background-color: white;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        user-select: none;
+                        -webkit-tap-highlight-color: transparent;
+                    ">
+                        <div class="choice-indicator" style="
+                            width: 28px;
+                            height: 28px;
+                            border-radius: 50%;
+                            background: #edf2f7;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: 500;
+                            color: #4a5568;
+                            flex-shrink: 0;
+                        ">${letter}</div>
+                        <div class="choice-text" style="
+                            flex: 1;
+                            font-size: clamp(14px, 2.5vw, 16px);
+                            color: #2d3748;
+                            line-height: 1.5;
+                        ">${formatMathExpressions(question.choices[letter])}</div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="submit-button-container" style="
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+                width: 100%;
+            ">
+                <button id="submit-answer-button" style="
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    font-weight: 500;
+                    background-color: #4299e1;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+                    opacity: 0.7;
+                    pointer-events: none;
+                ">提交答案</button>
+            </div>
+        `;
+
+        // Add enhanced interaction effects for choice cells
+        const choiceCells = choicesContainer.querySelectorAll('.choice-cell');
+        const submitButton = document.getElementById('submit-answer-button');
+        let selectedCell = null;
+        let selectedValue = null;
+
+        choiceCells.forEach(cell => {
+            const indicator = cell.querySelector('.choice-indicator');
+            
+            // Function to update cell styles
+            const updateCellStyles = (cell, isSelected) => {
+                cell.style.borderColor = isSelected ? '#4299e1' : '#e2e8f0';
+                cell.style.backgroundColor = isSelected ? '#ebf8ff' : 'white';
+                cell.querySelector('.choice-indicator').style.backgroundColor = isSelected ? '#4299e1' : '#edf2f7';
+                cell.querySelector('.choice-indicator').style.color = isSelected ? 'white' : '#4a5568';
+            };
+            
+            // Click handling with single choice enforcement
+            cell.addEventListener('click', () => {
+                if (selectedCell) {
+                    updateCellStyles(selectedCell, false);
+                }
+                selectedCell = cell;
+                selectedValue = cell.dataset.value;
+                updateCellStyles(cell, true);
+                
+                // Enable submit button
+                if (submitButton) {
+                    submitButton.style.opacity = '1';
+                    submitButton.style.pointerEvents = 'auto';
+                }
+            });
+            
+            // Touch and hover effects
+            cell.addEventListener('touchstart', () => {
+                if (cell !== selectedCell) {
+                    cell.style.backgroundColor = '#f7fafc';
+                }
+            }, { passive: true });
+            
+            cell.addEventListener('touchend', () => {
+                if (cell !== selectedCell) {
+                    cell.style.backgroundColor = 'white';
+                }
+            }, { passive: true });
+            
+            cell.addEventListener('mouseover', () => {
+                if (cell !== selectedCell) {
+                    cell.style.borderColor = '#cbd5e0';
+                    cell.style.backgroundColor = '#f7fafc';
+                    cell.style.transform = 'translateY(-1px)';
+                }
+            });
+            
+            cell.addEventListener('mouseout', () => {
+                if (cell !== selectedCell) {
+                    cell.style.borderColor = '#e2e8f0';
+                    cell.style.backgroundColor = 'white';
+                    cell.style.transform = 'none';
+                }
+            });
+
+            // Set initial state if answer exists
+            if (window.userAnswers && window.userAnswers[window.currentQuestionIndex] === cell.dataset.value) {
+                selectedCell = cell;
+                selectedValue = cell.dataset.value;
+                updateCellStyles(cell, true);
+                
+                // Enable submit button if answer already selected
+                if (submitButton) {
+                    submitButton.style.opacity = '1';
+                    submitButton.style.pointerEvents = 'auto';
+                }
+            }
+        });
+        
+        // Add submit button functionality
+        if (submitButton) {
+            submitButton.addEventListener('click', () => {
+                if (selectedValue) {
+                    // Save the answer
+                    window.userAnswers[window.currentQuestionIndex] = selectedValue;
+                    
+                    // Show the answer container
+                    displayAnswer(selectedValue);
+                    
+                    // Check if all questions are answered
+                    const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
+                                               window.userAnswers.every(answer => answer !== null);
+                    
+                    // Show completion status if all questions are answered
+                    if (allQuestionsAnswered) {
+                        displayCompletionStatus();
+                    }
+                }
+            });
+        }
+        
+        console.log('Choice cells set up:', choiceCells.length);
+    } else {
+        console.error('Choices container element not found');
+        // Create it if it doesn't exist
+        const newChoices = document.createElement('div');
+        newChoices.id = 'choices-container';
+        newChoices.className = 'choices-container';
+        newChoices.innerHTML = `
+            <div class="choices-grid" style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: clamp(8px, 2vw, 20px);
+                margin: 25px 0;
+                width: 100%;
+            ">
+                ${['A', 'B', 'C', 'D'].map(letter => `
+                    <div class="choice-cell" data-value="${letter}" style="
+                        padding: clamp(10px, 2vw, 15px);
+                        border: 2px solid #e2e8f0;
+                        border-radius: 12px;
+                        background-color: white;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        user-select: none;
+                        -webkit-tap-highlight-color: transparent;
+                    ">
+                        <div class="choice-indicator" style="
+                            width: 28px;
+                            height: 28px;
+                            border-radius: 50%;
+                            background: #edf2f7;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: 500;
+                            color: #4a5568;
+                            flex-shrink: 0;
+                        ">${letter}</div>
+                        <div class="choice-text" style="
+                            flex: 1;
+                            font-size: clamp(14px, 2.5vw, 16px);
+                            color: #2d3748;
+                            line-height: 1.5;
+                        ">${formatMathExpressions(question.choices[letter])}</div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="submit-button-container" style="
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+                width: 100%;
+            ">
+                <button id="submit-answer-button" style="
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    font-weight: 500;
+                    background-color: #4299e1;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+                    opacity: 0.7;
+                    pointer-events: none;
+                ">提交答案</button>
+            </div>
+        `;
+        questionsDisplayContainer.appendChild(newChoices);
+        
+        // Add event listeners to the newly created choice cells
+        const choiceCells = newChoices.querySelectorAll('.choice-cell');
+        const submitButton = document.getElementById('submit-answer-button');
+        let selectedValue = null;
+        
+        choiceCells.forEach(cell => {
+            cell.addEventListener('click', function() {
+                // Update UI to show this cell as selected
+                choiceCells.forEach(c => {
+                    c.style.borderColor = '#e2e8f0';
+                    c.style.backgroundColor = 'white';
+                    c.querySelector('.choice-indicator').style.backgroundColor = '#edf2f7';
+                    c.querySelector('.choice-indicator').style.color = '#4a5568';
+                });
+                
+                this.style.borderColor = '#4299e1';
+                this.style.backgroundColor = '#ebf8ff';
+                this.querySelector('.choice-indicator').style.backgroundColor = '#4299e1';
+                this.querySelector('.choice-indicator').style.color = 'white';
+                
+                // Store selected value
+                selectedValue = this.dataset.value;
+                
+                // Enable submit button
+                if (submitButton) {
+                    submitButton.style.opacity = '1';
+                    submitButton.style.pointerEvents = 'auto';
+                }
+            });
+        });
+        
+        // Add submit button functionality
+        if (submitButton) {
+            submitButton.addEventListener('click', function() {
+                if (selectedValue) {
+                    // Save the answer
+                    window.userAnswers[window.currentQuestionIndex] = selectedValue;
+                    
+                    // Show answer and explanation
+                    displayAnswer(selectedValue);
+                    
+                    // Check if all questions are answered
+                    const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
+                                               window.userAnswers.every(answer => answer !== null);
+                    
+                    // Show completion status if all questions are answered
+                    if (allQuestionsAnswered) {
+                        displayCompletionStatus();
+                    }
+                }
+            });
+        }
+    }
     
-    updateNavigationButtons(index, questions.length);
+    // Function to display answer and explanation
+    function displayAnswer(selectedValue) {
+        // Create or get the answer container
+        let answerContainer = document.getElementById('answer-container');
+        if (!answerContainer) {
+            answerContainer = document.createElement('div');
+            answerContainer.id = 'answer-container';
+            answerContainer.className = 'answer-container';
+            answerContainer.style.cssText = `
+                margin-top: clamp(20px, 5vw, 30px);
+                padding: clamp(15px, 4vw, 25px);
+                border-radius: 12px;
+                background-color: white;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                width: 100%;
+                box-sizing: border-box;
+                animation: fadeIn 0.3s ease;
+            `;
+            questionsDisplayContainer.appendChild(answerContainer);
+        }
+        
+        answerContainer.classList.remove('hidden');
+        
+        // Check if answer is correct
+        const correctAnswer = question.answer;
+        const isCorrect = selectedValue === correctAnswer;
+        
+        // Create or update the answer result
+        let answerResult = document.getElementById('answer-result');
+        if (!answerResult) {
+            answerResult = document.createElement('div');
+            answerResult.id = 'answer-result';
+            answerResult.className = 'answer-result';
+            answerContainer.appendChild(answerResult);
+        }
+        
+        answerResult.style.cssText = `
+            font-size: 18px;
+            font-weight: 500;
+            color: ${isCorrect ? '#48bb78' : '#e53e3e'};
+            margin-bottom: 20px;
+            padding: 15px;
+            background: ${isCorrect ? '#f0fff4' : '#fff5f5'};
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        `;
+        
+        const resultText = isCorrect 
+            ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 正确！答案是：${correctAnswer}`
+            : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> 错误。正确答案是：${correctAnswer}`;
+        
+        answerResult.innerHTML = formatMathExpressions(resultText);
+        
+        // Create or update the explanation
+        let answerExplanation = document.getElementById('answer-explanation');
+        if (!answerExplanation) {
+            answerExplanation = document.createElement('div');
+            answerExplanation.id = 'answer-explanation';
+            answerExplanation.className = 'answer-explanation';
+            answerContainer.appendChild(answerExplanation);
+        }
+        
+        answerExplanation.style.cssText = `
+            font-size: 16px;
+            color: #4a5568;
+            line-height: 1.8;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            white-space: pre-wrap;
+        `;
+        answerExplanation.innerHTML = formatMathExpressions(question.explanation);
+        
+        // Disable the submit button after submission
+        const submitButton = document.getElementById('submit-answer-button');
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.style.opacity = '0.5';
+            submitButton.style.pointerEvents = 'none';
+            submitButton.textContent = '已提交';
+        }
+        
+        // Render math expressions
+        if (window.MathJax) {
+            window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+        }
+    }
+    
+    // Style the answer container when showing results
+    if (window.userAnswers && window.userAnswers[window.currentQuestionIndex]) {
+        const answerContainer = document.getElementById('answer-container');
+        if (answerContainer) {
+            answerContainer.classList.remove('hidden');
+            answerContainer.style.cssText = `
+                margin-top: clamp(20px, 5vw, 30px);
+                padding: clamp(15px, 4vw, 25px);
+                border-radius: 12px;
+                background-color: white;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                width: 100%;
+                box-sizing: border-box;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            const selectedAnswer = window.userAnswers[window.currentQuestionIndex];
+            const correctAnswer = question.answer;
+            const isCorrect = selectedAnswer === correctAnswer;
+            
+            // Style the result section
+            const answerResult = document.getElementById('answer-result');
+            if (answerResult) {
+                answerResult.style.cssText = `
+                    font-size: 18px;
+                    font-weight: 500;
+                    color: ${isCorrect ? '#48bb78' : '#e53e3e'};
+                    margin-bottom: 20px;
+                    padding: 15px;
+                    background: ${isCorrect ? '#f0fff4' : '#fff5f5'};
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                `;
+                
+                const resultText = isCorrect 
+                    ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 正确！答案是：${correctAnswer}`
+                    : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> 错误。正确答案是：${correctAnswer}`;
+                
+                answerResult.innerHTML = formatMathExpressions(resultText);
+            }
+            
+            // Style the explanation section
+            const answerExplanation = document.getElementById('answer-explanation');
+            if (answerExplanation) {
+                answerExplanation.style.cssText = `
+                    font-size: 16px;
+                    color: #4a5568;
+                    line-height: 1.8;
+                    margin-top: 20px;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                    white-space: pre-wrap;
+                `;
+                answerExplanation.innerHTML = formatMathExpressions(question.explanation);
+            }
+            
+            // Disable the submit button if already submitted
+            const submitButton = document.getElementById('submit-answer-button');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.style.opacity = '0.5';
+                submitButton.style.pointerEvents = 'none';
+                submitButton.textContent = '已提交';
+            }
+        }
+    } else {
+        const answerContainer = document.getElementById('answer-container');
+        if (answerContainer) {
+            answerContainer.classList.add('hidden');
+        }
+    }
+    
+    // Ensure create container has enough space and smooth scrolling
+    const createContainer = document.getElementById('create-container');
+    if (createContainer) {
+        createContainer.style.cssText = `
+            min-height: 100vh;
+            height: auto;
+            padding: clamp(15px, 4vw, 30px);
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            background: transparent;
+            border-radius: 16px;
+            box-shadow: none;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            margin: 0 auto;
+        `;
+    }
+    
+    // Render math expressions
+    if (window.MathJax) {
+        window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+    } else {
+        // If MathJax is not loaded, try to load it
+        if (!document.getElementById('mathjax-script')) {
+            const script = document.createElement('script');
+            script.id = 'mathjax-script';
+            script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+            script.async = true;
+            document.head.appendChild(script);
+            
+            script.onload = function() {
+                window.MathJax = {
+                    tex: {
+                        inlineMath: [['\\(', '\\)']],
+                        displayMath: [['\\[', '\\]']]
+                    },
+                    svg: {
+                        fontCache: 'global'
+                    }
+                };
+                
+                // Typeset the math after MathJax is loaded
+                window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+            };
+        }
+    }
+    
+    console.log('displayCurrentQuestion completed');
 }
 
 // Function to format math expressions
@@ -463,62 +1051,40 @@ function formatMathExpressions(text) {
 
 // Global function to update navigation buttons
 function updateNavigationButtons() {
-    console.log('Setting up navigation buttons');
+    console.log('updateNavigationButtons called', window.currentQuestionIndex, window.questions ? window.questions.length : 0);
     
-    // Ensure navigation container exists
-    let navContainer = document.getElementById('question-navigation');
-    if (!navContainer) {
-        navContainer = document.createElement('div');
-        navContainer.id = 'question-navigation';
-        
-        // Find questions container to append navigation after it
-        const questionsContainer = document.getElementById('questions-display-container');
-        if (questionsContainer) {
-            // Insert after questions container
-            if (questionsContainer.parentNode) {
-                questionsContainer.parentNode.insertBefore(navContainer, questionsContainer.nextSibling);
-            } else {
-                // Fallback - append to main content or body
-                const mainContent = document.querySelector('.main-content') || document.body;
-                mainContent.appendChild(navContainer);
-            }
-        } else {
-            // Fallback - append to main content or body
-            const mainContent = document.querySelector('.main-content') || document.body;
-            mainContent.appendChild(navContainer);
-        }
+    const prevButton = document.getElementById('prev-question-button');
+    const nextButton = document.getElementById('next-question-button');
+    
+    if (prevButton) {
+        prevButton.disabled = !window.questions || window.currentQuestionIndex <= 0;
     }
     
-    // Clear previous navigation buttons
-    navContainer.innerHTML = '';
+    if (nextButton) {
+        nextButton.disabled = !window.questions || window.currentQuestionIndex >= window.questions.length - 1;
+    }
+
+    // Update navigation buttons for mobile
+    if (prevButton && nextButton) {
+        const buttonStyle = `
+            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            border-radius: 8px;
+            margin: clamp(5px, 2vw, 10px);
+        `;
+        prevButton.style.cssText += buttonStyle;
+        nextButton.style.cssText += buttonStyle;
+    }
     
-    // Create navigation buttons
-    const prevButton = document.createElement('button');
-    prevButton.id = 'prev-question-btn';
-    prevButton.className = 'nav-button';
-    prevButton.textContent = 'Previous';
-    prevButton.addEventListener('click', () => {
-        if (currentQuestionIndex > 0) {
-            displayCurrentQuestion(currentQuestionIndex - 1);
+    // Check if all questions are answered and display completion status
+    if (window.userAnswers && window.questions) {
+        const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
+                                   window.userAnswers.every(answer => answer !== null);
+        
+        if (allQuestionsAnswered) {
+            displayCompletionStatus();
         }
-    });
-    
-    const nextButton = document.createElement('button');
-    nextButton.id = 'next-question-btn';
-    nextButton.className = 'nav-button';
-    nextButton.textContent = 'Next';
-    nextButton.addEventListener('click', () => {
-        if (currentQuestionIndex < questions.length - 1) {
-            displayCurrentQuestion(currentQuestionIndex + 1);
-        }
-    });
-    
-    // Add buttons to container
-    navContainer.appendChild(prevButton);
-    navContainer.appendChild(nextButton);
-    
-    // Initial update of button states
-    updateNavigationButtons(currentQuestionIndex, questions.length);
+    }
 }
 
 // Function to display completion status and score in navigation section
@@ -631,7 +1197,7 @@ function displayCompletionStatus() {
         completionStatus.appendChild(evaluateButton);
         
         // Insert completion status between navigation buttons
-        const prevButton = document.getElementById('prev-question-btn');
+        const prevButton = document.getElementById('prev-question-button');
         if (prevButton && prevButton.parentNode === navigationControls) {
             navigationControls.insertBefore(completionStatus, prevButton.nextSibling);
         } else {
@@ -1155,116 +1721,232 @@ function formatParagraph(paragraph) {
 }
 
 // Function to handle generating questions
-async function handleGenerateQuestionsClick() {
-    try {
-        // Show loading state
-        const generateButton = document.getElementById('generate-questions-btn');
-        const originalButtonText = generateButton.textContent;
-        generateButton.textContent = 'Generating...';
-        generateButton.disabled = true;
-        
-        // Ensure the empty state is hidden
-        const emptyState = document.getElementById('empty-state');
-        if (emptyState) {
-            emptyState.style.display = 'none';
-            console.log('Empty state hidden');
-        }
-        
-        // Get user input
-        const prompt = document.getElementById('prompt-input').value.trim();
-        const numQuestions = parseInt(document.getElementById('num-questions').value);
-        
-        if (!prompt) {
-            throw new Error('Please enter a prompt for generating questions.');
-        }
-        
-        // Create or ensure questions container exists
-        let questionsContainer = document.getElementById('questions-display-container');
-        if (!questionsContainer) {
-            console.log('Creating questions display container');
-            questionsContainer = document.createElement('div');
-            questionsContainer.id = 'questions-display-container';
-            
-            // Find a suitable parent to append to
-            const mainContent = document.querySelector('.main-content');
-            if (mainContent) {
-                mainContent.appendChild(questionsContainer);
-                console.log('Questions container created and appended to DOM');
-            } else {
-                console.error('Main content container not found');
-                throw new Error('Could not find main content container');
-            }
-        }
-        
-        // Generate questions
-        const generatedQuestions = await generateQuestions(prompt, numQuestions);
-        console.log('Successfully parsed', generatedQuestions.length, 'questions:', generatedQuestions);
-        console.log('Parsed questions:', generatedQuestions);
-        
-        // Update global questions array
-        questions = generatedQuestions;
-        
-        // Display the first question
-        if (questions.length > 0) {
-            displayCurrentQuestion(0);
-            setupNavigationButtons();
-        } else {
-            throw new Error('No questions were generated. Please try a different prompt.');
-        }
-        
-        // Show success message
-        if (questionsContainer) {
-            const successMessage = document.createElement('div');
-            successMessage.className = 'system-message success';
-            successMessage.textContent = `Generated ${questions.length} questions successfully!`;
-            
-            if (questionsContainer.firstChild) {
-                questionsContainer.insertBefore(successMessage, questionsContainer.firstChild);
-            } else {
-                questionsContainer.appendChild(successMessage);
-            }
-            
-            setTimeout(() => {
-                if (successMessage.parentNode) {
-                    successMessage.parentNode.removeChild(successMessage);
-                }
-            }, 5000);
-        }
-    } catch (error) {
-        console.log('Error processing questions:', error);
-        
-        // Create or ensure questions container exists for error message
-        let questionsContainer = document.getElementById('questions-display-container');
-        if (!questionsContainer) {
-            questionsContainer = document.createElement('div');
-            questionsContainer.id = 'questions-display-container';
-            
-            const mainContent = document.querySelector('.main-content');
-            if (mainContent) {
-                mainContent.appendChild(questionsContainer);
-            } else {
-                // If we can't find the main content, append to body as a fallback
-                document.body.appendChild(questionsContainer);
-            }
-        }
-        
-        // Show error message
-        const errorMessage = document.createElement('div');
-        errorMessage.className = 'system-message error';
-        errorMessage.textContent = `Error: ${error.message}`;
-        
-        questionsContainer.innerHTML = ''; // Clear container
-        questionsContainer.appendChild(errorMessage);
-        
-        console.log('API error:', error);
-    } finally {
-        // Reset button state
-        const generateButton = document.getElementById('generate-questions-btn');
-        if (generateButton) {
-            generateButton.textContent = originalButtonText || 'Generate Questions';
-            generateButton.disabled = false;
-        }
+function handleGenerateQuestionsClick() {
+    console.log('handleGenerateQuestionsClick called');
+    
+    // Get form elements from sidebar
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    const gradeSelect = document.getElementById('grade-select-sidebar');
+    const semesterSelect = document.getElementById('semester-select-sidebar');
+    const subjectSelect = document.getElementById('subject-select-sidebar');
+    const difficultySelect = document.getElementById('difficulty-select-sidebar');
+    const questionCountSelect = document.getElementById('question-count-select-sidebar');
+    const generateQuestionsButton = document.querySelector('.sidebar-generate-button');
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    const emptyState = document.getElementById('empty-state');
+    
+    if (!schoolSelect || !gradeSelect || !semesterSelect || !subjectSelect || 
+        !difficultySelect || !questionCountSelect || !generateQuestionsButton) {
+        console.error('One or more form elements not found');
+        return;
     }
+    
+    // Only show loading state if we're on the test page
+    const isTestPage = document.getElementById('create-container').classList.contains('active') || 
+                      !document.getElementById('create-container').classList.contains('hidden');
+    
+    if (isTestPage) {
+    // Show loading state on button
+    generateQuestionsButton.textContent = '生成中...';
+    generateQuestionsButton.disabled = true;
+    
+        // Hide empty state if it exists
+        if (emptyState) {
+            emptyState.classList.add('hidden');
+        }
+        
+        // Show loading indicator on the test page
+        showLoadingIndicator();
+    }
+    
+    // Collect form data from sidebar
+    const schoolType = schoolSelect.value;
+    const grade = gradeSelect.value;
+    const semester = semesterSelect.value;
+    const subject = subjectSelect.value;
+    const difficulty = difficultySelect.value;
+    const questionCount = questionCountSelect.value;
+    
+    console.log('Form data collected:', { schoolType, grade, semester, subject, difficulty, questionCount });
+    
+    // Create prompt for API
+    const prompt = `请生成${questionCount}道${schoolType}${grade}${semester}${subject}的${difficulty}难度选择题，每道题包括题目、四个选项(A、B、C、D)、答案和详细解析。严格的格式要求：
+每道题必须包含以下六个部分，缺一不可：
+1. "题目："后接具体题目
+2. "A."后接选项A的内容
+3. "B."后接选项B的内容
+4. "C."后接选项C的内容
+5. "D."后接选项D的内容
+6. "答案："后接正确选项（必须是A、B、C、D其中之一）
+7. "解析："后必须包含完整的解析（至少50字）
+
+解析部分必须包含以下内容（缺一不可）：
+1. 解题思路和方法，不能超纲
+2. 关键知识点解释
+3. 正确答案的推导过程
+4. 为什么其他选项是错误的
+5. 相关知识点的总结
+6. 易错点提醒
+
+示例格式：
+题目：[题目内容]
+A. [选项A内容]
+B. [选项B内容] 
+C. [选项C内容]
+D. [选项D内容]
+答案：[A或B或C或D]
+解析：本题主要考察[知识点]。解题思路是[详细说明]。首先，[推导过程]。选项分析：A选项[分析]，B选项[分析]，C选项[分析]，D选项[分析]。需要注意的是[易错点]。总的来说，[知识点总结]。同学们在解题时要特别注意[关键提醒]。
+
+题目质量要求：
+1. 题目表述必须清晰、准确，无歧义
+2. 选项内容必须完整，符合逻辑
+3. 所有选项必须有实际意义，不能有无意义的干扰项
+4. 难度必须符合年级水平
+5. 解析必须详尽，有教育意义
+6. 不出带图形的题目
+`;
+
+    // Call API to generate questions
+    fetchAIResponse(prompt)
+        .then(response => {
+            try {
+                console.log('Processing API response:', response);
+                
+                // Hide loading indicator
+                hideLoadingIndicator();
+                
+                // Parse the response
+                const parsedQuestions = parseQuestionsFromResponse(response);
+                console.log('Parsed questions:', parsedQuestions);
+                
+                if (parsedQuestions.length === 0) {
+                    throw new Error('No questions could be parsed from the response');
+                }
+                
+                // Make variables globally available
+                window.questions = parsedQuestions;
+                window.userAnswers = Array(parsedQuestions.length).fill(null);
+                window.currentQuestionIndex = 0;
+                
+                // Ensure the questions display container exists and is visible
+                if (!questionsDisplayContainer) {
+                    console.error('Questions display container not found, creating one');
+                    const newContainer = document.createElement('div');
+                    newContainer.id = 'questions-display-container';
+                    newContainer.className = 'questions-display-container';
+                    
+                    // Create required elements inside the container
+                    newContainer.innerHTML = `
+                        <div id="question-counter" class="question-counter"></div>
+                        <div id="question-text" class="question-text"></div>
+                        <div id="choices-container" class="choices-container"></div>
+                        <div id="answer-container" class="answer-container hidden">
+                            <div id="answer-result" class="answer-result"></div>
+                            <div id="answer-explanation" class="answer-explanation"></div>
+                        </div>
+                    `;
+                    
+                    // Add to the create container
+                    const createContainer = document.getElementById('create-container');
+                    if (createContainer) {
+                        createContainer.insertBefore(newContainer, createContainer.firstChild);
+                    }
+                }
+                
+                // Get a fresh reference to the questions display container
+                const questionsContainer = document.getElementById('questions-display-container');
+                
+                // Hide empty state if it exists
+                if (emptyState) {
+                    emptyState.classList.add('hidden');
+                    console.log('Empty state hidden');
+                }
+                
+                // Make sure the questions display container is visible
+                if (questionsContainer) {
+                    questionsContainer.classList.remove('hidden');
+                    console.log('Questions display container shown');
+                    
+                    // Ensure the container has the necessary child elements
+                    if (!document.getElementById('question-counter')) {
+                        const counterDiv = document.createElement('div');
+                        counterDiv.id = 'question-counter';
+                        counterDiv.className = 'question-counter';
+                        questionsContainer.appendChild(counterDiv);
+                    }
+                    
+                    if (!document.getElementById('question-text')) {
+                        const textDiv = document.createElement('div');
+                        textDiv.id = 'question-text';
+                        textDiv.className = 'question-text';
+                        questionsContainer.appendChild(textDiv);
+                    }
+                    
+                    if (!document.getElementById('choices-container')) {
+                        const choicesDiv = document.createElement('div');
+                        choicesDiv.id = 'choices-container';
+                        choicesDiv.className = 'choices-container';
+                        questionsContainer.appendChild(choicesDiv);
+                    }
+                    
+                    if (!document.getElementById('answer-container')) {
+                        const answerDiv = document.createElement('div');
+                        answerDiv.id = 'answer-container';
+                        answerDiv.className = 'answer-container hidden';
+                        answerDiv.innerHTML = `
+                            <div id="answer-result" class="answer-result"></div>
+                            <div id="answer-explanation" class="answer-explanation"></div>
+                        `;
+                        questionsContainer.appendChild(answerDiv);
+                    }
+                } else {
+                    console.error('Questions display container still not found after creation attempt');
+                }
+                
+                // Display the first question
+                displayCurrentQuestion();
+                updateNavigationButtons();
+                
+                // Set up navigation button event listeners
+                setupNavigationButtons();
+                
+                // Show success message
+                showSystemMessage(`已生成 ${parsedQuestions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`, 'success');
+            } catch (error) {
+                console.error('Error processing questions:', error);
+                showSystemMessage('生成题目时出错，请重试', 'error');
+                hideLoadingIndicator();
+                
+                // Show empty state again if there was an error
+                if (emptyState && questionsDisplayContainer) {
+                    emptyState.classList.remove('hidden');
+                    questionsDisplayContainer.classList.remove('hidden');
+                }
+            } finally {
+                // Reset button state
+                if (isTestPage) {
+                generateQuestionsButton.textContent = '出题';
+                generateQuestionsButton.disabled = false;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('API error:', error);
+            showSystemMessage('API调用失败，请重试', 'error');
+            hideLoadingIndicator();
+            
+            // Show empty state again if there was an error
+            if (emptyState && questionsDisplayContainer) {
+                emptyState.classList.remove('hidden');
+                questionsDisplayContainer.classList.remove('hidden');
+            }
+            
+            // Reset button state
+            if (isTestPage) {
+            generateQuestionsButton.textContent = '出题';
+            generateQuestionsButton.disabled = false;
+            }
+        });
 }
 
 // Function to show loading indicator with spinning icon
@@ -1363,60 +2045,116 @@ function hideLoadingIndicator() {
 function setupNavigationButtons() {
     console.log('Setting up navigation buttons');
     
-    // Ensure navigation container exists
-    let navContainer = document.getElementById('question-navigation');
-    if (!navContainer) {
-        navContainer = document.createElement('div');
-        navContainer.id = 'question-navigation';
+    const prevButton = document.getElementById('prev-question-button');
+    const nextButton = document.getElementById('next-question-button');
+    
+    // Create navigation controls if they don't exist
+    let navigationControls = document.querySelector('.navigation-controls');
+    if (!navigationControls) {
+        navigationControls = document.createElement('div');
+        navigationControls.className = 'navigation-controls';
+        navigationControls.style.cssText = `
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 10px;
+        `;
         
-        // Find questions container to append navigation after it
-        const questionsContainer = document.getElementById('questions-display-container');
-        if (questionsContainer) {
-            // Insert after questions container
-            if (questionsContainer.parentNode) {
-                questionsContainer.parentNode.insertBefore(navContainer, questionsContainer.nextSibling);
-            } else {
-                // Fallback - append to main content or body
-                const mainContent = document.querySelector('.main-content') || document.body;
-                mainContent.appendChild(navContainer);
-            }
-        } else {
-            // Fallback - append to main content or body
-            const mainContent = document.querySelector('.main-content') || document.body;
-            mainContent.appendChild(navContainer);
+        const questionsDisplayContainer = document.getElementById('questions-display-container');
+        if (questionsDisplayContainer) {
+            questionsDisplayContainer.appendChild(navigationControls);
         }
     }
     
-    // Clear previous navigation buttons
-    navContainer.innerHTML = '';
+    // Create prev button if it doesn't exist
+    if (!prevButton) {
+        const newPrevButton = document.createElement('button');
+        newPrevButton.id = 'prev-question-button';
+        newPrevButton.className = 'nav-button';
+        newPrevButton.innerHTML = '&larr; 上一题';
+        newPrevButton.style.cssText = `
+            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            border-radius: 8px;
+            margin: clamp(5px, 2vw, 10px);
+            background-color: #edf2f7;
+            color: #4a5568;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        `;
+        
+        newPrevButton.addEventListener('click', function() {
+            if (window.currentQuestionIndex > 0) {
+                window.currentQuestionIndex--;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+        
+        navigationControls.appendChild(newPrevButton);
+    } else {
+        // Remove any existing event listeners
+        const newPrevButton = prevButton.cloneNode(true);
+        prevButton.parentNode.replaceChild(newPrevButton, prevButton);
+        
+        // Add new event listener
+        newPrevButton.addEventListener('click', function() {
+            if (window.currentQuestionIndex > 0) {
+                window.currentQuestionIndex--;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+    }
     
-    // Create navigation buttons
-    const prevButton = document.createElement('button');
-    prevButton.id = 'prev-question-btn';
-    prevButton.className = 'nav-button';
-    prevButton.textContent = 'Previous';
-    prevButton.addEventListener('click', () => {
-        if (currentQuestionIndex > 0) {
-            displayCurrentQuestion(currentQuestionIndex - 1);
-        }
-    });
+    // Create next button if it doesn't exist
+    if (!nextButton) {
+        const newNextButton = document.createElement('button');
+        newNextButton.id = 'next-question-button';
+        newNextButton.className = 'nav-button';
+        newNextButton.innerHTML = '下一题 &rarr;';
+        newNextButton.style.cssText = `
+            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            border-radius: 8px;
+            margin: clamp(5px, 2vw, 10px);
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        `;
+        
+        newNextButton.addEventListener('click', function() {
+            if (window.questions && window.currentQuestionIndex < window.questions.length - 1) {
+                window.currentQuestionIndex++;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+        
+        navigationControls.appendChild(newNextButton);
+    } else {
+        // Remove any existing event listeners
+        const newNextButton = nextButton.cloneNode(true);
+        nextButton.parentNode.replaceChild(newNextButton, nextButton);
+        
+        // Add new event listener
+        newNextButton.addEventListener('click', function() {
+            if (window.questions && window.currentQuestionIndex < window.questions.length - 1) {
+                window.currentQuestionIndex++;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+    }
     
-    const nextButton = document.createElement('button');
-    nextButton.id = 'next-question-btn';
-    nextButton.className = 'nav-button';
-    nextButton.textContent = 'Next';
-    nextButton.addEventListener('click', () => {
-        if (currentQuestionIndex < questions.length - 1) {
-            displayCurrentQuestion(currentQuestionIndex + 1);
-        }
-    });
-    
-    // Add buttons to container
-    navContainer.appendChild(prevButton);
-    navContainer.appendChild(nextButton);
-    
-    // Initial update of button states
-    updateNavigationButtons(currentQuestionIndex, questions.length);
+    // Update button states
+    updateNavigationButtons();
 }
 
 // Function to set up option selection buttons
@@ -1480,31 +2218,32 @@ window.extractContentFromResponse = extractContentFromResponse;
 
 // Function to show system messages
 function showSystemMessage(message, type = 'info') {
-    const container = document.getElementById('questions-display-container');
-    
-    // Check if container exists before proceeding
-    if (!container) {
-        console.error('Cannot show system message: questions-display-container not found');
-        return; // Exit the function if container doesn't exist
-    }
-    
     const messageElement = document.createElement('div');
     messageElement.className = `system-message ${type}`;
     messageElement.textContent = message;
     
-    // Insert at the beginning of the container
-    if (container.firstChild) {
-        container.insertBefore(messageElement, container.firstChild);
-    } else {
-        container.appendChild(messageElement);
+    // Get the questions display container
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    
+    // Create status container if it doesn't exist
+    let statusContainer = document.getElementById('status-container');
+    if (!statusContainer) {
+        statusContainer = document.createElement('div');
+        statusContainer.id = 'status-container';
+        statusContainer.className = 'status-container';
+        questionsDisplayContainer.insertBefore(statusContainer, questionsDisplayContainer.firstChild);
     }
+    
+    // Clear previous messages
+    statusContainer.innerHTML = '';
+    
+    // Add new message
+    statusContainer.appendChild(messageElement);
     
     // Auto-remove after 5 seconds for non-error messages
     if (type !== 'error') {
         setTimeout(() => {
-            if (messageElement.parentNode) {
-                messageElement.parentNode.removeChild(messageElement);
-            }
+            messageElement.remove();
         }, 5000);
     }
 }
@@ -3914,94 +4653,49 @@ function getSimplifiedContextSummary() {
 
 // Initialize the application
 function init() {
-    console.log('Initializing application');
+    console.log('Initializing application...');
     
-    // Set up event listeners
+    // Setup event listeners
     setupEventListeners();
     
-    // Initialize form layout
-    initializeFormLayout();
+    // Populate sidebar options based on selected school
+    const selectedSchool = elements.schoolSelectSidebar.value;
+    if (selectedSchool) {
+        populateSidebarGradeOptions(selectedSchool);
+    }
     
-    // Initialize empty state
+    // Initialize empty state for quiz creation
     initializeEmptyState();
     
-    // Initialize poetry functionality
-    initializePoetryFunctionality();
-    
-    // Switch to default panel (questions)
-    switchPanel('questions');
+    // IMPORTANT: Directly add event listener to poetry button
+    const poetryButton = document.getElementById('poetry-button');
+    if (poetryButton) {
+        console.log('Adding direct click event listener to poetry button');
+        poetryButton.addEventListener('click', function() {
+            console.log('Poetry button clicked directly');
+            // Hide all panels
+            document.getElementById('qa-panel').classList.add('hidden');
+            document.getElementById('create-panel').classList.add('hidden');
+            
+            // Show poetry panel
+            const poetryPanel = document.getElementById('poetry-panel');
+            if (poetryPanel) {
+                poetryPanel.classList.remove('hidden');
+                console.log('Poetry panel is now visible');
+            } else {
+                console.error('Poetry panel element not found');
+            }
+            
+            // Update active states
+            document.getElementById('qa-button').classList.remove('active');
+            document.getElementById('create-button').classList.remove('active');
+            poetryButton.classList.add('active');
+        });
+    } else {
+        console.error('Poetry button not found during init');
+    }
     
     console.log('Application initialized');
-}
-
-function initializePoetryFunctionality() {
-    console.log('Initializing poetry functionality');
-    
-    // Create poetry container if it doesn't exist
-    let poetryContainer = document.getElementById('poetry-container');
-    if (!poetryContainer) {
-        const contentArea = document.querySelector('.content-area');
-        if (contentArea) {
-            poetryContainer = document.createElement('div');
-            poetryContainer.id = 'poetry-container';
-            poetryContainer.className = 'container hidden'; // Hidden by default
-            
-            // Add poetry content
-            poetryContainer.innerHTML = `
-                <div id="poetry-empty-state" class="empty-state">
-                    <h3>生成诗词</h3>
-                    <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成诗词。</p>
-                </div>
-                <div id="poetry-display" class="hidden">
-                    <div id="poem-content"></div>
-                    <div id="poem-navigation">
-                        <button id="prev-poem-btn" class="nav-button">上一首</button>
-                        <button id="next-poem-btn" class="nav-button">下一首</button>
-                    </div>
-                </div>
-            `;
-            
-            contentArea.appendChild(poetryContainer);
-            console.log('Poetry container created and added to content area');
-        }
-    }
-    
-    // Initialize poetry dropdowns
-    initializePoetryDropdowns();
-    
-    // Set up learn poetry button
-    const learnPoetryBtn = document.getElementById('learn-poetry-btn');
-    if (learnPoetryBtn) {
-        learnPoetryBtn.addEventListener('click', handleLearnPoetryClick);
-    } else {
-        console.error('Learn poetry button not found');
-    }
-    
-    // Set up navigation buttons
-    const prevPoemBtn = document.getElementById('prev-poem-btn');
-    const nextPoemBtn = document.getElementById('next-poem-btn');
-    
-    if (prevPoemBtn) {
-        prevPoemBtn.addEventListener('click', () => {
-            console.log('Previous poem button clicked');
-            if (currentPoemIndex > 0) {
-                currentPoemIndex--;
-                displayCurrentPoem();
-            }
-        });
-    }
-    
-    if (nextPoemBtn) {
-        nextPoemBtn.addEventListener('click', () => {
-            console.log('Next poem button clicked');
-            if (currentPoemIndex < poems.length - 1) {
-                currentPoemIndex++;
-                displayCurrentPoem();
-            }
-        });
-    }
-    
-    console.log('Poetry functionality initialized');
 }
 
 // ... existing code ...
@@ -4557,93 +5251,78 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleTabSwitch(containerType) {
         console.log('Switching to tab:', containerType);
         
-        // Get content area
-        const contentArea = document.querySelector('.content-area');
-        if (!contentArea) {
-            console.error('Content area not found');
-            return;
+        // First, remove all containers from DOM to ensure clean state
+        if (qaContainer && qaContainer.parentNode) {
+            qaContainer.parentNode.removeChild(qaContainer);
         }
         
-        // Hide all containers
-        const containers = contentArea.querySelectorAll('.container');
-        containers.forEach(container => {
-            container.classList.add('hidden');
-        });
-        
-        // Show the selected container
-        let container = document.getElementById(`${containerType}-container`);
-        
-        // If container doesn't exist, create it
-        if (!container) {
-            console.log(`${containerType} container not found, creating it`);
-            container = document.createElement('div');
-            container.id = `${containerType}-container`;
-            container.className = 'container';
-            
-            // Add specific content based on container type
-            if (containerType === 'poetry') {
-                container.innerHTML = `
-                    <div id="poetry-empty-state" class="empty-state">
-                        <h3>生成诗词</h3>
-                        <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成诗词。</p>
-                    </div>
-                    <div id="poetry-display" class="hidden">
-                        <div id="poem-content"></div>
-                        <div id="poem-navigation">
-                            <button id="prev-poem-btn" class="nav-button">上一首</button>
-                            <button id="next-poem-btn" class="nav-button">下一首</button>
-                        </div>
-                    </div>
-                `;
-                contentArea.appendChild(container);
-                console.log('Poetry container added to content area');
-                
-                // Initialize poetry-specific elements
-                initializePoetryDropdowns();
-                
-                // Set up event listeners for poetry navigation
-                const prevPoemBtn = document.getElementById('prev-poem-btn');
-                const nextPoemBtn = document.getElementById('next-poem-btn');
-                
-                if (prevPoemBtn) {
-                    prevPoemBtn.addEventListener('click', () => {
-                        console.log('Previous poem button clicked');
-                        if (currentPoemIndex > 0) {
-                            currentPoemIndex--;
-                            displayCurrentPoem();
-                        }
-                    });
-                }
-                
-                if (nextPoemBtn) {
-                    nextPoemBtn.addEventListener('click', () => {
-                        console.log('Next poem button clicked');
-                        if (currentPoemIndex < poems.length - 1) {
-                            currentPoemIndex++;
-                            displayCurrentPoem();
-                        }
-                    });
-                }
-            } else if (containerType === 'questions') {
-                // Add questions container content
-                // ... existing code for questions container ...
-            }
-            
-            contentArea.appendChild(container);
+        if (createContainer && createContainer.parentNode) {
+            createContainer.parentNode.removeChild(createContainer);
         }
         
-        // Show the container
-        container.classList.remove('hidden');
+        if (poetryContainer && poetryContainer.parentNode) {
+            poetryContainer.parentNode.removeChild(poetryContainer);
+        }
         
-        // Update active tab
-        const tabs = document.querySelectorAll('.tab');
-        tabs.forEach(tab => {
-            if (tab.dataset.container === containerType) {
-                tab.classList.add('active');
-            } else {
-                tab.classList.remove('active');
+        // Reset active states
+        if (qaButton) qaButton.classList.remove('active');
+        if (createButton) createButton.classList.remove('active');
+        if (poetryButton) poetryButton.classList.remove('active');
+        
+        // Add only the appropriate container to the content area
+        if (containerType === 'qa' && qaContainer && contentArea) {
+            contentArea.appendChild(qaContainer);
+            if (qaButton) qaButton.classList.add('active');
+            console.log('QA container added to content area');
+            
+            // Ensure poetry container is not present
+            const existingPoetryContainer = document.getElementById('poetry-container');
+            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
+                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
             }
-        });
+        } else if (containerType === 'create' && createContainer && contentArea) {
+            contentArea.appendChild(createContainer);
+            if (createButton) createButton.classList.add('active');
+            console.log('Create container added to content area');
+            
+            // Ensure poetry container is not present
+            const existingPoetryContainer = document.getElementById('poetry-container');
+            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
+                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
+            }
+            
+            // Show empty state on test page
+            const questionsDisplayContainer = document.getElementById('questions-display-container');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (questionsDisplayContainer) {
+                questionsDisplayContainer.classList.remove('hidden');
+                
+                if (emptyState) {
+                    emptyState.classList.remove('hidden');
+                }
+            }
+        } else if (containerType === 'poetry' && poetryContainer && contentArea) {
+            contentArea.appendChild(poetryContainer);
+            if (poetryButton) poetryButton.classList.add('active');
+            console.log('Poetry container added to content area');
+            
+            // After switching to poetry tab, add event listener to learn poetry button
+            setTimeout(() => {
+                const learnPoetryButton = document.getElementById('learn-poetry-button');
+                if (learnPoetryButton) {
+                    // Remove any existing event listeners
+                    const newButton = learnPoetryButton.cloneNode(true);
+                    learnPoetryButton.parentNode.replaceChild(newButton, learnPoetryButton);
+                    
+                    // Add new event listener
+                    newButton.addEventListener('click', function() {
+                        console.log('Learn poetry button clicked');
+                        handleLearnPoetryClick();
+                    });
+                }
+            }, 100);
+        }
     }
     
     // Add event listeners to buttons
@@ -4679,53 +5358,47 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to display the current poem
     function displayCurrentPoem() {
-        console.log('Displaying poem:', poems[currentPoemIndex], 'Current index:', currentPoemIndex);
-        
-        // Ensure poem content container exists
-        const poemContent = document.getElementById('poem-content');
-        if (!poemContent) {
-            console.error('Poem content container not found');
-            
-            // Try to create it if it doesn't exist
-            const poetryDisplay = document.getElementById('poetry-display');
-            if (poetryDisplay) {
-                const newPoemContent = document.createElement('div');
-                newPoemContent.id = 'poem-content';
-                poetryDisplay.prepend(newPoemContent);
-                console.log('Created poem content container');
-            } else {
-                console.error('Poetry display container not found, cannot create poem content container');
-                return;
-            }
-        }
-        
-        // Get current poem
-        if (!poems || poems.length === 0) {
+        if (!poemState.poems || poemState.poems.length === 0) {
             console.error('No poems available to display');
             return;
         }
         
-        const poem = poems[currentPoemIndex];
+        const poem = poemState.poems[poemState.currentIndex];
+        console.log('Displaying poem:', poem, 'Current index:', poemState.currentIndex);
         
-        // Format poem content with line breaks
-        const formattedContent = poem.content.replace(/[，。！？；：]/g, match => `${match}<br>`);
+        // Get poem elements
+        const poemTitle = document.querySelector('.poem-title');
+        const poemAuthor = document.querySelector('.poem-author');
+        const poemContent = document.querySelector('.poem-content');
+        const poemBackground = document.querySelector('.poem-background');
+        const poemExplanation = document.querySelector('.poem-explanation');
+        const poemCounter = document.querySelector('.poem-counter');
         
-        // Update poem content
-        const poemContentElement = document.getElementById('poem-content');
-        if (poemContentElement) {
-            poemContentElement.innerHTML = `
-                <h2>${poem.title}</h2>
-                <h3>${poem.author}</h3>
-                <div class="poem-text">${formattedContent}</div>
-                <div class="poem-background">
-                    <h4>背景</h4>
-                    <p>${poem.background}</p>
-                </div>
-                <div class="poem-explanation">
-                    <h4>赏析</h4>
-                    <p>${poem.explanation}</p>
-                </div>
-            `;
+        // Display poem data with null checks
+        if (poemTitle) poemTitle.textContent = poem.title || '无标题';
+        if (poemAuthor) poemAuthor.textContent = poem.author || '佚名';
+        
+        // Handle content with null check
+        if (poemContent) {
+            if (poem.content) {
+                poemContent.innerHTML = poem.content.replace ? poem.content.replace(/\n/g, '<br>') : poem.content;
+            } else {
+                poemContent.innerHTML = '无内容';
+            }
+        }
+        
+        // Handle background with null check
+        if (poemBackground) {
+            poemBackground.innerHTML = poem.background || '无背景信息';
+        }
+        
+        // Handle explanation with null check
+        if (poemExplanation) {
+            poemExplanation.innerHTML = poem.explanation || '无赏析';
+        }
+        
+        if (poemCounter) {
+            poemCounter.textContent = `${poemState.currentIndex + 1} / ${poemState.poems.length}`;
         }
         
         // Update navigation buttons
@@ -4734,16 +5407,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to update navigation buttons
     function updatePoemNavigationButtons() {
-        const prevButton = document.getElementById('prev-poem-btn');
-        const nextButton = document.getElementById('next-poem-btn');
+        const prevButton = document.getElementById('prev-poem-button');
+        const nextButton = document.getElementById('next-poem-button');
         
         if (prevButton) {
-            prevButton.disabled = currentPoemIndex === 0;
+            prevButton.disabled = poemState.currentIndex === 0;
             console.log('Prev button disabled:', prevButton.disabled);
         }
         
         if (nextButton) {
-            nextButton.disabled = currentPoemIndex === poems.length - 1;
+            nextButton.disabled = poemState.currentIndex === poemState.poems.length - 1;
             console.log('Next button disabled:', nextButton.disabled);
         }
     }
@@ -4752,54 +5425,39 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupPoemNavigationButtons() {
         console.log('Setting up poem navigation buttons');
         
-        // Ensure navigation container exists
-        let navContainer = document.getElementById('poem-navigation');
-        if (!navContainer) {
-            console.log('Poem navigation container not found, creating it');
+        // Remove any existing event listeners by cloning and replacing
+        const prevButton = document.getElementById('prev-poem-button');
+        const nextButton = document.getElementById('next-poem-button');
+        
+        if (prevButton) {
+            const newPrevButton = prevButton.cloneNode(true);
+            prevButton.parentNode.replaceChild(newPrevButton, prevButton);
             
-            // Find poetry display container
-            const poetryDisplay = document.getElementById('poetry-display');
-            if (!poetryDisplay) {
-                console.error('Poetry display container not found, cannot create navigation buttons');
-                return;
-            }
-            
-            navContainer = document.createElement('div');
-            navContainer.id = 'poem-navigation';
-            poetryDisplay.appendChild(navContainer);
-            
-            // Create navigation buttons
-            const prevButton = document.createElement('button');
-            prevButton.id = 'prev-poem-btn';
-            prevButton.className = 'nav-button';
-            prevButton.textContent = '上一首';
-            prevButton.addEventListener('click', () => {
-                console.log('Previous poem button clicked');
-                if (currentPoemIndex > 0) {
-                    currentPoemIndex--;
+            newPrevButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation(); // Stop event from bubbling up to document
+                console.log('Previous poem button clicked directly');
+                if (poemState.currentIndex > 0) {
+                    poemState.currentIndex--;
                     displayCurrentPoem();
                 }
             });
-            
-            const nextButton = document.createElement('button');
-            nextButton.id = 'next-poem-btn';
-            nextButton.className = 'nav-button';
-            nextButton.textContent = '下一首';
-            nextButton.addEventListener('click', () => {
-                console.log('Next poem button clicked');
-                if (currentPoemIndex < poems.length - 1) {
-                    currentPoemIndex++;
-                    displayCurrentPoem();
-                }
-            });
-            
-            // Add buttons to container
-            navContainer.appendChild(prevButton);
-            navContainer.appendChild(nextButton);
         }
         
-        // Update button states
-        updatePoemNavigationButtons();
+        if (nextButton) {
+            const newNextButton = nextButton.cloneNode(true);
+            nextButton.parentNode.replaceChild(newNextButton, nextButton);
+            
+            newNextButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation(); // Stop event from bubbling up to document
+                console.log('Next poem button clicked directly');
+                if (poemState.currentIndex < poemState.poems.length - 1) {
+                    poemState.currentIndex++;
+                    displayCurrentPoem();
+                }
+            });
+        }
     }
     
     // REMOVE the event delegation approach to avoid duplicate handling
@@ -5141,82 +5799,3 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry functionality initialized');
 });
-
-// ... existing code ...
-
-// Poetry button click handler
-const poetryButton = document.getElementById('poetry-btn');
-if (poetryButton) {
-    poetryButton.addEventListener('click', function() {
-        console.log('Poetry button clicked');
-        
-        // Switch to poetry panel
-        handleTabSwitch('poetry');
-        
-        // Ensure poetry panel is visible
-        const poetryContainer = document.getElementById('poetry-container');
-        if (!poetryContainer) {
-            console.error('Poetry container not found after tab switch');
-            // Create poetry container if it doesn't exist
-            const contentArea = document.querySelector('.content-area');
-            if (contentArea) {
-                const newPoetryContainer = document.createElement('div');
-                newPoetryContainer.id = 'poetry-container';
-                newPoetryContainer.className = 'container';
-                
-                // Add poetry content
-                newPoetryContainer.innerHTML = `
-                    <div id="poetry-empty-state" class="empty-state">
-                        <h3>生成诗词</h3>
-                        <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成诗词。</p>
-                    </div>
-                    <div id="poetry-display" class="hidden">
-                        <div id="poem-content"></div>
-                        <div id="poem-navigation">
-                            <button id="prev-poem-btn" class="nav-button">上一首</button>
-                            <button id="next-poem-btn" class="nav-button">下一首</button>
-                        </div>
-                    </div>
-                `;
-                
-                contentArea.appendChild(newPoetryContainer);
-                console.log('Poetry container created and added to content area');
-                
-                // Initialize poetry dropdowns
-                initializePoetryDropdowns();
-                
-                // Setup navigation button event listeners
-                const prevPoemBtn = document.getElementById('prev-poem-btn');
-                const nextPoemBtn = document.getElementById('next-poem-btn');
-                
-                if (prevPoemBtn) {
-                    prevPoemBtn.addEventListener('click', () => {
-                        console.log('Previous poem button clicked');
-                        if (currentPoemIndex > 0) {
-                            currentPoemIndex--;
-                            displayCurrentPoem();
-                        }
-                    });
-                }
-                
-                if (nextPoemBtn) {
-                    nextPoemBtn.addEventListener('click', () => {
-                        console.log('Next poem button clicked');
-                        if (currentPoemIndex < poems.length - 1) {
-                            currentPoemIndex++;
-                            displayCurrentPoem();
-                        }
-                    });
-                }
-            }
-        }
-        
-        // Show poetry container
-        const poetryContainerAfterCreation = document.getElementById('poetry-container');
-        if (poetryContainerAfterCreation) {
-            poetryContainerAfterCreation.classList.remove('hidden');
-        }
-    });
-} else {
-    console.error('Poetry button not found');
-}
