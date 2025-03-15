@@ -3846,3 +3846,59 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry functionality initialized');
 });
+
+// Function to get educational context from form inputs
+function getEducationalContext() {
+    // Get values from form elements
+    const school = document.getElementById('school-select') ? document.getElementById('school-select').value : '';
+    const grade = document.getElementById('grade-select') ? document.getElementById('grade-select').value : '';
+    const subject = document.getElementById('subject-select') ? document.getElementById('subject-select').value : '';
+    const topic = document.getElementById('topic-input') ? document.getElementById('topic-input').value : '';
+    const difficulty = document.getElementById('difficulty-select') ? document.getElementById('difficulty-select').value : '';
+    const questionCount = document.getElementById('question-count-select') ? document.getElementById('question-count-select').value : '5';
+    
+    // Get additional context if available
+    const additionalContext = document.getElementById('additional-context') ? 
+                             document.getElementById('additional-context').value : '';
+    
+    // Build the prompt
+    let prompt = `请根据以下教育背景，生成${questionCount}道选择题，每题包含4个选项(A、B、C、D)，并标明正确答案和详细解析。`;
+    
+    // Add educational level context
+    if (school && grade) {
+        prompt += `\n教育阶段: ${school}${grade}`;
+    }
+    
+    // Add subject and topic
+    if (subject) {
+        prompt += `\n学科: ${subject}`;
+    }
+    
+    if (topic && topic.trim() !== '') {
+        prompt += `\n主题: ${topic}`;
+    }
+    
+    // Add difficulty
+    if (difficulty) {
+        prompt += `\n难度: ${difficulty}`;
+    }
+    
+    // Add additional context if provided
+    if (additionalContext && additionalContext.trim() !== '') {
+        prompt += `\n额外要求: ${additionalContext}`;
+    }
+    
+    // Add format requirements
+    prompt += `\n请按以下格式输出:
+题目：[题目内容]
+A. [选项A]
+B. [选项B]
+C. [选项C]
+D. [选项D]
+答案：[正确选项字母]
+解析：[详细解析]
+
+请确保每道题目都有明确的正确答案，并提供详细的解析说明为什么该选项是正确的。`;
+    
+    return prompt;
+}
