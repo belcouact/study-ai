@@ -535,14 +535,24 @@ function updateNavigationButtons() {
 
 // Function to display completion status and score in navigation section
 function displayCompletionStatus() {
+    // Check if we have questions and answers
+    if (!questionsArray || questionsArray.length === 0) {
+        return; // No questions to display completion for
+    }
+    
+    // Initialize userAnswers array if it doesn't exist
+    if (!userAnswers || userAnswers.length !== questionsArray.length) {
+        userAnswers = new Array(questionsArray.length).fill(null);
+    }
+    
     // Calculate score
     let correctCount = 0;
-    window.userAnswers.forEach((answer, index) => {
-        if (answer === window.questions[index].answer) {
+    userAnswers.forEach((answer, index) => {
+        if (answer && answer === questionsArray[index].answer) {
             correctCount++;
         }
     });
-    const scorePercentage = (correctCount / window.questions.length) * 100;
+    const scorePercentage = (correctCount / questionsArray.length) * 100;
     
     // Get or create navigation controls
     let navigationControls = document.querySelector('.navigation-controls');
@@ -601,64 +611,40 @@ function displayCompletionStatus() {
         completionMessage.textContent = '测试完成！';
         completionStatus.appendChild(completionMessage);
         
-        // Add score information
-        const scoreInfo = document.createElement('div');
-        scoreInfo.style.cssText = `
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
+        // Add score
+        const scoreElement = document.createElement('div');
+        scoreElement.style.cssText = `
+            font-size: 16px;
+            color: #2b6cb0;
         `;
+        scoreElement.textContent = `得分: ${correctCount}/${questionsArray.length} (${scorePercentage.toFixed(1)}%)`;
+        completionStatus.appendChild(scoreElement);
         
-        const totalQuestions = document.createElement('span');
-        totalQuestions.textContent = `总题数: ${window.questions.length}`;
-        
-        const correctAnswers = document.createElement('span');
-        correctAnswers.textContent = `正确: ${correctCount}`;
-        
-        const scorePercent = document.createElement('span');
-        scorePercent.textContent = `正确率: ${scorePercentage.toFixed(1)}%`;
-        
-        scoreInfo.appendChild(totalQuestions);
-        scoreInfo.appendChild(correctAnswers);
-        scoreInfo.appendChild(scorePercent);
-        completionStatus.appendChild(scoreInfo);
-        
-        // Add evaluation button
-        const evaluateButton = document.createElement('button');
-        evaluateButton.textContent = '成绩评估';
-        evaluateButton.style.cssText = `
-            margin-top: 10px;
+        // Add view results button
+        const viewResultsButton = document.createElement('button');
+        viewResultsButton.textContent = '查看结果';
+        viewResultsButton.style.cssText = `
             padding: 8px 16px;
             background-color: #4299e1;
             color: white;
             border: none;
             border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
             font-weight: 500;
+            cursor: pointer;
+            margin-top: 10px;
             transition: all 0.2s ease;
         `;
-        evaluateButton.addEventListener('click', handleEvaluateClick);
-        completionStatus.appendChild(evaluateButton);
+        viewResultsButton.addEventListener('click', showResultsPopup);
+        completionStatus.appendChild(viewResultsButton);
         
-        // Insert completion status between navigation buttons
-        const prevButton = document.getElementById('prev-question-button');
-        if (prevButton && prevButton.parentNode === navigationControls) {
-            navigationControls.insertBefore(completionStatus, prevButton.nextSibling);
-        } else {
-            navigationControls.appendChild(completionStatus);
+        // Add to navigation controls
+        navigationControls.appendChild(completionStatus);
+    } else {
+        // Update existing completion status
+        const scoreElement = completionStatus.querySelector('div:nth-child(2)');
+        if (scoreElement) {
+            scoreElement.textContent = `得分: ${correctCount}/${questionsArray.length} (${scorePercentage.toFixed(1)}%)`;
         }
-        
-        // Add fadeIn animation
-        const styleElement = document.createElement('style');
-        styleElement.textContent = `
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(-10px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-        `;
-        document.head.appendChild(styleElement);
     }
 }
 
