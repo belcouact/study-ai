@@ -370,44 +370,44 @@ function showResultsPopup() {
 
 // Function to display the current question
 function displayCurrentQuestion() {
-    console.log('displayCurrentQuestion called', window.currentQuestionIndex);
-    console.log('Questions array:', window.questions);
+    console.log('displayCurrentQuestion called', currentQuestionIndex);
+    console.log('Questions array:', questions);
     
-    if (!window.questions || window.questions.length === 0) {
-        console.error('No questions available to display');
+    if (!questions || questions.length === 0) {
+        console.log('No questions available to display');
         return;
     }
     
-    const question = window.questions[window.currentQuestionIndex];
-    
-    if (!question) {
-        console.error('No question found at index', window.currentQuestionIndex);
-        return;
-    }
-    
+    const question = questions[currentQuestionIndex];
     console.log('Current question:', question);
-
-    // Make sure the questions display container is visible
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    if (questionsDisplayContainer) {
-        questionsDisplayContainer.classList.remove('hidden');
+    
+    // Create questions container if it doesn't exist
+    let questionsContainer = document.querySelector('.questions-container');
+    if (!questionsContainer) {
+        console.log('Creating questions container');
+        questionsContainer = document.createElement('div');
+        questionsContainer.className = 'questions-container';
         
-        // Hide the empty state if it exists
-        const emptyState = document.getElementById('empty-state');
-        if (emptyState) {
-            emptyState.classList.add('hidden');
+        const contentArea = document.querySelector('.content-area') || document.querySelector('.main-content');
+        if (contentArea) {
+            contentArea.appendChild(questionsContainer);
+        } else {
+            // If no content area found, append to body
+            document.body.appendChild(questionsContainer);
+            console.log('Appended questions container to body');
         }
-        
-        // Hide the loading indicator if it exists
-        const loadingIndicator = document.getElementById('test-loading-indicator');
-        if (loadingIndicator) {
-            loadingIndicator.style.display = 'none';
-        }
-    } else {
-        console.error('Questions display container not found in displayCurrentQuestion');
-        return;
     }
-
+    
+    // Always ensure empty state is hidden regardless of questions
+    const emptyState = document.querySelector('.empty-state');
+    if (emptyState) {
+        emptyState.style.display = 'none';
+        console.log('Empty state hidden');
+    }
+    
+    // Clear previous question
+    questionsContainer.innerHTML = '';
+    
     // Check if all questions are answered
     const allQuestionsAnswered = window.userAnswers && 
                                window.userAnswers.length === window.questions.length && 
@@ -432,7 +432,7 @@ function displayCurrentQuestion() {
             display: inline-block;
             width: fit-content;
         `;
-        questionCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
+        questionCounter.textContent = `题目 ${currentQuestionIndex + 1} / ${window.questions.length}`;
         console.log('Updated question counter:', questionCounter.textContent);
     } else {
         console.error('Question counter element not found');
@@ -451,8 +451,8 @@ function displayCurrentQuestion() {
             display: inline-block;
             width: fit-content;
         `;
-        newCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
-        questionsDisplayContainer.appendChild(newCounter);
+        newCounter.textContent = `题目 ${currentQuestionIndex + 1} / ${window.questions.length}`;
+        questionsContainer.appendChild(newCounter);
     }
     
     // Format and display question text with responsive styling
@@ -500,7 +500,7 @@ function displayCurrentQuestion() {
             displayText = displayText.substring(3);
         }
         newText.innerHTML = formatMathExpressions(displayText);
-        questionsDisplayContainer.appendChild(newText);
+        questionsContainer.appendChild(newText);
     }
     
     // Create responsive grid for choices with 2x2 layout
@@ -637,7 +637,7 @@ function displayCurrentQuestion() {
             });
 
             // Set initial state if answer exists
-            if (window.userAnswers && window.userAnswers[window.currentQuestionIndex] === cell.dataset.value) {
+            if (window.userAnswers && window.userAnswers[currentQuestionIndex] === cell.dataset.value) {
                 selectedCell = cell;
                 selectedValue = cell.dataset.value;
                 updateCellStyles(cell, true);
@@ -655,7 +655,7 @@ function displayCurrentQuestion() {
             submitButton.addEventListener('click', () => {
                 if (selectedValue) {
                     // Save the answer
-                    window.userAnswers[window.currentQuestionIndex] = selectedValue;
+                    window.userAnswers[currentQuestionIndex] = selectedValue;
                     
                     // Show the answer container
                     displayAnswer(selectedValue);
@@ -744,7 +744,7 @@ function displayCurrentQuestion() {
                 ">提交答案</button>
             </div>
         `;
-        questionsDisplayContainer.appendChild(newChoices);
+        questionsContainer.appendChild(newChoices);
         
         // Add event listeners to the newly created choice cells
         const choiceCells = newChoices.querySelectorAll('.choice-cell');
@@ -782,7 +782,7 @@ function displayCurrentQuestion() {
             submitButton.addEventListener('click', function() {
                 if (selectedValue) {
                     // Save the answer
-                    window.userAnswers[window.currentQuestionIndex] = selectedValue;
+                    window.userAnswers[currentQuestionIndex] = selectedValue;
                     
                     // Show answer and explanation
                     displayAnswer(selectedValue);
@@ -818,7 +818,7 @@ function displayCurrentQuestion() {
                 box-sizing: border-box;
                 animation: fadeIn 0.3s ease;
             `;
-            questionsDisplayContainer.appendChild(answerContainer);
+            questionsContainer.appendChild(answerContainer);
         }
         
         answerContainer.classList.remove('hidden');
@@ -892,7 +892,7 @@ function displayCurrentQuestion() {
     }
     
     // Style the answer container when showing results
-    if (window.userAnswers && window.userAnswers[window.currentQuestionIndex]) {
+    if (window.userAnswers && window.userAnswers[currentQuestionIndex]) {
         const answerContainer = document.getElementById('answer-container');
         if (answerContainer) {
             answerContainer.classList.remove('hidden');
@@ -907,7 +907,7 @@ function displayCurrentQuestion() {
                 animation: fadeIn 0.3s ease;
             `;
             
-            const selectedAnswer = window.userAnswers[window.currentQuestionIndex];
+            const selectedAnswer = window.userAnswers[currentQuestionIndex];
             const correctAnswer = question.answer;
             const isCorrect = selectedAnswer === correctAnswer;
             
@@ -1051,17 +1051,17 @@ function formatMathExpressions(text) {
 
 // Global function to update navigation buttons
 function updateNavigationButtons() {
-    console.log('updateNavigationButtons called', window.currentQuestionIndex, window.questions ? window.questions.length : 0);
+    console.log('updateNavigationButtons called', currentQuestionIndex, window.questions ? window.questions.length : 0);
     
     const prevButton = document.getElementById('prev-question-button');
     const nextButton = document.getElementById('next-question-button');
     
     if (prevButton) {
-        prevButton.disabled = !window.questions || window.currentQuestionIndex <= 0;
+        prevButton.disabled = !window.questions || currentQuestionIndex <= 0;
     }
     
     if (nextButton) {
-        nextButton.disabled = !window.questions || window.currentQuestionIndex >= window.questions.length - 1;
+        nextButton.disabled = !window.questions || currentQuestionIndex >= window.questions.length - 1;
     }
 
     // Update navigation buttons for mobile
@@ -1112,9 +1112,9 @@ function displayCompletionStatus() {
             flex-wrap: wrap;
         `;
         
-        const questionsDisplayContainer = document.getElementById('questions-display-container');
-        if (questionsDisplayContainer) {
-            questionsDisplayContainer.appendChild(navigationControls);
+        const questionsContainer = document.querySelector('.questions-container');
+        if (questionsContainer) {
+            questionsContainer.appendChild(navigationControls);
         }
     }
     
@@ -1750,9 +1750,10 @@ function handleGenerateQuestionsClick() {
     generateQuestionsButton.textContent = '生成中...';
     generateQuestionsButton.disabled = true;
     
-        // Hide empty state if it exists
+        // Always hide empty state regardless of result
         if (emptyState) {
-            emptyState.classList.add('hidden');
+            emptyState.style.display = 'none';
+            console.log('Empty state hidden');
         }
         
         // Show loading indicator on the test page
@@ -1856,9 +1857,10 @@ D. [选项D内容]
                 // Get a fresh reference to the questions display container
                 const questionsContainer = document.getElementById('questions-display-container');
                 
-                // Hide empty state if it exists
+                // Always ensure empty state is hidden regardless of questions
+                const emptyState = document.querySelector('.empty-state');
                 if (emptyState) {
-                    emptyState.classList.add('hidden');
+                    emptyState.style.display = 'none';
                     console.log('Empty state hidden');
                 }
                 
@@ -2063,9 +2065,9 @@ function setupNavigationButtons() {
             gap: 10px;
         `;
         
-        const questionsDisplayContainer = document.getElementById('questions-display-container');
-        if (questionsDisplayContainer) {
-            questionsDisplayContainer.appendChild(navigationControls);
+        const questionsContainer = document.querySelector('.questions-container');
+        if (questionsContainer) {
+            questionsContainer.appendChild(navigationControls);
         }
     }
     
@@ -2088,8 +2090,8 @@ function setupNavigationButtons() {
         `;
         
         newPrevButton.addEventListener('click', function() {
-            if (window.currentQuestionIndex > 0) {
-                window.currentQuestionIndex--;
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
                 displayCurrentQuestion();
                 updateNavigationButtons();
             }
@@ -2103,8 +2105,8 @@ function setupNavigationButtons() {
         
         // Add new event listener
         newPrevButton.addEventListener('click', function() {
-            if (window.currentQuestionIndex > 0) {
-                window.currentQuestionIndex--;
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
                 displayCurrentQuestion();
                 updateNavigationButtons();
             }
@@ -2130,8 +2132,8 @@ function setupNavigationButtons() {
         `;
         
         newNextButton.addEventListener('click', function() {
-            if (window.questions && window.currentQuestionIndex < window.questions.length - 1) {
-                window.currentQuestionIndex++;
+            if (window.questions && currentQuestionIndex < window.questions.length - 1) {
+                currentQuestionIndex++;
                 displayCurrentQuestion();
                 updateNavigationButtons();
             }
@@ -2145,8 +2147,8 @@ function setupNavigationButtons() {
         
         // Add new event listener
         newNextButton.addEventListener('click', function() {
-            if (window.questions && window.currentQuestionIndex < window.questions.length - 1) {
-                window.currentQuestionIndex++;
+            if (window.questions && currentQuestionIndex < window.questions.length - 1) {
+                currentQuestionIndex++;
                 displayCurrentQuestion();
                 updateNavigationButtons();
             }
@@ -2173,7 +2175,7 @@ function setupOptionButtons() {
             const option = this.getAttribute('data-option');
             if (option && window.questions) {
                 // Save user's answer
-                window.userAnswers[window.currentQuestionIndex] = option;
+                window.userAnswers[currentQuestionIndex] = option;
                 
                 // Update UI to show selected option
                 document.querySelectorAll('.option-button').forEach(btn => {
@@ -2182,7 +2184,7 @@ function setupOptionButtons() {
                 this.classList.add('selected');
                 
                 // Check if answer is correct
-                const currentQuestion = window.questions[window.currentQuestionIndex];
+                const currentQuestion = window.questions[currentQuestionIndex];
                 const isCorrect = option === currentQuestion.answer;
                 
                 // Show feedback
@@ -2835,7 +2837,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 subjectOptions = ['语文', '数学', '英语', '科学'];
                 break;
             case '初中':
-                subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+                subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'];
                 break;
             case '高中':
                 subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
@@ -2993,95 +2995,10 @@ function moveContentCreationToTop() {
 
 // Function to initialize empty state on the test page
 function initializeEmptyState() {
-    const createContainer = document.getElementById('create-container');
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    
-    // Only initialize empty state if no questions are loaded
-    if (!window.questions || window.questions.length === 0) {
-        // Create or get the empty state element
-        let emptyState = document.getElementById('empty-state');
-        
-        if (!emptyState) {
-            emptyState = document.createElement('div');
-            emptyState.id = 'empty-state';
-            emptyState.className = 'empty-state';
-            emptyState.style.cssText = `
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                padding: 40px 20px;
-                text-align: center;
-                background-color: white;
-                border-radius: 12px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-                margin: 20px auto;
-                max-width: 600px;
-            `;
-            
-            // Create icon
-            const icon = document.createElement('div');
-            icon.innerHTML = `
-                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#4299e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"></path>
-                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                </svg>
-            `;
-            icon.style.cssText = `
-                margin-bottom: 20px;
-                color: #4299e1;
-            `;
-            
-            // Create heading
-            const heading = document.createElement('h3');
-            heading.textContent = '准备好开始测验了吗？';
-            heading.style.cssText = `
-                font-size: 24px;
-                color: #2d3748;
-                                    margin-bottom: 15px;
-            `;
-            
-            // Create description
-            const description = document.createElement('p');
-            description.textContent = '使用左侧边栏选择学校类型、年级、学期、科目、难度和题目数量，然后点击"出题"按钮生成测验题目。';
-            description.style.cssText = `
-                font-size: 16px;
-                color: #4a5568;
-                line-height: 1.6;
-                max-width: 500px;
-            `;
-            
-            // Assemble empty state
-            emptyState.appendChild(icon);
-            emptyState.appendChild(heading);
-            emptyState.appendChild(description);
-            
-            // Add to container
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.innerHTML = '';
-                questionsDisplayContainer.appendChild(emptyState);
-                questionsDisplayContainer.classList.remove('hidden');
-            } else if (createContainer) {
-                // Create questions display container if it doesn't exist
-                const newQuestionsContainer = document.createElement('div');
-                newQuestionsContainer.id = 'questions-display-container';
-                newQuestionsContainer.className = 'questions-display-container';
-                newQuestionsContainer.appendChild(emptyState);
-                
-                createContainer.innerHTML = '';
-                createContainer.appendChild(newQuestionsContainer);
-            }
-        } else {
-            // Make sure the empty state is visible
-            emptyState.classList.remove('hidden');
-            
-            // Make sure the questions display container is visible
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.classList.remove('hidden');
-            }
-        }
-    }
-} 
+    // Function completely removed to disable empty state functionality
+    console.log('Empty state functionality disabled');
+    return; // Do nothing
+}
 
 // Add event listeners for the optimize and submit buttons in the chat interface
 const optimizeButton = document.getElementById('optimize-button');
@@ -3940,7 +3857,7 @@ function populateSidebarSubjectOptions(school) {
             subjectSelect.appendChild(option);
         });
     } else if (school === 'middle') {
-        const subjects = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
+        const subjects = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'];
         subjects.forEach((subject, index) => {
             const option = document.createElement('option');
             option.value = `subject${index + 1}`;
