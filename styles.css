@@ -208,6 +208,17 @@ body {
     color: #ecf0f1;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    cursor: default;
+}
+
+.frame-title.collapsible {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.frame-title.collapsible:hover {
+    color: #ffffff;
 }
 
 .frame-title::before {
@@ -220,10 +231,26 @@ body {
     border-radius: 2px;
 }
 
+.collapse-icon {
+    font-size: 0.7rem;
+    transition: transform 0.3s ease;
+}
+
+.frame-title.collapsed .collapse-icon {
+    transform: rotate(-90deg);
+}
+
 .frame-content {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
+    overflow: hidden;
+    max-height: 500px;
+    transition: max-height 0.3s ease-out;
+}
+
+.frame-content.collapsed {
+    max-height: 0;
 }
 
 .dropdown-container {

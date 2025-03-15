@@ -5799,3 +5799,87 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry functionality initialized');
 });
+
+// ... existing code ...
+
+    // Function to set up event listeners
+    function setupEventListeners() {
+        console.log('Setting up event listeners');
+        
+        // Set up collapsible sidebar frames
+        setupCollapsibleFrames();
+        
+        // Get the sidebar toggle button
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        
+        // Get the left panel
+        const leftPanel = document.querySelector('.left-panel');
+        
+        // Get the content area
+        const contentArea = document.querySelector('.content-area');
+        
+        // Add event listener to the sidebar toggle button
+        if (sidebarToggle && leftPanel && contentArea) {
+            sidebarToggle.addEventListener('click', function() {
+                leftPanel.classList.toggle('hidden');
+                contentArea.classList.toggle('full-width');
+                sidebarToggle.classList.toggle('collapsed');
+            });
+        }
+        
+        // Get the school select element
+        const schoolSelect = document.getElementById('school-select-sidebar');
+        
+        // Add event listener to the school select element
+        if (schoolSelect) {
+            schoolSelect.addEventListener('change', function() {
+                // Get the selected school
+                const school = schoolSelect.value;
+                
+                // Populate grade options based on the selected school
+                populateSidebarGradeOptions(school);
+                
+                // Populate subject options based on the selected school
+                populateSidebarSubjectOptions(school);
+            });
+            
+            // Trigger the change event to populate the grade and subject options
+            schoolSelect.dispatchEvent(new Event('change'));
+        }
+        
+        // Get the generate questions button
+        const generateQuestionsButton = document.getElementById('generate-questions-button');
+        
+        // Add event listener to the generate questions button
+        if (generateQuestionsButton) {
+            generateQuestionsButton.addEventListener('click', handleGenerateQuestionsClick);
+        }
+    }
+    
+    // Function to set up collapsible sidebar frames
+    function setupCollapsibleFrames() {
+        console.log('Setting up collapsible frames');
+        
+        // Get all collapsible frame titles
+        const collapsibleTitles = document.querySelectorAll('.frame-title.collapsible');
+        
+        // Add event listener to each collapsible title
+        collapsibleTitles.forEach(title => {
+            title.addEventListener('click', function() {
+                // Toggle the collapsed class on the title
+                this.classList.toggle('collapsed');
+                
+                // Get the content element (next sibling after the title)
+                const content = this.nextElementSibling;
+                
+                // Toggle the collapsed class on the content
+                if (content) {
+                    content.classList.toggle('collapsed');
+                }
+                
+                // Log the state for debugging
+                console.log('Frame toggled:', this.textContent.trim(), 'Collapsed:', this.classList.contains('collapsed'));
+            });
+        });
+    }
+// ... existing code ...
