@@ -4397,7 +4397,7 @@ function getSimplifiedContextSummary() {
 
     // Function to handle learn poetry button click
     async function handleLearnPoetryClick() {
-        console.log('Learn poetry button clicked');
+        console.log('Learn poetry button clicked - function invoked');
         
         // Get user's educational context
         const schoolSelect = document.getElementById('school-select-sidebar');
@@ -4416,9 +4416,19 @@ function getSimplifiedContextSummary() {
             return;
         }
         
-        // Get poetry type and style
-        const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
-        const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
+        // Get poetry type and style from the main panel selects (not sidebar)
+        // Get fresh references to avoid stale data
+        const currentTypeSelect = document.getElementById('poetry-type-select');
+        const currentStyleSelect = document.getElementById('poetry-style-select');
+        
+        if (!currentTypeSelect || !currentStyleSelect) {
+            console.error('Poetry type or style select not found');
+            showSystemMessage('无法获取诗词类型和风格信息', 'error');
+            return;
+        }
+        
+        const poetryType = currentTypeSelect.value;
+        const poetryStyle = currentStyleSelect.value;
         
         console.log(`Generating poems for: ${school} ${grade}, Type: ${poetryType}, Style: ${poetryStyle}`);
         
@@ -4453,16 +4463,79 @@ function getSimplifiedContextSummary() {
         }
         
         try {
+            // Determine appropriate complexity level based on educational background
+            let complexityLevel = "简单";
+            let vocabularyLevel = "基础";
+            let explanationDetail = "详细";
+            let examplePoems = "";
+            let wordCount = "20-40字";
+            
+            // Adjust complexity based on school level
+            if (school === "小学") {
+                if (parseInt(grade) <= 3) {
+                    complexityLevel = "非常简单";
+                    vocabularyLevel = "最基础";
+                    explanationDetail = "非常详细且通俗易懂";
+                    wordCount = "20-30字";
+                    examplePoems = "如《静夜思》《春晓》《悯农》等简短易懂的诗";
+                } else {
+                    complexityLevel = "简单";
+                    vocabularyLevel = "基础";
+                    explanationDetail = "详细且通俗易懂";
+                    wordCount = "30-40字";
+                    examplePoems = "如《登鹳雀楼》《游子吟》《咏柳》等小学课本中的经典诗";
+                }
+            } else if (school === "初中") {
+                complexityLevel = "中等";
+                vocabularyLevel = "适中";
+                explanationDetail = "较详细";
+                wordCount = "40-60字";
+                examplePoems = "如《望岳》《送元二使安西》《茅屋为秋风所破歌》等初中课本中的经典诗";
+            } else if (school === "高中") {
+                complexityLevel = "适当";
+                vocabularyLevel = "丰富";
+                explanationDetail = "深入";
+                wordCount = "不限";
+                examplePoems = "如《蜀相》《琵琶行》《念奴娇·赤壁怀古》等高中课本中的经典诗";
+            }
+            
+            // Modify the prompt to handle "任意" style
+            let stylePrompt = '';
+            if (poetryStyle === '任意') {
+                stylePrompt = `风格不限`;
+            } else {
+                stylePrompt = `风格为${poetryStyle}`;
+            }
+            
             // Prepare the prompt for the API - specifically requesting famous ancient poems
-            const prompt = `请为${school}${grade}的学生推荐5首著名的古代${poetryType}，风格为${poetryStyle}。
+            // with consideration for the student's educational level
+            const prompt = `请为${school}${grade}的学生推荐5首著名的古代${poetryType}，${stylePrompt}。
             请选择中国文学史上最著名、最经典的作品，这些作品应该是真实存在的古代诗词，不要创作新的内容。
+            
+            【重要】这些诗词必须严格符合${school}${grade}学生的认知水平和学习需求：
+            1. 诗词长度：优先选择${wordCount}左右的诗词，${examplePoems}
+            2. 难度要求：选择难度${complexityLevel}、词汇量${vocabularyLevel}的诗词
+            3. 内容要求：主题积极向上，意境清晰，适合${school}${grade}学生理解和背诵
+            4. 教育价值：具有明确的情感表达和思想内涵，能够引发学生共鸣
+            
+            针对不同学龄段的具体要求：
+            - 小学低年级(1-3年级)：选择字数少、节奏感强、内容生动形象的诗词，如《静夜思》《春晓》
+            - 小学高年级(4-6年级)：选择意境优美、主题明确的诗词，如《望庐山瀑布》《黄鹤楼送孟浩然之广陵》
+            - 初中：选择思想内涵较丰富、艺术手法有特色的诗词，如《望岳》《茅屋为秋风所破歌》
+            - 高中：选择思想深度和艺术价值较高的诗词，如《蜀相》《琵琶行》《念奴娇·赤壁怀古》
+            
+            解释和赏析要求：
+            - 解释要${explanationDetail}，使用适合${school}${grade}学生理解的语言
+            - 背景介绍要有趣且与学生的知识水平相符
+            - 赏析要重点解释难词难句，并用${school}${grade}学生能理解的现代语言翻译原文
+            - 分析要点明诗词的意境、情感和艺术特色，但避免过于学术化的术语
             
             每首诗都应包含以下内容：
             1. 题目
             2. 作者（必须是真实的历史人物）
             3. 原文（必须是原始的古代诗词文本）
-            4. 创作背景（包括历史背景和创作缘由）
-            5. 赏析（包括艺术特色和文学价值）
+            4. 创作背景（包括历史背景和创作缘由的详细介绍，适合${school}${grade}学生理解的深度）
+            5. 赏析（逐句解释翻译，同时指出难词难句，同时介绍诗词曲的艺术特色和文学价值，使用${school}${grade}学生能理解的语言）
             
             请以JSON格式返回，格式如下：
             [
@@ -4630,6 +4703,11 @@ function getSimplifiedContextSummary() {
                 // Display poems
                 if (poetryDisplay) poetryDisplay.classList.remove('hidden');
                 displayCurrentPoem();
+                
+                // Set up navigation buttons after poems are loaded
+                setTimeout(() => {
+                    setupPoemNavigationButtons();
+                }, 100);
             } else {
                 // Show error message
                 if (poetryEmptyState) poetryEmptyState.classList.remove('hidden');
@@ -4648,827 +4726,8 @@ function getSimplifiedContextSummary() {
             showSystemMessage('生成诗词时出错，请稍后再试', 'error');
         }
     }
-
-// ... existing code ...
-
-// Initialize the application
-function init() {
-    console.log('Initializing application...');
     
-    // Setup event listeners
-    setupEventListeners();
-    
-    // Populate sidebar options based on selected school
-    const selectedSchool = elements.schoolSelectSidebar.value;
-    if (selectedSchool) {
-        populateSidebarGradeOptions(selectedSchool);
-    }
-    
-    // Initialize empty state for quiz creation
-    initializeEmptyState();
-    
-    // IMPORTANT: Directly add event listener to poetry button
-    const poetryButton = document.getElementById('poetry-button');
-    if (poetryButton) {
-        console.log('Adding direct click event listener to poetry button');
-        poetryButton.addEventListener('click', function() {
-            console.log('Poetry button clicked directly');
-            // Hide all panels
-            document.getElementById('qa-panel').classList.add('hidden');
-            document.getElementById('create-panel').classList.add('hidden');
-            
-            // Show poetry panel
-            const poetryPanel = document.getElementById('poetry-panel');
-            if (poetryPanel) {
-                poetryPanel.classList.remove('hidden');
-                console.log('Poetry panel is now visible');
-            } else {
-                console.error('Poetry panel element not found');
-            }
-            
-            // Update active states
-            document.getElementById('qa-button').classList.remove('active');
-            document.getElementById('create-button').classList.remove('active');
-            poetryButton.classList.add('active');
-        });
-    } else {
-        console.error('Poetry button not found during init');
-    }
-    
-    console.log('Application initialized');
+    console.log('Poetry functionality initialized');
 }
 
-// ... existing code ...
-
-// Switch between different panels (keep this function for other buttons)
-function switchPanel(panelId) {
-    console.log('Switching to panel:', panelId);
-    
-    // Hide all panels
-    const qaPanel = document.getElementById('qa-panel');
-    const createPanel = document.getElementById('create-panel');
-    const poetryPanel = document.getElementById('poetry-panel');
-    
-    if (qaPanel) qaPanel.classList.add('hidden');
-    if (createPanel) createPanel.classList.add('hidden');
-    if (poetryPanel) poetryPanel.classList.add('hidden');
-    
-    // Show the selected panel
-    if (panelId === 'qa-panel' && qaPanel) {
-        qaPanel.classList.remove('hidden');
-        document.getElementById('qa-button').classList.add('active');
-        document.getElementById('create-button').classList.remove('active');
-        const poetryButton = document.getElementById('poetry-button');
-        if (poetryButton) poetryButton.classList.remove('active');
-    } else if (panelId === 'create-panel' && createPanel) {
-        createPanel.classList.remove('hidden');
-        document.getElementById('create-button').classList.add('active');
-        document.getElementById('qa-button').classList.remove('active');
-        const poetryButton = document.getElementById('poetry-button');
-        if (poetryButton) poetryButton.classList.remove('active');
-    } else if (panelId === 'poetry-panel' && poetryPanel) {
-        poetryPanel.classList.remove('hidden');
-        const poetryButton = document.getElementById('poetry-button');
-        if (poetryButton) poetryButton.classList.add('active');
-        document.getElementById('qa-button').classList.remove('active');
-        document.getElementById('create-button').classList.remove('active');
-        console.log('Poetry panel is now visible via switchPanel');
-    }
-}
-
-// Setup event listeners
-function setupEventListeners() {
-    console.log('Setting up event listeners...');
-    
-    // Sidebar toggle
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', toggleSidebar);
-    }
-    
-    // Panel buttons
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    
-    if (qaButton) {
-        qaButton.addEventListener('click', function() {
-            switchPanel('qa-panel');
-        });
-    }
-    
-    if (createButton) {
-        createButton.addEventListener('click', function() {
-            switchPanel('create-panel');
-        });
-    }
-}
-
-// Add this code at the end of the file to ensure it runs after everything else
-
-// Poetry Tab Functionality - Self-contained implementation
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Poetry tab functionality initializing...');
-    
-    // Get the poetry button and panel
-    const poetryButton = document.getElementById('poetry-button');
-    const poetryPanel = document.getElementById('poetry-panel');
-    const qaPanel = document.getElementById('qa-panel');
-    const createPanel = document.getElementById('create-panel');
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    
-    // Log what we found
-    console.log('Poetry elements found:', {
-        poetryButton: !!poetryButton,
-        poetryPanel: !!poetryPanel,
-        qaPanel: !!qaPanel,
-        createPanel: !!createPanel
-    });
-    
-    // Add direct event listener to poetry button
-    if (poetryButton) {
-        poetryButton.addEventListener('click', function(event) {
-            console.log('Poetry button clicked (direct handler)');
-            
-            // Hide other panels
-            if (qaPanel) qaPanel.classList.add('hidden');
-            if (createPanel) createPanel.classList.add('hidden');
-            
-            // Show poetry panel
-            if (poetryPanel) {
-                poetryPanel.classList.remove('hidden');
-                console.log('Poetry panel is now visible');
-            } else {
-                console.error('Poetry panel not found');
-            }
-            
-            // Update active states
-            if (qaButton) qaButton.classList.remove('active');
-            if (createButton) createButton.classList.remove('active');
-            poetryButton.classList.add('active');
-            
-            // Prevent default behavior
-            event.preventDefault();
-        });
-        console.log('Direct event listener added to poetry button');
-    } else {
-        console.error('Poetry button not found');
-    }
-    
-    // Add event listener to Learn Poetry button
-    const learnPoetryButton = document.getElementById('learn-poetry-button');
-    if (learnPoetryButton) {
-        learnPoetryButton.addEventListener('click', function() {
-            console.log('Learn poetry button clicked (direct handler)');
-            
-            // Mock data for testing
-            const mockPoems = [
-                {
-                    title: "望庐山瀑布",
-                    author: "李白",
-                    content: "日照香炉生紫烟，\n遥看瀑布挂前川。\n飞流直下三千尺，\n疑是银河落九天。",
-                    background: "这首诗是唐代诗人李白游览庐山时所作，描写了庐山瀑布的壮观景象。",
-                    explanation: "这首诗生动地描绘了庐山瀑布的壮丽景象，表现了诗人对自然的热爱和赞美。"
-                },
-                {
-                    title: "静夜思",
-                    author: "李白",
-                    content: "床前明月光，\n疑是地上霜。\n举头望明月，\n低头思故乡。",
-                    background: "这首诗是唐代诗人李白所作，表达了诗人思乡之情。",
-                    explanation: "这首诗通过月光和霜的联想，表达了诗人对故乡的思念之情。"
-                }
-            ];
-            
-            // Get poetry display elements
-            const poetryEmptyState = document.getElementById('poetry-empty-state');
-            const poetryDisplay = document.getElementById('poetry-display');
-            const poemTitle = document.getElementById('poem-title');
-            const poemAuthor = document.getElementById('poem-author');
-            const poemContent = document.getElementById('poem-content');
-            const poemBackground = document.getElementById('poem-background');
-            const poemExplanation = document.getElementById('poem-explanation');
-            const poemCounter = document.getElementById('poem-counter');
-            
-            // Hide empty state and show display
-            if (poetryEmptyState) poetryEmptyState.classList.add('hidden');
-            if (poetryDisplay) poetryDisplay.classList.remove('hidden');
-            
-            // Display the first poem
-            if (poemTitle) poemTitle.textContent = mockPoems[0].title;
-            if (poemAuthor) poemAuthor.textContent = mockPoems[0].author;
-            if (poemContent) poemContent.innerHTML = mockPoems[0].content.replace(/\n/g, '<br>');
-            if (poemBackground) poemBackground.innerHTML = mockPoems[0].background;
-            if (poemExplanation) poemExplanation.innerHTML = mockPoems[0].explanation;
-            if (poemCounter) poemCounter.textContent = `1 / ${mockPoems.length}`;
-            
-            console.log('Mock poem displayed');
-        });
-        console.log('Direct event listener added to learn poetry button');
-    }
-    
-    // Add event listeners for navigation buttons
-    const prevPoemButton = document.getElementById('prev-poem-button');
-    const nextPoemButton = document.getElementById('next-poem-button');
-    
-    if (prevPoemButton) {
-        prevPoemButton.addEventListener('click', function() {
-            console.log('Previous poem button clicked');
-        });
-    }
-    
-    if (nextPoemButton) {
-        nextPoemButton.addEventListener('click', function() {
-            console.log('Next poem button clicked');
-        });
-    }
-    
-    // Add event listener for poetry type dropdown
-    const poetryTypeSelect = document.getElementById('poetry-type');
-    const poetryStyleSelect = document.getElementById('poetry-style');
-    
-    if (poetryTypeSelect && poetryStyleSelect) {
-        poetryTypeSelect.addEventListener('change', function() {
-            const poetryType = poetryTypeSelect.value;
-            console.log('Poetry type changed to:', poetryType);
-            
-            // Clear existing options
-            while (poetryStyleSelect.options.length > 0) {
-                poetryStyleSelect.remove(0);
-            }
-            
-            // Add new options based on selected type
-            if (poetryType === '唐诗') {
-                const styles = ['山水', '边塞', '浪漫', '现实'];
-                styles.forEach(style => {
-                    const option = document.createElement('option');
-                    option.value = style;
-                    option.textContent = style;
-                    poetryStyleSelect.appendChild(option);
-                });
-            } else if (poetryType === '宋词') {
-                const styles = ['婉约', '豪放'];
-                styles.forEach(style => {
-                    const option = document.createElement('option');
-                    option.value = style;
-                    option.textContent = style;
-                    poetryStyleSelect.appendChild(option);
-                });
-            } else if (poetryType === '元曲') {
-                const styles = ['杂居', '散曲'];
-                styles.forEach(style => {
-                    const option = document.createElement('option');
-                    option.value = style;
-                    option.textContent = style;
-                    poetryStyleSelect.appendChild(option);
-                });
-            }
-            
-            console.log('Updated poetry style options');
-        });
-    }
-    
-    console.log('Poetry tab functionality initialized');
-});
-
-// Add this code at the end of the file
-
-// Poetry Tab Functionality - Complete implementation
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Poetry tab functionality initializing...');
-    
-    // Get the poetry button and panel
-    const poetryButton = document.getElementById('poetry-button');
-    const poetryPanel = document.getElementById('poetry-panel');
-    const qaPanel = document.getElementById('qa-panel');
-    const createPanel = document.getElementById('create-panel');
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    
-    // Log what we found
-    console.log('Poetry elements found:', {
-        poetryButton: !!poetryButton,
-        poetryPanel: !!poetryPanel,
-        qaPanel: !!qaPanel,
-        createPanel: !!createPanel
-    });
-    
-    // If poetry panel doesn't exist, create it
-    if (!poetryPanel) {
-        console.log('Creating poetry panel element');
-        const newPoetryPanel = document.createElement('div');
-        newPoetryPanel.id = 'poetry-panel';
-        newPoetryPanel.className = 'panel hidden';
-        
-        // Create the basic structure
-        newPoetryPanel.innerHTML = `
-            <div id="poetry-container" class="content-container">
-                <div class="poetry-header">
-                    <h2>诗词学习</h2>
-                    <div class="poetry-config-frame">
-                        <div class="config-row">
-                            <label for="poetry-type">诗词类型:</label>
-                            <select id="poetry-type">
-                                <option value="唐诗">唐诗</option>
-                                <option value="宋词">宋词</option>
-                                <option value="元曲">元曲</option>
-                            </select>
-                        </div>
-                        <div class="config-row">
-                            <label for="poetry-style">诗词风格:</label>
-                            <select id="poetry-style">
-                                <option value="山水">山水</option>
-                                <option value="边塞">边塞</option>
-                                <option value="浪漫">浪漫</option>
-                                <option value="现实">现实</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button id="learn-poetry-button" class="primary-button poetry-button">学习诗词</button>
-                </div>
-                <div class="poetry-content">
-                    <div id="poetry-empty-state" class="empty-state">
-                        <p>请选择学校和年级，然后点击"学习诗词"按钮生成适合您的诗词。</p>
-                    </div>
-                    <div id="poetry-display" class="hidden">
-                        <div class="poem-navigation">
-                            <button id="prev-poem-button" class="poem-nav-button" disabled>◀ 上一首</button>
-                            <span id="poem-counter">1 / 5</span>
-                            <button id="next-poem-button" class="poem-nav-button">下一首 ▶</button>
-                        </div>
-                        <div class="poem-display">
-                            <h3 id="poem-title" class="poem-title"></h3>
-                            <p id="poem-author" class="poem-author"></p>
-                            <div id="poem-content" class="poem-content"></div>
-                            <div class="poem-info">
-                                <div class="poem-section">
-                                    <h4>背景</h4>
-                                    <p id="poem-background"></p>
-                                </div>
-                                <div class="poem-section">
-                                    <h4>赏析</h4>
-                                    <p id="poem-explanation"></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        // Add the panel to the document
-        const mainContent = document.querySelector('.main-content');
-        if (mainContent) {
-            mainContent.appendChild(newPoetryPanel);
-            console.log('Poetry panel added to the document');
-        } else {
-            console.error('Main content element not found');
-        }
-    }
-    
-    // Add direct event listener to poetry button
-    if (poetryButton) {
-        poetryButton.addEventListener('click', function(event) {
-            console.log('Poetry button clicked (direct handler)');
-            
-            // Get the poetry panel again in case it was just created
-            const poetryPanel = document.getElementById('poetry-panel');
-            
-            // Hide other panels
-            if (qaPanel) qaPanel.classList.add('hidden');
-            if (createPanel) createPanel.classList.add('hidden');
-            
-            // Show poetry panel
-            if (poetryPanel) {
-                poetryPanel.classList.remove('hidden');
-                console.log('Poetry panel is now visible');
-            } else {
-                console.error('Poetry panel not found');
-            }
-            
-            // Update active states
-            if (qaButton) qaButton.classList.remove('active');
-            if (createButton) createButton.classList.remove('active');
-            poetryButton.classList.add('active');
-            
-            // Initialize poetry type and style dropdowns
-            initializePoetryDropdowns();
-        });
-        console.log('Direct event listener added to poetry button');
-    } else {
-        console.error('Poetry button not found');
-    }
-    
-    // Initialize poetry type and style dropdowns
-    function initializePoetryDropdowns() {
-        const poetryTypeSelect = document.getElementById('poetry-type');
-        const poetryStyleSelect = document.getElementById('poetry-style');
-        
-        if (poetryTypeSelect && poetryStyleSelect) {
-            // Add event listener for poetry type dropdown
-            poetryTypeSelect.addEventListener('change', function() {
-                updatePoetryStyleOptions(poetryTypeSelect.value);
-            });
-            
-            // Initialize style options based on current type
-            updatePoetryStyleOptions(poetryTypeSelect.value);
-        }
-    }
-    
-    // Update poetry style options based on selected type
-    function updatePoetryStyleOptions(poetryType) {
-        console.log('Updating poetry style options for type:', poetryType);
-        
-        const poetryStyleSelect = document.getElementById('poetry-style');
-        if (!poetryStyleSelect) {
-            console.error('Poetry style select element not found');
-            return;
-        }
-        
-        // Clear existing options
-        while (poetryStyleSelect.options.length > 0) {
-            poetryStyleSelect.remove(0);
-        }
-        
-        // Add new options based on selected type
-        let styles = [];
-        
-        if (poetryType === '唐诗') {
-            styles = ['山水', '边塞', '浪漫', '现实'];
-        } else if (poetryType === '宋词') {
-            styles = ['婉约', '豪放'];
-        } else if (poetryType === '元曲') {
-            styles = ['杂居', '散曲'];
-        }
-        
-        // Add options to select
-        styles.forEach(style => {
-            const option = document.createElement('option');
-            option.value = style;
-            option.textContent = style;
-            poetryStyleSelect.appendChild(option);
-        });
-        
-        console.log('Updated poetry style options:', styles);
-    }
-    
-    // Add event listener to Learn Poetry button
-    document.addEventListener('click', function(event) {
-        if (event.target && event.target.id === 'learn-poetry-button') {
-            console.log('Learn poetry button clicked via delegation');
-            
-            // Get selected values
-            const poetryTypeSelect = document.getElementById('poetry-type-select');
-            const poetryStyleSelect = document.getElementById('poetry-style-select');
-            const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
-            const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
-            
-            // Call the API function directly - no mock data
-            handleLearnPoetryClick();
-        }
-    });
-    
-    // Update the prompt in handleLearnPoetryClick function to specifically request famous ancient poems
-    const prompt = `请为${school}${grade}的学生推荐5首著名的古代${poetryType}，风格为${poetryStyle}。
-    请选择中国文学史上最著名、最经典的作品，这些作品应该是真实存在的古代诗词，不要创作新的内容。
-    
-    每首诗都应包含以下内容：
-    1. 题目
-    2. 作者（必须是真实的历史人物）
-    3. 原文（必须是原始的古代诗词文本）
-    4. 创作背景（包括历史背景和创作缘由）
-    5. 赏析（包括艺术特色和文学价值）
-    
-    请以JSON格式返回，格式如下：
-    [
-      {
-        "title": "诗词标题",
-        "author": "作者",
-        "content": "诗词原文",
-        "background": "创作背景",
-        "explanation": "赏析"
-      },
-      ...
-    ]`;
-    
-    // Remove any other instances of mock poem data in the file
-});
-
-// Add this code at the end of the file, replacing the previous fix
-
-// Fix for poetry functionality
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Poetry functionality initializing...');
-    
-    // Get the poetry type and style select elements from the main panel (not sidebar)
-    const poetryTypeSelect = document.getElementById('poetry-type-select');
-    const poetryStyleSelect = document.getElementById('poetry-style-select');
-    
-    if (poetryTypeSelect && poetryStyleSelect) {
-        console.log('Found poetry type and style selects');
-        
-        // Function to update style options based on selected type
-        function updatePoetryStyleOptions() {
-            const poetryType = poetryTypeSelect.value;
-            console.log('Updating poetry style options for type:', poetryType);
-            
-            // Clear existing options
-            while (poetryStyleSelect.options.length > 0) {
-                poetryStyleSelect.remove(0);
-            }
-            
-            // Always add "任意" option first
-            const anyOption = document.createElement('option');
-            anyOption.value = '任意';
-            anyOption.textContent = '任意';
-            poetryStyleSelect.appendChild(anyOption);
-            
-            // Add new options based on selected type
-            let styles = [];
-            
-            if (poetryType === '唐诗') {
-                styles = ['山水', '边塞', '浪漫', '现实'];
-            } else if (poetryType === '宋词') {
-                styles = ['婉约', '豪放'];
-            } else if (poetryType === '元曲') {
-                styles = ['杂居', '散曲'];
-            }
-            
-            // Add options to select
-            styles.forEach(style => {
-                const option = document.createElement('option');
-                option.value = style;
-                option.textContent = style;
-                poetryStyleSelect.appendChild(option);
-            });
-            
-            console.log('Updated poetry style options:', ['任意', ...styles]);
-        }
-        
-        // Add event listener for poetry type change
-        poetryTypeSelect.addEventListener('change', updatePoetryStyleOptions);
-        
-        // Initialize style options based on default type
-        updatePoetryStyleOptions();
-    } else {
-        console.error('Poetry type or style select not found');
-    }
-    
-    // Get all containers and store their original parent nodes
-    const poetryContainer = document.getElementById('poetry-container');
-    const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
-    
-    // Store original parent nodes
-    let poetryParent = null;
-    let qaParent = null;
-    let createParent = null;
-    
-    if (poetryContainer) {
-        poetryParent = poetryContainer.parentNode;
-        // Initially remove poetry container from DOM
-        if (poetryParent) {
-            poetryParent.removeChild(poetryContainer);
-        }
-    }
-    
-    if (qaContainer) {
-        qaParent = qaContainer.parentNode;
-    }
-    
-    if (createContainer) {
-        createParent = createContainer.parentNode;
-    }
-    
-    // Get all buttons
-    const poetryButton = document.getElementById('poetry-button');
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    
-    // Get the content area where containers should be placed
-    const contentArea = document.querySelector('.content-area');
-    
-    // Function to handle tab switching
-    function handleTabSwitch(containerType) {
-        console.log('Switching to tab:', containerType);
-        
-        // First, remove all containers from DOM to ensure clean state
-        if (qaContainer && qaContainer.parentNode) {
-            qaContainer.parentNode.removeChild(qaContainer);
-        }
-        
-        if (createContainer && createContainer.parentNode) {
-            createContainer.parentNode.removeChild(createContainer);
-        }
-        
-        if (poetryContainer && poetryContainer.parentNode) {
-            poetryContainer.parentNode.removeChild(poetryContainer);
-        }
-        
-        // Reset active states
-        if (qaButton) qaButton.classList.remove('active');
-        if (createButton) createButton.classList.remove('active');
-        if (poetryButton) poetryButton.classList.remove('active');
-        
-        // Add only the appropriate container to the content area
-        if (containerType === 'qa' && qaContainer && contentArea) {
-            contentArea.appendChild(qaContainer);
-            if (qaButton) qaButton.classList.add('active');
-            console.log('QA container added to content area');
-            
-            // Ensure poetry container is not present
-            const existingPoetryContainer = document.getElementById('poetry-container');
-            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
-                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
-            }
-        } else if (containerType === 'create' && createContainer && contentArea) {
-            contentArea.appendChild(createContainer);
-            if (createButton) createButton.classList.add('active');
-            console.log('Create container added to content area');
-            
-            // Ensure poetry container is not present
-            const existingPoetryContainer = document.getElementById('poetry-container');
-            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
-                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
-            }
-        } else if (containerType === 'poetry' && poetryContainer && contentArea) {
-            contentArea.appendChild(poetryContainer);
-            if (poetryButton) poetryButton.classList.add('active');
-            console.log('Poetry container added to content area');
-            
-            // After switching to poetry tab, add event listener to learn poetry button
-            setTimeout(() => {
-                const learnPoetryButton = document.getElementById('learn-poetry-button');
-                if (learnPoetryButton) {
-                    // Remove any existing event listeners
-                    const newButton = learnPoetryButton.cloneNode(true);
-                    learnPoetryButton.parentNode.replaceChild(newButton, learnPoetryButton);
-                    
-                    // Add new event listener
-                    newButton.addEventListener('click', function() {
-                        console.log('Learn poetry button clicked');
-                        handleLearnPoetryClick();
-                    });
-                }
-            }, 100);
-        }
-    }
-    
-    // Add event listeners to buttons
-    if (qaButton) {
-        qaButton.addEventListener('click', function() {
-            console.log('QA button clicked');
-            handleTabSwitch('qa');
-        });
-    }
-    
-    if (createButton) {
-        createButton.addEventListener('click', function() {
-            console.log('Create button clicked');
-            handleTabSwitch('create');
-        });
-    }
-    
-    if (poetryButton) {
-        poetryButton.addEventListener('click', function() {
-            console.log('Poetry button clicked');
-            handleTabSwitch('poetry');
-        });
-    }
-    
-    // Initialize with QA container
-    handleTabSwitch('qa');
-    
-    // Global state for poems
-    const poemState = {
-        poems: [],
-        currentIndex: 0
-    };
-    
-    // Function to display the current poem
-    function displayCurrentPoem() {
-        if (!poemState.poems || poemState.poems.length === 0) {
-            console.error('No poems available to display');
-            return;
-        }
-        
-        const poem = poemState.poems[poemState.currentIndex];
-        console.log('Displaying poem:', poem, 'Current index:', poemState.currentIndex);
-        
-        // Get poem elements
-        const poemTitle = document.querySelector('.poem-title');
-        const poemAuthor = document.querySelector('.poem-author');
-        const poemContent = document.querySelector('.poem-content');
-        const poemBackground = document.querySelector('.poem-background');
-        const poemExplanation = document.querySelector('.poem-explanation');
-        const poemCounter = document.querySelector('.poem-counter');
-        
-        // Display poem data with null checks
-        if (poemTitle) poemTitle.textContent = poem.title || '无标题';
-        if (poemAuthor) poemAuthor.textContent = poem.author || '佚名';
-        
-        // Handle content with null check
-        if (poemContent) {
-            if (poem.content) {
-                poemContent.innerHTML = poem.content.replace ? poem.content.replace(/\n/g, '<br>') : poem.content;
-            } else {
-                poemContent.innerHTML = '无内容';
-            }
-        }
-        
-        // Handle background with null check
-        if (poemBackground) {
-            poemBackground.innerHTML = poem.background || '无背景信息';
-        }
-        
-        // Handle explanation with null check
-        if (poemExplanation) {
-            poemExplanation.innerHTML = poem.explanation || '无赏析';
-        }
-        
-        if (poemCounter) {
-            poemCounter.textContent = `${poemState.currentIndex + 1} / ${poemState.poems.length}`;
-        }
-        
-        // Update navigation buttons
-        updatePoemNavigationButtons();
-    }
-    
-    // Function to update navigation buttons
-    function updatePoemNavigationButtons() {
-        const prevButton = document.getElementById('prev-poem-button');
-        const nextButton = document.getElementById('next-poem-button');
-        
-        if (prevButton) {
-            prevButton.disabled = poemState.currentIndex === 0;
-            console.log('Prev button disabled:', prevButton.disabled);
-        }
-        
-        if (nextButton) {
-            nextButton.disabled = poemState.currentIndex === poemState.poems.length - 1;
-            console.log('Next button disabled:', nextButton.disabled);
-        }
-    }
-    
-    // Improved setup function for navigation buttons - this is the ONLY place we should attach event listeners
-    function setupPoemNavigationButtons() {
-        console.log('Setting up poem navigation buttons');
-        
-        // Get references to the buttons
-        const prevButton = document.getElementById('prev-poem-button');
-        const nextButton = document.getElementById('next-poem-button');
-        
-        // Remove any existing event listeners by cloning and replacing
-        if (prevButton) {
-            const newPrevButton = prevButton.cloneNode(true);
-            prevButton.parentNode.replaceChild(newPrevButton, prevButton);
-            
-            // Add a single event listener for the previous button
-            newPrevButton.addEventListener('click', function(event) {
-                event.preventDefault();
-                event.stopPropagation(); // Prevent event bubbling
-                console.log('Previous poem button clicked directly');
-                if (poemState.currentIndex > 0) {
-                    poemState.currentIndex--;
-                    displayCurrentPoem();
-                }
-            });
-        }
-        
-        if (nextButton) {
-            const newNextButton = nextButton.cloneNode(true);
-            nextButton.parentNode.replaceChild(newNextButton, nextButton);
-            
-            // Add a single event listener for the next button
-            newNextButton.addEventListener('click', function(event) {
-                event.preventDefault();
-                event.stopPropagation(); // Prevent event bubbling
-                console.log('Next poem button clicked directly');
-                if (poemState.currentIndex < poemState.poems.length - 1) {
-                    poemState.currentIndex++;
-                    displayCurrentPoem();
-                }
-            });
-        }
-    }
-    
-    // REMOVE the event delegation approach to avoid duplicate handlers
-    // We'll rely solely on the direct event listeners set up in setupPoemNavigationButtons
-    
-// ... existing code ...
-
-            if (poems.length > 0) {
-                console.log('Successfully parsed', poems.length, 'poems');
-                // Store poems in state
-                poemState.poems = poems;
-                poemState.currentIndex = 0;
-                
-                // Display poems
-                if (poetryDisplay) poetryDisplay.classList.remove('hidden');
-                displayCurrentPoem();
-                
-                // Set up navigation buttons after poems are loaded
-                setTimeout(() => {
-                    setupPoemNavigationButtons();
-                }, 100);
-            } else {
 // ... existing code ...
