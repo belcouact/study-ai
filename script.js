@@ -3910,49 +3910,94 @@ function getSimplifiedContextSummary() {
 
 // Initialize the application
 function init() {
-    console.log('Initializing application...');
+    console.log('Initializing application');
     
-    // Setup event listeners
+    // Set up event listeners
     setupEventListeners();
     
-    // Populate sidebar options based on selected school
-    const selectedSchool = elements.schoolSelectSidebar.value;
-    if (selectedSchool) {
-        populateSidebarGradeOptions(selectedSchool);
-    }
+    // Initialize form layout
+    initializeFormLayout();
     
-    // Initialize empty state for quiz creation
+    // Initialize empty state
     initializeEmptyState();
     
-    // IMPORTANT: Directly add event listener to poetry button
-    const poetryButton = document.getElementById('poetry-button');
-    if (poetryButton) {
-        console.log('Adding direct click event listener to poetry button');
-        poetryButton.addEventListener('click', function() {
-            console.log('Poetry button clicked directly');
-            // Hide all panels
-            document.getElementById('qa-panel').classList.add('hidden');
-            document.getElementById('create-panel').classList.add('hidden');
-            
-            // Show poetry panel
-            const poetryPanel = document.getElementById('poetry-panel');
-            if (poetryPanel) {
-                poetryPanel.classList.remove('hidden');
-                console.log('Poetry panel is now visible');
-            } else {
-                console.error('Poetry panel element not found');
-            }
-            
-            // Update active states
-            document.getElementById('qa-button').classList.remove('active');
-            document.getElementById('create-button').classList.remove('active');
-            poetryButton.classList.add('active');
-        });
-    } else {
-        console.error('Poetry button not found during init');
-    }
+    // Initialize poetry functionality
+    initializePoetryFunctionality();
+    
+    // Switch to default panel (questions)
+    switchPanel('questions');
     
     console.log('Application initialized');
+}
+
+function initializePoetryFunctionality() {
+    console.log('Initializing poetry functionality');
+    
+    // Create poetry container if it doesn't exist
+    let poetryContainer = document.getElementById('poetry-container');
+    if (!poetryContainer) {
+        const contentArea = document.querySelector('.content-area');
+        if (contentArea) {
+            poetryContainer = document.createElement('div');
+            poetryContainer.id = 'poetry-container';
+            poetryContainer.className = 'container hidden'; // Hidden by default
+            
+            // Add poetry content
+            poetryContainer.innerHTML = `
+                <div id="poetry-empty-state" class="empty-state">
+                    <h3>生成诗词</h3>
+                    <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成诗词。</p>
+                </div>
+                <div id="poetry-display" class="hidden">
+                    <div id="poem-content"></div>
+                    <div id="poem-navigation">
+                        <button id="prev-poem-btn" class="nav-button">上一首</button>
+                        <button id="next-poem-btn" class="nav-button">下一首</button>
+                    </div>
+                </div>
+            `;
+            
+            contentArea.appendChild(poetryContainer);
+            console.log('Poetry container created and added to content area');
+        }
+    }
+    
+    // Initialize poetry dropdowns
+    initializePoetryDropdowns();
+    
+    // Set up learn poetry button
+    const learnPoetryBtn = document.getElementById('learn-poetry-btn');
+    if (learnPoetryBtn) {
+        learnPoetryBtn.addEventListener('click', handleLearnPoetryClick);
+    } else {
+        console.error('Learn poetry button not found');
+    }
+    
+    // Set up navigation buttons
+    const prevPoemBtn = document.getElementById('prev-poem-btn');
+    const nextPoemBtn = document.getElementById('next-poem-btn');
+    
+    if (prevPoemBtn) {
+        prevPoemBtn.addEventListener('click', () => {
+            console.log('Previous poem button clicked');
+            if (currentPoemIndex > 0) {
+                currentPoemIndex--;
+                displayCurrentPoem();
+            }
+        });
+    }
+    
+    if (nextPoemBtn) {
+        nextPoemBtn.addEventListener('click', () => {
+            console.log('Next poem button clicked');
+            if (currentPoemIndex < poems.length - 1) {
+                currentPoemIndex++;
+                displayCurrentPoem();
+            }
+        });
+    }
+    
+    console.log('Poetry functionality initialized');
 }
 
 // ... existing code ...
@@ -4508,78 +4553,93 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleTabSwitch(containerType) {
         console.log('Switching to tab:', containerType);
         
-        // First, remove all containers from DOM to ensure clean state
-        if (qaContainer && qaContainer.parentNode) {
-            qaContainer.parentNode.removeChild(qaContainer);
+        // Get content area
+        const contentArea = document.querySelector('.content-area');
+        if (!contentArea) {
+            console.error('Content area not found');
+            return;
         }
         
-        if (createContainer && createContainer.parentNode) {
-            createContainer.parentNode.removeChild(createContainer);
-        }
+        // Hide all containers
+        const containers = contentArea.querySelectorAll('.container');
+        containers.forEach(container => {
+            container.classList.add('hidden');
+        });
         
-        if (poetryContainer && poetryContainer.parentNode) {
-            poetryContainer.parentNode.removeChild(poetryContainer);
-        }
+        // Show the selected container
+        let container = document.getElementById(`${containerType}-container`);
         
-        // Reset active states
-        if (qaButton) qaButton.classList.remove('active');
-        if (createButton) createButton.classList.remove('active');
-        if (poetryButton) poetryButton.classList.remove('active');
-        
-        // Add only the appropriate container to the content area
-        if (containerType === 'qa' && qaContainer && contentArea) {
-            contentArea.appendChild(qaContainer);
-            if (qaButton) qaButton.classList.add('active');
-            console.log('QA container added to content area');
+        // If container doesn't exist, create it
+        if (!container) {
+            console.log(`${containerType} container not found, creating it`);
+            container = document.createElement('div');
+            container.id = `${containerType}-container`;
+            container.className = 'container';
             
-            // Ensure poetry container is not present
-            const existingPoetryContainer = document.getElementById('poetry-container');
-            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
-                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
-            }
-        } else if (containerType === 'create' && createContainer && contentArea) {
-            contentArea.appendChild(createContainer);
-            if (createButton) createButton.classList.add('active');
-            console.log('Create container added to content area');
-            
-            // Ensure poetry container is not present
-            const existingPoetryContainer = document.getElementById('poetry-container');
-            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
-                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
-            }
-            
-            // Show empty state on test page
-            const questionsDisplayContainer = document.getElementById('questions-display-container');
-            const emptyState = document.getElementById('empty-state');
-            
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.classList.remove('hidden');
+            // Add specific content based on container type
+            if (containerType === 'poetry') {
+                container.innerHTML = `
+                    <div id="poetry-empty-state" class="empty-state">
+                        <h3>生成诗词</h3>
+                        <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成诗词。</p>
+                    </div>
+                    <div id="poetry-display" class="hidden">
+                        <div id="poem-content"></div>
+                        <div id="poem-navigation">
+                            <button id="prev-poem-btn" class="nav-button">上一首</button>
+                            <button id="next-poem-btn" class="nav-button">下一首</button>
+                        </div>
+                    </div>
+                `;
+                contentArea.appendChild(container);
+                console.log('Poetry container added to content area');
                 
-                if (emptyState) {
-                    emptyState.classList.remove('hidden');
-                }
-            }
-        } else if (containerType === 'poetry' && poetryContainer && contentArea) {
-            contentArea.appendChild(poetryContainer);
-            if (poetryButton) poetryButton.classList.add('active');
-            console.log('Poetry container added to content area');
-            
-            // After switching to poetry tab, add event listener to learn poetry button
-            setTimeout(() => {
-                const learnPoetryButton = document.getElementById('learn-poetry-button');
-                if (learnPoetryButton) {
-                    // Remove any existing event listeners
-                    const newButton = learnPoetryButton.cloneNode(true);
-                    learnPoetryButton.parentNode.replaceChild(newButton, learnPoetryButton);
-                    
-                    // Add new event listener
-                    newButton.addEventListener('click', function() {
-                        console.log('Learn poetry button clicked');
-                        handleLearnPoetryClick();
+                // Initialize poetry-specific elements
+                initializePoetryDropdowns();
+                
+                // Set up event listeners for poetry navigation
+                const prevPoemBtn = document.getElementById('prev-poem-btn');
+                const nextPoemBtn = document.getElementById('next-poem-btn');
+                
+                if (prevPoemBtn) {
+                    prevPoemBtn.addEventListener('click', () => {
+                        console.log('Previous poem button clicked');
+                        if (currentPoemIndex > 0) {
+                            currentPoemIndex--;
+                            displayCurrentPoem();
+                        }
                     });
                 }
-            }, 100);
+                
+                if (nextPoemBtn) {
+                    nextPoemBtn.addEventListener('click', () => {
+                        console.log('Next poem button clicked');
+                        if (currentPoemIndex < poems.length - 1) {
+                            currentPoemIndex++;
+                            displayCurrentPoem();
+                        }
+                    });
+                }
+            } else if (containerType === 'questions') {
+                // Add questions container content
+                // ... existing code for questions container ...
+            }
+            
+            contentArea.appendChild(container);
         }
+        
+        // Show the container
+        container.classList.remove('hidden');
+        
+        // Update active tab
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            if (tab.dataset.container === containerType) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
     }
     
     // Add event listeners to buttons
@@ -4615,47 +4675,53 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to display the current poem
     function displayCurrentPoem() {
-        if (!poemState.poems || poemState.poems.length === 0) {
+        console.log('Displaying poem:', poems[currentPoemIndex], 'Current index:', currentPoemIndex);
+        
+        // Ensure poem content container exists
+        const poemContent = document.getElementById('poem-content');
+        if (!poemContent) {
+            console.error('Poem content container not found');
+            
+            // Try to create it if it doesn't exist
+            const poetryDisplay = document.getElementById('poetry-display');
+            if (poetryDisplay) {
+                const newPoemContent = document.createElement('div');
+                newPoemContent.id = 'poem-content';
+                poetryDisplay.prepend(newPoemContent);
+                console.log('Created poem content container');
+            } else {
+                console.error('Poetry display container not found, cannot create poem content container');
+                return;
+            }
+        }
+        
+        // Get current poem
+        if (!poems || poems.length === 0) {
             console.error('No poems available to display');
             return;
         }
         
-        const poem = poemState.poems[poemState.currentIndex];
-        console.log('Displaying poem:', poem, 'Current index:', poemState.currentIndex);
+        const poem = poems[currentPoemIndex];
         
-        // Get poem elements
-        const poemTitle = document.querySelector('.poem-title');
-        const poemAuthor = document.querySelector('.poem-author');
-        const poemContent = document.querySelector('.poem-content');
-        const poemBackground = document.querySelector('.poem-background');
-        const poemExplanation = document.querySelector('.poem-explanation');
-        const poemCounter = document.querySelector('.poem-counter');
+        // Format poem content with line breaks
+        const formattedContent = poem.content.replace(/[，。！？；：]/g, match => `${match}<br>`);
         
-        // Display poem data with null checks
-        if (poemTitle) poemTitle.textContent = poem.title || '无标题';
-        if (poemAuthor) poemAuthor.textContent = poem.author || '佚名';
-        
-        // Handle content with null check
-        if (poemContent) {
-            if (poem.content) {
-                poemContent.innerHTML = poem.content.replace ? poem.content.replace(/\n/g, '<br>') : poem.content;
-            } else {
-                poemContent.innerHTML = '无内容';
-            }
-        }
-        
-        // Handle background with null check
-        if (poemBackground) {
-            poemBackground.innerHTML = poem.background || '无背景信息';
-        }
-        
-        // Handle explanation with null check
-        if (poemExplanation) {
-            poemExplanation.innerHTML = poem.explanation || '无赏析';
-        }
-        
-        if (poemCounter) {
-            poemCounter.textContent = `${poemState.currentIndex + 1} / ${poemState.poems.length}`;
+        // Update poem content
+        const poemContentElement = document.getElementById('poem-content');
+        if (poemContentElement) {
+            poemContentElement.innerHTML = `
+                <h2>${poem.title}</h2>
+                <h3>${poem.author}</h3>
+                <div class="poem-text">${formattedContent}</div>
+                <div class="poem-background">
+                    <h4>背景</h4>
+                    <p>${poem.background}</p>
+                </div>
+                <div class="poem-explanation">
+                    <h4>赏析</h4>
+                    <p>${poem.explanation}</p>
+                </div>
+            `;
         }
         
         // Update navigation buttons
@@ -4664,16 +4730,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to update navigation buttons
     function updatePoemNavigationButtons() {
-        const prevButton = document.getElementById('prev-poem-button');
-        const nextButton = document.getElementById('next-poem-button');
+        const prevButton = document.getElementById('prev-poem-btn');
+        const nextButton = document.getElementById('next-poem-btn');
         
         if (prevButton) {
-            prevButton.disabled = poemState.currentIndex === 0;
+            prevButton.disabled = currentPoemIndex === 0;
             console.log('Prev button disabled:', prevButton.disabled);
         }
         
         if (nextButton) {
-            nextButton.disabled = poemState.currentIndex === poemState.poems.length - 1;
+            nextButton.disabled = currentPoemIndex === poems.length - 1;
             console.log('Next button disabled:', nextButton.disabled);
         }
     }
@@ -4682,39 +4748,54 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupPoemNavigationButtons() {
         console.log('Setting up poem navigation buttons');
         
-        // Remove any existing event listeners by cloning and replacing
-        const prevButton = document.getElementById('prev-poem-button');
-        const nextButton = document.getElementById('next-poem-button');
-        
-        if (prevButton) {
-            const newPrevButton = prevButton.cloneNode(true);
-            prevButton.parentNode.replaceChild(newPrevButton, prevButton);
+        // Ensure navigation container exists
+        let navContainer = document.getElementById('poem-navigation');
+        if (!navContainer) {
+            console.log('Poem navigation container not found, creating it');
             
-            newPrevButton.addEventListener('click', function(event) {
-                event.preventDefault();
-                event.stopPropagation(); // Stop event from bubbling up to document
-                console.log('Previous poem button clicked directly');
-                if (poemState.currentIndex > 0) {
-                    poemState.currentIndex--;
+            // Find poetry display container
+            const poetryDisplay = document.getElementById('poetry-display');
+            if (!poetryDisplay) {
+                console.error('Poetry display container not found, cannot create navigation buttons');
+                return;
+            }
+            
+            navContainer = document.createElement('div');
+            navContainer.id = 'poem-navigation';
+            poetryDisplay.appendChild(navContainer);
+            
+            // Create navigation buttons
+            const prevButton = document.createElement('button');
+            prevButton.id = 'prev-poem-btn';
+            prevButton.className = 'nav-button';
+            prevButton.textContent = '上一首';
+            prevButton.addEventListener('click', () => {
+                console.log('Previous poem button clicked');
+                if (currentPoemIndex > 0) {
+                    currentPoemIndex--;
                     displayCurrentPoem();
                 }
             });
-        }
-        
-        if (nextButton) {
-            const newNextButton = nextButton.cloneNode(true);
-            nextButton.parentNode.replaceChild(newNextButton, nextButton);
             
-            newNextButton.addEventListener('click', function(event) {
-                event.preventDefault();
-                event.stopPropagation(); // Stop event from bubbling up to document
-                console.log('Next poem button clicked directly');
-                if (poemState.currentIndex < poemState.poems.length - 1) {
-                    poemState.currentIndex++;
+            const nextButton = document.createElement('button');
+            nextButton.id = 'next-poem-btn';
+            nextButton.className = 'nav-button';
+            nextButton.textContent = '下一首';
+            nextButton.addEventListener('click', () => {
+                console.log('Next poem button clicked');
+                if (currentPoemIndex < poems.length - 1) {
+                    currentPoemIndex++;
                     displayCurrentPoem();
                 }
             });
+            
+            // Add buttons to container
+            navContainer.appendChild(prevButton);
+            navContainer.appendChild(nextButton);
         }
+        
+        // Update button states
+        updatePoemNavigationButtons();
     }
     
     // REMOVE the event delegation approach to avoid duplicate handling
@@ -5056,3 +5137,82 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry functionality initialized');
 });
+
+// ... existing code ...
+
+// Poetry button click handler
+const poetryButton = document.getElementById('poetry-btn');
+if (poetryButton) {
+    poetryButton.addEventListener('click', function() {
+        console.log('Poetry button clicked');
+        
+        // Switch to poetry panel
+        handleTabSwitch('poetry');
+        
+        // Ensure poetry panel is visible
+        const poetryContainer = document.getElementById('poetry-container');
+        if (!poetryContainer) {
+            console.error('Poetry container not found after tab switch');
+            // Create poetry container if it doesn't exist
+            const contentArea = document.querySelector('.content-area');
+            if (contentArea) {
+                const newPoetryContainer = document.createElement('div');
+                newPoetryContainer.id = 'poetry-container';
+                newPoetryContainer.className = 'container';
+                
+                // Add poetry content
+                newPoetryContainer.innerHTML = `
+                    <div id="poetry-empty-state" class="empty-state">
+                        <h3>生成诗词</h3>
+                        <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成诗词。</p>
+                    </div>
+                    <div id="poetry-display" class="hidden">
+                        <div id="poem-content"></div>
+                        <div id="poem-navigation">
+                            <button id="prev-poem-btn" class="nav-button">上一首</button>
+                            <button id="next-poem-btn" class="nav-button">下一首</button>
+                        </div>
+                    </div>
+                `;
+                
+                contentArea.appendChild(newPoetryContainer);
+                console.log('Poetry container created and added to content area');
+                
+                // Initialize poetry dropdowns
+                initializePoetryDropdowns();
+                
+                // Setup navigation button event listeners
+                const prevPoemBtn = document.getElementById('prev-poem-btn');
+                const nextPoemBtn = document.getElementById('next-poem-btn');
+                
+                if (prevPoemBtn) {
+                    prevPoemBtn.addEventListener('click', () => {
+                        console.log('Previous poem button clicked');
+                        if (currentPoemIndex > 0) {
+                            currentPoemIndex--;
+                            displayCurrentPoem();
+                        }
+                    });
+                }
+                
+                if (nextPoemBtn) {
+                    nextPoemBtn.addEventListener('click', () => {
+                        console.log('Next poem button clicked');
+                        if (currentPoemIndex < poems.length - 1) {
+                            currentPoemIndex++;
+                            displayCurrentPoem();
+                        }
+                    });
+                }
+            }
+        }
+        
+        // Show poetry container
+        const poetryContainerAfterCreation = document.getElementById('poetry-container');
+        if (poetryContainerAfterCreation) {
+            poetryContainerAfterCreation.classList.remove('hidden');
+        }
+    });
+} else {
+    console.error('Poetry button not found');
+}
