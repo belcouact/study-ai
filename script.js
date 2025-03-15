@@ -369,42 +369,32 @@ function showResultsPopup() {
 }
 
 // Function to display the current question
-function displayCurrentQuestion() {
-    console.log('displayCurrentQuestion called', window.currentQuestionIndex);
-    console.log('Questions array:', window.questions);
-    
-    if (!window.questions || window.questions.length === 0) {
-        console.error('No questions available to display');
-        return;
-    }
-    
-    const question = window.questions[window.currentQuestionIndex];
-    
-    if (!question) {
-        console.error('No question found at index', window.currentQuestionIndex);
-        return;
-    }
-    
-    console.log('Current question:', question);
+function displayCurrentQuestion(index) {
+    console.log("displayCurrentQuestion called", index);
+    console.log("Questions array:", questions);
 
-    // Make sure the questions display container is visible
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    if (questionsDisplayContainer) {
-        questionsDisplayContainer.classList.remove('hidden');
-        
-        // Hide the empty state if it exists
-        const emptyState = document.getElementById('empty-state');
-        if (emptyState) {
-            emptyState.classList.add('hidden');
-        }
-        
-        // Hide the loading indicator if it exists
-        const loadingIndicator = document.getElementById('test-loading-indicator');
-        if (loadingIndicator) {
-            loadingIndicator.style.display = 'none';
-        }
-    } else {
-        console.error('Questions display container not found in displayCurrentQuestion');
+    if (!questions || questions.length === 0) {
+        console.error("No questions available to display");
+        return;
+    }
+
+    currentQuestionIndex = index;
+    const question = questions[index];
+    console.log("Current question:", question);
+
+    // Make sure the questionsDisplayContainer exists
+    let questionsDisplayContainer = document.getElementById('questions-display-container');
+    
+    // If the container doesn't exist, create it
+    if (!questionsDisplayContainer) {
+        console.log("Creating questions display container");
+        questionsDisplayContainer = document.createElement('div');
+        questionsDisplayContainer.id = 'questions-display-container';
+        document.querySelector('.questions-section').appendChild(questionsDisplayContainer);
+    }
+    
+    if (!questionsDisplayContainer) {
+        console.error("Questions display container not found in displayCurrentQuestion");
         return;
     }
 
@@ -432,7 +422,7 @@ function displayCurrentQuestion() {
             display: inline-block;
             width: fit-content;
         `;
-        questionCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
+        questionCounter.textContent = `题目 ${index + 1} / ${window.questions.length}`;
         console.log('Updated question counter:', questionCounter.textContent);
     } else {
         console.error('Question counter element not found');
@@ -451,7 +441,7 @@ function displayCurrentQuestion() {
             display: inline-block;
             width: fit-content;
         `;
-        newCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
+        newCounter.textContent = `题目 ${index + 1} / ${window.questions.length}`;
         questionsDisplayContainer.appendChild(newCounter);
     }
     
@@ -637,7 +627,7 @@ function displayCurrentQuestion() {
             });
 
             // Set initial state if answer exists
-            if (window.userAnswers && window.userAnswers[window.currentQuestionIndex] === cell.dataset.value) {
+            if (window.userAnswers && window.userAnswers[index] === cell.dataset.value) {
                 selectedCell = cell;
                 selectedValue = cell.dataset.value;
                 updateCellStyles(cell, true);
@@ -655,7 +645,7 @@ function displayCurrentQuestion() {
             submitButton.addEventListener('click', () => {
                 if (selectedValue) {
                     // Save the answer
-                    window.userAnswers[window.currentQuestionIndex] = selectedValue;
+                    window.userAnswers[index] = selectedValue;
                     
                     // Show the answer container
                     displayAnswer(selectedValue);
@@ -782,7 +772,7 @@ function displayCurrentQuestion() {
             submitButton.addEventListener('click', function() {
                 if (selectedValue) {
                     // Save the answer
-                    window.userAnswers[window.currentQuestionIndex] = selectedValue;
+                    window.userAnswers[index] = selectedValue;
                     
                     // Show answer and explanation
                     displayAnswer(selectedValue);
@@ -892,7 +882,7 @@ function displayCurrentQuestion() {
     }
     
     // Style the answer container when showing results
-    if (window.userAnswers && window.userAnswers[window.currentQuestionIndex]) {
+    if (window.userAnswers && window.userAnswers[index]) {
         const answerContainer = document.getElementById('answer-container');
         if (answerContainer) {
             answerContainer.classList.remove('hidden');
@@ -907,7 +897,7 @@ function displayCurrentQuestion() {
                 animation: fadeIn 0.3s ease;
             `;
             
-            const selectedAnswer = window.userAnswers[window.currentQuestionIndex];
+            const selectedAnswer = window.userAnswers[index];
             const correctAnswer = question.answer;
             const isCorrect = selectedAnswer === correctAnswer;
             
@@ -2217,34 +2207,36 @@ window.showSystemMessage = showSystemMessage;
 window.extractContentFromResponse = extractContentFromResponse;
 
 // Function to show system messages
-function showSystemMessage(message, type = 'info') {
-    const messageElement = document.createElement('div');
-    messageElement.className = `system-message ${type}`;
-    messageElement.textContent = message;
+function showSystemMessage(message, isError = false) {
+    const systemMessagesContainer = document.getElementById('system-messages-container');
     
-    // Get the questions display container
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    
-    // Create status container if it doesn't exist
-    let statusContainer = document.getElementById('status-container');
-    if (!statusContainer) {
-        statusContainer = document.createElement('div');
-        statusContainer.id = 'status-container';
-        statusContainer.className = 'status-container';
-        questionsDisplayContainer.insertBefore(statusContainer, questionsDisplayContainer.firstChild);
+    // If the container doesn't exist, create it
+    if (!systemMessagesContainer) {
+        console.log("Creating system messages container");
+        const container = document.createElement('div');
+        container.id = 'system-messages-container';
+        document.body.appendChild(container);
     }
     
-    // Clear previous messages
-    statusContainer.innerHTML = '';
+    const messageElement = document.createElement('div');
+    messageElement.className = `system-message ${isError ? 'error' : 'info'}`;
+    messageElement.textContent = message;
     
-    // Add new message
-    statusContainer.appendChild(messageElement);
-    
-    // Auto-remove after 5 seconds for non-error messages
-    if (type !== 'error') {
+    const systemMessagesContainer = document.getElementById('system-messages-container');
+    if (systemMessagesContainer) {
+        systemMessagesContainer.insertBefore(messageElement, systemMessagesContainer.firstChild);
+        
+        // Auto-remove after 5 seconds
         setTimeout(() => {
-            messageElement.remove();
+            messageElement.classList.add('fade-out');
+            setTimeout(() => {
+                if (messageElement.parentNode === systemMessagesContainer) {
+                    systemMessagesContainer.removeChild(messageElement);
+                }
+            }, 500);
         }, 5000);
+    } else {
+        console.error("System messages container not found");
     }
 }
 
