@@ -5302,6 +5302,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     emptyState.classList.remove('hidden');
                 }
             }
+            
+            // Set up the test configuration dropdowns
+            setupTestConfigDropdowns();
         } else if (containerType === 'poetry' && poetryContainer && contentArea) {
             contentArea.appendChild(poetryContainer);
             if (poetryButton) poetryButton.classList.add('active');
@@ -5799,3 +5802,105 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry functionality initialized');
 });
+
+// Function to set up the test configuration dropdowns
+function setupTestConfigDropdowns() {
+    console.log('Setting up test configuration dropdowns');
+    
+    // Get references to the new dropdown elements
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    const gradeSelect = document.getElementById('grade-select-sidebar');
+    const subjectSelect = document.getElementById('subject-select');
+    const generateButton = document.getElementById('generate-questions-button');
+    
+    if (!schoolSelect || !gradeSelect) {
+        console.error('School or grade select not found');
+        return;
+    }
+    
+    // Get the current values from the sidebar
+    const school = schoolSelect.value;
+    const grade = gradeSelect.value;
+    
+    // Populate the subject dropdown based on school and grade
+    if (subjectSelect) {
+        populateSubjectOptions(school, subjectSelect);
+    }
+    
+    // Add event listener to the generate button
+    if (generateButton) {
+        // Remove any existing event listeners
+        const newButton = generateButton.cloneNode(true);
+        if (generateButton.parentNode) {
+            generateButton.parentNode.replaceChild(newButton, generateButton);
+        }
+        
+        // Add new event listener
+        newButton.addEventListener('click', handleGenerateQuestionsClick);
+    }
+    
+    // Add event listeners to school and grade selects to update subject options
+    if (schoolSelect && gradeSelect && subjectSelect) {
+        schoolSelect.addEventListener('change', function() {
+            populateSubjectOptions(schoolSelect.value, subjectSelect);
+        });
+        
+        gradeSelect.addEventListener('change', function() {
+            populateSubjectOptions(schoolSelect.value, subjectSelect);
+        });
+    }
+}
+
+// Modified function to populate subject options
+function populateSubjectOptions(school, subjectSelect) {
+    // Clear existing options
+    while (subjectSelect.options.length > 0) {
+        subjectSelect.remove(0);
+    }
+    
+    // Add new options based on school
+    let subjects = [];
+    
+    if (school === "小学") {
+        subjects = ["语文", "数学", "英语", "科学", "道德与法治"];
+    } else if (school === "初中") {
+        subjects = ["语文", "数学", "英语", "物理", "化学", "生物", "历史", "地理", "道德与法治"];
+    } else if (school === "高中") {
+        subjects = ["语文", "数学", "英语", "物理", "化学", "生物", "历史", "地理", "政治"];
+    }
+    
+    // Add options to select
+    subjects.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject;
+        subjectSelect.appendChild(option);
+    });
+}
+
+// Modified function to handle generate questions click
+function handleGenerateQuestionsClick() {
+    console.log('Generate questions button clicked');
+    
+    // Get values from the form
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    const gradeSelect = document.getElementById('grade-select-sidebar');
+    const subjectSelect = document.getElementById('subject-select');
+    const semesterSelect = document.getElementById('semester-select');
+    const difficultySelect = document.getElementById('difficulty-select');
+    const questionCountSelect = document.getElementById('question-count-select');
+    
+    if (!schoolSelect || !gradeSelect || !subjectSelect || !semesterSelect || !difficultySelect || !questionCountSelect) {
+        showSystemMessage('无法获取表单数据，请刷新页面重试', 'error');
+        return;
+    }
+    
+    const school = schoolSelect.value;
+    const grade = gradeSelect.options[gradeSelect.selectedIndex].text;
+    const subject = subjectSelect.value;
+    const semester = semesterSelect.value;
+    const difficulty = difficultySelect.value;
+    const questionCount = questionCountSelect.value;
+    
+    // ... rest of the existing handleGenerateQuestionsClick function ...
+}
