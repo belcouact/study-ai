@@ -4664,9 +4664,6 @@ function init() {
         populateSidebarGradeOptions(selectedSchool);
     }
     
-    // Initialize empty state for quiz creation
-    initializeEmptyState();
-    
     // IMPORTANT: Directly add event listener to poetry button
     const poetryButton = document.getElementById('poetry-button');
     if (poetryButton) {
