@@ -156,53 +156,57 @@ function parseQuestionsFromResponse(response) {
 
 // Global function to fetch AI response for question generation
 async function fetchAIResponse(prompt) {
-    console.log('Fetching AI response with prompt:', prompt);
+    const apiUrl = 'https://d7e72b44.study-llm.pages.dev/api/chat';
     
-    try {
-        // Show loading indicator if it exists
-        const loading = document.getElementById('loading');
-        if (loading) {
-            loading.classList.remove('hidden');
-        }
-        
-        // Make the actual API call using the current API function and model
-        const apiEndpoint = `/api/${currentApiFunction}`;
-        const response = await fetch(apiEndpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                messages: [
-                    {
-                        role: "user",
-                        content: prompt
-                    }
-                ],
-                model: currentModel,
-                temperature: 0.7,
-                max_tokens: 2000
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error(`API call failed with status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('API response:', data);
-        return data;
-        
-    } catch (error) {
-        console.error('Error in fetchAIResponse:', error);
-        throw error; // Re-throw the error to be handled by the caller
-    } finally {
-        // Hide loading indicator if it exists
-        const loading = document.getElementById('loading');
-        if (loading) {
-            loading.classList.add('hidden');
+    // Create request payload
+    const payload = {
+        prompt: prompt,
+        max_tokens: 2000,
+        temperature: 0.7
+    };
+    
+    // Add retry logic
+    const maxRetries = 3;
+    let retryCount = 0;
+    let lastError = null;
+    
+    while (retryCount < maxRetries) {
+        try {
+            console.log(`Attempt ${retryCount + 1} to fetch AI response`);
+            
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            // Check if response is ok (status in the range 200-299)
+            if (!response.ok) {
+                const errorText = await response.text().catch(() => 'No error details available');
+                throw new Error(`API call failed with status: ${response.status}. Details: ${errorText}`);
+            }
+            
+            const data = await response.json();
+            return extractContentFromResponse(data);
+        } catch (error) {
+            console.log(`Error in fetchAIResponse (attempt ${retryCount + 1}):`, error);
+            lastError = error;
+            retryCount++;
+            
+            if (retryCount < maxRetries) {
+                // Wait before retrying (exponential backoff)
+                const waitTime = Math.pow(2, retryCount) * 1000;
+                console.log(`Waiting ${waitTime}ms before retry...`);
+                await new Promise(resolve => setTimeout(resolve, waitTime));
+            }
         }
     }
+    
+    // If we've exhausted all retries, throw the last error
+    console.error(`Failed after ${maxRetries} attempts:`, lastError);
+    throw lastError || new Error('Failed to fetch AI response after multiple attempts');
 }
 
 // Function to extract content from API response
