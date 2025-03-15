@@ -1722,230 +1722,112 @@ function formatParagraph(paragraph) {
 
 // Function to handle generating questions
 function handleGenerateQuestionsClick() {
-    console.log('handleGenerateQuestionsClick called');
+    console.log('Generate questions button clicked');
     
-    // Get form elements from sidebar
-    const schoolSelect = document.getElementById('school-select-sidebar');
-    const gradeSelect = document.getElementById('grade-select-sidebar');
-    const semesterSelect = document.getElementById('semester-select-sidebar');
-    const subjectSelect = document.getElementById('subject-select-sidebar');
-    const difficultySelect = document.getElementById('difficulty-select-sidebar');
-    const questionCountSelect = document.getElementById('question-count-select-sidebar');
-    const generateQuestionsButton = document.querySelector('.sidebar-generate-button');
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    const emptyState = document.getElementById('empty-state');
+    // Get educational context
+    const educationalContext = getEducationalContext();
     
-    if (!schoolSelect || !gradeSelect || !semesterSelect || !subjectSelect || 
-        !difficultySelect || !questionCountSelect || !generateQuestionsButton) {
-        console.error('One or more form elements not found');
+    // Get additional parameters from the test configuration
+    const subjectSelect = document.getElementById('subject-select');
+    const semesterSelect = document.getElementById('semester-select');
+    const difficultySelect = document.getElementById('difficulty-select');
+    const questionCountSelect = document.getElementById('question-count-select');
+    
+    if (!subjectSelect || !semesterSelect || !difficultySelect || !questionCountSelect) {
+        console.error('One or more dropdown elements not found');
         return;
     }
     
-    // Only show loading state if we're on the test page
-    const isTestPage = document.getElementById('create-container').classList.contains('active') || 
-                      !document.getElementById('create-container').classList.contains('hidden');
-    
-    if (isTestPage) {
-    // Show loading state on button
-    generateQuestionsButton.textContent = '生成中...';
-    generateQuestionsButton.disabled = true;
-    
-        // Hide empty state if it exists
-        if (emptyState) {
-            emptyState.classList.add('hidden');
-        }
-        
-        // Show loading indicator on the test page
-        showLoadingIndicator();
-    }
-    
-    // Collect form data from sidebar
-    const schoolType = schoolSelect.value;
-    const grade = gradeSelect.value;
-    const semester = semesterSelect.value;
     const subject = subjectSelect.value;
+    const semester = semesterSelect.value;
     const difficulty = difficultySelect.value;
     const questionCount = questionCountSelect.value;
     
-    console.log('Form data collected:', { schoolType, grade, semester, subject, difficulty, questionCount });
+    console.log(`Generating ${questionCount} ${difficulty} questions for ${subject} (${semester})`);
     
-    // Create prompt for API
-    const prompt = `请生成${questionCount}道${schoolType}${grade}${semester}${subject}的${difficulty}难度选择题，每道题包括题目、四个选项(A、B、C、D)、答案和详细解析。严格的格式要求：
-每道题必须包含以下六个部分，缺一不可：
-1. "题目："后接具体题目
-2. "A."后接选项A的内容
-3. "B."后接选项B的内容
-4. "C."后接选项C的内容
-5. "D."后接选项D的内容
-6. "答案："后接正确选项（必须是A、B、C、D其中之一）
-7. "解析："后必须包含完整的解析（至少50字）
+    // Show loading indicator
+    showLoadingIndicator();
+    
+    // Hide empty state
+    const emptyState = document.getElementById('empty-state');
+    if (emptyState) {
+        emptyState.classList.add('hidden');
+    }
+    
+    // Prepare prompt for generating questions
+    const prompt = `请根据以下教育背景生成${questionCount}道${difficulty}难度的${subject}${semester}选择题：
+学校：${educationalContext.school}
+年级：${educationalContext.grade}
+科目：${subject}
+学期：${semester}
+难度：${difficulty}
 
-解析部分必须包含以下内容（缺一不可）：
-1. 解题思路和方法，不能超纲
-2. 关键知识点解释
-3. 正确答案的推导过程
-4. 为什么其他选项是错误的
-5. 相关知识点的总结
-6. 易错点提醒
+请以JSON格式返回题目，格式如下：
+[
+  {
+    "question": "题目内容",
+    "options": ["选项A", "选项B", "选项C", "选项D"],
+    "answer": "正确选项的字母（A、B、C或D）",
+    "explanation": "答案解析"
+  },
+  ...
+]
 
-示例格式：
-题目：[题目内容]
-A. [选项A内容]
-B. [选项B内容] 
-C. [选项C内容]
-D. [选项D内容]
-答案：[A或B或C或D]
-解析：本题主要考察[知识点]。解题思路是[详细说明]。首先，[推导过程]。选项分析：A选项[分析]，B选项[分析]，C选项[分析]，D选项[分析]。需要注意的是[易错点]。总的来说，[知识点总结]。同学们在解题时要特别注意[关键提醒]。
-
-题目质量要求：
-1. 题目表述必须清晰、准确，无歧义
-2. 选项内容必须完整，符合逻辑
-3. 所有选项必须有实际意义，不能有无意义的干扰项
-4. 难度必须符合年级水平
-5. 解析必须详尽，有教育意义
-6. 不出带图形的题目
-`;
-
+请确保题目符合${educationalContext.school}${educationalContext.grade}学生的认知水平，题目内容要准确、清晰，答案解析要详细易懂。`;
+    
     // Call API to generate questions
     fetchAIResponse(prompt)
         .then(response => {
-            try {
-                console.log('Processing API response:', response);
-                
-                // Hide loading indicator
-                hideLoadingIndicator();
-                
-                // Parse the response
-                const parsedQuestions = parseQuestionsFromResponse(response);
-                console.log('Parsed questions:', parsedQuestions);
-                
-                if (parsedQuestions.length === 0) {
-                    throw new Error('No questions could be parsed from the response');
-                }
-                
-                // Make variables globally available
+            // Parse questions from response
+            const parsedQuestions = parseQuestionsFromResponse(response);
+            console.log(`Successfully parsed ${parsedQuestions.length} questions:`, parsedQuestions);
+            
+            if (parsedQuestions.length > 0) {
+                // Store questions globally
                 window.questions = parsedQuestions;
-                window.userAnswers = Array(parsedQuestions.length).fill(null);
                 window.currentQuestionIndex = 0;
                 
-                // Ensure the questions display container exists and is visible
+                // Create or get questions display container
+                let questionsDisplayContainer = document.getElementById('questions-display-container');
                 if (!questionsDisplayContainer) {
-                    console.error('Questions display container not found, creating one');
-                    const newContainer = document.createElement('div');
-                    newContainer.id = 'questions-display-container';
-                    newContainer.className = 'questions-display-container';
-                    
-                    // Create required elements inside the container
-                    newContainer.innerHTML = `
-                        <div id="question-counter" class="question-counter"></div>
-                        <div id="question-text" class="question-text"></div>
-                        <div id="choices-container" class="choices-container"></div>
-                        <div id="answer-container" class="answer-container hidden">
-                            <div id="answer-result" class="answer-result"></div>
-                            <div id="answer-explanation" class="answer-explanation"></div>
-                        </div>
-                    `;
-                    
-                    // Add to the create container
-                    const createContainer = document.getElementById('create-container');
-                    if (createContainer) {
-                        createContainer.insertBefore(newContainer, createContainer.firstChild);
-                    }
+                    console.error('Questions display container not found');
+                    questionsDisplayContainer = document.createElement('div');
+                    questionsDisplayContainer.id = 'questions-display-container';
+                    questionsDisplayContainer.className = 'questions-display-container';
+                    document.getElementById('create-container').appendChild(questionsDisplayContainer);
+                    console.log('Created questions display container');
                 }
                 
-                // Get a fresh reference to the questions display container
-                const questionsContainer = document.getElementById('questions-display-container');
+                // Make sure the container is visible
+                questionsDisplayContainer.classList.remove('hidden');
                 
-                // Hide empty state if it exists
-                if (emptyState) {
-                    emptyState.classList.add('hidden');
-                    console.log('Empty state hidden');
-                }
-                
-                // Make sure the questions display container is visible
-                if (questionsContainer) {
-                    questionsContainer.classList.remove('hidden');
-                    console.log('Questions display container shown');
-                    
-                    // Ensure the container has the necessary child elements
-                    if (!document.getElementById('question-counter')) {
-                        const counterDiv = document.createElement('div');
-                        counterDiv.id = 'question-counter';
-                        counterDiv.className = 'question-counter';
-                        questionsContainer.appendChild(counterDiv);
-                    }
-                    
-                    if (!document.getElementById('question-text')) {
-                        const textDiv = document.createElement('div');
-                        textDiv.id = 'question-text';
-                        textDiv.className = 'question-text';
-                        questionsContainer.appendChild(textDiv);
-                    }
-                    
-                    if (!document.getElementById('choices-container')) {
-                        const choicesDiv = document.createElement('div');
-                        choicesDiv.id = 'choices-container';
-                        choicesDiv.className = 'choices-container';
-                        questionsContainer.appendChild(choicesDiv);
-                    }
-                    
-                    if (!document.getElementById('answer-container')) {
-                        const answerDiv = document.createElement('div');
-                        answerDiv.id = 'answer-container';
-                        answerDiv.className = 'answer-container hidden';
-                        answerDiv.innerHTML = `
-                            <div id="answer-result" class="answer-result"></div>
-                            <div id="answer-explanation" class="answer-explanation"></div>
-                        `;
-                        questionsContainer.appendChild(answerDiv);
-                    }
-                } else {
-                    console.error('Questions display container still not found after creation attempt');
+                // Create or get question counter
+                let questionCounter = document.getElementById('question-counter');
+                if (!questionCounter) {
+                    console.log('Question counter not found, creating it');
+                    questionCounter = document.createElement('div');
+                    questionCounter.id = 'question-counter';
+                    questionCounter.className = 'question-counter';
+                    questionsDisplayContainer.appendChild(questionCounter);
                 }
                 
                 // Display the first question
                 displayCurrentQuestion();
-                updateNavigationButtons();
                 
-                // Set up navigation button event listeners
+                // Setup navigation buttons
                 setupNavigationButtons();
-                
-                // Show success message
-                showSystemMessage(`已生成 ${parsedQuestions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`, 'success');
-            } catch (error) {
-                console.error('Error processing questions:', error);
-                showSystemMessage('生成题目时出错，请重试', 'error');
-                hideLoadingIndicator();
-                
-                // Show empty state again if there was an error
-                if (emptyState && questionsDisplayContainer) {
-                    emptyState.classList.remove('hidden');
-                    questionsDisplayContainer.classList.remove('hidden');
-                }
-            } finally {
-                // Reset button state
-                if (isTestPage) {
-                generateQuestionsButton.textContent = '出题';
-                generateQuestionsButton.disabled = false;
-                }
+            } else {
+                console.error('No questions were generated');
+                showSystemMessage('生成题目失败，请重试', 'error');
             }
+            
+            // Hide loading indicator
+            hideLoadingIndicator();
         })
         .catch(error => {
-            console.error('API error:', error);
-            showSystemMessage('API调用失败，请重试', 'error');
+            console.error('Error generating questions:', error);
+            showSystemMessage('生成题目时出错，请重试', 'error');
             hideLoadingIndicator();
-            
-            // Show empty state again if there was an error
-            if (emptyState && questionsDisplayContainer) {
-                emptyState.classList.remove('hidden');
-                questionsDisplayContainer.classList.remove('hidden');
-            }
-            
-            // Reset button state
-            if (isTestPage) {
-            generateQuestionsButton.textContent = '出题';
-            generateQuestionsButton.disabled = false;
-            }
         });
 }
 
@@ -5249,79 +5131,42 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to handle tab switching
     function handleTabSwitch(containerType) {
-        console.log('Switching to tab:', containerType);
+        console.log(`Switching to ${containerType} container`);
         
-        // First, remove all containers from DOM to ensure clean state
-        if (qaContainer && qaContainer.parentNode) {
-            qaContainer.parentNode.removeChild(qaContainer);
-        }
+        // Hide all containers first
+        document.querySelectorAll('.container').forEach(container => {
+            container.classList.add('hidden');
+        });
         
-        if (createContainer && createContainer.parentNode) {
-            createContainer.parentNode.removeChild(createContainer);
-        }
-        
-        if (poetryContainer && poetryContainer.parentNode) {
-            poetryContainer.parentNode.removeChild(poetryContainer);
-        }
-        
-        // Reset active states
-        if (qaButton) qaButton.classList.remove('active');
-        if (createButton) createButton.classList.remove('active');
-        if (poetryButton) poetryButton.classList.remove('active');
-        
-        // Add only the appropriate container to the content area
-        if (containerType === 'qa' && qaContainer && contentArea) {
-            contentArea.appendChild(qaContainer);
-            if (qaButton) qaButton.classList.add('active');
-            console.log('QA container added to content area');
+        // Show the selected container
+        const selectedContainer = document.getElementById(`${containerType}-container`);
+        if (selectedContainer) {
+            selectedContainer.classList.remove('hidden');
             
-            // Ensure poetry container is not present
-            const existingPoetryContainer = document.getElementById('poetry-container');
-            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
-                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
-            }
-        } else if (containerType === 'create' && createContainer && contentArea) {
-            contentArea.appendChild(createContainer);
-            if (createButton) createButton.classList.add('active');
-            console.log('Create container added to content area');
-            
-            // Ensure poetry container is not present
-            const existingPoetryContainer = document.getElementById('poetry-container');
-            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
-                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
-            }
-            
-            // Show empty state on test page
-            const questionsDisplayContainer = document.getElementById('questions-display-container');
-            const emptyState = document.getElementById('empty-state');
-            
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.classList.remove('hidden');
+            // If switching to create container, show empty state and initialize dropdowns
+            if (containerType === 'create') {
+                const questionsDisplayContainer = document.getElementById('questions-display-container');
+                const emptyState = document.getElementById('empty-state');
+                
+                if (questionsDisplayContainer) {
+                    questionsDisplayContainer.classList.remove('hidden');
+                }
                 
                 if (emptyState) {
                     emptyState.classList.remove('hidden');
                 }
+                
+                // Initialize subject dropdown based on school and grade
+                const educationalContext = getEducationalContext();
+                populateSubjectOptions(educationalContext.school);
+                
+                console.log('Initialized test page dropdowns');
             }
-        } else if (containerType === 'poetry' && poetryContainer && contentArea) {
-            contentArea.appendChild(poetryContainer);
-            if (poetryButton) poetryButton.classList.add('active');
-            console.log('Poetry container added to content area');
             
-            // After switching to poetry tab, add event listener to learn poetry button
-            setTimeout(() => {
-                const learnPoetryButton = document.getElementById('learn-poetry-button');
-                if (learnPoetryButton) {
-                    // Remove any existing event listeners
-                    const newButton = learnPoetryButton.cloneNode(true);
-                    learnPoetryButton.parentNode.replaceChild(newButton, learnPoetryButton);
-                    
-                    // Add new event listener
-                    newButton.addEventListener('click', function() {
-                        console.log('Learn poetry button clicked');
-                        handleLearnPoetryClick();
-                    });
-                }
-            }, 100);
+            // If switching to poetry container, initialize poetry dropdowns
+            if (containerType === 'poetry') {
+                initializePoetryDropdowns();
+            }
         }
     }
     
