@@ -6,70 +6,152 @@ let currentModel = 'deepseek-r1';
 function parseQuestionsFromResponse(response) {
     console.log('Parsing questions from response:', response);
     
-    try {
-        // Try to parse as JSON directly
-        let jsonData;
-        
-        if (typeof response === 'string') {
-            // If response is a string, try to extract JSON
-            const jsonMatch = response.match(/\[\s*\{.*\}\s*\]/s);
-            if (jsonMatch) {
-                jsonData = JSON.parse(jsonMatch[0]);
-            } else {
-                // Try to parse the entire response as JSON
-                jsonData = JSON.parse(response);
-            }
-        } else if (typeof response === 'object') {
-            // If response is already an object
-            if (Array.isArray(response)) {
-                jsonData = response;
-            } else if (response.choices && response.choices[0] && response.choices[0].message) {
-                // Handle API response format
-                const content = response.choices[0].message.content;
-                return parseQuestionsFromResponse(content);
-            } else {
-                console.error('Unexpected response format:', response);
-                return null;
-            }
-        }
-        
-        // Validate parsed data
-        if (Array.isArray(jsonData)) {
-            console.log('Successfully parsed', jsonData.length, 'questions:', jsonData);
-            
-            // Validate each question
-            const validQuestions = jsonData.filter(q => 
-                q && q.question && Array.isArray(q.options) && 
-                q.options.length === 4 && q.answer && q.explanation
-            );
-            
-            if (validQuestions.length > 0) {
-                return validQuestions;
-            } else {
-                console.error('No valid questions found in parsed data');
-                return null;
-            }
-        } else {
-            console.error('Parsed data is not an array:', jsonData);
-            return null;
-        }
-    } catch (error) {
-        console.error('Error parsing questions from response:', error);
-        
-        // Try to extract JSON from text
-        try {
-            const jsonRegex = /\[\s*\{[\s\S]*\}\s*\]/g;
-            const match = response.match(jsonRegex);
-            
-            if (match) {
-                return parseQuestionsFromResponse(match[0]);
-            }
-        } catch (e) {
-            console.error('Failed to extract JSON from text:', e);
-        }
-        
-        return null;
+    // Extract content from the API response
+    const content = extractContentFromResponse(response);
+    if (!content) {
+        console.error('No content found in response');
+        return [];
     }
+    
+    console.log('Extracted content:', content);
+    const parsedQuestions = [];
+    
+    // Check if the content already contains "题目：" marker
+    let contentToProcess = content;
+    if (!content.includes('题目：') && !content.startsWith('题目')) {
+        // If not, add it to make parsing consistent
+        contentToProcess = '题目：' + content;
+    }
+    
+    // Split the content by "题目："
+    const questionBlocks = contentToProcess.split(/题目：/).filter(block => block.trim());
+    console.log(`Found ${questionBlocks.length} question blocks`);
+    
+    if (questionBlocks.length === 0) {
+        // If no question blocks found with standard format, try alternative parsing
+        console.log('Attempting alternative parsing method');
+        
+        // Look for numbered questions like "1." or "Question 1:"
+        const altQuestionBlocks = content.split(/\d+[\.\:]\s+/).filter(block => block.trim());
+        
+        if (altQuestionBlocks.length > 0) {
+            console.log(`Found ${altQuestionBlocks.length} alternative question blocks`);
+            
+            for (const block of altQuestionBlocks) {
+                try {
+                    // Try to extract choices, answer and explanation with more flexible patterns
+                    const lines = block.split('\n').map(line => line.trim()).filter(line => line);
+                    
+                    if (lines.length < 5) continue; // Need at least question + 4 choices
+                    
+                    const questionText = lines[0];
+                    let choiceA = '', choiceB = '', choiceC = '', choiceD = '';
+                    let answer = '';
+                    let explanation = '';
+                    
+                    // Look for choices
+                    for (let i = 1; i < lines.length; i++) {
+                        const line = lines[i];
+                        if (line.startsWith('A') || line.startsWith('A.') || line.startsWith('(A)')) {
+                            choiceA = line.replace(/^A\.?\s*|\(A\)\s*/, '');
+                        } else if (line.startsWith('B') || line.startsWith('B.') || line.startsWith('(B)')) {
+                            choiceB = line.replace(/^B\.?\s*|\(B\)\s*/, '');
+                        } else if (line.startsWith('C') || line.startsWith('C.') || line.startsWith('(C)')) {
+                            choiceC = line.replace(/^C\.?\s*|\(C\)\s*/, '');
+                        } else if (line.startsWith('D') || line.startsWith('D.') || line.startsWith('(D)')) {
+                            choiceD = line.replace(/^D\.?\s*|\(D\)\s*/, '');
+                        } else if (line.includes('答案') || line.toLowerCase().includes('answer')) {
+                            answer = line.match(/[A-D]/)?.[0] || '';
+                        } else if (line.includes('解析') || line.toLowerCase().includes('explanation')) {
+                            explanation = lines.slice(i).join('\n');
+                            break;
+                        }
+                    }
+                    
+                    if (questionText && (choiceA || choiceB || choiceC || choiceD)) {
+                        parsedQuestions.push({
+                            questionText: `题目：${questionText}`,
+                            choices: {
+                                A: choiceA || '选项A',
+                                B: choiceB || '选项B',
+                                C: choiceC || '选项C',
+                                D: choiceD || '选项D'
+                            },
+                            answer: answer || 'A',
+                            explanation: explanation || '无解析'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error parsing alternative question block:', error, block);
+                }
+            }
+        }
+    }
+    
+    // Standard parsing for normal format
+    for (const block of questionBlocks) {
+        try {
+            console.log('Processing question block:', block.substring(0, 100) + '...');
+            
+            // Extract question text
+            const questionText = block.split(/[A-D]\.|\n答案：|\n解析：/)[0].trim();
+            console.log('Extracted question text:', questionText);
+            
+            // Extract choices
+            const choiceA = block.match(/A\.(.*?)(?=B\.|$)/s)?.[1]?.trim() || '';
+            const choiceB = block.match(/B\.(.*?)(?=C\.|$)/s)?.[1]?.trim() || '';
+            const choiceC = block.match(/C\.(.*?)(?=D\.|$)/s)?.[1]?.trim() || '';
+            const choiceD = block.match(/D\.(.*?)(?=\n答案：|$)/s)?.[1]?.trim() || '';
+            
+            console.log('Extracted choices:', { A: choiceA, B: choiceB, C: choiceC, D: choiceD });
+            
+            // Extract answer
+            const answer = block.match(/答案：([A-D])/)?.[1] || '';
+            console.log('Extracted answer:', answer);
+            
+            // Extract explanation
+            const explanation = block.match(/解析：([\s\S]*?)(?=题目：|$)/)?.[1]?.trim() || '';
+            console.log('Extracted explanation:', explanation.substring(0, 100) + '...');
+            
+            if (!questionText || !answer) {
+                console.warn('Skipping question with missing text or answer');
+                continue;
+            }
+            
+            parsedQuestions.push({
+                questionText: `题目：${questionText}`,
+                choices: {
+                    A: choiceA || '选项A未提供',
+                    B: choiceB || '选项B未提供',
+                    C: choiceC || '选项C未提供',
+                    D: choiceD || '选项D未提供'
+                },
+                answer: answer,
+                explanation: explanation || '无解析'
+            });
+        } catch (error) {
+            console.error('Error parsing question block:', error, block);
+        }
+    }
+    
+    // If we still have no questions, create a default one to prevent errors
+    if (parsedQuestions.length === 0) {
+        console.warn('No questions could be parsed, creating a default question');
+        parsedQuestions.push({
+            questionText: '题目：无法解析API返回的题目，这是一个默认题目',
+            choices: {
+                A: '选项A',
+                B: '选项B',
+                C: '选项C',
+                D: '选项D'
+            },
+            answer: 'A',
+            explanation: '由于API返回格式问题，无法解析题目。这是一个默认解析。'
+        });
+    }
+    
+    console.log(`Successfully parsed ${parsedQuestions.length} questions:`, parsedQuestions);
+    return parsedQuestions;
 }
 
 // Global function to fetch AI response for question generation
@@ -2964,7 +3046,7 @@ function initializeEmptyState() {
             
             // Create description
             const description = document.createElement('p');
-            description.textContent = '选择科目、学期、难度和题数，然后点击"开始出题"按钮生成测验题目。';
+            description.textContent = '使用左侧边栏选择学校类型、年级、学期、科目、难度和题目数量，然后点击"出题"按钮生成测验题目。';
             description.style.cssText = `
                 font-size: 16px;
                 color: #4a5568;
@@ -5209,7 +5291,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
             }
             
-            // Hide empty state on test page
+            // Show empty state on test page
             const questionsDisplayContainer = document.getElementById('questions-display-container');
             const emptyState = document.getElementById('empty-state');
             
@@ -5217,29 +5299,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 questionsDisplayContainer.classList.remove('hidden');
                 
                 if (emptyState) {
-                    emptyState.classList.add('hidden'); // Hide the empty state
+                    emptyState.classList.remove('hidden');
                 }
             }
+        } else if (containerType === 'poetry' && poetryContainer && contentArea) {
+            contentArea.appendChild(poetryContainer);
+            if (poetryButton) poetryButton.classList.add('active');
+            console.log('Poetry container added to content area');
             
-            // Set up the test configuration dropdowns
+            // After switching to poetry tab, add event listener to learn poetry button
             setTimeout(() => {
-                console.log('Setting up test config dropdowns after tab switch');
-                setupTestConfigDropdowns();
-                
-                // Add a direct event listener to the button as a fallback
-                const generateButton = document.getElementById('generate-questions-button');
-                if (generateButton) {
-                    console.log('Adding direct event listener to generate button');
-                    generateButton.addEventListener('click', function(event) {
-                        console.log('Direct generate button click handler');
-                        event.preventDefault();
-                        event.stopPropagation();
-                        handleGenerateQuestionsClick();
+                const learnPoetryButton = document.getElementById('learn-poetry-button');
+                if (learnPoetryButton) {
+                    // Remove any existing event listeners
+                    const newButton = learnPoetryButton.cloneNode(true);
+                    learnPoetryButton.parentNode.replaceChild(newButton, learnPoetryButton);
+                    
+                    // Add new event listener
+                    newButton.addEventListener('click', function() {
+                        console.log('Learn poetry button clicked');
+                        handleLearnPoetryClick();
                     });
                 }
             }, 100);
-        } else if (containerType === 'poetry' && poetryContainer && contentArea) {
-            // ... existing code for poetry tab ...
         }
     }
     
@@ -5717,211 +5799,3 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry functionality initialized');
 });
-
-// Function to set up the test configuration dropdowns
-function setupTestConfigDropdowns() {
-    console.log('Setting up test configuration dropdowns');
-    
-    // Get references to the new dropdown elements
-    const schoolSelect = document.getElementById('school-select-sidebar');
-    const gradeSelect = document.getElementById('grade-select-sidebar');
-    const subjectSelect = document.getElementById('subject-select');
-    const generateButton = document.getElementById('generate-questions-button');
-    
-    if (!schoolSelect || !gradeSelect) {
-        console.error('School or grade select not found');
-        return;
-    }
-    
-    // Get the current values from the sidebar
-    const school = schoolSelect.value;
-    const grade = gradeSelect.value;
-    
-    // Populate the subject dropdown based on school and grade
-    if (subjectSelect) {
-        populateSubjectOptions(school, subjectSelect);
-    }
-    
-    // Add event listener to the generate button
-    if (generateButton) {
-        console.log('Adding event listener to generate button');
-        // Remove any existing event listeners
-        const newButton = generateButton.cloneNode(true);
-        if (generateButton.parentNode) {
-            generateButton.parentNode.replaceChild(newButton, generateButton);
-        }
-        
-        // Add new event listener
-        newButton.addEventListener('click', function(event) {
-            console.log('Generate button clicked');
-            handleGenerateQuestionsClick();
-        });
-        
-        // Also add a direct onclick attribute as a fallback
-        newButton.onclick = function() {
-            console.log('Generate button onclick triggered');
-            handleGenerateQuestionsClick();
-            return false;
-        };
-    } else {
-        console.error('Generate questions button not found');
-    }
-    
-    // Add event listeners to school and grade selects to update subject options
-    if (schoolSelect && gradeSelect && subjectSelect) {
-        schoolSelect.addEventListener('change', function() {
-            populateSubjectOptions(schoolSelect.value, subjectSelect);
-        });
-        
-        gradeSelect.addEventListener('change', function() {
-            populateSubjectOptions(schoolSelect.value, subjectSelect);
-        });
-    }
-}
-
-// Modified function to populate subject options
-function populateSubjectOptions(school, subjectSelect) {
-    // Clear existing options
-    while (subjectSelect.options.length > 0) {
-        subjectSelect.remove(0);
-    }
-    
-    // Add new options based on school
-    let subjects = [];
-    
-    if (school === "小学") {
-        subjects = ["语文", "数学", "英语", "科学", "道德与法治"];
-    } else if (school === "初中") {
-        subjects = ["语文", "数学", "英语", "物理", "化学", "生物", "历史", "地理", "道德与法治"];
-    } else if (school === "高中") {
-        subjects = ["语文", "数学", "英语", "物理", "化学", "生物", "历史", "地理", "政治"];
-    }
-    
-    // Add options to select
-    subjects.forEach(subject => {
-        const option = document.createElement('option');
-        option.value = subject;
-        option.textContent = subject;
-        subjectSelect.appendChild(option);
-    });
-}
-
-// Modified function to handle generate questions click
-function handleGenerateQuestionsClick() {
-    console.log('handleGenerateQuestionsClick function called');
-    
-    // Get values from the form
-    const schoolSelect = document.getElementById('school-select-sidebar');
-    const gradeSelect = document.getElementById('grade-select-sidebar');
-    const subjectSelect = document.getElementById('subject-select');
-    const semesterSelect = document.getElementById('semester-select');
-    const difficultySelect = document.getElementById('difficulty-select');
-    const questionCountSelect = document.getElementById('question-count-select');
-    
-    if (!schoolSelect || !gradeSelect || !subjectSelect || !semesterSelect || !difficultySelect || !questionCountSelect) {
-        console.error('Form elements not found:', {
-            schoolSelect: !!schoolSelect,
-            gradeSelect: !!gradeSelect,
-            subjectSelect: !!subjectSelect,
-            semesterSelect: !!semesterSelect,
-            difficultySelect: !!difficultySelect,
-            questionCountSelect: !!questionCountSelect
-        });
-        showSystemMessage('无法获取表单数据，请刷新页面重试', 'error');
-        return;
-    }
-    
-    const school = schoolSelect.value;
-    const grade = gradeSelect.options[gradeSelect.selectedIndex].text;
-    const subject = subjectSelect.value;
-    const semester = semesterSelect.value;
-    const difficulty = difficultySelect.value;
-    const questionCount = questionCountSelect.value;
-    
-    console.log('Form values:', { school, grade, subject, semester, difficulty, questionCount });
-    
-    // Hide empty state if it exists
-    const emptyState = document.getElementById('empty-state');
-    if (emptyState) {
-        emptyState.classList.add('hidden');
-    }
-    
-    // Show loading indicator
-    showLoadingIndicator();
-    
-    // Get educational context
-    const educationalContext = getEducationalContext();
-    
-    // Prepare prompt for generating questions
-    const prompt = `请根据以下条件生成${questionCount}道${difficulty}难度的${school}${grade}${subject}${semester}选择题，每道题有4个选项(A, B, C, D)，并且只有一个正确答案。
-    
-    学生教育背景: ${educationalContext}
-    
-    请以JSON格式返回题目，格式如下:
-    [
-      {
-        "question": "题目内容",
-        "options": ["选项A", "选项B", "选项C", "选项D"],
-        "answer": "正确选项的字母(A, B, C或D)",
-        "explanation": "答案解析"
-      },
-      ...
-    ]
-    
-    请确保生成的题目符合${school}${grade}${subject}${semester}的教学大纲和难度要求。`;
-    
-    console.log('Sending prompt to generate questions:', prompt);
-    
-    // Call API to generate questions
-    fetchAIResponse(prompt)
-        .then(response => {
-            console.log('Received response from API:', response);
-            
-            // Hide loading indicator
-            hideLoadingIndicator();
-            
-            // Parse questions from response
-            const questions = parseQuestionsFromResponse(response);
-            console.log('Parsed questions:', questions);
-            
-            if (questions && questions.length > 0) {
-                // Store questions in global variable
-                window.questions = questions;
-                window.currentQuestionIndex = 0;
-                window.userAnswers = new Array(questions.length).fill(null);
-                
-                // Display first question
-                displayCurrentQuestion();
-                
-                // Setup navigation buttons
-                setupNavigationButtons();
-                
-                // Hide empty state
-                const emptyState = document.getElementById('empty-state');
-                if (emptyState) {
-                    emptyState.classList.add('hidden');
-                }
-                
-                // Show questions display container
-                const questionsDisplayContainer = document.getElementById('questions-display-container');
-                if (questionsDisplayContainer) {
-                    questionsDisplayContainer.classList.remove('hidden');
-                }
-                
-                // Show success message
-                showSystemMessage(`已生成 ${questions.length} 道${school}${grade}${subject}${semester}${difficulty}难度的题目`, 'success');
-            } else {
-                // Show error message
-                showSystemMessage('无法解析生成的题目，请重试', 'error');
-                console.error('Failed to parse questions from response:', response);
-            }
-        })
-        .catch(error => {
-            // Hide loading indicator
-            hideLoadingIndicator();
-            
-            // Show error message
-            showSystemMessage('生成题目时出错，请重试', 'error');
-            console.error('Error generating questions:', error);
-        });
-}
