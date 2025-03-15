@@ -3653,7 +3653,7 @@ function setupChatButtons() {
     console.log('Setting up chat buttons');
     
     // Inspect dropdowns to debug the issue
-    // inspectDropdowns();
+    inspectDropdowns();
     
     // First, ensure the chat interface exists and get references to its elements
     const chatElements = createChatInterface();
@@ -5423,7 +5423,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             newPrevButton.addEventListener('click', function(event) {
                 event.preventDefault();
-                event.stopPropagation(); // Stop event from bubbling up to document
                 console.log('Previous poem button clicked directly');
                 if (poemState.currentIndex > 0) {
                     poemState.currentIndex--;
@@ -5438,7 +5437,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             newNextButton.addEventListener('click', function(event) {
                 event.preventDefault();
-                event.stopPropagation(); // Stop event from bubbling up to document
                 console.log('Next poem button clicked directly');
                 if (poemState.currentIndex < poemState.poems.length - 1) {
                     poemState.currentIndex++;
@@ -5448,8 +5446,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // REMOVE the event delegation approach to avoid duplicate handling
-    // We'll rely solely on the direct event listeners set up in setupPoemNavigationButtons
+    // Add event listeners for navigation buttons using event delegation as a backup
+    document.addEventListener('click', function(event) {
+        // Handle previous poem button
+        if (event.target && (event.target.id === 'prev-poem-button' || 
+            (event.target.parentElement && event.target.parentElement.id === 'prev-poem-button'))) {
+            console.log('Previous poem button clicked via delegation');
+            if (poemState.currentIndex > 0) {
+                poemState.currentIndex--;
+                displayCurrentPoem();
+            }
+        }
+        
+        // Handle next poem button
+        if (event.target && (event.target.id === 'next-poem-button' || 
+            (event.target.parentElement && event.target.parentElement.id === 'next-poem-button'))) {
+            console.log('Next poem button clicked via delegation');
+            if (poemState.currentIndex < poemState.poems.length - 1) {
+                poemState.currentIndex++;
+                displayCurrentPoem();
+            }
+        }
+    });
     
     // Function to handle learn poetry button click
     async function handleLearnPoetryClick() {
