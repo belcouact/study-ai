@@ -1745,14 +1745,25 @@ function handleGenerateQuestionsClick() {
     
     // Get educational context
     const context = getEducationalContext();
-    if (!context) {
+    console.log('Educational context:', context);
+    
+    // Validate context and provide fallback values
+    if (!context || !context.school || !context.grade || !context.subject) {
         hideLoadingIndicator();
         showSystemMessage('请先选择学校、年级和科目', 'warning');
         return;
     }
     
-    // Prepare the prompt
-    const prompt = `请为${context.school}${context.grade}的${context.subject}课程创建${context.questionCount}道${context.difficulty}难度的选择题，适合${context.semester}学习。
+    // Ensure all required values exist with fallbacks
+    const school = context.school || '未指定学校';
+    const grade = context.grade || '未指定年级';
+    const subject = context.subject || '未指定科目';
+    const questionCount = context.questionCount || 5;
+    const difficulty = context.difficulty || '中等';
+    const semester = context.semester || '当前学期';
+    
+    // Prepare the prompt with validated values
+    const prompt = `请为${school}${grade}的${subject}课程创建${questionCount}道${difficulty}难度的选择题，适合${semester}学习。
     每个问题应该有4个选项(A, B, C, D)，并且只有一个正确答案。
     请提供详细的解析，包括解题思路、知识点和易错点分析。
     
@@ -1771,6 +1782,8 @@ function handleGenerateQuestionsClick() {
       },
       ...
     ]`;
+    
+    console.log('Fetching AI response with prompt:', prompt);
     
     // Call the API
     fetchAIResponse(prompt)
@@ -3369,86 +3382,57 @@ ${educationalContext}
 
 // Function to get educational context from any available dropdowns in the document
 function getEducationalContext() {
-    console.log('Getting educational context - direct approach');
+    console.log('Getting educational context');
     
-    // Initialize with default values
-    let school = '未指定学校类型';
-    let grade = '未指定年级';
-    let semester = '未指定学期';
-    let subject = '未指定科目';
+    // Get form elements
+    const schoolSelect = document.getElementById('school-select');
+    const gradeSelect = document.getElementById('grade-select');
+    const subjectSelect = document.getElementById('subject-select');
+    const difficultySelect = document.getElementById('difficulty-select');
+    const questionCountSelect = document.getElementById('question-count-select');
+    const semesterSelect = document.getElementById('semester-select');
     
-    // Get all select elements in the document
-    const allSelects = document.querySelectorAll('select');
-    console.log('Found ' + allSelects.length + ' select elements');
-    
-    // Scan through all selects to find our dropdowns
-    allSelects.forEach(select => {
-        const id = select.id || '';
-        const name = select.name || '';
-        const value = select.value;
-        
-        console.log('Examining select:', id, name, value);
-        
-        // Check if this is a school dropdown
-        if (id.includes('school') || name.includes('school')) {
-            if (value && value !== 'none') {
-                try {
-                    school = select.options[select.selectedIndex].text;
-                } catch (e) {
-                    // Map values to text
-                    const schoolMap = {
-                        'primary': '小学',
-                        'middle': '初中',
-                        'high': '高中'
-                    };
-                    school = schoolMap[value] || value;
-                }
-                console.log('Found school:', school);
-            }
-        }
-        
-        // Check if this is a grade dropdown
-        if (id.includes('grade') || name.includes('grade')) {
-            if (value && value !== 'none') {
-                try {
-                    grade = select.options[select.selectedIndex].text;
-                } catch (e) {
-                    grade = value;
-                }
-                console.log('Found grade:', grade);
-            }
-        }
-        
-        // Check if this is a semester dropdown
-        if (id.includes('semester') || name.includes('semester')) {
-            if (value && value !== 'none') {
-                try {
-                    semester = select.options[select.selectedIndex].text;
-                } catch (e) {
-                    semester = value;
-                }
-                console.log('Found semester:', semester);
-            }
-        }
-        
-        // Check if this is a subject dropdown
-        if (id.includes('subject') || name.includes('subject')) {
-            if (value && value !== 'none') {
-                try {
-                    subject = select.options[select.selectedIndex].text;
-                } catch (e) {
-                    subject = value;
-                }
-                console.log('Found subject:', subject);
-            }
-        }
+    // Log the form elements to debug
+    console.log('Form elements:', {
+        schoolSelect,
+        gradeSelect,
+        subjectSelect,
+        difficultySelect,
+        questionCountSelect,
+        semesterSelect
     });
     
-    // Build educational context string
-    let context = `学校类型：${school}\n年级：${grade}\n学期：${semester}\n科目：${subject}\n`;
+    // Check if all required elements exist
+    if (!schoolSelect || !gradeSelect || !subjectSelect) {
+        console.error('Required form elements not found');
+        return null;
+    }
     
-    // Add curriculum information based on selections
-    context += getCurriculumInfo(school, grade, subject);
+    // Get selected values
+    const school = schoolSelect.value;
+    const grade = gradeSelect.value;
+    const subject = subjectSelect.value;
+    
+    // Get optional values with fallbacks
+    const difficulty = difficultySelect ? difficultySelect.value : '中等';
+    const questionCount = questionCountSelect ? parseInt(questionCountSelect.value) || 5 : 5;
+    const semester = semesterSelect ? semesterSelect.value : '当前学期';
+    
+    // Validate required values
+    if (!school || !grade || !subject) {
+        console.error('Required form values not selected');
+        return null;
+    }
+    
+    // Log the context
+    const context = {
+        school,
+        grade,
+        subject,
+        difficulty,
+        questionCount,
+        semester
+    };
     
     console.log('Educational context:', context);
     return context;
