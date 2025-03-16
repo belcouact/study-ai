@@ -5712,3 +5712,87 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry functionality initialized');
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const style = urlParams.get('style') || 'all';
+    const quantity = urlParams.get('quantity') || '10';
+    
+    document.getElementById('style').value = style;
+    if (document.getElementById('quantity')) {
+        document.getElementById('quantity').value = quantity;
+    }
+    
+    fetchPoems(style, quantity);
+    
+    document.getElementById('style').addEventListener('change', function() {
+        const selectedStyle = this.value;
+        const selectedQuantity = document.getElementById('quantity').value;
+        updateURL(selectedStyle, selectedQuantity);
+        fetchPoems(selectedStyle, selectedQuantity);
+    });
+    
+    document.getElementById('quantity').addEventListener('change', function() {
+        const selectedStyle = document.getElementById('style').value;
+        const selectedQuantity = this.value;
+        updateURL(selectedStyle, selectedQuantity);
+        fetchPoems(selectedStyle, selectedQuantity);
+    });
+});
+
+function updateURL(style, quantity) {
+    const url = new URL(window.location);
+    url.searchParams.set('style', style);
+    url.searchParams.set('quantity', quantity);
+    window.history.pushState({}, '', url);
+}
+
+function fetchPoems(style, quantity) {
+    const poemsContainer = document.getElementById('poems-container');
+    poemsContainer.innerHTML = '<div class="loading">加载中...</div>';
+    
+    let apiUrl = 'https://v1.jinrishici.com/all';
+    if (style !== 'all') {
+        apiUrl = `https://v1.jinrishici.com/${style}`;
+    }
+    
+    const fetchPromises = [];
+    const numPoems = parseInt(quantity);
+    
+    for (let i = 0; i < numPoems; i++) {
+        fetchPromises.push(
+            fetch(apiUrl)
+                .then(response => response.json())
+                .catch(error => {
+                    console.error('Error fetching poem:', error);
+                    return null;
+                })
+        );
+    }
+    
+    Promise.all(fetchPromises)
+        .then(results => {
+            poemsContainer.innerHTML = '';
+            
+            results.forEach(data => {
+                if (!data) return;
+                
+                const poemElement = document.createElement('div');
+                poemElement.className = 'poem';
+                
+                poemElement.innerHTML = `
+                    <div class="poem-content">${data.content}</div>
+                    <div class="poem-info">
+                        <span class="poem-title">${data.origin}</span>
+                        <span class="poem-author">${data.author}</span>
+                    </div>
+                `;
+                
+                poemsContainer.appendChild(poemElement);
+            });
+        })
+        .catch(error => {
+            console.error('Error processing poems:', error);
+            poemsContainer.innerHTML = '<div class="error">加载失败，请稍后再试</div>';
+        });
+}
