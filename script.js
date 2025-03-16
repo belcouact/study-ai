@@ -5032,8 +5032,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Get selected values
             const poetryTypeSelect = document.getElementById('poetry-type-select');
             const poetryStyleSelect = document.getElementById('poetry-style-select');
+            const poetryQtySelect = document.getElementById('poetry-qty-select');
             const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
             const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
+            const poetryQty = poetryQtySelect ? poetryQtySelect.value : '10';
             
             // Call the API function directly - no mock data
             handleLearnPoetryClick();
@@ -5075,6 +5077,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get the poetry type and style select elements from the main panel (not sidebar)
     const poetryTypeSelect = document.getElementById('poetry-type-select');
     const poetryStyleSelect = document.getElementById('poetry-style-select');
+    const poetryQtySelect = document.getElementById('poetry-qty-select');
     
     if (poetryTypeSelect && poetryStyleSelect) {
         console.log('Found poetry type and style selects');
@@ -5401,6 +5404,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get fresh references to avoid stale data
         const currentTypeSelect = document.getElementById('poetry-type-select');
         const currentStyleSelect = document.getElementById('poetry-style-select');
+        const currentQtySelect = document.getElementById('poetry-qty-select');
         
         if (!currentTypeSelect || !currentStyleSelect) {
             console.error('Poetry type or style select not found');
@@ -5410,6 +5414,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const poetryType = currentTypeSelect.value;
         const poetryStyle = currentStyleSelect.value;
+        const poetryQty = currentQtySelect.value;
         
         console.log(`Generating poems for: ${school} ${grade}, Type: ${poetryType}, Style: ${poetryStyle}`);
         
@@ -5490,7 +5495,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Prepare the prompt for the API - specifically requesting famous ancient poems
             // with consideration for the student's educational level
-            const prompt = `请为${school}${grade}的学生推荐5首著名的古代${poetryType}，${stylePrompt}。
+            const prompt = `请为${school}${grade}的学生推荐${poetryQty}首著名的古代${poetryType}，${stylePrompt}。
             请选择中国文学史上最著名、最经典的作品，这些作品应该是真实存在的古代诗词，不要创作新的内容。
             
             【重要】这些诗词必须严格符合${school}${grade}学生的认知水平和学习需求：
