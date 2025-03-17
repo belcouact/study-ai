@@ -2712,7 +2712,7 @@ function parseOptimizedQuestion(content) {
         
         switch (school) {
             case '小学':
-            subjectOptions = ['语文', '数学', '英语', '科学', '道德与法治'];
+            subjectOptions = ['语文', '数学', '英语', '科学'];
                 break;
             case '初中':
             subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
@@ -3852,7 +3852,7 @@ function populateSidebarSubjectOptions(school) {
     
     // Add appropriate subject options based on school
     if (school === 'primary') {
-        const subjects = ['语文', '数学', '英语', '科学', '道德与法治'];
+        const subjects = ['语文', '数学', '英语', '科学'];
         subjects.forEach((subject, index) => {
             const option = document.createElement('option');
             option.value = `subject${index + 1}`;
@@ -5717,4 +5717,50 @@ document.addEventListener('DOMContentLoaded', function() {
     // IMPORTANT: Removing the delegation event listener to avoid duplicate API calls
     
     console.log('Poetry functionality initialized');
+});
+
+// ... existing code ...
+
+// Get the school select element
+const schoolSelect = document.getElementById('school-select');
+const subjectSelect = document.getElementById('subject-select');
+
+// Add event listener to the school select
+schoolSelect.addEventListener('change', function() {
+    // Clear current subject options
+    subjectSelect.innerHTML = '<option value="">选择科目</option>';
+    
+    const selectedSchool = this.value;
+    if (!selectedSchool) return;
+    
+    // Populate subjects based on selected school
+    const subjects = getSubjectsForSchool(selectedSchool);
+    
+    subjects.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject;
+        subjectSelect.appendChild(option);
+    });
+});
+
+// Function to get subjects for a specific school
+function getSubjectsForSchool(school) {
+    // Define subjects for each school
+    const schoolSubjects = {
+        '小学': ['语文', '数学', '英语', '科学'],
+        '初中': ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'],
+        '高中': ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治']
+    };
+    
+    return schoolSubjects[school] || [];
+}
+
+// Initialize the subject dropdown if school is already selected on page load
+document.addEventListener('DOMContentLoaded', function() {
+    if (schoolSelect.value) {
+        // Trigger the change event to populate subjects
+        const event = new Event('change');
+        schoolSelect.dispatchEvent(event);
+    }
 });
