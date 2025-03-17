@@ -786,8 +786,7 @@ button:active {
 }
 
 /* Create container */
-.create-container {
-    position: relative;
+#create-container {
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -1213,26 +1212,34 @@ button:active {
     }
 }
 
-.filter-controls {
-    position: sticky;
+.content {
+    margin-left: 250px;
+    padding: 20px;
+    padding-top: 70px; /* Add padding to account for fixed filter bar */
+}
+
+.filter-bar {
+    position: fixed;
     top: 0;
-    background-color: white;
+    left: 250px; /* Same as sidebar width */
+    right: 0;
+    background: white;
     padding: 15px;
-    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 100;
     display: flex;
     gap: 10px;
     align-items: center;
-    z-index: 100;
 }
 
-.filter-controls select {
+.filter-bar select {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     min-width: 120px;
 }
 
-.filter-controls button {
+.filter-bar button {
     padding: 8px 16px;
     background-color: #4CAF50;
     color: white;
@@ -1241,6 +1248,6 @@ button:active {
     cursor: pointer;
 }
 
-.filter-controls button:hover {
+.filter-bar button:hover {
     background-color: #45a049;
 } 

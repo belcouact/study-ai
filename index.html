@@ -115,6 +115,23 @@
         
         <!-- Right Content Area -->
         <div class="content-area">
+            <!-- Add new fixed filter bar at top -->
+            <div class="filter-bar">
+                <select id="subject">
+                    <option value="">科目</option>
+                </select>
+                <select id="semester">
+                    <option value="">学期</option>
+                </select>
+                <select id="difficulty">
+                    <option value="">难度</option>
+                </select>
+                <select id="questionCount">
+                    <option value="">题数</option>
+                </select>
+                <button id="generateBtn">出题</button>
+            </div>
+            
             <!-- Q&A Chat Container -->
             <div id="qa-container" class="container">
                 <div class="chat-container">
@@ -143,21 +160,6 @@
             
             <!-- Create Questions Container (initially hidden) -->
             <div id="create-container" class="container hidden">
-                <div class="filter-controls">
-                    <select id="subject-select">
-                        <option value="">选择科目</option>
-                    </select>
-                    <select id="semester-select">
-                        <option value="">选择学期</option>
-                    </select>
-                    <select id="difficulty-select">
-                        <option value="">选择难度</option>
-                    </select>
-                    <select id="question-count">
-                        <option value="">题数</option>
-                    </select>
-                    <button id="generate-btn">出题</button>
-                </div>
                 <!-- Questions display container moved to the top -->
                 <div id="questions-display-container" class="questions-display-container hidden">
                     <!-- Empty state message -->
