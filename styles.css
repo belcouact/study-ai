@@ -632,7 +632,7 @@ button:active {
     background-color: #fff;
     border-radius: 8px;
     padding: 1.5rem 2rem;
-    margin-top: 0;
+    margin-top: 15px;
     box-shadow: var(--shadow);
     transition: all var(--transition-speed) ease;
     width: 100%;
@@ -1218,23 +1218,26 @@ button:active {
     position: relative;
 }
 
+/* Control panel for test page */
 .control-panel {
-    position: sticky;
-    top: 0;
-    background-color: white;
-    padding: 15px 0;
-    border-bottom: 1px solid #ddd;
-    z-index: 100;
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     align-items: center;
 }
 
 .control-panel select {
-    padding: 8px;
+    padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    background-color: white;
     min-width: 120px;
+    font-size: 14px;
 }
 
 .control-panel button {
@@ -1244,10 +1247,25 @@ button:active {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s;
 }
 
 .control-panel button:hover {
     background-color: #45a049;
+}
+
+/* Make the control panel sticky so it stays at the top when scrolling */
+.control-panel {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+/* Adjust the questions display container to have proper spacing */
+.questions-display-container {
+    margin-top: 15px;
 }
 
 .question-container {
