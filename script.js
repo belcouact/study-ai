@@ -5764,3 +5764,43 @@ document.addEventListener('DOMContentLoaded', function() {
         schoolSelect.dispatchEvent(event);
     }
 });
+
+// Update these lines to ensure we're getting the correct elements
+const schoolSelect = document.getElementById('school-select'); // Make sure this ID exists in your HTML
+const subjectSelect = document.getElementById('subject-select'); // Make sure this ID exists in your HTML
+
+// Add console logs to debug
+console.log('School select element:', schoolSelect);
+console.log('Subject select element:', subjectSelect);
+
+// Add event listener to the school select with error handling
+if (schoolSelect) {
+    schoolSelect.addEventListener('change', function() {
+        console.log('School changed to:', this.value);
+        
+        // Check if subject select exists
+        if (!subjectSelect) {
+            console.error('Subject select element not found');
+            return;
+        }
+        
+        // Clear current subject options
+        subjectSelect.innerHTML = '<option value="">选择科目</option>';
+        
+        const selectedSchool = this.value;
+        if (!selectedSchool) return;
+        
+        // Populate subjects based on selected school
+        const subjects = getSubjectsForSchool(selectedSchool);
+        console.log('Subjects for', selectedSchool, ':', subjects);
+        
+        subjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            subjectSelect.appendChild(option);
+        });
+    });
+} else {
+    console.error('School select element not found');
+}
