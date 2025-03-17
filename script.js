@@ -5764,3 +5764,57 @@ document.addEventListener('DOMContentLoaded', function() {
         schoolSelect.dispatchEvent(event);
     }
 });
+
+// ... existing code ...
+
+// Add event listener to the generate button
+function setupEventListeners() {
+    // ... existing code ...
+    
+    // Link the 出题 button with handleGenerateQuestionsClick function
+    const generateBtn = document.getElementById('generate-btn');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', handleGenerateQuestionsClick);
+    }
+    
+    // ... existing code ...
+}
+
+// ... existing code ...
+
+function handleGenerateQuestionsClick() {
+    // This function already exists in your code
+    // Make sure it's properly connected to the generate button
+    
+    // Get values from the dropdowns
+    const subject = document.getElementById('subject-select').value;
+    const semester = document.getElementById('semester-select').value;
+    const difficulty = document.getElementById('difficulty-select').value;
+    const questionCount = document.getElementById('question-count-select').value;
+    
+    // Validate inputs
+    if (!subject || !semester || !difficulty || !questionCount) {
+        showSystemMessage('请选择所有选项', 'error');
+        return;
+    }
+    
+    // Show loading indicator and proceed with generating questions
+    showLoadingIndicator();
+    
+    // The rest of the function should remain unchanged
+    // ... existing code ...
+}
+
+// Make sure this is called when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing code ...
+    
+    // Link the 出题 button with handleGenerateQuestionsClick function
+    const generateBtn = document.getElementById('generate-btn');
+    if (generateBtn) {
+        console.log('Setting up generate button event listener');
+        generateBtn.addEventListener('click', handleGenerateQuestionsClick);
+    }
+    
+    // ... existing code ...
+});
