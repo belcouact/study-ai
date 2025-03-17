@@ -1223,7 +1223,7 @@ button:active {
 .control-panel {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 10px;
     margin-bottom: 20px;
     padding: 15px;
     background-color: #f8f9fa;
@@ -1233,20 +1233,7 @@ button:active {
     position: sticky;
     top: 0;
     z-index: 100;
-}
-
-/* Style for dropdown groups with labels */
-.dropdown-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.dropdown-group label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-    white-space: nowrap;
+    order: -1;
 }
 
 .control-panel select {
@@ -1268,7 +1255,6 @@ button:active {
     font-size: 14px;
     font-weight: 500;
     transition: background-color 0.2s;
-    margin-left: auto;
 }
 
 .control-panel button:hover {
