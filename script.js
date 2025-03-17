@@ -5834,3 +5834,42 @@ if (!window.schoolSelectInitialized) {
 }
 
 // ... rest of the code ...
+
+// At line 5725-5745, modify the code to check if these variables already exist:
+// Instead of declaring new constants, use let variables with different names
+let schoolSelectElement = document.getElementById('school-select');
+let subjectSelectElement = document.getElementById('subject-select');
+
+// Add event listener to the school select
+if (schoolSelectElement) {
+    schoolSelectElement.addEventListener('change', function() {
+        // Clear current subject options
+        if (subjectSelectElement) {
+            subjectSelectElement.innerHTML = '<option value="">选择科目</option>';
+            
+            const selectedSchool = this.value;
+            if (!selectedSchool) return;
+            
+            // Populate subjects based on selected school
+            const subjects = getSubjectsForSchool(selectedSchool);
+            
+            subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectSelectElement.appendChild(option);
+            });
+        }
+    });
+}
+
+// ... rest of the code ...
+
+// Also update the DOMContentLoaded event listener at line 5760
+document.addEventListener('DOMContentLoaded', function() {
+    if (schoolSelectElement && schoolSelectElement.value) {
+        // Trigger the change event to populate subjects
+        const event = new Event('change');
+        schoolSelectElement.dispatchEvent(event);
+    }
+});
