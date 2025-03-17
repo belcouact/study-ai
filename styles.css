@@ -1212,11 +1212,17 @@ button:active {
     }
 }
 
-.test-controls {
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+    position: relative;
+}
+
+.control-panel {
     position: sticky;
     top: 0;
     background-color: white;
-    padding: 15px;
+    padding: 15px 0;
     border-bottom: 1px solid #ddd;
     z-index: 100;
     display: flex;
@@ -1224,13 +1230,14 @@ button:active {
     align-items: center;
 }
 
-.test-controls select {
+.control-panel select {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    min-width: 120px;
 }
 
-.test-controls button {
+.control-panel button {
     padding: 8px 16px;
     background-color: #4CAF50;
     color: white;
@@ -1239,6 +1246,10 @@ button:active {
     cursor: pointer;
 }
 
-.test-controls button:hover {
+.control-panel button:hover {
     background-color: #45a049;
+}
+
+.question-container {
+    margin-top: 20px;
 } 
