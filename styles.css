@@ -753,6 +753,7 @@ button:active {
     background-color: #f8fafc;
     border-radius: 12px;
     margin: 20px 0;
+    order: 1;
 }
 
 .empty-state-icon {
@@ -1229,6 +1230,10 @@ button:active {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    order: -1;
 }
 
 .control-panel select {
@@ -1254,13 +1259,6 @@ button:active {
 
 .control-panel button:hover {
     background-color: #45a049;
-}
-
-/* Make the control panel sticky so it stays at the top when scrolling */
-.control-panel {
-    position: sticky;
-    top: 0;
-    z-index: 100;
 }
 
 /* Adjust the questions display container to have proper spacing */
