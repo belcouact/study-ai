@@ -5764,3 +5764,29 @@ document.addEventListener('DOMContentLoaded', function() {
         schoolSelect.dispatchEvent(event);
     }
 });
+
+// Update the event listeners for the school select dropdown
+document.addEventListener('DOMContentLoaded', function() {
+    const schoolSelect = document.getElementById('school-select');
+    const subjectSelect = document.getElementById('subject-select');
+    
+    // Add event listener to the school select
+    schoolSelect.addEventListener('change', function() {
+        const selectedSchool = this.value;
+        // Use the existing function to populate subjects
+        populateSubjectOptions(selectedSchool);
+    });
+    
+    // Initialize the subject dropdown if school is already selected on page load
+    if (schoolSelect.value) {
+        populateSubjectOptions(schoolSelect.value);
+    }
+});
+
+// Keep the existing populateSubjectOptions function
+// function populateSubjectOptions(school) {
+//     // This function should already exist in your code
+//     // It populates the subject dropdown based on the selected school
+// }
+
+// ... existing code ...
