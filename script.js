@@ -183,7 +183,7 @@ async function fetchAIResponse(prompt) {
                 ],
                 model: currentModel,
                 temperature: 0.7,
-                max_tokens: 2000
+                max_tokens: 4096
             })
         });
         
@@ -2008,7 +2008,7 @@ function showLoadingIndicator() {
         
         // Create loading text
         const loadingText = document.createElement('div');
-        loadingText.textContent = '出题中，请稍后...';
+        loadingText.textContent = '出题中，请稍候...';
         loadingText.style.cssText = `
             font-size: 18px;
             color: #4a5568;
