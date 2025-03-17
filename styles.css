@@ -1212,34 +1212,25 @@ button:active {
     }
 }
 
-.content {
-    margin-left: 250px;
-    padding: 20px;
-    padding-top: 70px; /* Add padding to account for fixed filter bar */
-}
-
-.filter-bar {
-    position: fixed;
+.test-controls {
+    position: sticky;
     top: 0;
-    left: 250px; /* Same as sidebar width */
-    right: 0;
-    background: white;
+    background-color: white;
     padding: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-bottom: 1px solid #ddd;
     z-index: 100;
     display: flex;
     gap: 10px;
     align-items: center;
 }
 
-.filter-bar select {
+.test-controls select {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    min-width: 120px;
 }
 
-.filter-bar button {
+.test-controls button {
     padding: 8px 16px;
     background-color: #4CAF50;
     color: white;
@@ -1248,6 +1239,6 @@ button:active {
     cursor: pointer;
 }
 
-.filter-bar button:hover {
+.test-controls button:hover {
     background-color: #45a049;
 } 
