@@ -1980,7 +1980,7 @@ function showLoadingIndicator() {
             align-items: center;
             justify-content: center;
             padding: 40px;
-            background-color: white;
+            background-color: AntiqueWhite;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             margin: 20px auto;
@@ -2008,7 +2008,7 @@ function showLoadingIndicator() {
         
         // Create loading text
         const loadingText = document.createElement('div');
-        loadingText.textContent = 'Thinking...';
+        loadingText.textContent = '出题中，请稍后...';
         loadingText.style.cssText = `
             font-size: 18px;
             color: #4a5568;
