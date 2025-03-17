@@ -143,6 +143,21 @@
             
             <!-- Create Questions Container (initially hidden) -->
             <div id="create-container" class="container hidden">
+                <div class="filter-controls">
+                    <select id="subject-select">
+                        <option value="">选择科目</option>
+                    </select>
+                    <select id="semester-select">
+                        <option value="">选择学期</option>
+                    </select>
+                    <select id="difficulty-select">
+                        <option value="">选择难度</option>
+                    </select>
+                    <select id="question-count">
+                        <option value="">题数</option>
+                    </select>
+                    <button id="generate-btn">出题</button>
+                </div>
                 <!-- Questions display container moved to the top -->
                 <div id="questions-display-container" class="questions-display-container hidden">
                     <!-- Empty state message -->
