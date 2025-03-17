@@ -5904,3 +5904,40 @@ function updateSubjectOptions() {
 }
 
 // ... existing code ...
+
+// Fix the subject dropdown population based on school selection
+document.addEventListener('DOMContentLoaded', function() {
+    // Get references to the school and subject select elements
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    const subjectSelect = document.getElementById('subject-select');
+    
+    // Add event listener to the school select in sidebar
+    schoolSelect.addEventListener('change', function() {
+        const selectedSchool = this.value;
+        
+        // Clear and populate the subject dropdown based on selected school
+        populateSubjectOptions(selectedSchool);
+    });
+    
+    // Initialize subject dropdown if school is already selected
+    if (schoolSelect.value) {
+        populateSubjectOptions(schoolSelect.value);
+    }
+});
+
+// Make sure the existing populateSubjectOptions function is used
+// This function should already exist in your code and look something like:
+// function populateSubjectOptions(school) {
+//     const subjectSelect = document.getElementById('subject-select');
+//     subjectSelect.innerHTML = '<option value="">选择科目</option>';
+//     
+//     const subjects = getSubjectsForSchool(school);
+//     subjects.forEach(subject => {
+//         const option = document.createElement('option');
+//         option.value = subject;
+//         option.textContent = subject;
+//         subjectSelect.appendChild(option);
+//     });
+// }
+
+// ... existing code ...

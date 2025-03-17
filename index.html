@@ -114,26 +114,42 @@
             <div id="create-container" class="container hidden">
                 <!-- Add control panel at the top -->
                 <div class="control-panel">
-                    <select id="subject-select">
-                        <option value="">选择科目</option>
-                    </select>
-                    <select id="semester-select">
-                        <option value="">选择学期</option>
-                        <option value="上学期">上学期</option>
-                        <option value="下学期">下学期</option>
-                    </select>
-                    <select id="difficulty-select">
-                        <option value="">选择难度</option>
-                        <option value="容易">容易</option>
-                        <option value="中等">中等</option>
-                        <option value="偏难">偏难</option>
-                    </select>
-                    <select id="question-count-select">
-                        <option value="">题数</option>
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                    </select>
+                    <div class="dropdown-group">
+                        <label for="subject-select">学科</label>
+                        <select id="subject-select">
+                            <option value="">选择科目</option>
+                        </select>
+                    </div>
+                    
+                    <div class="dropdown-group">
+                        <label for="semester-select">学期</label>
+                        <select id="semester-select">
+                            <option value="">选择学期</option>
+                            <option value="上学期">上学期</option>
+                            <option value="下学期">下学期</option>
+                        </select>
+                    </div>
+                    
+                    <div class="dropdown-group">
+                        <label for="difficulty-select">难度</label>
+                        <select id="difficulty-select">
+                            <option value="">选择难度</option>
+                            <option value="容易">容易</option>
+                            <option value="中等">中等</option>
+                            <option value="偏难">偏难</option>
+                        </select>
+                    </div>
+                    
+                    <div class="dropdown-group">
+                        <label for="question-count-select">题数</label>
+                        <select id="question-count-select">
+                            <option value="">选择题数</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                        </select>
+                    </div>
+                    
                     <button id="generate-btn">出题</button>
                 </div>
 
