@@ -5846,3 +5846,61 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ... existing code ...
+
+// Fix the subject dropdown population
+document.addEventListener('DOMContentLoaded', function() {
+    const schoolSelect = document.getElementById('school-select');
+    const gradeSelect = document.getElementById('grade-select');
+    const subjectSelect = document.getElementById('subject-select');
+    
+    // Add event listener to the school select
+    schoolSelect.addEventListener('change', function() {
+        const selectedSchool = this.value;
+        
+        // Update grade options
+        populateGradeOptions(selectedSchool);
+        
+        // Update subject options
+        updateSubjectOptions();
+    });
+    
+    // Add event listener to the grade select
+    gradeSelect.addEventListener('change', function() {
+        // Update subject options when grade changes
+        updateSubjectOptions();
+    });
+    
+    // Initialize dropdowns if values are already selected
+    if (schoolSelect.value) {
+        updateSubjectOptions();
+    }
+});
+
+// Make sure the updateSubjectOptions function is properly connected
+// This function exists at line 5820 in your code
+function updateSubjectOptions() {
+    const schoolSelect = document.getElementById('school-select');
+    const gradeSelect = document.getElementById('grade-select');
+    const subjectSelect = document.getElementById('subject-select');
+    
+    const selectedSchool = schoolSelect.value;
+    const selectedGrade = gradeSelect.value;
+    
+    // Clear current subject options
+    subjectSelect.innerHTML = '<option value="">选择科目</option>';
+    
+    if (!selectedSchool) return;
+    
+    // Get subjects for the selected school using the existing function
+    const subjects = getSubjectsForSchool(selectedSchool);
+    
+    // Populate the subject dropdown
+    subjects.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject;
+        subjectSelect.appendChild(option);
+    });
+}
+
+// ... existing code ...
