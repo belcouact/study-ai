@@ -5804,3 +5804,33 @@ if (schoolSelect) {
 } else {
     console.error('School select element not found');
 }
+
+// Instead, use the existing variables or check if they exist first
+if (!window.schoolSelectInitialized) {
+    window.schoolSelectInitialized = true;
+    
+    // Make sure schoolSelect exists before adding event listener
+    if (schoolSelect) {
+        schoolSelect.addEventListener('change', function() {
+            // Clear current subject options
+            if (subjectSelect) {
+                subjectSelect.innerHTML = '<option value="">选择科目</option>';
+                
+                const selectedSchool = this.value;
+                if (!selectedSchool) return;
+                
+                // Populate subjects based on selected school
+                const subjects = getSubjectsForSchool(selectedSchool);
+                
+                subjects.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject;
+                    option.textContent = subject;
+                    subjectSelect.appendChild(option);
+                });
+            }
+        });
+    }
+}
+
+// ... rest of the code ...
