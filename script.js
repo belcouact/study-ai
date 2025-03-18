@@ -5436,7 +5436,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingIndicator.id = 'poetry-loading';
             loadingIndicator.innerHTML = `
                 <div class="spinner"></div>
-                <p>正在查找适合${school}${grade}学生的经典${poetryType}，风格为${poetryStyle}...</p>
+                <p>十里走马正疾驰，五里扬鞭未敢停 --- 加速生成中...</p>
             `;
             loadingIndicator.style.display = 'flex';
             loadingIndicator.style.flexDirection = 'column';
@@ -5523,7 +5523,7 @@ document.addEventListener('DOMContentLoaded', function() {
             每首诗都应包含以下内容：
             1. 题目
             2. 作者（必须是真实的历史人物）
-            3. 原文（必须是原始的古代诗词文本）
+            3. 原文（必须是原始的古代诗词文本，且内容完整，不能节选）
             4. 创作背景（包括历史背景和创作缘由的详细介绍，适合${school}${grade}学生理解的深度）
             5. 赏析（逐句解释翻译，同时指出难词难句，用现代语言描述诗词曲描述的画面和故事，并介绍诗词曲的艺术特色和文学价值，使用${school}${grade}学生能理解的语言）
             
