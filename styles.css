@@ -483,27 +483,36 @@ button:active {
 
 /* System messages */
 .system-message {
-    padding: 0.8rem 1rem;
-    margin-bottom: 1rem;
-    border-radius: 4px;
-    background-color: #f8f9fa;
-    border-left: 3px solid #6c757d;
-    width: 100%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    animation: slideInFromTop 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.system-message.info {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196F3;
+    color: #0d47a1;
 }
 
 .system-message.error {
-    background-color: #f8d7da;
-    border-left-color: #dc3545;
-}
-
-.system-message.warning {
-    background-color: #fff3cd;
-    border-left-color: #ffc107;
+    background-color: #ffebee;
+    border-left: 4px solid #f44336;
+    color: #b71c1c;
 }
 
 .system-message.success {
-    background-color: #d4edda;
-    border-left-color: #28a745;
+    background-color: #e8f5e9;
+    border-left: 4px solid #4CAF50;
+    color: #1b5e20;
+}
+
+@keyframes slideInFromTop {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 /* AI message */
@@ -749,30 +758,38 @@ button:active {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 40px 20px;
+    padding: 60px 30px;
     background-color: #f8fafc;
     border-radius: 12px;
-    margin: 20px 0;
-    order: 1;
-}
-
-.empty-state-icon {
-    font-size: 48px;
-    color: #a0aec0;
-    margin-bottom: 20px;
+    margin: 30px 0;
+    transition: all 0.3s ease;
+    border: 2px dashed #e0e0e0;
 }
 
 .empty-state h3 {
-    font-size: 24px;
-    color: #4a5568;
     margin-bottom: 15px;
+    font-size: 22px;
+    color: #333;
 }
 
 .empty-state p {
-    font-size: 16px;
-    color: #718096;
+    color: #666;
     max-width: 500px;
+    margin: 0 auto 20px;
     line-height: 1.6;
+}
+
+.empty-state img {
+    width: 120px;
+    height: auto;
+    margin-bottom: 20px;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.empty-state:hover img {
+    opacity: 1;
+    transform: scale(1.05);
 }
 
 /* Utility classes */
@@ -1223,42 +1240,71 @@ button:active {
 .control-panel {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding: 15px;
+    gap: 12px;
+    margin-bottom: 25px;
+    padding: 18px;
     background-color: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
     align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    order: -1;
+    transition: all 0.3s ease;
 }
 
+.control-panel:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* Style dropdowns more attractively */
 .control-panel select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 10px 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
     background-color: white;
-    min-width: 120px;
+    min-width: 140px;
     font-size: 14px;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    padding-right: 35px;
 }
 
+.control-panel select:hover {
+    border-color: #bdbdbd;
+}
+
+.control-panel select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+/* Enhance the generate button */
 .control-panel button {
-    padding: 8px 16px;
+    padding: 10px 20px;
     background-color: #4CAF50;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
 }
 
 .control-panel button:hover {
-    background-color: #45a049;
+    background-color: #3e9f41;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4);
+}
+
+.control-panel button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(76, 175, 80, 0.3);
 }
 
 /* Adjust the questions display container to have proper spacing */
@@ -1268,4 +1314,70 @@ button:active {
 
 .question-container {
     margin-top: 20px;
+}
+
+/* Enhance loading indicator */
+.loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.loading-spinner {
+    border: 4px solid rgba(76, 175, 80, 0.2);
+    border-radius: 50%;
+    border-top: 4px solid #4CAF50;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Add fade in animation for questions */
+.question-item {
+    animation: fadeIn 0.5s ease;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #e0e0e0;
+    background-color: white;
+    transition: all 0.3s;
+}
+
+.question-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Add styles for dropdown validation */
+.control-panel select.selected {
+    border-color: #4CAF50;
+    background-color: rgba(76, 175, 80, 0.05);
+}
+
+.control-panel select:invalid {
+    border-color: #ff6b6b;
+}
+
+/* Style for the ready button */
+.control-panel button.ready {
+    background-color: #4CAF50;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.5);
+}
+
+.control-panel button:disabled {
+    background-color: #9e9e9e;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.7;
 } 

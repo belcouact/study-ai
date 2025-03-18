@@ -5733,3 +5733,58 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Make sure handleGenerateQuestionsClick is in the global scope
 window.handleGenerateQuestionsClick = handleGenerateQuestionsClick;
+
+// Enhance the school-subject linkage
+document.addEventListener('DOMContentLoaded', function() {
+    const schoolSelect = document.getElementById('school-select');
+    const subjectSelect = document.getElementById('subject-select');
+    const gradeSelect = document.getElementById('grade-select');
+    const generateBtn = document.getElementById('generate-btn');
+    
+    // Add visual feedback for selections
+    function addSelectionFeedback(selectElement) {
+        selectElement.addEventListener('change', function() {
+            if (this.value) {
+                this.classList.add('selected');
+            } else {
+                this.classList.remove('selected');
+            }
+            
+            // Check if all required fields are filled
+            checkRequiredFields();
+        });
+    }
+    
+    // Add visual feedback to the generate button based on form completion
+    function checkRequiredFields() {
+        const requiredSelects = [schoolSelect, gradeSelect, subjectSelect, 
+                                document.getElementById('semester-select'),
+                                document.getElementById('difficulty-select'),
+                                document.getElementById('question-count-select')];
+        
+        const allFilled = requiredSelects.every(select => select && select.value);
+        
+        if (generateBtn) {
+            if (allFilled) {
+                generateBtn.classList.add('ready');
+                generateBtn.disabled = false;
+            } else {
+                generateBtn.classList.remove('ready');
+                generateBtn.disabled = true;
+            }
+        }
+    }
+    
+    // Apply to all select elements
+    const allSelects = document.querySelectorAll('.control-panel select');
+    allSelects.forEach(addSelectionFeedback);
+    
+    // Initial check
+    checkRequiredFields();
+    
+    // Make sure the generate button is linked to the handler
+    if (generateBtn) {
+        generateBtn.addEventListener('click', handleGenerateQuestionsClick);
+        console.log('Generate button event listener attached');
+    }
+});
