@@ -4288,8 +4288,26 @@ function getSimplifiedContextSummary() {
             
             vocabularyButton.addEventListener('click', function() {
                 console.log('Vocabulary button clicked');
-                switchPanel('vocabulary-container');
+                
+                // Hide all other panels
+                const containers = ['qa-container', 'create-container', 'poetry-container'];
+                containers.forEach(containerId => {
+                    const container = document.getElementById(containerId);
+                    if (container) container.classList.add('hidden');
+                });
+                
+                // Show only vocabulary container
+                if (vocabularyContainer) {
+                    vocabularyContainer.classList.remove('hidden');
+                    console.log('Vocabulary container is now visible');
+                }
+                
+                // Update active button states
+                const buttons = document.querySelectorAll('.panel-button');
+                buttons.forEach(button => button.classList.remove('active'));
+                vocabularyButton.classList.add('active');
             });
+            console.log('Event listener added to vocabulary button');
         } else {
             console.error('Vocabulary button not found in setupEventListeners');
         }
