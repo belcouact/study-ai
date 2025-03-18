@@ -5723,53 +5723,13 @@ document.addEventListener('DOMContentLoaded', function() {
             showSystemMessage('生成诗词时出错，请稍后再试', 'error');
         }
     }
-    
-    // IMPORTANT: Removing the delegation event listener to avoid duplicate API calls
-    
+        
     console.log('Poetry functionality initialized');
 });
-
-// ... existing code ...
 
 // Get the school select element
 const schoolSelect = document.getElementById('school-select-sidebar');
 const subjectSelect = document.getElementById('subject-select');
-
-
-/*
-// Add event listener to the school select
-schoolSelect.addEventListener('change', function() {
-    // Clear current subject options
-    // subjectSelect.innerHTML = '<select id="subject-select" name="subject">';
-    
-    // const selectedSchool = this.value;
-    // if (!selectedSchool) return;
-    
-    // Populate subjects based on selected school
-    const subjects = getSubjectsForSchool(schoolSelect);
-    
-    subjects.forEach(subject => {
-        const option = document.createElement('option');
-        option.value = subject;
-        option.textContent = subject;
-        subjectSelect.appendChild(option);
-    });
-});
-*/
-
-/*
-// Function to get subjects for a specific school
-function getSubjectsForSchool(school) {
-    // Define subjects for each school
-    const schoolSubjects = {
-        '小学': ['语文', '数学', '英语', '科学'],
-        '初中': ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'],
-        '高中': ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治']
-    };
-    
-    return schoolSubjects[school] || [];
-}
-*/
 
 // Initialize the subject dropdown if school is already selected on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -5780,61 +5740,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ... existing code ...
-
-// Add event listener to the generate button
-
 function setupEventListeners() {
     // ... existing code ...
     
     // Link the 出题 button with handleGenerateQuestionsClick function
     const generateBtn = document.getElementById('generate-btn');
+
+    console.log('generate-btn clicked');
+
     if (generateBtn) {
         generateBtn.addEventListener('click', handleGenerateQuestionsClick);
     }
     
-    // ... existing code ...
 }
-
-
-// ... existing code ...
-/*
-function handleGenerateQuestionsClick() {
-    // This function already exists in your code
-    // Make sure it's properly connected to the generate button
-    
-    // Get values from the dropdowns
-    const subject = document.getElementById('subject-select').value;
-    const semester = document.getElementById('semester-select').value;
-    const difficulty = document.getElementById('difficulty-select').value;
-    const questionCount = document.getElementById('question-count-select').value;
-    
-    // Validate inputs
-    if (!subject || !semester || !difficulty || !questionCount) {
-        showSystemMessage('请选择所有选项', 'error');
-        return;
-    }
-    
-    // Show loading indicator and proceed with generating questions
-    showLoadingIndicator();
-    
-    // The rest of the function should remain unchanged
-    // ... existing code ...
-}
-*/
-
-/*
-// Make sure this is called when the page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // ... existing code ...
-    
-    // Link the 出题 button with handleGenerateQuestionsClick function
-    const generateBtn = document.getElementById('generate-btn');
-    if (generateBtn) {
-        console.log('Setting up generate button event listener');
-        generateBtn.addEventListener('click', handleGenerateQuestionsClick);
-    }
-    
-    // ... existing code ...
-});
-*/
