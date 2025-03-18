@@ -4569,8 +4569,6 @@ function getSimplifiedContextSummary() {
         }
     }
 
-// ... existing code ...
-
 // Initialize the application
 function init() {
     console.log('Initializing application...');
@@ -5739,19 +5737,76 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-function setupEventListeners() {
-    // ... existing code ...
+// ... existing code ...
+
+// Move this inside DOMContentLoaded to ensure DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the school select element - update to correct ID
+    const schoolSelect = document.getElementById('school-select');
+    const subjectSelect = document.getElementById('subject-select');
     
-    // Link the 出题 button with handleGenerateQuestionsClick function
+    if (schoolSelect && schoolSelect.value) {
+        // Trigger the change event to populate subjects
+        const event = new Event('change');
+        schoolSelect.dispatchEvent(event);
+    }
+    
+    // Directly attach the event listener here to ensure it gets connected
     const generateBtn = document.getElementById('generate-btn');
-
-    console.log('generate-btn clicked');
-
     if (generateBtn) {
-        console.log('Setting up generate button event listener');
-        generateBtn.addEventListener('click', handleGenerateQuestionsClick);
+        console.log('Setting up generate button event listener directly');
+        generateBtn.addEventListener('click', function() {
+            console.log('Generate button clicked');
+            handleGenerateQuestionsClick();
+        });
     } else {
-        console.error('Generate button not found');
+        console.error('Generate button not found in DOMContentLoaded');
+    }
+    
+    // Make sure setupEventListeners is called
+    setupEventListeners();
+});
+
+// Move this inside DOMContentLoaded to ensure DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the school select element - update to correct ID
+    const schoolSelect = document.getElementById('school-select');
+    const subjectSelect = document.getElementById('subject-select');
+    
+    if (schoolSelect && schoolSelect.value) {
+        // Trigger the change event to populate subjects
+        const event = new Event('change');
+        schoolSelect.dispatchEvent(event);
+    }
+    
+    // Directly attach the event listener here to ensure it gets connected
+    const generateBtn = document.getElementById('generate-btn');
+    if (generateBtn) {
+        console.log('Setting up generate button event listener directly');
+        generateBtn.addEventListener('click', function() {
+            console.log('Generate button clicked');
+            handleGenerateQuestionsClick();
+        });
+    } else {
+        console.error('Generate button not found in DOMContentLoaded');
+    }
+    
+    // Make sure setupEventListeners is called
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    // Keep the event listener here as well for redundancy
+    const generateBtn = document.getElementById('generate-btn');
+    if (generateBtn) {
+        console.log('Setting up generate button event listener in setupEventListeners');
+        // Using an anonymous function to log and then call the handler
+        generateBtn.addEventListener('click', function() {
+            console.log('Generate button clicked from setupEventListeners');
+            handleGenerateQuestionsClick();
+        });
+    } else {
+        console.error('Generate button not found in setupEventListeners');
     }
     
     // ... existing code ...
