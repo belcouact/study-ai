@@ -307,8 +307,11 @@ textarea#user-input:focus {
 
 .button-container {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 1rem;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .right-controls {
@@ -1765,8 +1768,7 @@ button:active {
 /* SVG Generate Button Styling */
 .svg-button-container {
     display: flex;
-    margin-top: 10px;
-    padding: 0 15px;
+    align-items: center;
 }
 
 .svg-generate-button {

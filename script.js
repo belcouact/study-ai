@@ -6105,3 +6105,29 @@ function escapeHTML(str) {
 function escapeSingleQuotes(str) {
     return str.replace(/'/g, "\\'");
 }
+
+// Add event listener for the SVG generation button
+document.addEventListener('DOMContentLoaded', function() {
+    const generateSvgBtn = document.getElementById('generate-svg-btn');
+    const userInput = document.getElementById('user-input');
+    
+    if (generateSvgBtn && userInput) {
+        generateSvgBtn.addEventListener('click', function() {
+            const inputText = userInput.value.trim();
+            
+            if (!inputText) {
+                showSystemMessage('请输入要生成SVG的描述内容', 'error');
+                return;
+            }
+            
+            generateSVGFromText(inputText);
+        });
+        
+        // Make sure the button is visible
+        generateSvgBtn.style.display = 'flex';
+        
+        console.log('SVG button initialized');
+    } else {
+        console.error('Could not find SVG button or user input element');
+    }
+});
