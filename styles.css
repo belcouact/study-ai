@@ -1242,10 +1242,11 @@ button:active {
     position: relative;
 }
 
-/* Control panel for test page - make it sticky */
+/* Control panel for test page - remove sticky positioning */
 .control-panel {
-    position: sticky;
-    /* top: 0;*/
+    /* remove position: sticky; */
+    position: relative; /* Change from sticky to relative */
+    /* remove top: 0; */
     z-index: 100;
     display: flex;
     flex-wrap: wrap;
@@ -1260,15 +1261,9 @@ button:active {
     order: -1; /* Ensures it's always first in the flex container */
 }
 
-/* Add more room for the control panel when scrolling */
+/* Remove the before pseudo-element as it's no longer needed */
 .control-panel:before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: 0;
-    right: 0;
-    height: 10px;
-    background-color: transparent;
+    display: none;
 }
 
 /* Ensure the empty state appears below the control panel */
