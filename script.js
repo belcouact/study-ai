@@ -5772,7 +5772,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ... existing code ...
 
 // Add event listener to the generate button
-/*
+
 function setupEventListeners() {
     // ... existing code ...
     
@@ -5784,10 +5784,10 @@ function setupEventListeners() {
     
     // ... existing code ...
 }
-*/
+
 
 // ... existing code ...
-
+/*
 function handleGenerateQuestionsClick() {
     // This function already exists in your code
     // Make sure it's properly connected to the generate button
@@ -5810,7 +5810,9 @@ function handleGenerateQuestionsClick() {
     // The rest of the function should remain unchanged
     // ... existing code ...
 }
+*/
 
+/*
 // Make sure this is called when the page loads
 document.addEventListener('DOMContentLoaded', function() {
     // ... existing code ...
@@ -5824,3 +5826,4 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // ... existing code ...
 });
+*/
