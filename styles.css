@@ -720,27 +720,22 @@ button:active {
 
 /* Navigation controls */
 .navigation-controls {
+    position: sticky;
+    bottom: 20px;
+    z-index: 90;
     display: flex;
     justify-content: space-between;
+    margin-top: 20px;
+    padding: 15px;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    padding: 15px;
-    margin-top: 20px;
-    
-    /* Fixed positioning */
-    position: fixed;
-    bottom: 20px;
-    left: calc(var(--sidebar-width) + 20px);
-    right: 20px;
-    z-index: 99;
-    max-width: calc(100% - var(--sidebar-width) - 40px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+    order: 3;
 }
 
-/* When sidebar is collapsed, adjust the navigation controls */
-.content-area.full-width .navigation-controls {
-    left: 20px;
-    max-width: calc(100% - 40px);
+.navigation-controls:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 .nav-button {
@@ -778,6 +773,7 @@ button:active {
     margin: 30px 0;
     transition: all 0.3s ease;
     border: 2px dashed #e0e0e0;
+    order: 1;
 }
 
 .empty-state h3 {
@@ -822,10 +818,8 @@ button:active {
     display: flex;
     flex-direction: column;
     padding: 20px;
-    height: auto;
     min-height: calc(100vh - 60px);
     position: relative;
-    padding-bottom: 80px; /* Add padding to prevent content from hiding behind navigation */
 }
 
 /* Loading indicator for tests */
@@ -1252,7 +1246,7 @@ button:active {
     position: relative;
 }
 
-/* Control panel for test page - make it sticky */
+/* Control panel - fixed at top when scrolling */
 .control-panel {
     position: sticky;
     top: 0;
@@ -1267,28 +1261,56 @@ button:active {
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
     align-items: center;
     transition: all 0.3s ease;
-    order: -1; /* Ensures it's always first in the flex container */
+    order: -1;
 }
 
-/* Add more room for the control panel when scrolling */
-.control-panel:before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: 0;
-    right: 0;
-    height: 10px;
-    background-color: transparent;
+/* Create container adjustments to work with sticky elements */
+#create-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    min-height: calc(100vh - 60px);
+    position: relative;
 }
 
-/* Ensure the empty state appears below the control panel */
-.empty-state {
-    order: 1;
+/* Fix navigation controls at the bottom while scrolling */
+.navigation-controls {
+    position: sticky;
+    bottom: 20px;
+    z-index: 90;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+    order: 3;
 }
 
-/* Ensure questions container appears below the control panel */
+.navigation-controls:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Ensure proper spacing between elements */
 .questions-display-container {
     order: 2;
+    margin-bottom: 70px; /* Add space for the navigation controls */
+    flex: 1;
+}
+
+/* Add padding to the bottom of the page for better scrolling experience */
+#create-container::after {
+    content: '';
+    display: block;
+    height: 20px;
+    order: 4;
+}
+
+/* Make sure elements maintain proper order */
+.empty-state {
+    order: 1;
 }
 
 /* Style dropdowns more attractively */
@@ -1417,9 +1439,4 @@ button:active {
     cursor: not-allowed;
     box-shadow: none;
     opacity: 0.7;
-}
-
-/* Ensure there's space at the bottom when the navigation controls are fixed */
-.questions-display-container {
-    margin-bottom: 80px;
 } 

@@ -1909,7 +1909,7 @@ function handleGenerateQuestionsClick() {
                 setupNavigationButtons();
                 
                 // Show success message
-                showSystemMessage(`已生成 ${parsedQuestions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`, 'success');
+                // showSystemMessage(`已生成 ${parsedQuestions.length} 道 ${schoolType}${grade}${semester}${subject} ${difficulty}难度题目`, 'success');
             } catch (error) {
                 console.error('Error processing questions:', error);
                 showSystemMessage('生成题目时出错，请重试', 'error');
