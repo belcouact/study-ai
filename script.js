@@ -1756,9 +1756,6 @@ function handleGenerateQuestionsClick() {
     console.log('Proceeding with question generation');
     
     // The rest of your handleGenerateQuestionsClick function should remain unchanged
-    
-}
-
     // Collect form data from sidebar
     const schoolType = schoolSelect.value;
     const grade = gradeSelect.value;
@@ -1948,7 +1945,7 @@ function handleGenerateQuestionsClick() {
             generateQuestionsButton.disabled = false;
             }
         });
-
+}
 
 // Function to show loading indicator with spinning icon
 function showLoadingIndicator() {
