@@ -861,19 +861,22 @@ button:active {
     padding: 2rem;
     height: auto;
     min-height: calc(100vh - 60px);
+    overflow-y: visible;
 }
 
 .poetry-header {
+    position: relative;
     padding: 20px;
     margin-bottom: 30px;
     border-radius: 10px;
     background-color: #f8f9fa;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 50;
 }
 
 .poetry-header:hover {
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
 }
 
@@ -888,6 +891,8 @@ button:active {
     flex-wrap: wrap;
     gap: 15px;
     margin-bottom: 20px;
+    padding: 5px;
+    transition: background-color 0.3s ease;
 }
 
 .selector-group {
