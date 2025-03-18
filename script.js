@@ -5847,3 +5847,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 100); // Small delay to ensure all elements are loaded
 });
+
+// Add this at the end of your script.js file
+console.log('Script loaded');
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded');
+    
+    // Check if element exists
+    const generateBtn = document.getElementById('generate-btn');
+    console.log('Generate button found:', generateBtn);
+    
+    // Check if function exists
+    console.log('handleGenerateQuestionsClick exists:', typeof handleGenerateQuestionsClick === 'function');
+    
+    // Log all buttons on the page
+    const allButtons = document.querySelectorAll('button');
+    console.log('All buttons on page:', allButtons);
+    
+    // Check IDs of all buttons
+    allButtons.forEach(button => {
+        console.log('Button ID:', button.id);
+    });
+});
