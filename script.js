@@ -4352,7 +4352,7 @@ function getSimplifiedContextSummary() {
             loadingIndicator.id = 'poetry-loading';
             loadingIndicator.innerHTML = `
                 <div class="spinner"></div>
-                <p>十里走马正疾驰，五里扬鞭未敢停 --- 加速生成中...</p>
+                <p>十里走马正疾驰，五里扬鞭未敢停...</p>
             `;
             loadingIndicator.style.display = 'flex';
             loadingIndicator.style.flexDirection = 'column';
@@ -5436,7 +5436,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingIndicator.id = 'poetry-loading';
             loadingIndicator.innerHTML = `
                 <div class="spinner"></div>
-                <p>十里走马正疾驰，五里扬鞭未敢停 --- 加速生成中...</p>
+                <p>十里走马正疾驰，五里扬鞭未敢停...</p>
             `;
             loadingIndicator.style.display = 'flex';
             loadingIndicator.style.flexDirection = 'column';
