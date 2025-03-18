@@ -6695,3 +6695,22 @@ async function fetchVocabularyWords(schoolLevel, gradeLevel) {
         if (loadingSpinner) loadingSpinner.style.display = 'none';
     }
 }
+
+// Helper function to clean JSON content from markdown formatting
+function cleanJsonContent(content) {
+    // Remove markdown code blocks if present
+    let cleanedContent = content;
+    
+    // Check for ```json or ```JavaScript blocks
+    const codeBlockRegex = /```(?:json|javascript)?\s*([\s\S]*?)```/i;
+    const match = cleanedContent.match(codeBlockRegex);
+    
+    if (match && match[1]) {
+        cleanedContent = match[1].trim();
+    }
+    
+    // Remove any leading/trailing whitespace
+    cleanedContent = cleanedContent.trim();
+    
+    return cleanedContent;
+}
