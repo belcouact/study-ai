@@ -1854,4 +1854,13 @@ button:active {
         margin-left: 0;
         width: 100%;
     }
+}
+
+/* Add these styles for the vocabulary loading spinner */
+.vocabulary-container .loading-spinner {
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    color: #666;
+    animation: none; /* Prevent rotation */
 } 
