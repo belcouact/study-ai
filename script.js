@@ -6235,12 +6235,12 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeVocabularyTab() {
     console.log("Initializing vocabulary tab");
     
-    const vocabularyButton = document.getElementById('vocabulary-button');
     const generateButton = document.getElementById('generate-vocabulary');
     const prevButton = document.getElementById('prev-word');
     const nextButton = document.getElementById('next-word');
     const wordCounter = document.getElementById('word-counter');
     
+    // State variables for vocabulary
     let currentWordIndex = 0;
     let vocabularyWords = [];
     
@@ -6269,11 +6269,24 @@ function initializeVocabularyTab() {
             const gradeLevel = gradeSelect.value;
             
             try {
-                // Fetch vocabulary words
+                // Fetch vocabulary words using the API
                 vocabularyWords = await fetchVocabularyWords(schoolLevel, gradeLevel);
                 currentWordIndex = 0;
+                
+                // Display the first word
+                displayCurrentWord(vocabularyWords, currentWordIndex);
+                
+                // Show navigation for multiple words
+                const navigationDiv = document.querySelector('.vocabulary-navigation');
+                if (navigationDiv) navigationDiv.style.display = 'flex';
+                
+                // Update the counter
+                updateWordCounter();
             } catch (error) {
                 console.error('Error in generate vocabulary handler:', error);
+                // Reset the state if there was an error
+                vocabularyWords = [];
+                currentWordIndex = 0;
             }
         });
     }
@@ -6324,7 +6337,6 @@ function initializeVocabularyTab() {
         }
         
         const word = words[index];
-        updateWordCounter();
         
         // Create the word card
         const wordCardHTML = `
@@ -6643,69 +6655,40 @@ async function fetchVocabularyWords(schoolLevel, gradeLevel) {
           ...
         ]`;
         
-        // Make the actual API call using the current API function and model
-        const apiEndpoint = `/api/${currentApiFunction}`;
-        const response = await fetch(apiEndpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                messages: [
-                    {
-                        role: "user",
-                        content: promptText
-                    }
-                ],
-                model: currentModel,
-                temperature: 0.7,
-                max_tokens: 2000
-            })
-        });
+        // Call the fetchAIResponse function with the prompt
+        const response = await fetchAIResponse(promptText);
+        console.log('API response received for vocabulary');
         
-        if (!response.ok) {
-            throw new Error(`API response error: ${response.status}`);
-        }
+        // Extract content from the API response
+        const content = extractContentFromResponse(response);
+        console.log('Extracted content:', content.substring(0, 100) + '...');
         
-        // Get the response data
-        const data = await response.json();
-        
-        // Extract the content from the API response
-        const content = extractContentFromResponse(data);
+        let vocabularyWords = [];
         
         try {
             // Try to parse the JSON response
             vocabularyWords = JSON.parse(content);
-            console.log('Successfully parsed vocabulary words:', vocabularyWords);
+            console.log('Successfully parsed vocabulary words:', vocabularyWords.length, 'words found');
         } catch (parseError) {
             console.error('Error parsing vocabulary JSON from API response:', parseError);
-            console.log('Raw API response content:', content);
+            console.log('Raw API response content:', content.substring(0, 500));
             
-            // If JSON parsing fails, use mock data
-            vocabularyWords = getMockVocabularyWords();
-            showSystemMessage('词汇解析错误，使用样本数据', 'warning');
+            // If JSON parsing fails, show error message
+            showSystemMessage('词汇解析错误，请重试', 'error');
+            throw new Error('Failed to parse vocabulary response');
         }
         
-        // Display the first word
-        if (vocabularyWords && vocabularyWords.length > 0) {
-            currentWordIndex = 0;
-            displayCurrentWord();
-            if (navigationDiv) navigationDiv.style.display = 'flex';
-        } else {
+        // Check if we got valid vocabulary words
+        if (!vocabularyWords || vocabularyWords.length === 0) {
             throw new Error('No vocabulary words were returned');
         }
+        
+        return vocabularyWords;
         
     } catch (error) {
         console.error('Error fetching vocabulary words:', error);
         showSystemMessage(`获取词汇失败: ${error.message}`, 'error');
-        
-        // Use mock data as fallback
-        vocabularyWords = getMockVocabularyWords();
-        currentWordIndex = 0;
-        displayCurrentWord();
-        
-        const navigationDiv = document.querySelector('.vocabulary-navigation');
-        if (navigationDiv) navigationDiv.style.display = 'flex';
+        throw error;
     } finally {
         // Hide loading spinner
         const loadingSpinner = document.querySelector('.vocabulary-container .loading-spinner');
