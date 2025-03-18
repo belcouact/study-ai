@@ -6531,3 +6531,151 @@ function switchPanel(panelId) {
 }
 
 // ... existing code ...
+
+function setupEventListeners() {
+    // Get button references
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const poetryButton = document.getElementById('poetry-button');
+    const vocabularyButton = document.getElementById('vocabulary-button');
+
+    // Get panel references
+    const qaPanel = document.getElementById('qa-container');
+    const createPanel = document.getElementById('create-container');
+    const poetryPanel = document.getElementById('poetry-container');
+    const vocabularyPanel = document.getElementById('vocabulary-container');
+
+    console.log('Setting up event listeners for tabs');
+
+    // Add event listener to QA button
+    if (qaButton) {
+        qaButton.addEventListener('click', function(event) {
+            console.log('QA button clicked (direct handler)');
+            
+            // Hide other panels
+            if (createPanel) createPanel.classList.add('hidden');
+            if (poetryPanel) poetryPanel.classList.add('hidden');
+            if (vocabularyPanel) vocabularyPanel.classList.add('hidden');
+            
+            // Show QA panel
+            if (qaPanel) {
+                qaPanel.classList.remove('hidden');
+                console.log('QA panel is now visible');
+            } else {
+                console.error('QA panel not found');
+            }
+            
+            // Update active states
+            if (createButton) createButton.classList.remove('active');
+            if (poetryButton) poetryButton.classList.remove('active');
+            if (vocabularyButton) vocabularyButton.classList.remove('active');
+            qaButton.classList.add('active');
+            
+            // Prevent default behavior
+            event.preventDefault();
+        });
+        console.log('Direct event listener added to QA button');
+    } else {
+        console.error('QA button not found');
+    }
+    
+    // Add event listener to Create button
+    if (createButton) {
+        createButton.addEventListener('click', function(event) {
+            console.log('Create button clicked (direct handler)');
+            
+            // Hide other panels
+            if (qaPanel) qaPanel.classList.add('hidden');
+            if (poetryPanel) poetryPanel.classList.add('hidden');
+            if (vocabularyPanel) vocabularyPanel.classList.add('hidden');
+            
+            // Show create panel
+            if (createPanel) {
+                createPanel.classList.remove('hidden');
+                console.log('Create panel is now visible');
+            } else {
+                console.error('Create panel not found');
+            }
+            
+            // Update active states
+            if (qaButton) qaButton.classList.remove('active');
+            if (poetryButton) poetryButton.classList.remove('active');
+            if (vocabularyButton) vocabularyButton.classList.remove('active');
+            createButton.classList.add('active');
+            
+            // Prevent default behavior
+            event.preventDefault();
+        });
+        console.log('Direct event listener added to create button');
+    } else {
+        console.error('Create button not found');
+    }
+    
+    // Add event listener to Poetry button
+    if (poetryButton) {
+        poetryButton.addEventListener('click', function(event) {
+            console.log('Poetry button clicked (direct handler)');
+            
+            // Hide other panels
+            if (qaPanel) qaPanel.classList.add('hidden');
+            if (createPanel) createPanel.classList.add('hidden');
+            if (vocabularyPanel) vocabularyPanel.classList.add('hidden');
+            
+            // Show poetry panel
+            if (poetryPanel) {
+                poetryPanel.classList.remove('hidden');
+                console.log('Poetry panel is now visible');
+            } else {
+                console.error('Poetry panel not found');
+            }
+            
+            // Update active states
+            if (qaButton) qaButton.classList.remove('active');
+            if (createButton) createButton.classList.remove('active');
+            if (vocabularyButton) vocabularyButton.classList.remove('active');
+            poetryButton.classList.add('active');
+            
+            // Prevent default behavior
+            event.preventDefault();
+        });
+        console.log('Direct event listener added to poetry button');
+    } else {
+        console.error('Poetry button not found');
+    }
+    
+    // Add event listener to Vocabulary button
+    if (vocabularyButton) {
+        vocabularyButton.addEventListener('click', function(event) {
+            console.log('Vocabulary button clicked (direct handler)');
+            
+            // Hide other panels
+            if (qaPanel) qaPanel.classList.add('hidden');
+            if (createPanel) createPanel.classList.add('hidden');
+            if (poetryPanel) poetryPanel.classList.add('hidden');
+            
+            // Show vocabulary panel
+            if (vocabularyPanel) {
+                vocabularyPanel.classList.remove('hidden');
+                console.log('Vocabulary panel is now visible');
+            } else {
+                console.error('Vocabulary panel not found');
+            }
+            
+            // Update active states
+            if (qaButton) qaButton.classList.remove('active');
+            if (createButton) createButton.classList.remove('active');
+            if (poetryButton) poetryButton.classList.remove('active');
+            vocabularyButton.classList.add('active');
+            
+            // Prevent default behavior
+            event.preventDefault();
+        });
+        console.log('Direct event listener added to vocabulary button');
+    } else {
+        console.error('Vocabulary button not found');
+    }
+    
+    // ... rest of the existing event listeners ...
+}
+
+// ... existing code ...
