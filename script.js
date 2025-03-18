@@ -5050,6 +5050,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get user's educational context
     const school = document.getElementById('school-select-sidebar');
     const grade = document.getElementById('grade-select-sidebar');
+    const poetryType = document.getElementById('poetry-type-select');
+    const poetryStyle = document.getElementById('poetry-style-select');
 
     // Update the prompt in handleLearnPoetryClick function to specifically request famous ancient poems
     const prompt = `请为${school}${grade}的学生推荐5首著名的古代${poetryType}，风格为${poetryStyle}。
@@ -5734,6 +5736,7 @@ const schoolSelect = document.getElementById('school-select-sidebar');
 const subjectSelect = document.getElementById('subject-select');
 
 
+/*
 // Add event listener to the school select
 schoolSelect.addEventListener('change', function() {
     // Clear current subject options
@@ -5752,7 +5755,7 @@ schoolSelect.addEventListener('change', function() {
         subjectSelect.appendChild(option);
     });
 });
-
+*/
 
 /*
 // Function to get subjects for a specific school
