@@ -5783,10 +5783,7 @@ function setupEventListeners() {
 // ... existing code ...
 
 function handleGenerateQuestionsClick() {
-    // This function already exists in your code
-    // Make sure it's properly connected to the generate button
-    
-    // Get values from the dropdowns
+    // Get values from the control panel dropdowns (not the sidebar ones)
     const subject = document.getElementById('subject-select').value;
     const semester = document.getElementById('semester-select').value;
     const difficulty = document.getElementById('difficulty-select').value;
