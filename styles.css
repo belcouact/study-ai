@@ -722,11 +722,25 @@ button:active {
 .navigation-controls {
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
-    padding: 15px;
     background: white;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 15px;
+    margin-top: 20px;
+    
+    /* Fixed positioning */
+    position: fixed;
+    bottom: 20px;
+    left: calc(var(--sidebar-width) + 20px);
+    right: 20px;
+    z-index: 99;
+    max-width: calc(100% - var(--sidebar-width) - 40px);
+}
+
+/* When sidebar is collapsed, adjust the navigation controls */
+.content-area.full-width .navigation-controls {
+    left: 20px;
+    max-width: calc(100% - 40px);
 }
 
 .nav-button {
@@ -811,6 +825,7 @@ button:active {
     height: auto;
     min-height: calc(100vh - 60px);
     position: relative;
+    padding-bottom: 80px; /* Add padding to prevent content from hiding behind navigation */
 }
 
 /* Loading indicator for tests */
@@ -1402,4 +1417,9 @@ button:active {
     cursor: not-allowed;
     box-shadow: none;
     opacity: 0.7;
+}
+
+/* Ensure there's space at the bottom when the navigation controls are fixed */
+.questions-display-container {
+    margin-bottom: 80px;
 } 
