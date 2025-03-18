@@ -6269,24 +6269,46 @@ function initializeVocabularyTab() {
             const gradeLevel = gradeSelect.value;
             
             try {
+                // Show the loading spinner
+                const loadingSpinner = document.querySelector('.vocabulary-container .loading-spinner');
+                if (loadingSpinner) loadingSpinner.style.display = 'block';
+                
                 // Fetch vocabulary words using the API
                 vocabularyWords = await fetchVocabularyWords(schoolLevel, gradeLevel);
+                
+                // Reset to first word
                 currentWordIndex = 0;
                 
                 // Display the first word
-                displayCurrentWord(vocabularyWords, currentWordIndex);
-                
-                // Show navigation for multiple words
-                const navigationDiv = document.querySelector('.vocabulary-navigation');
-                if (navigationDiv) navigationDiv.style.display = 'flex';
-                
-                // Update the counter
-                updateWordCounter();
+                if (vocabularyWords && vocabularyWords.length > 0) {
+                    displayCurrentWord(vocabularyWords, currentWordIndex);
+                    
+                    // Show navigation for multiple words
+                    const navigationDiv = document.querySelector('.vocabulary-navigation');
+                    if (navigationDiv) navigationDiv.style.display = 'flex';
+                    
+                    // Update the counter
+                    updateWordCounter();
+                } else {
+                    throw new Error('No vocabulary words returned');
+                }
             } catch (error) {
                 console.error('Error in generate vocabulary handler:', error);
                 // Reset the state if there was an error
                 vocabularyWords = [];
                 currentWordIndex = 0;
+                
+                // Show empty state
+                const emptyState = document.getElementById('vocabulary-empty-state');
+                if (emptyState) emptyState.style.display = 'block';
+                
+                // Hide navigation
+                const navigationDiv = document.querySelector('.vocabulary-navigation');
+                if (navigationDiv) navigationDiv.style.display = 'none';
+            } finally {
+                // Hide loading spinner
+                const loadingSpinner = document.querySelector('.vocabulary-container .loading-spinner');
+                if (loadingSpinner) loadingSpinner.style.display = 'none';
             }
         });
     }
@@ -6294,7 +6316,7 @@ function initializeVocabularyTab() {
     // Navigation buttons
     if (prevButton) {
         prevButton.addEventListener('click', function() {
-            if (currentWordIndex > 0) {
+            if (vocabularyWords && currentWordIndex > 0) {
                 currentWordIndex--;
                 displayCurrentWord(vocabularyWords, currentWordIndex);
                 updateWordCounter();
@@ -6342,29 +6364,29 @@ function initializeVocabularyTab() {
         const wordCardHTML = `
             <div class="word-card active">
                 <div class="word-header">
-                    <h2 class="word-title">${word.word}</h2>
-                    <span class="pronunciation">${word.pronunciation}</span>
+                    <h2 class="word-title">${word.word || 'Unknown'}</h2>
+                    <span class="pronunciation">${word.pronunciation || ''}</span>
                 </div>
                 
                 <div class="meaning-section">
                     <div class="english-meaning">
-                        <strong>英文释义:</strong> ${word.englishMeaning}
+                        <strong>英文释义:</strong> ${word.englishMeaning || ''}
                     </div>
                     <div class="chinese-meaning">
-                        <strong>中文意思:</strong> ${word.chineseMeaning}
+                        <strong>中文意思:</strong> ${word.chineseMeaning || ''}
                     </div>
                     <div class="parts-of-speech">
-                        <span class="part-of-speech">${word.partOfSpeech}</span>
-                        <span><strong>相关形式:</strong> ${word.relatedForms}</span>
+                        <span class="part-of-speech">${word.partOfSpeech || ''}</span>
+                        <span><strong>相关形式:</strong> ${word.relatedForms || ''}</span>
                     </div>
                 </div>
                 
                 <div class="example-section">
                     <div class="english-example">
-                        <strong>例句:</strong> ${word.example}
+                        <strong>例句:</strong> ${word.example || ''}
                     </div>
                     <div class="chinese-translation">
-                        <strong>翻译:</strong> ${word.exampleTranslation}
+                        <strong>翻译:</strong> ${word.exampleTranslation || ''}
                     </div>
                 </div>
             </div>
