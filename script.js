@@ -6204,3 +6204,330 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
   }
 });
+
+// ... existing code ...
+
+// Initialize the vocabulary tab functionality
+function initializeVocabularyTab() {
+    const vocabularyButton = document.getElementById('vocabulary-button');
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    const generateButton = document.getElementById('generate-vocabulary');
+    const wordDisplay = document.getElementById('word-display');
+    const navigationDiv = document.querySelector('.vocabulary-navigation');
+    const prevButton = document.getElementById('prev-word');
+    const nextButton = document.getElementById('next-word');
+    const wordCounter = document.getElementById('word-counter');
+    const loadingSpinner = document.querySelector('.vocabulary-container .loading-spinner');
+    const emptyState = document.getElementById('vocabulary-empty-state');
+    
+    let currentWordIndex = 0;
+    let vocabularyWords = [];
+    
+    // Add tab click functionality
+    vocabularyButton.addEventListener('click', function() {
+        switchPanel('vocabulary-container');
+    });
+    
+    // Generate vocabulary words
+    generateButton.addEventListener('click', async function() {
+        // Get the school and grade values from sidebar
+        const schoolSelect = document.getElementById('school-select-sidebar');
+        const gradeSelect = document.getElementById('grade-select-sidebar');
+        
+        if (!schoolSelect || !schoolSelect.value || !gradeSelect || !gradeSelect.value) {
+            showSystemMessage('请先在左侧边栏选择学校和年级', 'error');
+            return;
+        }
+        
+        // Convert school type to English for API
+        const schoolMapping = {
+            '小学': 'elementary',
+            '初中': 'middle',
+            '高中': 'high'
+        };
+        
+        const schoolLevel = schoolMapping[schoolSelect.value] || 'elementary';
+        const gradeLevel = gradeSelect.value;
+        
+        // Show loading spinner
+        emptyState.style.display = 'none';
+        loadingSpinner.style.display = 'block';
+        wordDisplay.innerHTML = '';
+        navigationDiv.style.display = 'none';
+        
+        // Call the function to fetch vocabulary words
+        try {
+            await fetchVocabularyWords(schoolLevel, gradeLevel);
+        } catch (error) {
+            console.error('Error generating vocabulary:', error);
+            showSystemMessage('生成词汇时出错，请稍后再试', 'error');
+            loadingSpinner.style.display = 'none';
+            emptyState.style.display = 'flex';
+        }
+    });
+    
+    // Handle navigation buttons
+    prevButton.addEventListener('click', function() {
+        if (currentWordIndex > 0) {
+            currentWordIndex--;
+            displayCurrentWord();
+        }
+    });
+    
+    nextButton.addEventListener('click', function() {
+        if (currentWordIndex < vocabularyWords.length - 1) {
+            currentWordIndex++;
+            displayCurrentWord();
+        }
+    });
+    
+    // Function to fetch vocabulary words from DeepSeek API
+    async function fetchVocabularyWords(schoolLevel, gradeLevel) {
+        try {
+            // Similar to the handleGenerateQuestionsClick function:
+            // Get the DeepSeek API endpoint - in a real implementation, you would add your own API endpoint
+            const apiUrl = 'https://api.deepseek.com/v1/chat/completions';  // Replace with actual DeepSeek API endpoint
+            
+            const promptText = `Generate 10 English vocabulary words appropriate for a ${schoolLevel} school student in grade ${gradeLevel}. 
+            For each word, provide:
+            1. English word
+            2. Pronunciation
+            3. English meaning
+            4. Chinese meaning
+            5. Related forms (noun, verb, adjective, etc.)
+            6. Example sentence using the word
+            7. Chinese translation of the example sentence
+            
+            Format the response as JSON with the following structure:
+            [
+              {
+                "word": "example",
+                "pronunciation": "/ɪɡˈzæmpəl/",
+                "englishMeaning": "a thing characteristic of its kind",
+                "chineseMeaning": "例子",
+                "partOfSpeech": "noun",
+                "relatedForms": "exemplary (adj), exemplify (v)",
+                "example": "This is an example of good writing.",
+                "exampleTranslation": "这是优秀写作的例子。"
+              },
+              ...
+            ]`;
+            
+            // Similar to how fetchAIResponse is used in handleGenerateQuestionsClick
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer YOUR_DEEPSEEK_API_KEY' // Replace with your actual API key
+                },
+                body: JSON.stringify({
+                    model: "deepseek-chat",
+                    messages: [
+                        {
+                            role: "user",
+                            content: promptText
+                        }
+                    ],
+                    temperature: 0.7
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch vocabulary words');
+            }
+            
+            const data = await response.json();
+            
+            // For development/testing purposes, use mock data if API is not set up yet
+            if (data.choices && data.choices[0] && data.choices[0].message) {
+                try {
+                    vocabularyWords = JSON.parse(data.choices[0].message.content);
+                } catch (e) {
+                    console.error('Error parsing JSON from API:', e);
+                    vocabularyWords = getMockVocabularyWords();
+                }
+            } else {
+                vocabularyWords = getMockVocabularyWords();
+            }
+            
+            // Display the first word
+            currentWordIndex = 0;
+            displayCurrentWord();
+            navigationDiv.style.display = 'flex';
+            
+        } catch (error) {
+            console.error('Error fetching vocabulary words:', error);
+            // Use mock data as fallback
+            vocabularyWords = getMockVocabularyWords();
+            currentWordIndex = 0;
+            displayCurrentWord();
+            navigationDiv.style.display = 'flex';
+        } finally {
+            loadingSpinner.style.display = 'none';
+        }
+    }
+    
+    // Function to display the current word
+    function displayCurrentWord() {
+        if (vocabularyWords.length === 0) return;
+        
+        const word = vocabularyWords[currentWordIndex];
+        wordCounter.textContent = `${currentWordIndex + 1} / ${vocabularyWords.length}`;
+        
+        // Update navigation button states
+        prevButton.disabled = currentWordIndex === 0;
+        nextButton.disabled = currentWordIndex === vocabularyWords.length - 1;
+        
+        // Create the word card
+        const wordCardHTML = `
+            <div class="word-card active">
+                <div class="word-header">
+                    <h2 class="word-title">${word.word}</h2>
+                    <span class="pronunciation">${word.pronunciation}</span>
+                </div>
+                
+                <div class="meaning-section">
+                    <div class="english-meaning">
+                        <strong>英文释义:</strong> ${word.englishMeaning}
+                    </div>
+                    <div class="chinese-meaning">
+                        <strong>中文意思:</strong> ${word.chineseMeaning}
+                    </div>
+                    <div class="parts-of-speech">
+                        <span class="part-of-speech">${word.partOfSpeech}</span>
+                        <span><strong>相关形式:</strong> ${word.relatedForms}</span>
+                    </div>
+                </div>
+                
+                <div class="example-section">
+                    <div class="english-example">
+                        <strong>例句:</strong> ${word.example}
+                    </div>
+                    <div class="chinese-translation">
+                        <strong>翻译:</strong> ${word.exampleTranslation}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        wordDisplay.innerHTML = wordCardHTML;
+    }
+    
+    // Function to generate mock vocabulary words for testing
+    function getMockVocabularyWords() {
+        return [
+            {
+                "word": "abundant",
+                "pronunciation": "/əˈbʌn.dənt/",
+                "englishMeaning": "existing in large quantities; more than enough",
+                "chineseMeaning": "丰富的，充裕的",
+                "partOfSpeech": "adjective",
+                "relatedForms": "abundance (n), abundantly (adv)",
+                "example": "The region has abundant natural resources.",
+                "exampleTranslation": "该地区拥有丰富的自然资源。"
+            },
+            {
+                "word": "diligent",
+                "pronunciation": "/ˈdɪl.ɪ.dʒənt/",
+                "englishMeaning": "having or showing care and conscientiousness in one's work or duties",
+                "chineseMeaning": "勤奋的，勤勉的",
+                "partOfSpeech": "adjective",
+                "relatedForms": "diligence (n), diligently (adv)",
+                "example": "She's a diligent student who always completes her homework on time.",
+                "exampleTranslation": "她是一个勤奋的学生，总是按时完成作业。"
+            },
+            // ... additional mock words as already defined
+            {
+                "word": "persevere",
+                "pronunciation": "/ˌpɜː.səˈvɪər/",
+                "englishMeaning": "to continue trying to do something despite difficulties",
+                "chineseMeaning": "坚持，毅力",
+                "partOfSpeech": "verb",
+                "relatedForms": "perseverance (n), persevering (adj)",
+                "example": "If you persevere with your studies, you will succeed eventually.",
+                "exampleTranslation": "如果你坚持学习，最终你会成功的。"
+            },
+            {
+                "word": "eloquent",
+                "pronunciation": "/ˈel.ə.kwənt/",
+                "englishMeaning": "fluent or persuasive in speaking or writing",
+                "chineseMeaning": "雄辩的，流利的",
+                "partOfSpeech": "adjective",
+                "relatedForms": "eloquence (n), eloquently (adv)",
+                "example": "She gave an eloquent speech that moved the entire audience.",
+                "exampleTranslation": "她发表了一篇雄辩的演讲，感动了全体观众。"
+            },
+            {
+                "word": "benevolent",
+                "pronunciation": "/bəˈnev.əl.ənt/",
+                "englishMeaning": "well meaning and kindly",
+                "chineseMeaning": "仁慈的，慈善的",
+                "partOfSpeech": "adjective",
+                "relatedForms": "benevolence (n), benevolently (adv)",
+                "example": "The benevolent king was loved by all his subjects.",
+                "exampleTranslation": "这位仁慈的国王受到所有臣民的爱戴。"
+            }
+        ];
+    }
+}
+
+// Update the init function to include the vocabulary tab initialization
+function init() {
+    // ... existing code ...
+    
+    // Initialize the vocabulary tab
+    initializeVocabularyTab();
+    
+    // Set up tab switching
+    setupTabSwitching();
+    
+    // ... existing code ...
+}
+
+// Update the switchPanel function to include vocabulary container
+function switchPanel(panelId) {
+    // Hide all content sections
+    const panels = ['qa-container', 'create-container', 'poetry-container', 'vocabulary-container'];
+    panels.forEach(panel => {
+        const element = document.getElementById(panel);
+        if (element) {
+            element.classList.add('hidden');
+        }
+    });
+    
+    // Show the selected panel
+    const selectedPanel = document.getElementById(panelId);
+    if (selectedPanel) {
+        selectedPanel.classList.remove('hidden');
+    }
+    
+    // Update active tab
+    const tabButtons = document.querySelectorAll('.panel-button');
+    tabButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Set active tab based on panelId
+    let activeTabId;
+    switch (panelId) {
+        case 'qa-container':
+            activeTabId = 'qa-button';
+            break;
+        case 'create-container':
+            activeTabId = 'create-button';
+            break;
+        case 'poetry-container':
+            activeTabId = 'poetry-button';
+            break;
+        case 'vocabulary-container':
+            activeTabId = 'vocabulary-button';
+            break;
+    }
+    
+    const activeTab = document.getElementById(activeTabId);
+    if (activeTab) {
+        activeTab.classList.add('active');
+    }
+}
+
+// ... existing code ...
