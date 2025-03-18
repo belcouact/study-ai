@@ -2867,7 +2867,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Populate subject dropdown
-        const subjectSelectSidebar = document.getElementById('subject-select');
+        const subjectSelect = document.getElementById('subject-select');
         if (subjectSelect) {
             subjectSelect.innerHTML = '';
             subjectOptions.forEach(subject => {
@@ -2879,7 +2879,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Add change event listener to update dropdowns when school changes
-        schoolSelect.addEventListener('change', function() {
+        schoolSelectSidebar.addEventListener('change', function() {
             const school = this.value;
             
             // Define grade options based on school
