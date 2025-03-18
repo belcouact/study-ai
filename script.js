@@ -5790,3 +5790,68 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Generate button event listener attached');
     }
 });
+
+// Add this to your existing JavaScript to enhance the poetry page interactivity
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Wrap each line of the poem in a span for hover effects
+    const poemContent = document.querySelector('.poem-content');
+    if (poemContent) {
+        const lines = poemContent.innerHTML.split('\n');
+        let wrappedContent = '';
+        
+        lines.forEach(line => {
+            if (line.trim()) {
+                wrappedContent += `<span class="poem-line">${line}</span>\n`;
+            } else {
+                wrappedContent += '\n';
+            }
+        });
+        
+        poemContent.innerHTML = wrappedContent;
+    }
+    
+    // Add subtle parallax effect to poem display
+    const poemDisplay = document.querySelector('.poem-display');
+    if (poemDisplay) {
+        poemDisplay.addEventListener('mousemove', function(e) {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            poemDisplay.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg) translateY(-3px)`;
+        });
+        
+        // Reset transform when mouse leaves
+        poemDisplay.addEventListener('mouseleave', function() {
+            poemDisplay.style.transform = 'rotateY(0deg) rotateX(0deg) translateY(-3px)';
+        });
+    }
+    
+    // Add visual feedback when selections are made
+    const poetrySelects = document.querySelectorAll('.poetry-select');
+    poetrySelects.forEach(select => {
+        select.addEventListener('change', function() {
+            if (this.value) {
+                this.classList.add('selected');
+                this.closest('.selector-group').classList.add('has-selection');
+            } else {
+                this.classList.remove('selected');
+                this.closest('.selector-group').classList.remove('has-selection');
+            }
+        });
+    });
+    
+    // Add animation when poem sections are scrolled into view
+    const poemSections = document.querySelectorAll('.poem-section');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    poemSections.forEach(section => {
+        observer.observe(section);
+    });
+});
