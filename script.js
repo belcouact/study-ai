@@ -1922,9 +1922,10 @@ function handleGenerateQuestionsClick() {
                 }
             } finally {
                 // Reset button state
-                if (isTestPage) {
-                generateQuestionsButton.textContent = '出题';
-                generateQuestionsButton.disabled = false;
+                const generateQuestionsButton = document.getElementById('generate-btn');
+                if (generateQuestionsButton) {
+                    generateQuestionsButton.textContent = '出题';
+                    generateQuestionsButton.disabled = false;
                 }
             }
         })
@@ -1936,13 +1937,14 @@ function handleGenerateQuestionsClick() {
             // Show empty state again if there was an error
             if (emptyState && questionsDisplayContainer) {
                 emptyState.classList.remove('hidden');
-                questionsDisplayContainer.classList.remove('hidden');
+                questionsDisplayContainer.classList.add('hidden');
             }
             
             // Reset button state
-            if (isTestPage) {
-            generateQuestionsButton.textContent = '出题';
-            generateQuestionsButton.disabled = false;
+            const generateQuestionsButton = document.getElementById('generate-btn');
+            if (generateQuestionsButton) {
+                generateQuestionsButton.textContent = '出题';
+                generateQuestionsButton.disabled = false;
             }
         });
 }

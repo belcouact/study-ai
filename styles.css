@@ -810,6 +810,7 @@ button:active {
     padding: 20px;
     height: auto;
     min-height: calc(100vh - 60px);
+    position: relative;
 }
 
 /* Loading indicator for tests */
@@ -1236,8 +1237,11 @@ button:active {
     position: relative;
 }
 
-/* Control panel for test page */
+/* Control panel for test page - make it sticky */
 .control-panel {
+    position: sticky;
+    top: 0;
+    z-index: 100;
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
@@ -1248,10 +1252,28 @@ button:active {
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
     align-items: center;
     transition: all 0.3s ease;
+    order: -1; /* Ensures it's always first in the flex container */
 }
 
-.control-panel:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+/* Add more room for the control panel when scrolling */
+.control-panel:before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background-color: transparent;
+}
+
+/* Ensure the empty state appears below the control panel */
+.empty-state {
+    order: 1;
+}
+
+/* Ensure questions container appears below the control panel */
+.questions-display-container {
+    order: 2;
 }
 
 /* Style dropdowns more attractively */
