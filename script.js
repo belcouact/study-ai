@@ -2867,7 +2867,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Populate subject dropdown
-        const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
+        const subjectSelectSidebar = document.getElementById('subject-select');
         if (subjectSelectSidebar) {
             subjectSelectSidebar.innerHTML = '';
             subjectOptions.forEach(subject => {
