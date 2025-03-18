@@ -49,47 +49,12 @@
                     </div>
                     
                     <!-- Test Configuration Frame -->
-                    <!--
                     <div class="sidebar-frame">
                         <h3 class="frame-title">测验</h3>
                         <div class="frame-content">
-                            <div class="dropdown-container">
-                                <label for="subject-select-sidebar">科目</label>
-                                <select id="subject-select-sidebar" name="subject">
-                                    <!-- Options will be populated dynamically -->
-                                </select>
-                            </div>
-                            
-                            <div class="dropdown-container">
-                                <label for="semester-select-sidebar">学期</label>
-                                <select id="semester-select-sidebar" name="semester">
-                                    <option value="上学期">上学期</option>
-                                    <option value="下学期">下学期</option>
-                                </select>
-                            </div>
-                            
-                            <div class="dropdown-container">
-                                <label for="difficulty-select-sidebar">难度</label>
-                                <select id="difficulty-select-sidebar" name="difficulty">
-                                    <option value="容易">容易</option>
-                                    <option value="中等">中等</option>
-                                    <option value="偏难">偏难</option>
-                                </select>
-                            </div>
-                            
-                            <div class="dropdown-container">
-                                <label for="question-count-select-sidebar">题数</label>
-                                <select id="question-count-select-sidebar" name="questionCount">
-                                    <option value="5">5</option>
-                                    <option value="10">10</option>
-                                    <option value="15">15</option>
-                                </select>
-                            </div>
-                            
-                            <button id="generate-btn-sidebar" class="action-button">出题</button>
+                            <!-- Remove these dropdown containers -->
                         </div>
                     </div>
-                    -->
                 </div>
                 
                 <!-- External AI Services -->
@@ -269,28 +234,5 @@
     </div>
     <!-- Load script at the end with defer -->
     <script src="script.js" defer></script>
-    <script>
-      // This runs after the page is fully loaded
-      window.addEventListener('load', function() {
-        // Wait a short time to make sure all dynamic elements are created
-        setTimeout(function() {
-          const generateBtn = document.getElementById('generate-btn');
-          if (generateBtn) {
-            console.log('Button found in inline script');
-            generateBtn.addEventListener('click', function() {
-              console.log('Button clicked');
-              // Try to call the function
-              if (typeof handleGenerateQuestionsClick === 'function') {
-                handleGenerateQuestionsClick();
-              } else {
-                alert('出题功能暂不可用, 请刷新页面重试.');
-              }
-            });
-          } else {
-            console.log('Button not found in inline script');
-          }
-        }, 500);
-      });
-    </script>
 </body>
 </html> 

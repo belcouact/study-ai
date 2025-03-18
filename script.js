@@ -5783,7 +5783,10 @@ function setupEventListeners() {
 // ... existing code ...
 
 function handleGenerateQuestionsClick() {
-    // Get values from the control panel dropdowns (not the sidebar ones)
+    // This function already exists in your code
+    // Make sure it's properly connected to the generate button
+    
+    // Get values from the dropdowns
     const subject = document.getElementById('subject-select').value;
     const semester = document.getElementById('semester-select').value;
     const difficulty = document.getElementById('difficulty-select').value;
@@ -5815,123 +5818,3 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // ... existing code ...
 });
-
-document.addEventListener('DOMContentLoaded', function() {
-    // ... existing code ...
-    
-    // Only set up event listeners if we're on the test page
-    if (document.getElementById('create-container')) {
-        setupEventListeners();
-    }
-    
-    // ... existing code ...
-});
-
-// Add this code near the bottom of your script.js file
-document.addEventListener('DOMContentLoaded', function() {
-    // This ensures the DOM is fully loaded before we try to access elements
-    setTimeout(() => {
-        const generateBtn = document.getElementById('generate-btn');
-        if (generateBtn) {
-            console.log('Generate button found');
-            generateBtn.addEventListener('click', function() {
-                // Call the appropriate handleGenerateQuestionsClick function
-                if (typeof handleGenerateQuestionsClick === 'function') {
-                    handleGenerateQuestionsClick();
-                } else {
-                    console.error('handleGenerateQuestionsClick function not found');
-                }
-            });
-        } else {
-            console.log('Generate button not found, might be on a different page');
-        }
-    }, 100); // Small delay to ensure all elements are loaded
-});
-
-// Add this at the end of your script.js file
-console.log('Script loaded');
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded');
-    
-    // Check if element exists
-    const generateBtn = document.getElementById('generate-btn');
-    console.log('Generate button found:', generateBtn);
-    
-    // Check if function exists
-    console.log('handleGenerateQuestionsClick exists:', typeof handleGenerateQuestionsClick === 'function');
-    
-    // Log all buttons on the page
-    const allButtons = document.querySelectorAll('button');
-    console.log('All buttons on page:', allButtons);
-    
-    // Check IDs of all buttons
-    allButtons.forEach(button => {
-        console.log('Button ID:', button.id);
-    });
-});
-
-// Add this code at the very end of your script.js file (after line 5785)
-
-// Independent event listener for the generate button
-(function() {
-    // Function to be executed when DOM is fully loaded
-    function onDOMLoaded() {
-        console.log("DOM fully loaded, setting up generate button");
-        
-        // Find the generate button
-        const generateBtn = document.getElementById('generate-btn');
-        
-        if (generateBtn) {
-            console.log("Generate button found, adding event listener");
-            
-            // Define a new click handler that calls the existing function
-            const clickHandler = function() {
-                console.log("Generate button clicked");
-                
-                // Find the function we want to call
-                if (typeof window.handleGenerateQuestionsClick === 'function') {
-                    window.handleGenerateQuestionsClick();
-                } else if (typeof handleGenerateQuestionsClick === 'function') {
-                    handleGenerateQuestionsClick();
-                } else {
-                    console.error("handleGenerateQuestionsClick function not found");
-                    
-                    // Fallback implementation
-                    const subject = document.getElementById('subject-select').value;
-                    const semester = document.getElementById('semester-select').value;
-                    const difficulty = document.getElementById('difficulty-select').value;
-                    const questionCount = document.getElementById('question-count-select').value;
-                    
-                    if (!subject || !semester || !difficulty || !questionCount) {
-                        alert('请选择所有选项');
-                        return;
-                    }
-                    
-                    alert('正在生成问题...');
-                    // Here you would normally call your question generation logic
-                }
-            };
-            
-            // Add the click event
-            generateBtn.addEventListener('click', clickHandler);
-        } else {
-            console.log("Generate button not found - are you on the correct page?");
-            
-            // Log all buttons to help debugging
-            const allButtons = document.querySelectorAll('button');
-            console.log("All buttons on the page:");
-            allButtons.forEach((btn, index) => {
-                console.log(`Button ${index}: id="${btn.id}", text="${btn.textContent.trim()}"`);
-            });
-        }
-    }
-    
-    // Check if DOM is already loaded
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", onDOMLoaded);
-    } else {
-        // DOM is already loaded
-        onDOMLoaded();
-    }
-})();
