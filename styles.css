@@ -911,7 +911,7 @@ button:active {
     transition: color 0.2s;
     margin-bottom: 0;
     white-space: nowrap;
-    min-width: 70px;
+    min-width: 50px;
 }
 
 .selector-group:hover label {
