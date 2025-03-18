@@ -1726,7 +1726,7 @@ function formatParagraph(paragraph) {
 function handleGenerateQuestionsClick() {
     console.log('handleGenerateQuestionsClick called');
     
-    // Get form elements - use the moved elements from top control panel
+    // Get form elements
     const schoolSelect = document.getElementById('school-select');
     const gradeSelect = document.getElementById('grade-select');
     const semesterSelect = document.getElementById('semester-select');
@@ -5812,62 +5812,61 @@ function setupEventListeners() {
     // ... existing code ...
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM content loaded');
+// Add this function to connect the generate button
+function setupGenerateButton() {
+    console.log('Setting up generate button');
     
-    // Check if we're on the test page by looking for key elements
-    const questionsContainer = document.getElementById('questions-display-container');
-    if (!questionsContainer) {
-        console.log('Not on the test page, skipping test page setup');
-        return;
-    }
-    
-    console.log('On test page, setting up generate button');
-    
-    // Check all possible button IDs that might be used
-    const possibleButtonIds = [
-        'generate-btn',
-        'generate-questions-btn',
-        'chuTi-btn',
-        'generateQuestions-btn'
-    ];
-    
-    let generateButton = null;
+    // Try multiple possible IDs for the generate button
+    const possibleButtonIds = ['generate-btn', 'generate-questions-btn', 'generateQuestionsButton'];
+    let generateBtn = null;
     
     for (const id of possibleButtonIds) {
-        const button = document.getElementById(id);
-        if (button) {
-            console.log(`Found button with ID: ${id}`);
-            generateButton = button;
+        const btn = document.getElementById(id);
+        if (btn) {
+            console.log(`Found generate button with ID: ${id}`);
+            generateBtn = btn;
             break;
         }
     }
     
-    // If we still can't find the button, try to get it by other means
-    if (!generateButton) {
-        console.log('Button not found by ID, trying to find by query selector');
-        // Try to find the button by its text content
+    if (!generateBtn) {
+        console.error('Could not find generate button with any known ID');
+        // Try to find by other attributes
         const buttons = document.querySelectorAll('button');
-        for (const button of buttons) {
-            if (button.textContent.includes('出题')) {
-                console.log('Found button with text: 出题');
-                generateButton = button;
+        for (const btn of buttons) {
+            if (btn.textContent.includes('出题')) {
+                console.log('Found generate button by text content');
+                generateBtn = btn;
                 break;
             }
         }
     }
     
-    if (generateButton) {
-        console.log('Successfully found generate button, attaching event listener');
-        generateButton.addEventListener('click', function() {
+    if (generateBtn) {
+        console.log('Attaching click event to generate button');
+        // Remove any existing event listeners to avoid duplicates
+        const newBtn = generateBtn.cloneNode(true);
+        generateBtn.parentNode.replaceChild(newBtn, generateBtn);
+        generateBtn = newBtn;
+        
+        generateBtn.addEventListener('click', function(e) {
             console.log('Generate button clicked');
-            if (typeof handleGenerateQuestionsClick === 'function') {
-                handleGenerateQuestionsClick();
-            } else {
-                console.error('handleGenerateQuestionsClick function not found');
-            }
+            e.preventDefault();
+            handleGenerateQuestionsClick();
         });
     } else {
-        console.error('Generate button not found by any method');
+        console.error('Failed to find the generate button by any method');
     }
+}
+
+// Modify the DOMContentLoaded event to call this function
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing code ...
+    
+    setupGenerateButton();
+    
+    // ... existing code ...
 });
+
+// Also call it directly in case DOMContentLoaded already fired
+setTimeout(setupGenerateButton, 1000);
