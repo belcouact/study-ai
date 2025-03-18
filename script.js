@@ -4,6 +4,9 @@ let currentModel = 'deepseek-r1';
 // Add global variable for current question index
 let currentQuestionIndex = 0;
 
+// Add this at the top of your script, after any document ready handlers
+console.log('Checking if vocabulary button exists:', document.getElementById('vocabulary-button'));
+
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
     console.log('Parsing questions from response:', response);
@@ -1787,7 +1790,7 @@ function handleGenerateQuestionsClick() {
 
     示例格式：
     题目：[题目内容]
-    A. [选项A内容]
+    A. [选项A内容] 
     B. [选项B内容] 
     C. [选项C内容]
     D. [选项D内容]
@@ -4275,6 +4278,27 @@ function getSimplifiedContextSummary() {
         
         // Poetry buttons
         setupPoetryButtons();
+
+        // Add event listener for vocabulary button
+        const vocabularyButton = document.getElementById('vocabulary-button');
+        const vocabularyContainer = document.getElementById('vocabulary-container');
+        
+        if (vocabularyButton) {
+            console.log('Found vocabulary button, adding event listener');
+            
+            vocabularyButton.addEventListener('click', function() {
+                console.log('Vocabulary button clicked');
+                switchPanel('vocabulary-container');
+            });
+        } else {
+            console.error('Vocabulary button not found in setupEventListeners');
+        }
+
+        // Add some debug logging at the beginning of the function
+        console.log('Setting up event listeners. Vocabulary button element:', 
+                    document.getElementById('vocabulary-button'));
+                
+        // ... rest of existing function ...
     }
 
 // ... existing code ...
@@ -6679,3 +6703,33 @@ function setupEventListeners() {
 }
 
 // ... existing code ...
+
+// Make sure init() calls setupEventListeners()
+function init() {
+    console.log('Initializing application');
+    
+    // Set up school dropdown change event
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    if (schoolSelect) {
+        populateSidebarGradeOptions(schoolSelect.value);
+        schoolSelect.addEventListener('change', function() {
+            populateSidebarGradeOptions(this.value);
+        });
+    }
+    
+    // Make sure event listeners are set up
+    setupEventListeners();
+    
+    // Initialize all tabs
+    initializeVocabularyTab();
+    
+    // ... rest of init function ...
+    
+    console.log('Initialization complete');
+}
+
+// Make sure the DOM content loaded event calls init()
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM content loaded, calling init()');
+    init();
+});
