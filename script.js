@@ -2868,18 +2868,18 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Populate subject dropdown
         const subjectSelectSidebar = document.getElementById('subject-select');
-        if (subjectSelectSidebar) {
-            subjectSelectSidebar.innerHTML = '';
+        if (subjectSelect) {
+            subjectSelect.innerHTML = '';
             subjectOptions.forEach(subject => {
                 const option = document.createElement('option');
                 option.value = subject;
                 option.textContent = subject;
-                subjectSelectSidebar.appendChild(option);
+                subjectSelect.appendChild(option);
             });
         }
         
         // Add change event listener to update dropdowns when school changes
-        schoolSelectSidebar.addEventListener('change', function() {
+        schoolSelect.addEventListener('change', function() {
             const school = this.value;
             
             // Define grade options based on school
@@ -2933,14 +2933,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Update subject dropdown
-            const subjectSelectSidebar = document.getElementById('subject-select-sidebar');
-            if (subjectSelectSidebar) {
-                subjectSelectSidebar.innerHTML = '';
+            const subjectSelect = document.getElementById('subject-select');
+            if (subjectSelect) {
+                subjectSelect.innerHTML = '';
                 subjectOptions.forEach(subject => {
                     const option = document.createElement('option');
                     option.value = subject;
                     option.textContent = subject;
-                    subjectSelectSidebar.appendChild(option);
+                    subjectSelect.appendChild(option);
                 });
             }
         });
