@@ -5733,13 +5733,13 @@ const subjectSelect = document.getElementById('subject-select');
 // Add event listener to the school select
 schoolSelect.addEventListener('change', function() {
     // Clear current subject options
-    subjectSelect.innerHTML = '<select id="subject-select" name="subject">';
+    // subjectSelect.innerHTML = '<select id="subject-select" name="subject">';
     
-    const selectedSchool = this.value;
-    if (!selectedSchool) return;
+    // const selectedSchool = this.value;
+    // if (!selectedSchool) return;
     
     // Populate subjects based on selected school
-    const subjects = getSubjectsForSchool(selectedSchool);
+    const subjects = getSubjectsForSchool(schoolSelect);
     
     subjects.forEach(subject => {
         const option = document.createElement('option');
