@@ -5046,7 +5046,11 @@ document.addEventListener('DOMContentLoaded', function() {
             handleLearnPoetryClick();
         }
     });
-    
+
+    // Get user's educational context
+    const school = document.getElementById('school-select-sidebar');
+    const grade = document.getElementById('grade-select-sidebar');
+
     // Update the prompt in handleLearnPoetryClick function to specifically request famous ancient poems
     const prompt = `请为${school}${grade}的学生推荐5首著名的古代${poetryType}，风格为${poetryStyle}。
     请选择中国文学史上最著名、最经典的作品，这些作品应该是真实存在的古代诗词，不要创作新的内容。
