@@ -6714,3 +6714,156 @@ function cleanJsonContent(content) {
     
     return cleanedContent;
 }
+
+async function fetchVocabularyWords(schoolLevel, gradeLevel) {
+    console.log('Fetching vocabulary words for school level:', schoolLevel, 'grade level:', gradeLevel);
+    
+    try {
+        // Show loading spinner
+        const emptyState = document.getElementById('vocabulary-empty-state');
+        const loadingSpinner = document.querySelector('.vocabulary-container .loading-spinner');
+        const wordDisplay = document.getElementById('word-display');
+        const navigationDiv = document.querySelector('.vocabulary-navigation');
+        
+        if (emptyState) emptyState.style.display = 'none';
+        if (loadingSpinner) loadingSpinner.style.display = 'block';
+        if (wordDisplay) wordDisplay.innerHTML = '';
+        if (navigationDiv) navigationDiv.style.display = 'none';
+        
+        // Create prompt for vocabulary generation
+        const promptText = `Generate 10 English vocabulary words appropriate for a ${schoolLevel} school student in grade ${gradeLevel}. 
+        For each word, provide:
+        1. English word
+        2. Pronunciation
+        3. English meaning
+        4. Chinese meaning
+        5. Related forms (noun, verb, adjective, etc.)
+        6. Example sentence using the word
+        7. Chinese translation of the example sentence
+        
+        Return your response as a valid JSON array with no markdown formatting or code blocks.`;
+        
+        // Call the fetchAIResponse function with the prompt
+        const response = await fetchAIResponse(promptText);
+        console.log('API response received for vocabulary');
+        
+        // Extract content from the API response
+        let content = extractContentFromResponse(response);
+        console.log('Extracted content length:', content.length);
+        
+        // Clean up the content by removing markdown code blocks
+        content = cleanJsonContent(content);
+        console.log('Cleaned content length:', content.length);
+        
+        let vocabularyWords = [];
+        
+        try {
+            // Try to parse the JSON response
+            vocabularyWords = JSON.parse(content);
+            console.log('Successfully parsed vocabulary words:', vocabularyWords.length, 'words found');
+        } catch (parseError) {
+            console.error('Error parsing vocabulary JSON from API response:', parseError);
+            
+            // If the first attempt fails, try to fix the JSON
+            try {
+                // Try to extract just the array portion using regex
+                const jsonArrayRegex = /\[\s*\{\s*"word"[\s\S]*\}\s*\]/;
+                const arrayMatch = content.match(jsonArrayRegex);
+                
+                if (arrayMatch && arrayMatch[0]) {
+                    const extractedJsonArray = arrayMatch[0];
+                    vocabularyWords = JSON.parse(extractedJsonArray);
+                    console.log('Successfully parsed JSON using regex extraction:', vocabularyWords.length, 'words found');
+                } else {
+                    throw new Error('Could not extract JSON array pattern');
+                }
+            } catch (secondError) {
+                console.error('Second parsing attempt failed:', secondError);
+                
+                // Try one more approach - line by line manual parsing
+                try {
+                    // Try to manually reconstruct the JSON from the content
+                    const manuallyFixedJson = manuallyFixJson(content);
+                    vocabularyWords = JSON.parse(manuallyFixedJson);
+                    console.log('Successfully parsed manually fixed JSON:', vocabularyWords.length, 'words found');
+                } catch (thirdError) {
+                    console.error('Third parsing attempt failed:', thirdError);
+                    console.log('Raw content for debugging:', content);
+                    showSystemMessage('词汇解析错误，请重试', 'error');
+                    throw new Error('Failed to parse vocabulary response');
+                }
+            }
+        }
+        
+        // Check if we got valid vocabulary words
+        if (!vocabularyWords || vocabularyWords.length === 0) {
+            throw new Error('No vocabulary words were returned');
+        }
+        
+        return vocabularyWords;
+        
+    } catch (error) {
+        console.error('Error fetching vocabulary words:', error);
+        showSystemMessage(`获取词汇失败: ${error.message}`, 'error');
+        throw error;
+    } finally {
+        // Hide loading spinner
+        const loadingSpinner = document.querySelector('.vocabulary-container .loading-spinner');
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
+    }
+}
+
+// Improved function to clean JSON content from markdown formatting
+function cleanJsonContent(content) {
+    // First check if the content is already valid JSON
+    try {
+        JSON.parse(content);
+        return content; // If it parses without error, return as is
+    } catch (e) {
+        // Not valid JSON, continue with cleaning
+    }
+    
+    // Remove markdown code blocks
+    let cleanedContent = content;
+    
+    // Look for JSON code blocks with backticks
+    const codeBlockRegex = /```(?:json|javascript)?\s*([\s\S]*?)```/i;
+    const match = cleanedContent.match(codeBlockRegex);
+    
+    if (match && match[1]) {
+        cleanedContent = match[1].trim();
+        console.log('Extracted JSON from code block');
+    }
+    
+    // Remove any trailing or leading whitespace
+    cleanedContent = cleanedContent.trim();
+    
+    return cleanedContent;
+}
+
+// Function to attempt manual JSON reconstruction for difficult cases
+function manuallyFixJson(content) {
+    // Remove all backticks and markdown indicators
+    let cleaned = content.replace(/```json|```|```javascript/g, '');
+    
+    // Trim whitespace
+    cleaned = cleaned.trim();
+    
+    // Make sure it starts with [ and ends with ]
+    if (!cleaned.startsWith('[')) {
+        cleaned = '[' + cleaned;
+    }
+    
+    if (!cleaned.endsWith(']')) {
+        cleaned = cleaned + ']';
+    }
+    
+    // Replace any cut-off portions with valid syntax
+    // This attempts to fix issues where the JSON might be truncated
+    cleaned = cleaned.replace(/,\s*$/, '');
+    cleaned = cleaned.replace(/,\s*\]$/, ']');
+    cleaned = cleaned.replace(/"\s*:/, '":');
+    
+    console.log('Manually fixed JSON:', cleaned.substring(0, 100) + '...');
+    return cleaned;
+}
