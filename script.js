@@ -4038,8 +4038,8 @@ function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, subm
                         <div class="error-message">
                             <i class="fas fa-exclamation-circle"></i>
                             抱歉，处理您的问题时出现了错误。请重试。
-                        </div>
-                    `;
+            </div>
+        `;
                     showSystemMessage('提交问题时出错，请重试。', 'error');
                 })
                 .finally(() => {
@@ -4289,22 +4289,18 @@ function getSimplifiedContextSummary() {
             vocabularyButton.addEventListener('click', function() {
                 console.log('Vocabulary button clicked');
                 
-                // Hide all other panels
-                const containers = ['qa-container', 'create-container', 'poetry-container'];
-                containers.forEach(containerId => {
-                    const container = document.getElementById(containerId);
-                    if (container) container.classList.add('hidden');
+                // Prevent any default behavior
+                event.preventDefault();
+                
+                // Use the common switchPanel function
+                switchPanel('vocabulary-container');
+                
+                // Update active states for buttons
+                [qaButton, createButton, poetryButton, vocabularyButton].forEach(btn => {
+                    if (btn) {
+                        btn.classList.remove('active');
+                    }
                 });
-                
-                // Show only vocabulary container
-                if (vocabularyContainer) {
-                    vocabularyContainer.classList.remove('hidden');
-                    console.log('Vocabulary container is now visible');
-                }
-                
-                // Update active button states
-                const buttons = document.querySelectorAll('.panel-button');
-                buttons.forEach(button => button.classList.remove('active'));
                 vocabularyButton.classList.add('active');
             });
             console.log('Event listener added to vocabulary button');
