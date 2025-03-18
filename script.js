@@ -5815,3 +5815,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // ... existing code ...
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing code ...
+    
+    // Only set up event listeners if we're on the test page
+    if (document.getElementById('create-container')) {
+        setupEventListeners();
+    }
+    
+    // ... existing code ...
+});
