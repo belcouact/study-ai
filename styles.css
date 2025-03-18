@@ -718,15 +718,20 @@ button:active {
     color: var(--text-color);
 }
 
-/* Navigation controls */
+/* Navigation controls - position at bottom of create page */
 .navigation-controls {
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
+    margin-top: auto;  /* Push to bottom of flex container */
     padding: 15px;
     background: white;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    order: 999;  /* Ensure it appears after all other elements */
+    position: sticky;
+    bottom: 0;
+    z-index: 90;  /* Lower than control panel but still above content */
+    margin-bottom: 10px;
 }
 
 .nav-button {
