@@ -23,6 +23,7 @@
                 <button id="qa-button" class="panel-button active">问答</button>
                 <button id="create-button" class="panel-button">测验</button>
                 <button id="poetry-button" class="panel-button">诗词</button>
+                <button class="tab-button" id="vocabulary-tab">单词</button>
                 
                 <!-- Dropdown Frames -->
                 <div class="dropdown-frames">
@@ -225,6 +226,44 @@
                                 <div class="poem-explanation"></div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulary Container -->
+            <div class="content-section" id="vocabulary-content" style="display: none;">
+                <div class="vocabulary-container">
+                    <div class="vocabulary-settings">
+                        <div class="form-group">
+                            <label for="school-level">School Level:</label>
+                            <select id="school-level">
+                                <option value="elementary">Elementary School</option>
+                                <option value="middle">Middle School</option>
+                                <option value="high">High School</option>
+                                <option value="college">College</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="grade-level">Grade:</label>
+                            <select id="grade-level">
+                                <option value="1">1st Grade</option>
+                                <option value="2">2nd Grade</option>
+                                <option value="3">3rd Grade</option>
+                                <option value="4">4th Grade</option>
+                                <option value="5">5th Grade</option>
+                                <option value="6">6th Grade</option>
+                            </select>
+                        </div>
+                        <button id="generate-vocabulary">Generate Vocabulary Words</button>
+                    </div>
+                    <div class="vocabulary-navigation" style="display: none;">
+                        <button id="prev-word">← Previous</button>
+                        <span id="word-counter">1 / 10</span>
+                        <button id="next-word">Next →</button>
+                    </div>
+                    <div id="vocabulary-result">
+                        <div class="loading-spinner" style="display: none;">Loading...</div>
+                        <div id="word-display"></div>
                     </div>
                 </div>
             </div>

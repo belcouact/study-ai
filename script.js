@@ -5900,3 +5900,307 @@ function loadPoemDetails(poem) {
 
 // If your code uses a different function to display poem details, 
 // ensure the sections are added and visible in that function instead.
+
+// Vocabulary tab functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const vocabularyTab = document.getElementById('vocabulary-tab');
+  const vocabularyContent = document.getElementById('vocabulary-content');
+  const generateButton = document.getElementById('generate-vocabulary');
+  const wordDisplay = document.getElementById('word-display');
+  const navigationDiv = document.querySelector('.vocabulary-navigation');
+  const prevButton = document.getElementById('prev-word');
+  const nextButton = document.getElementById('next-word');
+  const wordCounter = document.getElementById('word-counter');
+  const loadingSpinner = document.querySelector('.loading-spinner');
+  
+  let currentWordIndex = 0;
+  let vocabularyWords = [];
+  
+  // Add tab click functionality
+  vocabularyTab.addEventListener('click', function() {
+    // Hide all content sections
+    const contentSections = document.querySelectorAll('.content-section');
+    contentSections.forEach(section => {
+      section.style.display = 'none';
+    });
+    
+    // Show vocabulary content
+    vocabularyContent.style.display = 'block';
+    
+    // Mark this tab as active
+    const tabs = document.querySelectorAll('.tab-button');
+    tabs.forEach(tab => {
+      tab.classList.remove('active');
+    });
+    vocabularyTab.classList.add('active');
+  });
+  
+  // Generate vocabulary words
+  generateButton.addEventListener('click', function() {
+    const schoolLevel = document.getElementById('school-level').value;
+    const gradeLevel = document.getElementById('grade-level').value;
+    
+    // Show loading spinner
+    loadingSpinner.style.display = 'block';
+    wordDisplay.innerHTML = '';
+    navigationDiv.style.display = 'none';
+    
+    // Call the API to generate vocabulary words
+    fetchVocabularyWords(schoolLevel, gradeLevel);
+  });
+  
+  // Handle navigation buttons
+  prevButton.addEventListener('click', function() {
+    if (currentWordIndex > 0) {
+      currentWordIndex--;
+      displayCurrentWord();
+    }
+  });
+  
+  nextButton.addEventListener('click', function() {
+    if (currentWordIndex < vocabularyWords.length - 1) {
+      currentWordIndex++;
+      displayCurrentWord();
+    }
+  });
+  
+  // Function to fetch vocabulary words from DeepSeek API
+  async function fetchVocabularyWords(schoolLevel, gradeLevel) {
+    try {
+      // This is a placeholder for the actual API call
+      // In a real application, you would need to replace this with your actual API endpoint and authentication
+      
+      // IMPORTANT NOTE: You need to set up your own DeepSeek API key and endpoint
+      const apiUrl = 'https://api.deepseek.com/v1/chat/completions';  // Replace with actual DeepSeek API endpoint
+      const apiKey = 'YOUR_DEEPSEEK_API_KEY';  // Replace with your actual API key
+      
+      const promptText = `Generate 10 English vocabulary words appropriate for a ${schoolLevel} school student in grade ${gradeLevel}. 
+      For each word, provide:
+      1. English word
+      2. Pronunciation
+      3. English meaning
+      4. Chinese meaning
+      5. Related forms (noun, verb, adjective, etc.)
+      6. Example sentence using the word
+      7. Chinese translation of the example sentence
+      
+      Format the response as JSON with the following structure:
+      [
+        {
+          "word": "example",
+          "pronunciation": "/ɪɡˈzæmpəl/",
+          "englishMeaning": "a thing characteristic of its kind",
+          "chineseMeaning": "例子",
+          "partOfSpeech": "noun",
+          "relatedForms": "exemplary (adj), exemplify (v)",
+          "example": "This is an example of good writing.",
+          "exampleTranslation": "这是优秀写作的例子。"
+        },
+        ...
+      ]`;
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "deepseek-chat",
+          messages: [
+            {
+              role: "user",
+              content: promptText
+            }
+          ],
+          temperature: 0.7
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch vocabulary words');
+      }
+      
+      const data = await response.json();
+      
+      // Parse the response to get the vocabulary words
+      // This assumes the API returns the words in the JSON format requested in the prompt
+      // In a real implementation, you might need to adjust this based on actual API response
+      vocabularyWords = JSON.parse(data.choices[0].message.content);
+      
+      // For development/testing purposes, use mock data if API is not set up yet
+      if (!vocabularyWords || vocabularyWords.length === 0) {
+        vocabularyWords = getMockVocabularyWords();
+      }
+      
+      // Display the first word
+      currentWordIndex = 0;
+      displayCurrentWord();
+      navigationDiv.style.display = 'flex';
+      
+    } catch (error) {
+      console.error('Error fetching vocabulary words:', error);
+      wordDisplay.innerHTML = `<div class="error-message">Error: ${error.message}. Using sample data instead.</div>`;
+      
+      // Use mock data as fallback
+      vocabularyWords = getMockVocabularyWords();
+      currentWordIndex = 0;
+      displayCurrentWord();
+      navigationDiv.style.display = 'flex';
+    } finally {
+      loadingSpinner.style.display = 'none';
+    }
+  }
+  
+  // Function to display the current word
+  function displayCurrentWord() {
+    if (vocabularyWords.length === 0) return;
+    
+    const word = vocabularyWords[currentWordIndex];
+    wordCounter.textContent = `${currentWordIndex + 1} / ${vocabularyWords.length}`;
+    
+    // Update navigation button states
+    prevButton.disabled = currentWordIndex === 0;
+    nextButton.disabled = currentWordIndex === vocabularyWords.length - 1;
+    
+    // Create the word card
+    const wordCardHTML = `
+      <div class="word-card active">
+        <div class="word-header">
+          <h2 class="word-title">${word.word}</h2>
+          <span class="pronunciation">${word.pronunciation}</span>
+        </div>
+        
+        <div class="meaning-section">
+          <div class="english-meaning">
+            <strong>English Meaning:</strong> ${word.englishMeaning}
+          </div>
+          <div class="chinese-meaning">
+            <strong>Chinese Meaning:</strong> ${word.chineseMeaning}
+          </div>
+          <div class="parts-of-speech">
+            <span class="part-of-speech">${word.partOfSpeech}</span>
+            <span>${word.relatedForms}</span>
+          </div>
+        </div>
+        
+        <div class="example-section">
+          <div class="english-example">
+            <strong>Example:</strong> ${word.example}
+          </div>
+          <div class="chinese-translation">
+            <strong>Translation:</strong> ${word.exampleTranslation}
+          </div>
+        </div>
+      </div>
+    `;
+    
+    wordDisplay.innerHTML = wordCardHTML;
+  }
+  
+  // Function to generate mock vocabulary words for testing
+  function getMockVocabularyWords() {
+    return [
+      {
+        "word": "abundant",
+        "pronunciation": "/əˈbʌn.dənt/",
+        "englishMeaning": "existing in large quantities; more than enough",
+        "chineseMeaning": "丰富的，充裕的",
+        "partOfSpeech": "adjective",
+        "relatedForms": "abundance (n), abundantly (adv)",
+        "example": "The region has abundant natural resources.",
+        "exampleTranslation": "该地区拥有丰富的自然资源。"
+      },
+      {
+        "word": "diligent",
+        "pronunciation": "/ˈdɪl.ɪ.dʒənt/",
+        "englishMeaning": "having or showing care and conscientiousness in one's work or duties",
+        "chineseMeaning": "勤奋的，勤勉的",
+        "partOfSpeech": "adjective",
+        "relatedForms": "diligence (n), diligently (adv)",
+        "example": "She's a diligent student who always completes her homework on time.",
+        "exampleTranslation": "她是一个勤奋的学生，总是按时完成作业。"
+      },
+      {
+        "word": "persevere",
+        "pronunciation": "/ˌpɜː.səˈvɪər/",
+        "englishMeaning": "to continue trying to do something despite difficulties",
+        "chineseMeaning": "坚持，毅力",
+        "partOfSpeech": "verb",
+        "relatedForms": "perseverance (n), persevering (adj)",
+        "example": "If you persevere with your studies, you will succeed eventually.",
+        "exampleTranslation": "如果你坚持学习，最终你会成功的。"
+      },
+      {
+        "word": "eloquent",
+        "pronunciation": "/ˈel.ə.kwənt/",
+        "englishMeaning": "fluent or persuasive in speaking or writing",
+        "chineseMeaning": "雄辩的，流利的",
+        "partOfSpeech": "adjective",
+        "relatedForms": "eloquence (n), eloquently (adv)",
+        "example": "She gave an eloquent speech that moved the entire audience.",
+        "exampleTranslation": "她发表了一篇雄辩的演讲，感动了全体观众。"
+      },
+      {
+        "word": "benevolent",
+        "pronunciation": "/bəˈnev.əl.ənt/",
+        "englishMeaning": "well meaning and kindly",
+        "chineseMeaning": "仁慈的，慈善的",
+        "partOfSpeech": "adjective",
+        "relatedForms": "benevolence (n), benevolently (adv)",
+        "example": "The benevolent king was loved by all his subjects.",
+        "exampleTranslation": "这位仁慈的国王受到所有臣民的爱戴。"
+      },
+      {
+        "word": "meticulous",
+        "pronunciation": "/məˈtɪk.jə.ləs/",
+        "englishMeaning": "showing great attention to detail; very careful and precise",
+        "chineseMeaning": "一丝不苟的，严谨的",
+        "partOfSpeech": "adjective",
+        "relatedForms": "meticulousness (n), meticulously (adv)",
+        "example": "The scientist was meticulous in recording his experimental results.",
+        "exampleTranslation": "这位科学家一丝不苟地记录他的实验结果。"
+      },
+      {
+        "word": "pragmatic",
+        "pronunciation": "/præɡˈmæt.ɪk/",
+        "englishMeaning": "dealing with things sensibly and realistically in a way that is based on practical rather than theoretical considerations",
+        "chineseMeaning": "务实的，实用主义的",
+        "partOfSpeech": "adjective",
+        "relatedForms": "pragmatism (n), pragmatically (adv)",
+        "example": "We need a pragmatic approach to solve this problem.",
+        "exampleTranslation": "我们需要一种务实的方法来解决这个问题。"
+      },
+      {
+        "word": "resilient",
+        "pronunciation": "/rɪˈzɪl.i.ənt/",
+        "englishMeaning": "able to withstand or recover quickly from difficult conditions",
+        "chineseMeaning": "有弹性的，能恢复的",
+        "partOfSpeech": "adjective",
+        "relatedForms": "resilience (n), resiliently (adv)",
+        "example": "Children are often more resilient than adults when facing challenges.",
+        "exampleTranslation": "在面对挑战时，孩子们通常比成年人更有韧性。"
+      },
+      {
+        "word": "innovative",
+        "pronunciation": "/ˈɪn.ə.veɪ.tɪv/",
+        "englishMeaning": "featuring new methods; advanced and original",
+        "chineseMeaning": "创新的，革新的",
+        "partOfSpeech": "adjective",
+        "relatedForms": "innovation (n), innovate (v)",
+        "example": "The company is known for its innovative approach to product design.",
+        "exampleTranslation": "该公司以其产品设计的创新方法而闻名。"
+      },
+      {
+        "word": "ambiguous",
+        "pronunciation": "/æmˈbɪɡ.ju.əs/",
+        "englishMeaning": "open to more than one interpretation; having a double meaning",
+        "chineseMeaning": "模棱两可的，不明确的",
+        "partOfSpeech": "adjective",
+        "relatedForms": "ambiguity (n), ambiguously (adv)",
+        "example": "His ambiguous response left us wondering what he really meant.",
+        "exampleTranslation": "他模棱两可的回答让我们疑惑他真正的意思是什么。"
+      }
+    ];
+  }
+});
