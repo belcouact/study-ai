@@ -4333,8 +4333,11 @@ function getSimplifiedContextSummary() {
         }
         
         // Get poetry type and style
-        const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
-        const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
+        // const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
+        // const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
+        // Add event listener for poetry type dropdown
+        const poetryType = document.getElementById('poetry-type');
+        const poetryStyle = document.getElementById('poetry-style');
         
         console.log(`Generating poems for: ${school} ${grade}, Type: ${poetryType}, Style: ${poetryStyle}`);
         
