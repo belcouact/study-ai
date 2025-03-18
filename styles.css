@@ -42,6 +42,7 @@ body {
     flex: 1;
     display: flex;
     justify-content: center;
+    padding-top: 20px;
 }
 
 .content-area.full-width {
@@ -647,6 +648,8 @@ button:active {
     width: 100%;
     margin-bottom: 20px;
     flex: 1;
+    position: relative;
+    z-index: 10;
 }
 
 #question-navigation {
@@ -820,6 +823,8 @@ button:active {
     padding: 20px;
     min-height: calc(100vh - 60px);
     position: relative;
+    height: auto;
+    overflow: visible;
 }
 
 /* Loading indicator for tests */
@@ -1246,7 +1251,7 @@ button:active {
     position: relative;
 }
 
-/* Control panel - fixed at top when scrolling */
+/* Control panel - scroll with page but stick at top when scrolled to */
 .control-panel {
     position: sticky;
     top: 0;
@@ -1262,15 +1267,35 @@ button:active {
     align-items: center;
     transition: all 0.3s ease;
     order: -1;
+    width: 100%;
 }
 
-/* Create container adjustments to work with sticky elements */
+/* Create container adjustments */
 #create-container {
     display: flex;
     flex-direction: column;
     padding: 20px;
     min-height: calc(100vh - 60px);
     position: relative;
+    height: auto;
+    overflow: visible;
+}
+
+/* Add some padding at the top of the content area */
+.content-area {
+    padding-top: 20px;
+    overflow-y: auto;
+}
+
+/* Ensure no overflow hidden in parent containers */
+.container, .app-container, body {
+    overflow: visible;
+}
+
+/* Fix z-index stacking for proper sticky behavior */
+.questions-display-container {
+    position: relative;
+    z-index: 10;
 }
 
 /* Fix navigation controls at the bottom while scrolling */
@@ -1291,26 +1316,6 @@ button:active {
 
 .navigation-controls:hover {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
-
-/* Ensure proper spacing between elements */
-.questions-display-container {
-    order: 2;
-    margin-bottom: 70px; /* Add space for the navigation controls */
-    flex: 1;
-}
-
-/* Add padding to the bottom of the page for better scrolling experience */
-#create-container::after {
-    content: '';
-    display: block;
-    height: 20px;
-    order: 4;
-}
-
-/* Make sure elements maintain proper order */
-.empty-state {
-    order: 1;
 }
 
 /* Style dropdowns more attractively */
@@ -1364,15 +1369,6 @@ button:active {
 .control-panel button:active {
     transform: translateY(0);
     box-shadow: 0 1px 2px rgba(76, 175, 80, 0.3);
-}
-
-/* Adjust the questions display container to have proper spacing */
-.questions-display-container {
-    margin-top: 15px;
-}
-
-.question-container {
-    margin-top: 20px;
 }
 
 /* Enhance loading indicator */
