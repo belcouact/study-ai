@@ -5729,10 +5729,11 @@ document.addEventListener('DOMContentLoaded', function() {
 const schoolSelect = document.getElementById('school-select');
 const subjectSelect = document.getElementById('subject-select');
 
+
 // Add event listener to the school select
 schoolSelect.addEventListener('change', function() {
     // Clear current subject options
-    subjectSelect.innerHTML = '<option value="">选择科目</option>';
+    subjectSelect.innerHTML = '<select id="subject-select" name="subject">';
     
     const selectedSchool = this.value;
     if (!selectedSchool) return;
@@ -5748,6 +5749,8 @@ schoolSelect.addEventListener('change', function() {
     });
 });
 
+
+/*
 // Function to get subjects for a specific school
 function getSubjectsForSchool(school) {
     // Define subjects for each school
@@ -5759,6 +5762,7 @@ function getSubjectsForSchool(school) {
     
     return schoolSubjects[school] || [];
 }
+*/
 
 // Initialize the subject dropdown if school is already selected on page load
 document.addEventListener('DOMContentLoaded', function() {

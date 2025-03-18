@@ -106,25 +106,30 @@
             <div id="create-container" class="container hidden">
                 <!-- Add control panel at the top -->
                 <div class="control-panel">
-                    <select id="subject-select">
-                        <option value="语文">语文</option>
-                        <option value="数学">数学</option>
-                        <option value="英语">英语</option>
+                    <label for="subject-selectr">科目</label>
+                    <select id="subject-select" name="subject">
+                        <!-- Options will be populated dynamically -->
                     </select>
+
+                    <label for="semester-select">学期</label>
                     <select id="semester-select">
                         <option value="上学期">上学期</option>
                         <option value="下学期">下学期</option>
                     </select>
-                    <select id="difficulty-select">
-                        <option value="容易">容易</option>
-                        <option value="中等">中等</option>
-                        <option value="偏难">偏难</option>
-                    </select>
-                    <select id="question-count-select">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                    </select>
+
+                    <label for="difficulty-select">难度</label>
+                        <select id="difficulty-select">
+                            <option value="容易">容易</option>
+                            <option value="中等">中等</option>
+                            <option value="偏难">偏难</option>
+                        </select>
+
+                        <label for="question-count-select">题数</label>
+                        <select id="question-count-select">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                        </select>
                     <button id="generate-btn">出题</button>
                 </div>
 
