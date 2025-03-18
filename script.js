@@ -1733,7 +1733,7 @@ function handleGenerateQuestionsClick() {
     const subjectSelect = document.getElementById('subject-select-sidebar');
     const difficultySelect = document.getElementById('difficulty-select-sidebar');
     const questionCountSelect = document.getElementById('question-count-select-sidebar');
-    const generateQuestionsButton = document.querySelector('.sidebar-generate-button');
+    //const generateQuestionsButton = document.querySelector('.sidebar-generate-button');
     const questionsDisplayContainer = document.getElementById('questions-display-container');
     const emptyState = document.getElementById('empty-state');
     
@@ -2490,6 +2490,7 @@ function initializeFormLayout() {
         });
     }
     
+    /*
     // Set up event listeners for the sidebar generate button
     const sidebarGenerateButton = document.getElementById('sidebar-generate-button');
     if (sidebarGenerateButton) {
@@ -2503,7 +2504,8 @@ function initializeFormLayout() {
             handleGenerateQuestionsClick();
         });
     }
-    
+    */
+
     // Add event listeners for the optimize and submit buttons
     setupOptimizeAndSubmitButtons();
 }
@@ -2945,6 +2947,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Add click handler for sidebar generate button
+    /*
     const sidebarGenerateButton = document.createElement('button');
     sidebarGenerateButton.textContent = '出题';
     sidebarGenerateButton.className = 'sidebar-generate-button';
@@ -2958,6 +2961,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Then generate questions
         handleGenerateQuestionsClick();
     });
+    */
     
     // Add the button to the second frame
     const testFrame = document.querySelector('.sidebar-frame:nth-child(2) .frame-content');
@@ -5768,6 +5772,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ... existing code ...
 
 // Add event listener to the generate button
+/*
 function setupEventListeners() {
     // ... existing code ...
     
@@ -5779,6 +5784,7 @@ function setupEventListeners() {
     
     // ... existing code ...
 }
+*/
 
 // ... existing code ...
 
