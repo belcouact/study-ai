@@ -1097,6 +1097,8 @@ button:active {
     border-left: 4px solid var(--poetry-accent, #8e44ad);
     position: relative;
     overflow: hidden;
+    display: block !important;
+    opacity: 1 !important;
 }
 
 .poem-section:hover {
@@ -1107,9 +1109,10 @@ button:active {
 .poem-section h3 {
     font-size: 1.3rem;
     color: var(--poetry-accent, #8e44ad);
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
     position: relative;
-    padding-bottom: 8px;
+    padding-bottom: 10px;
+    font-weight: 600;
 }
 
 .poem-section h3::after {
@@ -1123,10 +1126,28 @@ button:active {
     border-radius: 2px;
 }
 
-.poem-background, .poem-explanation {
+.poem-background-section, 
+.poem-analysis-section {
+    display: block !important;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.poem-background-section h3::before {
+    content: "📜 ";
+}
+
+.poem-analysis-section h3::before {
+    content: "✨ ";
+}
+
+.poem-background, 
+.poem-explanation {
     font-size: 1.05rem;
     line-height: 1.8;
     color: #34495e;
+    display: block !important;
+    opacity: 1 !important;
 }
 
 /* Add subtle decorative element */

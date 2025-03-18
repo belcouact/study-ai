@@ -4352,7 +4352,7 @@ function getSimplifiedContextSummary() {
             loadingIndicator.id = 'poetry-loading';
             loadingIndicator.innerHTML = `
                 <div class="spinner"></div>
-                <p>正在查找适合${school}${grade}学生的经典${poetryType}，风格为${poetryStyle}...</p>
+                <p>十里走马正疾驰，五里扬鞭未敢停 --- 加速生成中...</p>
             `;
             loadingIndicator.style.display = 'flex';
             loadingIndicator.style.flexDirection = 'column';
@@ -5855,3 +5855,48 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(section);
     });
 });
+
+// Fix poem sections display in the loadPoemDetails function
+function loadPoemDetails(poem) {
+    // ... existing code ...
+    
+    // Make sure the background and analysis sections are created and populated
+    const poemDisplay = document.querySelector('.poem-display') || document.getElementById('poem-display');
+    
+    // Check if background section exists, create if not
+    let backgroundSection = document.querySelector('.poem-background-section');
+    if (!backgroundSection) {
+        backgroundSection = document.createElement('div');
+        backgroundSection.className = 'poem-section poem-background-section';
+        poemDisplay.parentNode.insertBefore(backgroundSection, poemDisplay.nextSibling);
+    }
+    
+    // Populate background section
+    backgroundSection.innerHTML = `
+        <h3>创作背景</h3>
+        <div class="poem-background">${poem.background || '暂无创作背景信息'}</div>
+    `;
+    
+    // Check if analysis section exists, create if not
+    let analysisSection = document.querySelector('.poem-analysis-section');
+    if (!analysisSection) {
+        analysisSection = document.createElement('div');
+        analysisSection.className = 'poem-section poem-analysis-section';
+        backgroundSection.parentNode.insertBefore(analysisSection, backgroundSection.nextSibling);
+    }
+    
+    // Populate analysis section
+    analysisSection.innerHTML = `
+        <h3>赏析</h3>
+        <div class="poem-explanation">${poem.analysis || '暂无赏析信息'}</div>
+    `;
+    
+    // Make sections visible
+    backgroundSection.style.display = 'block';
+    analysisSection.style.display = 'block';
+    
+    // ... rest of existing code ...
+}
+
+// If your code uses a different function to display poem details, 
+// ensure the sections are added and visible in that function instead.
