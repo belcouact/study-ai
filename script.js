@@ -5811,3 +5811,63 @@ function setupEventListeners() {
     
     // ... existing code ...
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM content loaded');
+    
+    // Check if we're on the test page by looking for key elements
+    const questionsContainer = document.getElementById('questions-display-container');
+    if (!questionsContainer) {
+        console.log('Not on the test page, skipping test page setup');
+        return;
+    }
+    
+    console.log('On test page, setting up generate button');
+    
+    // Check all possible button IDs that might be used
+    const possibleButtonIds = [
+        'generate-btn',
+        'generate-questions-btn',
+        'chuTi-btn',
+        'generateQuestions-btn'
+    ];
+    
+    let generateButton = null;
+    
+    for (const id of possibleButtonIds) {
+        const button = document.getElementById(id);
+        if (button) {
+            console.log(`Found button with ID: ${id}`);
+            generateButton = button;
+            break;
+        }
+    }
+    
+    // If we still can't find the button, try to get it by other means
+    if (!generateButton) {
+        console.log('Button not found by ID, trying to find by query selector');
+        // Try to find the button by its text content
+        const buttons = document.querySelectorAll('button');
+        for (const button of buttons) {
+            if (button.textContent.includes('出题')) {
+                console.log('Found button with text: 出题');
+                generateButton = button;
+                break;
+            }
+        }
+    }
+    
+    if (generateButton) {
+        console.log('Successfully found generate button, attaching event listener');
+        generateButton.addEventListener('click', function() {
+            console.log('Generate button clicked');
+            if (typeof handleGenerateQuestionsClick === 'function') {
+                handleGenerateQuestionsClick();
+            } else {
+                console.error('handleGenerateQuestionsClick function not found');
+            }
+        });
+    } else {
+        console.error('Generate button not found by any method');
+    }
+});
