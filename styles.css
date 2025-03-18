@@ -864,10 +864,10 @@ button:active {
 }
 
 .poetry-header {
-    padding: 1.5rem;
+    padding: 20px;
+    margin-bottom: 30px;
     border-radius: 10px;
     background-color: #f8f9fa;
-    margin-bottom: 2rem;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -885,25 +885,28 @@ button:active {
 
 .poetry-selectors {
     display: flex;
-    align-items: center;
     flex-wrap: wrap;
-    gap: 1.2rem;
-    margin-bottom: 1rem;
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
 .selector-group {
     position: relative;
     display: flex;
-    flex-direction: column;
-    min-width: 160px;
+    flex-direction: row;
+    align-items: center;
+    min-width: 220px;
+    gap: 10px;
 }
 
 .selector-group label {
     font-weight: 600;
     color: #2c3e50;
-    margin-bottom: 0.5rem;
     font-size: 0.9rem;
     transition: color 0.2s;
+    margin-bottom: 0;
+    white-space: nowrap;
+    min-width: 70px;
 }
 
 .selector-group:hover label {
@@ -911,6 +914,7 @@ button:active {
 }
 
 .poetry-select {
+    flex: 1;
     padding: 10px 14px;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
@@ -938,6 +942,8 @@ button:active {
 }
 
 .poetry-button {
+    margin-top: 15px;
+    margin-left: auto;
     padding: 12px 24px;
     background-color: var(--poetry-accent, #8e44ad);
     color: white;
@@ -948,8 +954,6 @@ button:active {
     font-weight: 500;
     transition: all 0.3s;
     box-shadow: 0 2px 6px rgba(142, 68, 173, 0.4);
-    align-self: flex-end;
-    margin-left: auto;
 }
 
 .poetry-button:hover {
@@ -1165,15 +1169,17 @@ button:active {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .poetry-selectors {
-        flex-direction: column;
-        align-items: flex-start;
+    .selector-group {
+        flex-direction: row; /* Keep it as row even on mobile */
+        width: 100%;
     }
     
-    .poetry-button {
-        margin-left: 0;
-        margin-top: 0.5rem;
-        width: 100%;
+    .selector-group label {
+        min-width: 60px;
+    }
+    
+    .poetry-select {
+        flex: 1;
     }
     
     .poem-display {
