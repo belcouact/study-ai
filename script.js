@@ -5826,3 +5826,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // ... existing code ...
 });
+
+// Add this code near the bottom of your script.js file
+document.addEventListener('DOMContentLoaded', function() {
+    // This ensures the DOM is fully loaded before we try to access elements
+    setTimeout(() => {
+        const generateBtn = document.getElementById('generate-btn');
+        if (generateBtn) {
+            console.log('Generate button found');
+            generateBtn.addEventListener('click', function() {
+                // Call the appropriate handleGenerateQuestionsClick function
+                if (typeof handleGenerateQuestionsClick === 'function') {
+                    handleGenerateQuestionsClick();
+                } else {
+                    console.error('handleGenerateQuestionsClick function not found');
+                }
+            });
+        } else {
+            console.log('Generate button not found, might be on a different page');
+        }
+    }, 100); // Small delay to ensure all elements are loaded
+});
