@@ -6733,3 +6733,115 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM content loaded, calling init()');
     init();
 });
+
+// Update the fetchVocabularyWords function to match fetchAIResponse
+async function fetchVocabularyWords(schoolLevel, gradeLevel) {
+    console.log('Fetching vocabulary words for school level:', schoolLevel, 'grade level:', gradeLevel);
+    
+    try {
+        // Show loading spinner
+        const emptyState = document.getElementById('vocabulary-empty-state');
+        const loadingSpinner = document.querySelector('.vocabulary-container .loading-spinner');
+        const wordDisplay = document.getElementById('word-display');
+        const navigationDiv = document.querySelector('.vocabulary-navigation');
+        
+        if (emptyState) emptyState.style.display = 'none';
+        if (loadingSpinner) loadingSpinner.style.display = 'block';
+        if (wordDisplay) wordDisplay.innerHTML = '';
+        if (navigationDiv) navigationDiv.style.display = 'none';
+        
+        // Create prompt for vocabulary generation
+        const promptText = `Generate 10 English vocabulary words appropriate for a ${schoolLevel} school student in grade ${gradeLevel}. 
+        For each word, provide:
+        1. English word
+        2. Pronunciation
+        3. English meaning
+        4. Chinese meaning
+        5. Related forms (noun, verb, adjective, etc.)
+        6. Example sentence using the word
+        7. Chinese translation of the example sentence
+        
+        Format the response as JSON with the following structure:
+        [
+          {
+            "word": "example",
+            "pronunciation": "/ɪɡˈzæmpəl/",
+            "englishMeaning": "a thing characteristic of its kind",
+            "chineseMeaning": "例子",
+            "partOfSpeech": "noun",
+            "relatedForms": "exemplary (adj), exemplify (v)",
+            "example": "This is an example of good writing.",
+            "exampleTranslation": "这是优秀写作的例子。"
+          },
+          ...
+        ]`;
+        
+        // Make the actual API call using the current API function and model
+        const apiEndpoint = `/api/${currentApiFunction}`;
+        const response = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                messages: [
+                    {
+                        role: "user",
+                        content: promptText
+                    }
+                ],
+                model: currentModel,
+                temperature: 0.7,
+                max_tokens: 2000
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API response error: ${response.status}`);
+        }
+        
+        // Get the response data
+        const data = await response.json();
+        
+        // Extract the content from the API response
+        const content = extractContentFromResponse(data);
+        
+        try {
+            // Try to parse the JSON response
+            vocabularyWords = JSON.parse(content);
+            console.log('Successfully parsed vocabulary words:', vocabularyWords);
+        } catch (parseError) {
+            console.error('Error parsing vocabulary JSON from API response:', parseError);
+            console.log('Raw API response content:', content);
+            
+            // If JSON parsing fails, use mock data
+            vocabularyWords = getMockVocabularyWords();
+            showSystemMessage('词汇解析错误，使用样本数据', 'warning');
+        }
+        
+        // Display the first word
+        if (vocabularyWords && vocabularyWords.length > 0) {
+            currentWordIndex = 0;
+            displayCurrentWord();
+            if (navigationDiv) navigationDiv.style.display = 'flex';
+        } else {
+            throw new Error('No vocabulary words were returned');
+        }
+        
+    } catch (error) {
+        console.error('Error fetching vocabulary words:', error);
+        showSystemMessage(`获取词汇失败: ${error.message}`, 'error');
+        
+        // Use mock data as fallback
+        vocabularyWords = getMockVocabularyWords();
+        currentWordIndex = 0;
+        displayCurrentWord();
+        
+        const navigationDiv = document.querySelector('.vocabulary-navigation');
+        if (navigationDiv) navigationDiv.style.display = 'flex';
+    } finally {
+        // Hide loading spinner
+        const loadingSpinner = document.querySelector('.vocabulary-container .loading-spinner');
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
+    }
+}
