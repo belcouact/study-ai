@@ -1726,19 +1726,18 @@ function formatParagraph(paragraph) {
 function handleGenerateQuestionsClick() {
     console.log('handleGenerateQuestionsClick called');
     
-    // Get form elements from sidebar
-    const schoolSelect = document.getElementById('school-select-sidebar');
-    const gradeSelect = document.getElementById('grade-select-sidebar');
+    // Get form elements - use the moved elements from top control panel
+    const schoolSelect = document.getElementById('school-select');
+    const gradeSelect = document.getElementById('grade-select');
     const semesterSelect = document.getElementById('semester-select');
     const subjectSelect = document.getElementById('subject-select');
     const difficultySelect = document.getElementById('difficulty-select');
     const questionCountSelect = document.getElementById('question-count-select');
-    //const generateQuestionsButton = document.querySelector('.sidebar-generate-button');
     const questionsDisplayContainer = document.getElementById('questions-display-container');
     const emptyState = document.getElementById('empty-state');
     
     if (!schoolSelect || !gradeSelect || !semesterSelect || !subjectSelect || 
-        !difficultySelect || !questionCountSelect || !generateQuestionsButton) {
+        !difficultySelect || !questionCountSelect) {
         console.error('One or more form elements not found');
         return;
     }
@@ -5749,7 +5748,11 @@ function setupEventListeners() {
     console.log('generate-btn clicked');
 
     if (generateBtn) {
+        console.log('Setting up generate button event listener');
         generateBtn.addEventListener('click', handleGenerateQuestionsClick);
+    } else {
+        console.error('Generate button not found');
     }
     
+    // ... existing code ...
 }
