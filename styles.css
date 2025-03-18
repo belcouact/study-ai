@@ -1760,4 +1760,62 @@ button:active {
 
 .poetry-header.scrolled {
     animation: stickyAppear 0.3s forwards;
+}
+
+/* SVG Generate Button Styling */
+.svg-button-container {
+    display: flex;
+    margin-top: 10px;
+    padding: 0 15px;
+}
+
+.svg-generate-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background-color: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(99, 102, 241, 0.3);
+}
+
+.svg-generate-button:hover {
+    background-color: #4f46e5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(99, 102, 241, 0.4);
+}
+
+.svg-generate-button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3);
+}
+
+.svg-generate-button svg {
+    transition: transform 0.3s ease;
+}
+
+.svg-generate-button:hover svg {
+    transform: rotate(180deg);
+}
+
+/* SVG Loading Indicator */
+.svg-loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: svg-spin 1s linear infinite;
+}
+
+@keyframes svg-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 } 

@@ -2218,30 +2218,30 @@ window.extractContentFromResponse = extractContentFromResponse;
 
 // Function to show system messages
 function showSystemMessage(message, type = 'info') {
-    console.log('\n', message);
+    const messageContainer = document.getElementById('system-message-container') || 
+                            document.createElement('div');
     
-    const container = document.querySelector('.questions-container');
-    if (!container) {
-        console.error('System message container not found');
-        return; // Exit the function if container doesn't exist
+    if (!document.getElementById('system-message-container')) {
+        messageContainer.id = 'system-message-container';
+        messageContainer.style.position = 'fixed';
+        messageContainer.style.top = '20px';
+        messageContainer.style.right = '20px';
+        messageContainer.style.zIndex = '1000';
+        document.body.appendChild(messageContainer);
     }
     
     const messageElement = document.createElement('div');
     messageElement.className = `system-message ${type}`;
     messageElement.textContent = message;
     
-    // Check if container has a firstChild before using insertBefore
-    if (container.firstChild) {
-        container.insertBefore(messageElement, container.firstChild);
-    } else {
-        container.appendChild(messageElement); // Use appendChild if there's no firstChild
-    }
+    messageContainer.appendChild(messageElement);
     
-    // Auto-remove the message after 5 seconds
+    // Auto remove after 5 seconds
     setTimeout(() => {
-        if (messageElement.parentNode) {
-            messageElement.remove();
-        }
+        messageElement.style.opacity = '0';
+        setTimeout(() => {
+            messageContainer.removeChild(messageElement);
+        }, 300);
     }, 5000);
 }
 
@@ -5900,3 +5900,208 @@ function loadPoemDetails(poem) {
 
 // If your code uses a different function to display poem details, 
 // ensure the sections are added and visible in that function instead.
+
+// SVG Generation functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const generateSvgBtn = document.getElementById('generate-svg-btn');
+    const chatInput = document.querySelector('.chat-input'); // Adjust selector if needed
+    
+    if (generateSvgBtn && chatInput) {
+        generateSvgBtn.addEventListener('click', function() {
+            const inputText = chatInput.value.trim();
+            
+            if (!inputText) {
+                showSystemMessage('请输入要生成SVG的描述内容', 'error');
+                return;
+            }
+            
+            generateSVGFromText(inputText);
+        });
+    }
+});
+
+// Function to generate SVG from text using DeepSeek API
+async function generateSVGFromText(text) {
+    // Show loading state
+    const generateSvgBtn = document.getElementById('generate-svg-btn');
+    const originalButtonContent = generateSvgBtn.innerHTML;
+    generateSvgBtn.innerHTML = '<span class="svg-loading"></span> 生成中...';
+    generateSvgBtn.disabled = true;
+    
+    try {
+        // Call to DeepSeek API
+        const response = await fetch('https://api.deepseek.com/v1/svg/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer YOUR_DEEPSEEK_API_KEY' // Replace with your actual API key
+            },
+            body: JSON.stringify({
+                prompt: text,
+                style: 'modern', // Adjust parameters as needed
+                format: 'svg'
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API responded with status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data && data.svg) {
+            // Display SVG in a new window
+            displaySVG(data.svg);
+            showSystemMessage('SVG生成成功！', 'success');
+        } else {
+            throw new Error('No SVG returned from API');
+        }
+    } catch (error) {
+        console.error('Error generating SVG:', error);
+        showSystemMessage(`SVG生成失败: ${error.message}`, 'error');
+    } finally {
+        // Reset button state
+        generateSvgBtn.innerHTML = originalButtonContent;
+        generateSvgBtn.disabled = false;
+    }
+}
+
+// Function to display SVG in a new window
+function displaySVG(svgCode) {
+    const newWindow = window.open('', '_blank');
+    
+    if (!newWindow) {
+        showSystemMessage('弹出窗口被阻止，请允许弹出窗口后重试', 'error');
+        return;
+    }
+    
+    // Create HTML content for the new window
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="zh">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SVG 图像预览</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 20px;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background-color: #f9f9f9;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .svg-container {
+                margin: 20px 0;
+                padding: 20px;
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                max-width: 90%;
+                overflow: auto;
+                text-align: center;
+            }
+            .controls {
+                margin: 20px 0;
+                display: flex;
+                gap: 10px;
+            }
+            button {
+                padding: 8px 16px;
+                background-color: #6366f1;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            button:hover {
+                background-color: #4f46e5;
+            }
+            .code-container {
+                text-align: left;
+                background-color: #f8f8f8;
+                padding: 15px;
+                border-radius: 6px;
+                margin-top: 20px;
+                overflow-x: auto;
+                white-space: pre-wrap;
+                font-family: monospace;
+                font-size: 14px;
+                line-height: 1.5;
+                border: 1px solid #ddd;
+            }
+            h1 {
+                color: #333;
+                font-size: 24px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>SVG 图像预览</h1>
+        <div class="svg-container">
+            ${svgCode}
+        </div>
+        <div class="controls">
+            <button onclick="downloadSVG()">下载 SVG</button>
+            <button onclick="copyToClipboard()">复制 SVG 代码</button>
+            <button onclick="window.print()">打印</button>
+        </div>
+        <div class="code-container">${escapeHTML(svgCode)}</div>
+        
+        <script>
+            function downloadSVG() {
+                const svgData = new Blob(['${escapeSingleQuotes(svgCode)}'], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(svgData);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'generated-svg-' + new Date().getTime() + '.svg';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+            
+            function copyToClipboard() {
+                const code = \`${escapeSingleQuotes(svgCode)}\`;
+                navigator.clipboard.writeText(code).then(() => {
+                    alert('SVG 代码已复制到剪贴板！');
+                }).catch(err => {
+                    console.error('无法复制到剪贴板:', err);
+                    alert('复制失败，请手动复制代码');
+                });
+            }
+            
+            function escapeHTML(str) {
+                return str
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+        </script>
+    </body>
+    </html>
+    `;
+    
+    newWindow.document.write(htmlContent);
+    newWindow.document.close();
+}
+
+// Helper function to escape HTML for display
+function escapeHTML(str) {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// Helper function to escape single quotes for JavaScript strings
+function escapeSingleQuotes(str) {
+    return str.replace(/'/g, "\\'");
+}
