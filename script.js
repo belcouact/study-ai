@@ -1729,10 +1729,10 @@ function handleGenerateQuestionsClick() {
     // Get form elements from sidebar
     const schoolSelect = document.getElementById('school-select-sidebar');
     const gradeSelect = document.getElementById('grade-select-sidebar');
-    const semesterSelect = document.getElementById('semester-select-sidebar');
-    const subjectSelect = document.getElementById('subject-select-sidebar');
-    const difficultySelect = document.getElementById('difficulty-select-sidebar');
-    const questionCountSelect = document.getElementById('question-count-select-sidebar');
+    const semesterSelect = document.getElementById('semester-select');
+    const subjectSelect = document.getElementById('subject-select');
+    const difficultySelect = document.getElementById('difficulty-select');
+    const questionCountSelect = document.getElementById('question-count-select');
     //const generateQuestionsButton = document.querySelector('.sidebar-generate-button');
     const questionsDisplayContainer = document.getElementById('questions-display-container');
     const emptyState = document.getElementById('empty-state');
@@ -5726,7 +5726,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ... existing code ...
 
 // Get the school select element
-const schoolSelect = document.getElementById('school-select');
+const schoolSelect = document.getElementById('school-select-sidebar');
 const subjectSelect = document.getElementById('subject-select');
 
 
