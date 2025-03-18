@@ -718,20 +718,15 @@ button:active {
     color: var(--text-color);
 }
 
-/* Navigation controls - position at bottom of create page */
+/* Navigation controls */
 .navigation-controls {
     display: flex;
     justify-content: space-between;
-    margin-top: auto;  /* Push to bottom of flex container */
+    margin-top: 20px;
     padding: 15px;
     background: white;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    order: 999;  /* Ensure it appears after all other elements */
-    position: sticky;
-    bottom: 0;
-    z-index: 90;  /* Lower than control panel but still above content */
-    margin-bottom: 10px;
 }
 
 .nav-button {
@@ -1242,11 +1237,10 @@ button:active {
     position: relative;
 }
 
-/* Control panel for test page - remove sticky positioning */
+/* Control panel for test page - make it sticky */
 .control-panel {
-    /* remove position: sticky; */
-    position: relative; /* Change from sticky to relative */
-    /* remove top: 0; */
+    position: sticky;
+    top: 0;
     z-index: 100;
     display: flex;
     flex-wrap: wrap;
@@ -1261,9 +1255,15 @@ button:active {
     order: -1; /* Ensures it's always first in the flex container */
 }
 
-/* Remove the before pseudo-element as it's no longer needed */
+/* Add more room for the control panel when scrolling */
 .control-panel:before {
-    display: none;
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background-color: transparent;
 }
 
 /* Ensure the empty state appears below the control panel */

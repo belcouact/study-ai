@@ -4313,35 +4313,256 @@ function getSimplifiedContextSummary() {
 
     // Function to handle learn poetry button click
     async function handleLearnPoetryClick() {
-        // Show loading indicator
-        showPoetryLoading();
+        console.log('Learn poetry button clicked');
         
-        // Get values from selectors
-        const dynasty = document.getElementById('poetry-dynasty-select');
-        const author = document.getElementById('poetry-author-select');
-        const name = document.getElementById('poetry-name-select');
+        // Get user's educational context
+        const schoolSelect = document.getElementById('school-select-sidebar');
+        const gradeSelect = document.getElementById('grade-select-sidebar');
         
-        // Check if elements exist before accessing their values
-        const dynastyValue = dynasty ? dynasty.value : '';
-        const authorValue = author ? author.value : '';
-        const nameValue = name ? name.value : '';
-        
-        // Validate selections - make sure at least one is provided
-        if (!dynastyValue && !authorValue && !nameValue) {
-            hidePoetryLoading();
-            showSystemMessage('请至少选择一个筛选条件', 'error');
+        if (!schoolSelect || !gradeSelect) {
+            showSystemMessage('无法获取学校和年级信息', 'error');
             return;
         }
         
-        // Create request body
-        const requestBody = {
-            dynasty: dynastyValue,
-            author: authorValue,
-            name: nameValue
-        };
+        const school = schoolSelect.value;
+        const grade = gradeSelect.options[gradeSelect.selectedIndex].text;
         
-        // The rest of the function remains unchanged
-        // ... existing code ...
+        if (!school || !grade) {
+            showSystemMessage('请先选择学校和年级', 'warning');
+            return;
+        }
+        
+        // Get poetry type and style
+        const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
+        const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
+        
+        console.log(`Generating poems for: ${school} ${grade}, Type: ${poetryType}, Style: ${poetryStyle}`);
+        
+        // Show loading state
+        const poetryEmptyState = document.getElementById('poetry-empty-state');
+        const poetryDisplay = document.getElementById('poetry-display');
+        
+        if (poetryEmptyState) poetryEmptyState.classList.add('hidden');
+        if (poetryDisplay) poetryDisplay.classList.add('hidden');
+        
+        // Create and show loading indicator
+        let loadingIndicator = document.getElementById('poetry-loading');
+        if (!loadingIndicator) {
+            loadingIndicator = document.createElement('div');
+            loadingIndicator.id = 'poetry-loading';
+            loadingIndicator.innerHTML = `
+                <div class="spinner"></div>
+                <p>正在查找适合${school}${grade}学生的经典${poetryType}，风格为${poetryStyle}...</p>
+            `;
+            loadingIndicator.style.display = 'flex';
+            loadingIndicator.style.flexDirection = 'column';
+            loadingIndicator.style.alignItems = 'center';
+            loadingIndicator.style.justifyContent = 'center';
+            loadingIndicator.style.padding = '3rem';
+            
+            const poetryContent = document.querySelector('.poetry-content');
+            if (poetryContent) {
+                poetryContent.appendChild(loadingIndicator);
+            }
+        } else {
+            loadingIndicator.style.display = 'flex';
+        }
+        
+        try {
+            // Prepare the prompt for the API - specifically requesting famous ancient poems
+            const prompt = `请为${school}${grade}的学生推荐5首著名的古代${poetryType}，风格为${poetryStyle}。
+            请选择中国文学史上最著名、最经典的作品，这些作品应该是真实存在的古代诗词，不要创作新的内容。
+            
+            每首诗都应包含以下内容：
+            1. 题目
+            2. 作者（必须是真实的历史人物）
+            3. 原文（必须是原始的古代诗词文本）
+            4. 创作背景（包括历史背景和创作缘由）
+            5. 赏析（包括艺术特色和文学价值）
+            
+            请以JSON格式返回，格式如下：
+            [
+              {
+                "title": "诗词标题",
+                "author": "作者",
+                "content": "诗词原文",
+                "background": "创作背景",
+                "explanation": "赏析"
+              },
+              ...
+            ]`;
+            
+            // Call the API
+            const apiResponse = await fetchAIResponse(prompt);
+            console.log('API response received');
+            
+            // Extract text content from the response
+            let responseText = '';
+            if (typeof apiResponse === 'string') {
+                responseText = apiResponse;
+            } else if (apiResponse && typeof apiResponse === 'object') {
+                // Try to extract content from response object
+                if (apiResponse.choices && apiResponse.choices.length > 0 && apiResponse.choices[0].message) {
+                    responseText = apiResponse.choices[0].message.content || '';
+                } else if (apiResponse.content) {
+                    responseText = apiResponse.content;
+                } else if (apiResponse.text) {
+                    responseText = apiResponse.text;
+                } else if (apiResponse.message) {
+                    responseText = apiResponse.message;
+                } else if (apiResponse.data) {
+                    responseText = typeof apiResponse.data === 'string' ? apiResponse.data : JSON.stringify(apiResponse.data);
+                } else {
+                    // Last resort: stringify the entire response
+                    responseText = JSON.stringify(apiResponse);
+                }
+            } else {
+                throw new Error('Unexpected response format');
+            }
+            
+            console.log('Extracted response text:', responseText.substring(0, 100) + '...');
+            
+            // Parse the response to extract the poems
+            let poems = [];
+            try {
+                // First try: direct JSON parse if the response is already JSON
+                try {
+                    if (responseText.trim().startsWith('[') && responseText.trim().endsWith(']')) {
+                        poems = JSON.parse(responseText);
+                        console.log('Parsed JSON directly');
+                    } else {
+                        throw new Error('Response is not direct JSON');
+                    }
+                } catch (directParseError) {
+                    console.log('Direct JSON parse failed, trying to extract JSON from text');
+                    
+                    // Second try: find JSON in the response text
+                    const jsonMatch = responseText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                    if (jsonMatch) {
+                        poems = JSON.parse(jsonMatch[0]);
+                        console.log('Extracted and parsed JSON from text');
+                    } else {
+                        throw new Error('No JSON found in response');
+                    }
+                }
+            } catch (parseError) {
+                console.error('Error parsing poems from response:', parseError);
+                
+                // Fallback: Try to extract structured content
+                console.log('Trying to extract structured content');
+                const sections = responseText.split(/(?=\d+\.\s*题目[:：])/);
+                console.log('Found', sections.length - 1, 'potential poem sections');
+                
+                for (let i = 1; i < sections.length; i++) {
+                    const section = sections[i];
+                    
+                    const titleMatch = section.match(/题目[:：]\s*(.+?)(?=\n|$)/);
+                    const authorMatch = section.match(/作者[:：]\s*(.+?)(?=\n|$)/);
+                    const contentMatch = section.match(/原文[:：]\s*([\s\S]+?)(?=\n\d+\.\s*创作背景[:：]|$)/);
+                    const backgroundMatch = section.match(/创作背景[:：]\s*([\s\S]+?)(?=\n\d+\.\s*赏析[:：]|$)/);
+                    const explanationMatch = section.match(/赏析[:：]\s*([\s\S]+?)(?=\n\d+\.\s*题目[:：]|$)/);
+                    
+                    if (titleMatch && authorMatch && contentMatch) {
+                        poems.push({
+                            title: titleMatch[1].trim(),
+                            author: authorMatch[1].trim(),
+                            content: contentMatch[1].trim(),
+                            background: backgroundMatch ? backgroundMatch[1].trim() : "暂无背景信息",
+                            explanation: explanationMatch ? explanationMatch[1].trim() : "暂无赏析"
+                        });
+                    }
+                }
+                
+                // If still no poems, try one more approach with a different pattern
+                if (poems.length === 0) {
+                    console.log('Trying alternative parsing approach');
+                    
+                    // Look for numbered poems (1. 2. 3. etc.)
+                    const poemSections = responseText.split(/(?=\d+\.)/);
+                    
+                    for (let i = 1; i < poemSections.length; i++) {
+                        const section = poemSections[i];
+                        
+                        // Extract what we can
+                        const titleMatch = section.match(/(?:题目[:：]|《(.+?)》)/);
+                        const authorMatch = section.match(/(?:作者[:：]|[\(（](.+?)[\)）])/);
+                        
+                        // If we found at least a title, create a basic poem entry
+                        if (titleMatch) {
+                            const title = titleMatch[1] || titleMatch[0].replace(/题目[:：]/, '').trim();
+                            const author = authorMatch ? (authorMatch[1] || authorMatch[0].replace(/作者[:：]/, '').trim()) : "未知";
+                            
+                            // Get the rest of the content
+                            const contentStart = section.indexOf(titleMatch[0]) + titleMatch[0].length;
+                            let content = section.substring(contentStart).trim();
+                            
+                            // Basic poem with what we could extract
+                            poems.push({
+                                title: title,
+                                author: author,
+                                content: content,
+                                background: "暂无背景信息",
+                                explanation: "暂无赏析"
+                            });
+                        }
+                    }
+                }
+                
+                // Last resort: if we still have no poems, create a single poem from the entire response
+                if (poems.length === 0 && responseText.length > 0) {
+                    console.log('Creating fallback poem from entire response');
+                    poems.push({
+                        title: `${poetryType}·${poetryStyle}`,
+                        author: "古代诗人",
+                        content: responseText.substring(0, 200), // Take first 200 chars as content
+                        background: "这是根据您的要求查找的内容，但解析遇到了困难。",
+                        explanation: "由于解析困难，无法提供完整赏析。请尝试重新生成。"
+                    });
+                }
+            }
+            
+            // Validate poem objects
+            poems = poems.map(poem => {
+                return {
+                    title: poem.title || '无标题',
+                    author: poem.author || '佚名',
+                    content: poem.content || '无内容',
+                    background: poem.background || '无背景信息',
+                    explanation: poem.explanation || '无赏析'
+                };
+            });
+            
+            // Remove loading indicator
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
+            
+            if (poems.length > 0) {
+                console.log('Successfully parsed', poems.length, 'poems');
+                // Store poems in state
+                poemState.poems = poems;
+                poemState.currentIndex = 0;
+                
+                // Display poems
+                if (poetryDisplay) poetryDisplay.classList.remove('hidden');
+                displayCurrentPoem();
+            } else {
+                // Show error message
+                if (poetryEmptyState) poetryEmptyState.classList.remove('hidden');
+                showSystemMessage(`无法生成${poetryType}的${poetryStyle}风格诗词，请稍后再试`, 'error');
+            }
+        } catch (error) {
+            console.error('Error generating poems:', error);
+            
+            // Remove loading indicator
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
+            
+            // Show error message
+            if (poetryEmptyState) poetryEmptyState.classList.remove('hidden');
+            showSystemMessage('生成诗词时出错，请稍后再试', 'error');
+        }
     }
 
 // Initialize the application
@@ -5472,6 +5693,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Display poems
                 if (poetryDisplay) poetryDisplay.classList.remove('hidden');
                 displayCurrentPoem();
+                
+                // Set up navigation buttons after poems are loaded
+                setTimeout(() => {
+                    setupPoemNavigationButtons();
+                }, 100);
             } else {
                 // Show error message
                 if (poetryEmptyState) poetryEmptyState.classList.remove('hidden');
