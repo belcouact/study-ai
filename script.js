@@ -4,15 +4,9 @@ let currentModel = 'deepseek-r1';
 // Add global variable for current question index
 let currentQuestionIndex = 0;
 
-// Add these global variables if they don't exist elsewhere
-// You can add these at the top of your script
-if (typeof vocabularyWords === 'undefined') {
-    var vocabularyWords = [];
-}
-
-if (typeof currentWordIndex === 'undefined') {
-    var currentWordIndex = 0;
-}
+// Global variables
+let vocabularyWords = [];
+let currentWordIndex = 0;
 
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
@@ -5943,10 +5937,6 @@ function loadPoemDetails(poem) {
     backgroundSection.style.display = 'block';
     analysisSection.style.display = 'block';
 }
-
-// Global variables
-let vocabularyWords = [];
-let currentWordIndex = 0;
 
 // Add event listeners after DOM loads
 document.addEventListener('DOMContentLoaded', function() {
