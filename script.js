@@ -6203,6 +6203,8 @@ function handleTabSwitch(containerType) {
     // Reset active states for tab content
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.remove('active');
+        // Also remove any hidden class that might be preventing display
+        content.classList.remove('hidden');
     });
     
     // Handle specific container types
@@ -6223,16 +6225,93 @@ function handleTabSwitch(containerType) {
     
     // Handle vocabulary tab and other tab-based content
     if (containerType === 'vocabulary') {
+        console.log('Showing vocabulary content');
         const vocabularyContent = document.getElementById('vocabulary-content');
         if (vocabularyContent) {
+            // Make sure to remove any classes that might hide it
+            vocabularyContent.classList.remove('hidden');
             vocabularyContent.classList.add('active');
+            vocabularyContent.style.display = 'block';
             if (wordButton) wordButton.classList.add('active');
+            
+            // Debug log to check if the content exists
+            console.log('Vocabulary content element:', vocabularyContent);
+        } else {
+            console.warn('Vocabulary content element not found!');
         }
     } else if (containerType && document.getElementById(`${containerType}-content`)) {
-        document.getElementById(`${containerType}-content`).classList.add('active');
+        const contentElement = document.getElementById(`${containerType}-content`);
+        contentElement.classList.remove('hidden');
+        contentElement.classList.add('active');
     }
     
     // Always update the UI state if these functions exist
     if (typeof handleResize === 'function') handleResize();
     if (typeof resetContentArea === 'function') resetContentArea();
 }
+
+// Add this function to make sure the vocabulary tab is initialized
+function ensureVocabularyTabSetup() {
+    // Check if the vocabulary content exists
+    const vocabularyContent = document.getElementById('vocabulary-content');
+    if (!vocabularyContent) {
+        console.warn('Vocabulary content not found, creating element...');
+        
+        // Create the vocabulary content if it doesn't exist
+        const rightPanel = document.getElementById('right-panel');
+        if (rightPanel) {
+            const newVocabContent = document.createElement('div');
+            newVocabContent.id = 'vocabulary-content';
+            newVocabContent.className = 'tab-content';
+            
+            // Add initial content
+            newVocabContent.innerHTML = `
+                <div class="section-title">词汇学习</div>
+                <div class="content-container">
+                    <div class="vocabulary-controls">
+                        <button id="load-vocabulary-btn" class="primary-button">加载词汇</button>
+                        <div class="navigation-controls">
+                            <button id="prev-word-btn" class="nav-button" disabled>&lt; 上一个</button>
+                            <span id="word-counter">0/0</span>
+                            <button id="next-word-btn" class="nav-button" disabled>下一个 &gt;</button>
+                        </div>
+                    </div>
+                    <div id="vocabulary-container">
+                        <div class="initial-message">
+                            点击"加载词汇"按钮开始学习英语单词
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            rightPanel.appendChild(newVocabContent);
+            
+            // Add event listeners
+            const loadBtn = newVocabContent.querySelector('#load-vocabulary-btn');
+            if (loadBtn) {
+                loadBtn.addEventListener('click', handleLoadVocabularyClick);
+            }
+            
+            const prevBtn = newVocabContent.querySelector('#prev-word-btn');
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => navigateWordCard(-1));
+            }
+            
+            const nextBtn = newVocabContent.querySelector('#next-word-btn');
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => navigateWordCard(1));
+            }
+        }
+    }
+}
+
+// Call this function during initialization
+document.addEventListener('DOMContentLoaded', function() {
+    // Your existing code...
+    
+    // Make sure vocabulary tab is set up
+    ensureVocabularyTabSetup();
+    
+    // Setup tab event listeners
+    setupTabEventListeners();
+});
