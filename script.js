@@ -6525,7 +6525,7 @@ function handleTabSwitch(containerType) {
             if (qaButton) qaButton.classList.add('active');
             console.log('QA container added to content area');
             
-            // Ensure other containers are not present
+            // Remove other containers
             removeContainerIfPresent('poetry-container');
             removeContainerIfPresent('word-container');
             
@@ -6534,7 +6534,7 @@ function handleTabSwitch(containerType) {
             if (createButton) createButton.classList.add('active');
             console.log('Create container added to content area');
             
-            // Ensure other containers are not present
+            // Remove other containers
             removeContainerIfPresent('poetry-container');
             removeContainerIfPresent('word-container');
             
@@ -6555,7 +6555,7 @@ function handleTabSwitch(containerType) {
             if (poetryButton) poetryButton.classList.add('active');
             console.log('Poetry container added to content area');
             
-            // Ensure other containers are not present
+            // Remove word container
             removeContainerIfPresent('word-container');
             
         } else if (containerType === 'word' && wordContainer && contentArea) {
@@ -6563,11 +6563,11 @@ function handleTabSwitch(containerType) {
             if (wordButton) wordButton.classList.add('active');
             console.log('Word container added to content area');
             
-            // Ensure poetry container is not present
+            // Remove poetry container
             removeContainerIfPresent('poetry-container');
             
-            // Update education context for the word container
-            updateEducationContext();
+            // Update education context AFTER the word container is added to the DOM
+            setTimeout(updateEducationContext, 0);
         }
     }
 }
