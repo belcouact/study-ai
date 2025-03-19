@@ -5907,8 +5907,8 @@ function loadPoemDetails(poem) {
 
 // Add this function with your other functions
 async function handleGenerateVocabulary() {
-    const selectedSchool = document.getElementById('schoolSelect').value;
-    const selectedGrade = document.getElementById('gradeSelect').value;
+    const selectedSchool = document.getElementById('school-select-sidebar').value;
+    const selectedGrade = document.getElementById('grade-select-sidebar').value;
     
     const prompt = `Generate 10 English vocabulary words appropriate for ${selectedSchool} school ${selectedGrade} grade students. For each word, provide:
     1. The word
@@ -5920,22 +5920,37 @@ async function handleGenerateVocabulary() {
     Format as JSON array.`;
 
     try {
-        const response = await fetch('YOUR_DEEPSEEK_API_ENDPOINT', {
+        const response = await fetch(`${process.env.API_BASE_URL}/v1/chat/completions`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer YOUR_API_KEY'
+                'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
             },
-            body: JSON.stringify({ prompt: prompt })
+            body: JSON.stringify({
+                model: "deepseek-chat",
+                messages: [
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ],
+                temperature: 0.7,
+                max_tokens: 2000
+            })
         });
 
         const data = await response.json();
-        vocabularyList = JSON.parse(data.response); // Assuming the API returns JSON string
+        if (!response.ok) {
+            throw new Error(data.error?.message || 'Failed to generate vocabulary');
+        }
+
+        vocabularyList = JSON.parse(data.choices[0].message.content);
         currentWordIndex = 0;
         displayCurrentWord();
         updateWordCounter();
     } catch (error) {
         console.error('Error generating vocabulary:', error);
+        alert('Failed to generate vocabulary. Please try again.');
     }
 }
 
