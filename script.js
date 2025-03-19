@@ -5964,8 +5964,8 @@ async function handleLoadVocabularyClick() {
     
     try {
         // Get education context from sidebar
-        const schoolSelect = document.getElementById('school-select');
-        const gradeSelect = document.getElementById('grade-select');
+        const schoolSelect = document.getElementById('school-select-sidebar');
+        const gradeSelect = document.getElementById('grade-select-sidebar');
         
         // Check if the elements exist before accessing their values
         if (!schoolSelect || !gradeSelect) {
