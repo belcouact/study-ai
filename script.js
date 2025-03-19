@@ -5912,22 +5912,55 @@ document.getElementById('word-button').addEventListener('click', function() {
 });
 
 function switchPanel(panelId) {
-    // ... existing code ...
+    // Update active tab styling
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
     
-    // Hide all containers
-    document.getElementById('qa-container').classList.add('hidden');
-    document.getElementById('create-container').classList.add('hidden');
-    document.getElementById('poetry-container').classList.add('hidden');
-    document.getElementById('word-container').style.display = 'none';
+    // Find the tab corresponding to this panel and make it active
+    const tabMap = {
+        'qa-container': 'qa-tab',
+        'create-container': 'create-tab',
+        'poetry-container': 'poetry-tab',
+        'word-container': 'words-tab'
+    };
     
-    // Show the selected container
-    if (panelId === 'qa-container' || panelId === 'create-container' || panelId === 'poetry-container') {
-        document.getElementById(panelId).classList.remove('hidden');
-    } else if (panelId === 'word-container') {
-        document.getElementById(panelId).style.display = 'flex';
+    const tabId = tabMap[panelId];
+    if (tabId) {
+        const tabElement = document.getElementById(tabId);
+        if (tabElement) {
+            tabElement.classList.add('active');
+        }
     }
     
-    // ... existing code ...
+    // Hide all containers
+    const containers = [
+        'qa-container', 
+        'create-container', 
+        'poetry-container', 
+        'word-container'
+    ];
+    
+    containers.forEach(containerId => {
+        const container = document.getElementById(containerId);
+        if (container) {
+            if (containerId === 'word-container') {
+                container.style.display = 'none';
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+    });
+    
+    // Show the selected container
+    const selectedContainer = document.getElementById(panelId);
+    if (selectedContainer) {
+        if (panelId === 'word-container') {
+            selectedContainer.style.display = 'flex';
+        } else {
+            selectedContainer.classList.remove('hidden');
+        }
+    }
 }
 
 function updateEducationContext() {
