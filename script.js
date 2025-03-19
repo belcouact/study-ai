@@ -6201,3 +6201,6 @@ function init() {
     
     // ... existing code ...
 }
+
+// Make sure initialization happens when the DOM is ready
+document.addEventListener('DOMContentLoaded', init);
