@@ -4035,8 +4035,8 @@ function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, subm
                         <div class="error-message">
                             <i class="fas fa-exclamation-circle"></i>
                             抱歉，处理您的问题时出现了错误。请重试。
-            </div>
-        `;
+                        </div>
+                    `;
                     showSystemMessage('提交问题时出错，请重试。', 'error');
                 })
                 .finally(() => {
@@ -5207,7 +5207,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (poetryContainer && poetryContainer.parentNode) {
             poetryContainer.parentNode.removeChild(poetryContainer);
         }
-
+        
         // Get vocabulary container
         const vocabularyContent = document.getElementById('vocabulary-content');
         
@@ -5948,8 +5948,8 @@ async function handleLoadVocabularyClick() {
         
         // Display words
         if (words && words.length > 0) {
-            vocabularyWords = words;
-            currentWordIndex = 0;
+        vocabularyWords = words;
+        currentWordIndex = 0;
             displayWordCard(currentWordIndex);
             updateNavigationControls();
         } else {
@@ -5985,11 +5985,11 @@ async function fetchVocabularyWords(school, grade) {
             count: 10
         })
     });
-    
+
     if (!response.ok) {
         throw new Error(`API responded with status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.words;
 }
@@ -6015,7 +6015,7 @@ function displayWordCard(index) {
                 <div class="meaning-row">
                     <div class="meaning-label">英文释义:</div>
                     <div class="meaning-content">${word.englishMeaning}</div>
-                </div>
+            </div>
                 <div class="meaning-row">
                     <div class="meaning-label">中文释义:</div>
                     <div class="meaning-content">${word.chineseMeaning}</div>
