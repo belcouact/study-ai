@@ -4275,6 +4275,30 @@ function getSimplifiedContextSummary() {
         
         // Poetry buttons
         setupPoetryButtons();
+        
+        // Button click handlers for sidebar navigation
+        if (qaButton) {
+            qaButton.addEventListener('click', () => handleTabSwitch('qa'));
+        }
+        
+        if (createButton) {
+            createButton.addEventListener('click', () => handleTabSwitch('create'));
+        }
+        
+        if (poetryButton) {
+            poetryButton.addEventListener('click', () => handleTabSwitch('poetry'));
+        }
+        
+        const wordButton = document.getElementById('word-button');
+        if (wordButton) {
+            wordButton.addEventListener('click', () => handleTabSwitch('vocabulary'));
+        }
+        
+        // Tab switching for any additional tabs using data-tab attributes
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => handleTabSwitch(tab.dataset.tab));
+        });
     }
 
 // ... existing code ...
@@ -5183,66 +5207,57 @@ document.addEventListener('DOMContentLoaded', function() {
         if (poetryContainer && poetryContainer.parentNode) {
             poetryContainer.parentNode.removeChild(poetryContainer);
         }
+
+        // Get vocabulary container
+        const vocabularyContent = document.getElementById('vocabulary-content');
         
-        // Reset active states
+        // Reset active states for sidebar buttons
         if (qaButton) qaButton.classList.remove('active');
         if (createButton) createButton.classList.remove('active');
         if (poetryButton) poetryButton.classList.remove('active');
+        const wordButton = document.getElementById('word-button');
+        if (wordButton) wordButton.classList.remove('active');
         
-        // Add only the appropriate container to the content area
-        if (containerType === 'qa' && qaContainer && contentArea) {
+        // Reset active states for tab elements if they exist
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+            if (tab.dataset.tab === containerType) {
+                tab.classList.add('active');
+            }
+        });
+        
+        // Reset active states for tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        // Hide all content containers
+        if (vocabularyContent) vocabularyContent.classList.add('hidden');
+        
+        // Set the appropriate container active based on containerType
+        if (containerType === 'qa') {
             contentArea.appendChild(qaContainer);
-            if (qaButton) qaButton.classList.add('active');
-            console.log('QA container added to content area');
-            
-            // Ensure poetry container is not present
-            const existingPoetryContainer = document.getElementById('poetry-container');
-            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
-                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
-            }
-        } else if (containerType === 'create' && createContainer && contentArea) {
+            qaButton.classList.add('active');
+        } else if (containerType === 'create') {
             contentArea.appendChild(createContainer);
-            if (createButton) createButton.classList.add('active');
-            console.log('Create container added to content area');
-            
-            // Ensure poetry container is not present
-            const existingPoetryContainer = document.getElementById('poetry-container');
-            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
-                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
-            }
-            
-            // Show empty state on test page
-            const questionsDisplayContainer = document.getElementById('questions-display-container');
-            const emptyState = document.getElementById('empty-state');
-            
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.classList.remove('hidden');
-                
-                if (emptyState) {
-                    emptyState.classList.remove('hidden');
-                }
-            }
-        } else if (containerType === 'poetry' && poetryContainer && contentArea) {
+            createButton.classList.add('active');
+        } else if (containerType === 'poetry') {
             contentArea.appendChild(poetryContainer);
-            if (poetryButton) poetryButton.classList.add('active');
-            console.log('Poetry container added to content area');
-            
-            // After switching to poetry tab, add event listener to learn poetry button
-            setTimeout(() => {
-                const learnPoetryButton = document.getElementById('learn-poetry-button');
-                if (learnPoetryButton) {
-                    // Remove any existing event listeners
-                    const newButton = learnPoetryButton.cloneNode(true);
-                    learnPoetryButton.parentNode.replaceChild(newButton, learnPoetryButton);
-                    
-                    // Add new event listener
-                    newButton.addEventListener('click', function() {
-                        console.log('Learn poetry button clicked');
-                        handleLearnPoetryClick();
-                    });
-                }
-            }, 100);
+            poetryButton.classList.add('active');
+        } else if (containerType === 'vocabulary' || containerType === 'word') {
+            // Show vocabulary content
+            if (vocabularyContent) {
+                vocabularyContent.classList.remove('hidden');
+                if (wordButton) wordButton.classList.add('active');
+            }
+        } else if (containerType && document.getElementById(`${containerType}-content`)) {
+            // For other tab content that follows the naming pattern
+            document.getElementById(`${containerType}-content`).classList.add('active');
         }
+        
+        // Always update the UI state
+        handleResize();
+        resetContentArea();
     }
     
     // Add event listeners to buttons
