@@ -5285,7 +5285,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (wordButton) {
         wordButton.addEventListener('click', function() {
             console.log('Word button clicked');
-            handleTabSwitch('word');
+            handleTabSwitch('vocabulary');  // Changed from 'word' to 'vocabulary'
         });
     }
     
