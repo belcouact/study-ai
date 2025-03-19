@@ -6033,12 +6033,12 @@ async function fetchVocabularyWords(school, grade) {
             return parseVocabularyResponse(response);
         } else {
             console.warn('Unexpected API response format:', response);
-            return getMockVocabularyWords();
+            // return getMockVocabularyWords();
         }
     } catch (error) {
         console.error('Error in fetchVocabularyWords:', error);
         // Return mock data on error for testing
-        return getMockVocabularyWords();
+        // return getMockVocabularyWords();
     }
 }
 
@@ -6065,17 +6065,9 @@ function parseVocabularyResponse(text) {
         console.warn('Failed to parse JSON from response:', e);
     }
     
-    // If JSON parsing failed, try to extract structured data
-    const words = extractVocabularyFromText(text);
-    
-    if (words && words.length > 0) {
-        console.log('Extracted vocabulary words from text:', words);
-        return words;
-    }
-    
     // If all extraction methods fail, return mock data
-    console.warn('Could not parse vocabulary words from response, using mock data');
-    return getMockVocabularyWords();
+    console.warn('Could not parse vocabulary words from response');
+    // return getMockVocabularyWords();
 }
 
 // Keep the mock data function for fallback
@@ -6113,8 +6105,6 @@ function getMockVocabularyWords() {
         }
     ];
 }
-
-// Add these missing functions after getMockVocabularyWords()
 
 // Function to display a vocabulary word card
 function displayWordCard(index) {
