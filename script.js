@@ -6327,3 +6327,69 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup tab event listeners
     setupTabEventListeners();
 });
+
+// Locate the existing handleTabSwitch function at line 5195
+// Turn it into a global function
+window.handleTabSwitch = function(containerType) {
+    console.log('Switching to tab:', containerType);
+    
+    // Reset active states for tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.tab === containerType) {
+            tab.classList.add('active');
+        }
+    });
+    
+    // Hide all tab content first
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Handle specific container types
+    if (containerType === 'qa') {
+        if (typeof qaContainer !== 'undefined' && qaContainer) {
+            if (typeof contentArea !== 'undefined') {
+                contentArea.appendChild(qaContainer);
+            }
+            if (typeof qaButton !== 'undefined') qaButton.classList.add('active');
+        }
+    } else if (containerType === 'create') {
+        if (typeof createContainer !== 'undefined' && createContainer) {
+            if (typeof contentArea !== 'undefined') {
+                contentArea.appendChild(createContainer);
+            }
+            if (typeof createButton !== 'undefined') createButton.classList.add('active');
+        }
+    } else if (containerType === 'poetry') {
+        if (typeof poetryContainer !== 'undefined' && poetryContainer) {
+            if (typeof contentArea !== 'undefined') {
+                contentArea.appendChild(poetryContainer);
+            }
+            if (typeof poetryButton !== 'undefined') poetryButton.classList.add('active');
+        }
+    } else if (containerType === 'vocabulary') {
+        // Show vocabulary content
+        const vocabularyContent = document.getElementById('vocabulary-content');
+        if (vocabularyContent) {
+            vocabularyContent.classList.add('active');
+            
+            // Hide other tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                if (content !== vocabularyContent) {
+                    content.classList.remove('active');
+                }
+            });
+            
+            const wordButton = document.getElementById('word-button');
+            if (wordButton) wordButton.classList.add('active');
+        }
+    } else if (containerType && document.getElementById(`${containerType}-content`)) {
+        const contentElement = document.getElementById(`${containerType}-content`);
+        contentElement.classList.add('active');
+    }
+    
+    // Call UI update functions if they exist
+    if (typeof handleResize === 'function') handleResize();
+    if (typeof resetContentArea === 'function') resetContentArea();
+};
