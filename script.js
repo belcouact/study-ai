@@ -6495,3 +6495,103 @@ function setupEventListeners() {
     
     // ... remaining code ...
 }
+
+function handleTabSwitch(containerType) {
+    // Get container elements
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    const poetryContainer = document.getElementById('poetry-container');
+    const wordContainer = document.getElementById('word-container');
+
+    // Hide all containers with null checks
+    if (qaContainer) qaContainer.classList.add('hidden');
+    if (createContainer) createContainer.classList.add('hidden');
+    if (poetryContainer) poetryContainer.classList.add('hidden');
+    
+    // For word container, use style.display property
+    if (wordContainer) wordContainer.style.display = 'none';
+    
+    // Show the selected container
+    if (containerType === 'qa' && qaContainer) {
+        qaContainer.classList.remove('hidden');
+    } else if (containerType === 'create' && createContainer) {
+        createContainer.classList.remove('hidden');
+    } else if (containerType === 'poetry' && poetryContainer) {
+        poetryContainer.classList.remove('hidden');
+    } else if (containerType === 'word' && wordContainer) {
+        // For word container, use style.display = 'flex'
+        wordContainer.style.display = 'flex';
+        // Update education context when showing the word container
+        if (typeof updateEducationContext === 'function') {
+            updateEducationContext();
+        }
+    }
+    
+    // Update active tab styling
+    // Get tab elements
+    const qaTab = document.getElementById('qa-tab');
+    const createTab = document.getElementById('create-tab');
+    const poetryTab = document.getElementById('poetry-tab');
+    const wordTab = document.getElementById('words-tab');
+    
+    // Remove active class from all tabs with null checks
+    if (qaTab) qaTab.classList.remove('active');
+    if (createTab) createTab.classList.remove('active');
+    if (poetryTab) poetryTab.classList.remove('active');
+    if (wordTab) wordTab.classList.remove('active');
+    
+    // Add active class to the current tab
+    if (containerType === 'qa' && qaTab) {
+        qaTab.classList.add('active');
+    } else if (containerType === 'create' && createTab) {
+        createTab.classList.add('active');
+    } else if (containerType === 'poetry' && poetryTab) {
+        poetryTab.classList.add('active');
+    } else if (containerType === 'word' && wordTab) {
+        wordTab.classList.add('active');
+    }
+    
+    console.log("Switched to", containerType, "container");
+}
+
+// Add this to your setupEventListeners function
+function setupWordFeatureEventListeners() {
+    const generateWordsButton = document.getElementById('generate-words');
+    if (generateWordsButton) {
+        generateWordsButton.addEventListener('click', async function() {
+            const school = document.getElementById('school-select-sidebar').value;
+            const grade = document.getElementById('grade-select-sidebar').value;
+            
+            if (!school || !grade) {
+                showSystemMessage('请先在侧边栏选择学校和年级', 'error');
+                return;
+            }
+            
+            await generateWords(school, grade);
+        });
+    }
+    
+    // Set up word navigation buttons
+    const prevWordsButton = document.getElementById('prev-words');
+    const nextWordsButton = document.getElementById('next-words');
+    
+    if (prevWordsButton) {
+        prevWordsButton.addEventListener('click', function() {
+            if (currentWordPage > 0) {
+                currentWordPage--;
+                displayWords(wordHistory[currentWordPage]);
+                updateWordNavigationButtons();
+            }
+        });
+    }
+    
+    if (nextWordsButton) {
+        nextWordsButton.addEventListener('click', function() {
+            if (currentWordPage < wordHistory.length - 1) {
+                currentWordPage++;
+                displayWords(wordHistory[currentWordPage]);
+                updateWordNavigationButtons();
+            }
+        });
+    }
+}
