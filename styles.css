@@ -1763,6 +1763,7 @@ button:active {
 }
 
 .vocab-container {
+    display: none; /* Hidden by default */
     padding: 20px;
     max-width: 800px;
     margin: 0 auto;

@@ -4279,6 +4279,20 @@ function getSimplifiedContextSummary() {
         
         // Poetry buttons
         setupPoetryButtons();
+
+        // Add event listener for vocabulary tab
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const tabId = e.target.getAttribute('data-tab');
+                handleTabSwitch(tabId);
+            });
+        });
+
+        // Initialize vocab container to be hidden by default
+        const vocabContainer = document.querySelector('.vocab-container');
+        if (vocabContainer) {
+            vocabContainer.style.display = 'none';
+        }
     }
 
 // ... existing code ...
@@ -5902,9 +5916,6 @@ function loadPoemDetails(poem) {
     // ... rest of existing code ...
 }
 
-// If your code uses a different function to display poem details, 
-// ensure the sections are added and visible in that function instead.
-
 // Add this function with your other functions
 async function handleGenerateVocabulary() {
     const selectedSchool = document.getElementById('school-select-sidebar').value;
@@ -5989,3 +6000,21 @@ document.getElementById('nextWord').addEventListener('click', () => {
         updateWordCounter();
     }
 });
+
+// Add this to your tab switching logic
+function handleTabSwitch(containerType) {
+    // ... existing code ...
+    
+    // Add this condition for vocabulary tab
+    if (containerType === '单词') {
+        const vocabContainer = document.querySelector('.vocab-container');
+        if (vocabContainer) {
+            vocabContainer.style.display = 'block';
+        }
+    } else {
+        const vocabContainer = document.querySelector('.vocab-container');
+        if (vocabContainer) {
+            vocabContainer.style.display = 'none';
+        }
+    }
+}
