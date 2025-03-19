@@ -1760,4 +1760,128 @@ button:active {
 
 .poetry-header.scrolled {
     animation: stickyAppear 0.3s forwards;
+}
+
+/* Vocabulary Styles */
+#vocabulary-content .content-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.vocabulary-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.navigation-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#vocabulary-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.initial-message {
+    text-align: center;
+    color: #666;
+    margin: 50px 0;
+    font-size: 16px;
+}
+
+.word-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: transform 0.2s;
+}
+
+.word-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.word-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.word-english {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2a4365;
+}
+
+.word-form {
+    font-size: 14px;
+    color: #718096;
+    background-color: #f0f4f8;
+    padding: 3px 8px;
+    border-radius: 12px;
+}
+
+.word-meanings {
+    margin-bottom: 15px;
+}
+
+.meaning-row {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.meaning-label {
+    width: 70px;
+    font-weight: bold;
+    color: #4a5568;
+}
+
+.meaning-content {
+    flex: 1;
+}
+
+.word-examples {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 15px;
+}
+
+.example-item {
+    margin-bottom: 12px;
+}
+
+.example-english {
+    color: #2d3748;
+    margin-bottom: 4px;
+}
+
+.example-chinese {
+    color: #718096;
+    font-size: 14px;
+}
+
+.nav-button {
+    padding: 6px 12px;
+    background-color: #e2e8f0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.nav-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#word-counter {
+    font-size: 14px;
+    color: #718096;
 } 

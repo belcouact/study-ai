@@ -5898,5 +5898,185 @@ function loadPoemDetails(poem) {
     // ... rest of existing code ...
 }
 
-// If your code uses a different function to display poem details, 
-// ensure the sections are added and visible in that function instead.
+// Global variables
+let vocabularyWords = [];
+let currentWordIndex = 0;
+
+// Add event listeners after DOM loads
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing code ...
+    
+    // Tab switching
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => handleTabSwitch(tab.dataset.tab));
+    });
+    
+    // Add vocabulary related event listeners
+    document.getElementById('load-vocabulary-btn').addEventListener('click', handleLoadVocabularyClick);
+    document.getElementById('next-word-btn').addEventListener('click', () => navigateWordCard(1));
+    document.getElementById('prev-word-btn').addEventListener('click', () => navigateWordCard(-1));
+    
+    // ... existing code ...
+});
+
+// ... existing code ...
+
+// Tab switching function
+function handleTabSwitch(tabName) {
+    // ... existing code ...
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.tab === tabName) {
+            tab.classList.add('active');
+        }
+    });
+
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    document.getElementById(`${tabName}-content`).classList.add('active');
+    // ... existing code ...
+}
+
+// ... existing code ...
+
+// Handle loading vocabulary words
+async function handleLoadVocabularyClick() {
+    const loadBtn = document.getElementById('load-vocabulary-btn');
+    loadBtn.disabled = true;
+    loadBtn.textContent = '加载中...';
+    
+    try {
+        // Get education context from sidebar
+        const school = document.getElementById('school-select').value;
+        const grade = document.getElementById('grade-select').value;
+        
+        // Fetch vocabulary words from API
+        const words = await fetchVocabularyWords(school, grade);
+        
+        // Display words
+        if (words && words.length > 0) {
+            vocabularyWords = words;
+            currentWordIndex = 0;
+            displayWordCard(currentWordIndex);
+            updateNavigationControls();
+        } else {
+            showVocabularyError('无法获取单词数据');
+        }
+    } catch (error) {
+        console.error('Error loading vocabulary:', error);
+        showVocabularyError('获取单词时出错');
+    } finally {
+        loadBtn.disabled = false;
+        loadBtn.textContent = '加载词汇';
+    }
+}
+
+// Fetch vocabulary words from API
+async function fetchVocabularyWords(school, grade) {
+    const API_BASE_URL = process.env.API_BASE_URL;
+    const API_KEY = process.env.DEEPSEEK_API_KEY;
+    
+    if (!API_BASE_URL || !API_KEY) {
+        throw new Error('API configuration missing');
+    }
+    
+    const response = await fetch(`${API_BASE_URL}/generate-vocabulary`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify({
+            school: school,
+            grade: grade,
+            count: 10
+        })
+    });
+    
+    if (!response.ok) {
+        throw new Error(`API responded with status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.words;
+}
+
+// Display word card
+function displayWordCard(index) {
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    const word = vocabularyWords[index];
+    
+    if (!word) {
+        vocabularyContainer.innerHTML = '<div class="initial-message">无单词数据</div>';
+        return;
+    }
+    
+    // Create word card HTML
+    const cardHTML = `
+        <div class="word-card">
+            <div class="word-header">
+                <div class="word-english">${word.english}</div>
+                <div class="word-form">${word.form || 'n/a'}</div>
+            </div>
+            <div class="word-meanings">
+                <div class="meaning-row">
+                    <div class="meaning-label">英文释义:</div>
+                    <div class="meaning-content">${word.englishMeaning}</div>
+                </div>
+                <div class="meaning-row">
+                    <div class="meaning-label">中文释义:</div>
+                    <div class="meaning-content">${word.chineseMeaning}</div>
+                </div>
+            </div>
+            <div class="word-examples">
+                ${word.examples.map(example => `
+                    <div class="example-item">
+                        <div class="example-english">${example.english}</div>
+                        <div class="example-chinese">${example.chinese}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    vocabularyContainer.innerHTML = cardHTML;
+    
+    // Update counter
+    document.getElementById('word-counter').textContent = `${index + 1}/${vocabularyWords.length}`;
+}
+
+// Navigate word cards
+function navigateWordCard(direction) {
+    const newIndex = currentWordIndex + direction;
+    
+    if (newIndex >= 0 && newIndex < vocabularyWords.length) {
+        currentWordIndex = newIndex;
+        displayWordCard(currentWordIndex);
+        updateNavigationControls();
+    }
+}
+
+// Update navigation buttons state
+function updateNavigationControls() {
+    const prevBtn = document.getElementById('prev-word-btn');
+    const nextBtn = document.getElementById('next-word-btn');
+    
+    prevBtn.disabled = currentWordIndex === 0;
+    nextBtn.disabled = currentWordIndex === vocabularyWords.length - 1;
+}
+
+// Show error message in vocabulary container
+function showVocabularyError(message) {
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    vocabularyContainer.innerHTML = `
+        <div class="error-message">
+            <p>${message}</p>
+            <p>请稍后再试</p>
+        </div>
+    `;
+}
+
+// ... existing code ...
