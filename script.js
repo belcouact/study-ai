@@ -4,6 +4,16 @@ let currentModel = 'deepseek-r1';
 // Add global variable for current question index
 let currentQuestionIndex = 0;
 
+// Add these global variables if they don't exist elsewhere
+// You can add these at the top of your script
+if (typeof vocabularyWords === 'undefined') {
+    var vocabularyWords = [];
+}
+
+if (typeof currentWordIndex === 'undefined') {
+    var currentWordIndex = 0;
+}
+
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
     console.log('Parsing questions from response:', response);
@@ -6012,20 +6022,23 @@ async function fetchVocabularyWords(school, grade) {
         For each word, include:
         1. The English word
         2. Part of speech (noun, verb, adjective, etc.)
-        3. English meaning/definition
-        4. Chinese meaning/translation
+        3. English definition/meaning
+        4. Chinese translation
         5. Two example sentences using the word (with Chinese translations)
 
-        Format the response as a structured JSON object with an array of word objects.`;
+        Format the response as a JSON array.`;
         
         // Use the existing fetchAIResponse function
         const response = await fetchAIResponse(prompt);
         console.log('Raw API response for vocabulary:', response);
         
-        // Check if response is in the expected format
+        // Handle the API response format
         if (response && response.choices && response.choices[0] && response.choices[0].message) {
             const messageContent = response.choices[0].message.content;
             return parseVocabularyResponse(messageContent);
+        } else if (typeof response === 'object' && Array.isArray(response)) {
+            // If response is already an array of words
+            return response;
         } else if (typeof response === 'string') {
             return parseVocabularyResponse(response);
         } else {
@@ -6109,4 +6122,110 @@ function getMockVocabularyWords() {
             ]
         }
     ];
+}
+
+// Add these missing functions after getMockVocabularyWords()
+
+// Function to display a vocabulary word card
+function displayWordCard(index) {
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    const word = vocabularyWords[index];
+    
+    if (!word) {
+        vocabularyContainer.innerHTML = '<div class="initial-message">无单词数据</div>';
+        return;
+    }
+    
+    // Create word card HTML - handle both API response format and our mock data format
+    const english = word.word || word.english;
+    const form = word.part_of_speech || word.form || 'n/a';
+    const englishMeaning = word.english_definition || word.englishMeaning || '';
+    const chineseMeaning = word.chinese_translation || word.chineseMeaning || '';
+    
+    // Handle examples in either format
+    let examples = [];
+    if (word.example_sentences && Array.isArray(word.example_sentences)) {
+        examples = word.example_sentences.map(example => {
+            // If example is a string with both English and Chinese separated by a delimiter
+            if (typeof example === 'string') {
+                const parts = example.split(/[。.]\s*(?=[\u4e00-\u9fa5])/);
+                if (parts.length >= 2) {
+                    return {
+                        english: parts[0].trim(),
+                        chinese: parts[1].trim()
+                    };
+                }
+                return { english: example, chinese: '' };
+            }
+            // If example is already an object
+            return example;
+        });
+    } else if (word.examples && Array.isArray(word.examples)) {
+        examples = word.examples;
+    }
+    
+    const cardHTML = `
+        <div class="word-card">
+            <div class="word-header">
+                <div class="word-english">${english}</div>
+                <div class="word-form">${form}</div>
+            </div>
+            <div class="word-meanings">
+                <div class="meaning-row">
+                    <div class="meaning-label">英文释义:</div>
+                    <div class="meaning-content">${englishMeaning}</div>
+                </div>
+                <div class="meaning-row">
+                    <div class="meaning-label">中文释义:</div>
+                    <div class="meaning-content">${chineseMeaning}</div>
+                </div>
+            </div>
+            <div class="word-examples">
+                ${examples.map(example => `
+                    <div class="example-item">
+                        <div class="example-english">${example.english || example}</div>
+                        <div class="example-chinese">${example.chinese || ''}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    vocabularyContainer.innerHTML = cardHTML;
+    
+    // Update counter
+    document.getElementById('word-counter').textContent = `${index + 1}/${vocabularyWords.length}`;
+}
+
+// Function to show error messages in the vocabulary container
+function showVocabularyError(message) {
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    vocabularyContainer.innerHTML = `
+        <div class="error-message">
+            <p>${message}</p>
+            <p>请稍后再试</p>
+        </div>
+    `;
+}
+
+// Function to update navigation controls for vocabulary
+function updateNavigationControls() {
+    const prevBtn = document.getElementById('prev-word-btn');
+    const nextBtn = document.getElementById('next-word-btn');
+    
+    if (!prevBtn || !nextBtn) return;
+    
+    prevBtn.disabled = currentWordIndex === 0;
+    nextBtn.disabled = currentWordIndex === vocabularyWords.length - 1;
+}
+
+// Function to navigate between word cards
+function navigateWordCard(direction) {
+    const newIndex = currentWordIndex + direction;
+    
+    if (newIndex >= 0 && newIndex < vocabularyWords.length) {
+        currentWordIndex = newIndex;
+        displayWordCard(currentWordIndex);
+        updateNavigationControls();
+    }
 }
