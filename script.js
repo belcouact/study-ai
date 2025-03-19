@@ -6075,23 +6075,29 @@ function showVocabularyError(message) {
 function handleTabSwitch(containerType) {
     console.log('Switching to tab:', containerType);
     
-    // First, remove all containers from DOM to ensure clean state
-    if (qaContainer && qaContainer.parentNode) {
+    // First, hide all containers
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Remove the previous containers from DOM if they exist
+    if (typeof qaContainer !== 'undefined' && qaContainer && qaContainer.parentNode) {
         qaContainer.parentNode.removeChild(qaContainer);
     }
     
-    if (createContainer && createContainer.parentNode) {
+    if (typeof createContainer !== 'undefined' && createContainer && createContainer.parentNode) {
         createContainer.parentNode.removeChild(createContainer);
     }
     
-    if (poetryContainer && poetryContainer.parentNode) {
+    if (typeof poetryContainer !== 'undefined' && poetryContainer && poetryContainer.parentNode) {
         poetryContainer.parentNode.removeChild(poetryContainer);
     }
     
     // Reset active states for sidebar buttons
-    if (qaButton) qaButton.classList.remove('active');
-    if (createButton) createButton.classList.remove('active');
-    if (poetryButton) poetryButton.classList.remove('active');
+    if (typeof qaButton !== 'undefined' && qaButton) qaButton.classList.remove('active');
+    if (typeof createButton !== 'undefined' && createButton) createButton.classList.remove('active');
+    if (typeof poetryButton !== 'undefined' && poetryButton) poetryButton.classList.remove('active');
+    
     const wordButton = document.getElementById('word-button');
     if (wordButton) wordButton.classList.remove('active');
     
@@ -6103,36 +6109,50 @@ function handleTabSwitch(containerType) {
         }
     });
     
-    // Hide all tab content sections
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    
-    // Set the appropriate container active based on containerType
-    if (containerType === 'qa') {
+    // Handle specific container types
+    if (containerType === 'qa' && typeof qaContainer !== 'undefined' && qaContainer) {
         contentArea.appendChild(qaContainer);
-        qaButton.classList.add('active');
-    } else if (containerType === 'create') {
+        if (typeof qaButton !== 'undefined' && qaButton) qaButton.classList.add('active');
+    } else if (containerType === 'create' && typeof createContainer !== 'undefined' && createContainer) {
         contentArea.appendChild(createContainer);
-        createButton.classList.add('active');
-    } else if (containerType === 'poetry') {
+        if (typeof createButton !== 'undefined' && createButton) createButton.classList.add('active');
+    } else if (containerType === 'poetry' && typeof poetryContainer !== 'undefined' && poetryContainer) {
         contentArea.appendChild(poetryContainer);
-        poetryButton.classList.add('active');
+        if (typeof poetryButton !== 'undefined' && poetryButton) poetryButton.classList.add('active');
     } else if (containerType === 'vocabulary') {
-        // Show vocabulary content
+        // Show vocabulary content and activate the word button
         const vocabularyContent = document.getElementById('vocabulary-content');
         if (vocabularyContent) {
+            // Make sure to remove other content first
+            document.querySelectorAll('.tab-content').forEach(content => {
+                if (content !== vocabularyContent) {
+                    content.classList.remove('active');
+                    content.style.display = 'none';
+                }
+            });
+            
             vocabularyContent.classList.add('active');
+            vocabularyContent.style.display = 'block';
             if (wordButton) wordButton.classList.add('active');
         }
     } else if (containerType && document.getElementById(`${containerType}-content`)) {
-        // For other tab content that follows the naming pattern
-        document.getElementById(`${containerType}-content`).classList.add('active');
+        const tabContent = document.getElementById(`${containerType}-content`);
+        
+        // Make sure to remove other content first
+        document.querySelectorAll('.tab-content').forEach(content => {
+            if (content !== tabContent) {
+                content.classList.remove('active');
+                content.style.display = 'none';
+            }
+        });
+        
+        tabContent.classList.add('active');
+        tabContent.style.display = 'block';
     }
     
-    // Always update the UI state
-    handleResize();
-    resetContentArea();
+    // Always update the UI state if these functions exist
+    if (typeof handleResize === 'function') handleResize();
+    if (typeof resetContentArea === 'function') resetContentArea();
 }
 
 // Add this code to make sure the vocabulary tab is properly handled
