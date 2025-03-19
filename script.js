@@ -4,10 +4,6 @@ let currentModel = 'deepseek-r1';
 // Add global variable for current question index
 let currentQuestionIndex = 0;
 
-// Add these variables at the top with other global variables
-let vocabularyList = [];
-let currentWordIndex = 0;
-
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
     console.log('Parsing questions from response:', response);
@@ -4279,20 +4275,6 @@ function getSimplifiedContextSummary() {
         
         // Poetry buttons
         setupPoetryButtons();
-
-        // Add event listener for vocabulary tab
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const tabId = e.target.getAttribute('data-tab');
-                handleTabSwitch(tabId);
-            });
-        });
-
-        // Initialize vocab container to be hidden by default
-        const vocabContainer = document.querySelector('.vocab-container');
-        if (vocabContainer) {
-            vocabContainer.style.display = 'none';
-        }
     }
 
 // ... existing code ...
@@ -5916,186 +5898,186 @@ function loadPoemDetails(poem) {
     // ... rest of existing code ...
 }
 
-// Add this function with your other functions
-async function handleGenerateVocabulary() {
-    const selectedSchool = document.getElementById('school-select-sidebar').value;
-    const selectedGrade = document.getElementById('grade-select-sidebar').value;
+// If your code uses a different function to display poem details, 
+// ensure the sections are added and visible in that function instead.
+
+// Global variables for vocabulary functionality
+let vocabularyWords = [];
+let currentWordIndex = 0;
+
+// Function to initialize the vocabulary tab
+function initVocabularyTab() {
+    const vocabButton = document.getElementById('vocab-button');
+    const vocabContainer = document.getElementById('vocab-container');
+    const generateVocabButton = document.getElementById('generate-vocab-button');
+    const prevWordButton = document.getElementById('prev-word');
+    const nextWordButton = document.getElementById('next-word');
+
+    vocabButton.addEventListener('click', () => {
+        showSection('vocab-container');
+    });
+
+    generateVocabButton.addEventListener('click', handleGenerateVocabularyClick);
     
-    const prompt = `Generate 10 English vocabulary words appropriate for ${selectedSchool} school ${selectedGrade} grade students. For each word, provide:
-    1. The word
-    2. Its part of speech
-    3. English meaning
-    4. Chinese meaning
-    5. An example sentence in English
-    6. Chinese translation of the example sentence
-    Format as JSON array.`;
-
-    try {
-        const response = await fetch(`${process.env.API_BASE_URL}/v1/chat/completions`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
-            },
-            body: JSON.stringify({
-                model: "deepseek-chat",
-                messages: [
-                    {
-                        role: "user",
-                        content: prompt
-                    }
-                ],
-                temperature: 0.7,
-                max_tokens: 2000
-            })
-        });
-
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error?.message || 'Failed to generate vocabulary');
+    prevWordButton.addEventListener('click', () => {
+        if (currentWordIndex > 0) {
+            currentWordIndex--;
+            displayCurrentWord();
         }
+    });
+    
+    nextWordButton.addEventListener('click', () => {
+        if (currentWordIndex < vocabularyWords.length - 1) {
+            currentWordIndex++;
+            displayCurrentWord();
+        }
+    });
+}
 
-        vocabularyList = JSON.parse(data.choices[0].message.content);
+// Function to handle generating vocabulary
+async function handleGenerateVocabularyClick() {
+    const generateButton = document.getElementById('generate-vocab-button');
+    const vocabDisplay = document.getElementById('vocab-display');
+    
+    try {
+        generateButton.disabled = true;
+        generateButton.textContent = '生成中...';
+        
+        vocabDisplay.innerHTML = '<div class="loading">正在生成词汇，请稍候...</div>';
+        
+        // Get selected school and grade
+        const schoolSelect = document.getElementById('school-select');
+        const gradeSelect = document.getElementById('grade-select');
+        const school = schoolSelect.value;
+        const grade = gradeSelect.value;
+        
+        // Call API to generate vocabulary
+        const words = await generateVocabulary(school, grade);
+        vocabularyWords = words;
         currentWordIndex = 0;
-        displayCurrentWord();
-        updateWordCounter();
+        
+        if (vocabularyWords.length > 0) {
+            displayCurrentWord();
+            updateNavButtons();
+        } else {
+            vocabDisplay.innerHTML = '<div class="error">无法生成词汇，请重试</div>';
+        }
     } catch (error) {
         console.error('Error generating vocabulary:', error);
-        alert('Failed to generate vocabulary. Please try again.');
+        vocabDisplay.innerHTML = `<div class="error">生成词汇时出错: ${error.message}</div>`;
+    } finally {
+        generateButton.disabled = false;
+        generateButton.textContent = '生成词汇';
     }
 }
 
+// Function to generate vocabulary using DeepSeek API
+async function generateVocabulary(school, grade) {
+    const response = await fetch(API_BASE_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+        },
+        body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: [
+                {
+                    role: "user",
+                    content: `Generate 10 English vocabulary words appropriate for ${school} students in grade ${grade}. 
+                    For each word, provide: 
+                    1. The English word
+                    2. English definition
+                    3. Chinese translation
+                    4. Related forms (noun, verb, adjective, etc.)
+                    5. Two example sentences with Chinese translation
+                    
+                    Format the response as a JSON array of objects, each containing the properties: 
+                    word, definition, chinese, wordForms, examples (array with english and chinese properties).`
+                }
+            ],
+            temperature: 0.7,
+            max_tokens: 2000
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+    
+    // Parse the JSON content from the API response
+    try {
+        // Extract JSON from the response if it's not already pure JSON
+        const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/) || content.match(/```([\s\S]*?)```/);
+        const jsonContent = jsonMatch ? jsonMatch[1] : content;
+        return JSON.parse(jsonContent);
+    } catch (error) {
+        console.error("Error parsing vocabulary JSON:", error);
+        console.log("Raw content:", content);
+        throw new Error("Failed to parse vocabulary data");
+    }
+}
+
+// Function to display the current word
 function displayCurrentWord() {
-    if (vocabularyList.length === 0) return;
+    const vocabDisplay = document.getElementById('vocab-display');
+    const wordCounter = document.getElementById('word-counter');
     
-    const word = vocabularyList[currentWordIndex];
-    document.querySelector('.english-word').textContent = word.word;
-    document.querySelector('.word-form').textContent = word.partOfSpeech;
-    document.querySelector('.english-meaning').textContent = word.englishMeaning;
-    document.querySelector('.chinese-meaning').textContent = word.chineseMeaning;
-    document.querySelector('.example-english').textContent = word.exampleEnglish;
-    document.querySelector('.example-chinese').textContent = word.exampleChinese;
+    if (vocabularyWords.length === 0) {
+        return;
+    }
+    
+    const word = vocabularyWords[currentWordIndex];
+    
+    wordCounter.textContent = `${currentWordIndex + 1}/${vocabularyWords.length}`;
+    
+    let examplesHtml = '';
+    if (word.examples && word.examples.length > 0) {
+        examplesHtml = word.examples.map((example, index) => `
+            <div class="example">
+                <p class="example-english">${index + 1}. ${example.english}</p>
+                <p class="example-chinese">${example.chinese}</p>
+            </div>
+        `).join('');
+    }
+    
+    vocabDisplay.innerHTML = `
+        <div class="vocab-card">
+            <h2 class="vocab-word">${word.word}</h2>
+            <div class="vocab-forms">${word.wordForms || ''}</div>
+            <div class="vocab-definitions">
+                <p class="definition-english">${word.definition}</p>
+                <p class="definition-chinese">${word.chinese}</p>
+            </div>
+            <div class="vocab-examples">
+                <h3>示例：</h3>
+                ${examplesHtml}
+            </div>
+        </div>
+    `;
 }
 
-function updateWordCounter() {
-    document.getElementById('wordCounter').textContent = 
-        `${currentWordIndex + 1}/${vocabularyList.length}`;
+// Function to update navigation buttons
+function updateNavButtons() {
+    const prevButton = document.getElementById('prev-word');
+    const nextButton = document.getElementById('next-word');
+    
+    prevButton.disabled = currentWordIndex === 0;
+    nextButton.disabled = currentWordIndex === vocabularyWords.length - 1;
 }
 
-// Add these event listeners in your initialization code
-document.getElementById('generateVocabBtn').addEventListener('click', handleGenerateVocabulary);
-
-document.getElementById('prevWord').addEventListener('click', () => {
-    if (currentWordIndex > 0) {
-        currentWordIndex--;
-        displayCurrentWord();
-        updateWordCounter();
-    }
-});
-
-document.getElementById('nextWord').addEventListener('click', () => {
-    if (currentWordIndex < vocabularyList.length - 1) {
-        currentWordIndex++;
-        displayCurrentWord();
-        updateWordCounter();
-    }
-});
-
-// Add this to your tab switching logic
-function handleTabSwitch(containerType) {
+// Add the initVocabularyTab function to the init function
+function init() {
     // ... existing code ...
     
-    // Add this condition for vocabulary tab
-    if (containerType === '单词') {
-        const vocabContainer = document.querySelector('.vocab-container');
-        if (vocabContainer) {
-            vocabContainer.style.display = 'block';
-        }
-    } else {
-        const vocabContainer = document.querySelector('.vocab-container');
-        if (vocabContainer) {
-            vocabContainer.style.display = 'none';
-        }
-    }
-}
-
-function handleTabSwitch(containerType) {
-    // Hide all tab content
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.style.display = 'none';
-    });
+    initTextTab();
+    initQuestionsTab();
+    initVocabularyTab(); // Add this line
     
-    // Show the selected tab content
-    const selectedTab = document.getElementById(containerType);
-    if (selectedTab) {
-        selectedTab.style.display = 'block';
-    }
-    
-    // Remove active class from all tab buttons
-    document.querySelectorAll('.tab-button').forEach(button => {
-        button.classList.remove('active');
-    });
-    
-    // Add active class to the clicked button
-    document.querySelector(`.tab-button[data-tab="${containerType}"]`).classList.add('active');
-    
-    // Show/hide vocab container
-    if (containerType === '单词') {
-        const vocabContainer = document.querySelector('.vocab-container');
-        if (vocabContainer) {
-            vocabContainer.style.display = 'block';
-        }
-    }
-}
-
-function setupEventListeners() {
     // ... existing code ...
-    
-    // Add event listener for tab buttons
-    document.querySelectorAll('.tab-button').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const tabId = e.target.getAttribute('data-tab');
-            handleTabSwitch(tabId);
-        });
-    });
-    
-    // Add event listener for vocab button
-    const generateVocabBtn = document.getElementById('generateVocabBtn');
-    if (generateVocabBtn) {
-        generateVocabBtn.addEventListener('click', handleGenerateVocabulary);
-    }
-    
-    // Add event listeners for vocab navigation buttons
-    const prevWordBtn = document.getElementById('prevWord');
-    const nextWordBtn = document.getElementById('nextWord');
-    
-    if (prevWordBtn) {
-        prevWordBtn.addEventListener('click', () => {
-            if (currentWordIndex > 0) {
-                currentWordIndex--;
-                displayCurrentWord();
-                updateWordCounter();
-            }
-        });
-    }
-    
-    if (nextWordBtn) {
-        nextWordBtn.addEventListener('click', () => {
-            if (currentWordIndex < vocabularyList.length - 1) {
-                currentWordIndex++;
-                displayCurrentWord();
-                updateWordCounter();
-            }
-        });
-    }
-    
-    // Initialize - hide vocab container by default
-    const vocabContainer = document.querySelector('.vocab-container');
-    if (vocabContainer) {
-        vocabContainer.style.display = 'none';
-    }
 }
 
-// Make sure this is called during initialization
-// If you have an init() function, ensure setupEventListeners() is called there
 // ... existing code ...

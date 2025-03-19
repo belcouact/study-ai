@@ -23,6 +23,8 @@
                 <button id="qa-button" class="panel-button active">问答</button>
                 <button id="create-button" class="panel-button">测验</button>
                 <button id="poetry-button" class="panel-button">诗词</button>
+                <button id="text-button" class="panel-button">文本</button>
+                <button id="questions-button" class="panel-button">问题</button>
                 <button id="vocab-button" class="panel-button">单词</button>
                 
                 <!-- Dropdown Frames -->
@@ -229,31 +231,21 @@
                     </div>
                 </div>
             </div>
-
-            <!-- New vocabulary learning tab -->
-            <div id="单词" class="tab-content">
-                <div class="vocab-container">
-                    <div class="vocab-controls">
-                        <button id="generateVocabBtn">Generate New Words</button>
-                        <div class="navigation-buttons">
-                            <button id="prevWord">Previous</button>
-                            <span id="wordCounter">0/0</span>
-                            <button id="nextWord">Next</button>
-                        </div>
-                    </div>
-                    <div class="vocab-display">
-                        <div class="word-card">
-                            <h2 class="english-word"></h2>
-                            <div class="word-details">
-                                <p class="word-form"></p>
-                                <p class="english-meaning"></p>
-                                <p class="chinese-meaning"></p>
-                                <div class="example">
-                                    <p class="example-english"></p>
-                                    <p class="example-chinese"></p>
-                                </div>
-                            </div>
-                        </div>
+            
+            <!-- Vocabulary Container -->
+            <div id="vocab-container" class="content-section">
+                <div class="vocab-header">
+                    <h2>英语词汇学习</h2>
+                    <button id="generate-vocab-button" class="action-button">生成词汇</button>
+                </div>
+                <div class="vocab-navigation">
+                    <button id="prev-word" class="nav-button" disabled>上一个</button>
+                    <span id="word-counter">0/0</span>
+                    <button id="next-word" class="nav-button" disabled>下一个</button>
+                </div>
+                <div id="vocab-display">
+                    <div class="empty-state">
+                        点击"生成词汇"按钮开始学习英语单词
                     </div>
                 </div>
             </div>
