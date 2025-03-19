@@ -23,6 +23,7 @@
                 <button id="qa-button" class="panel-button active">问答</button>
                 <button id="create-button" class="panel-button">测验</button>
                 <button id="poetry-button" class="panel-button">诗词</button>
+                <button class="tab-button" data-tab="单词">单词</button>
                 
                 <!-- Dropdown Frames -->
                 <div class="dropdown-frames">
@@ -223,6 +224,34 @@
                             <div class="poem-section">
                                 <h3>赏析</h3>
                                 <div class="poem-explanation"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New vocabulary learning tab -->
+            <div id="单词" class="tab-content">
+                <div class="vocab-container">
+                    <div class="vocab-controls">
+                        <button id="generateVocabBtn">Generate New Words</button>
+                        <div class="navigation-buttons">
+                            <button id="prevWord">Previous</button>
+                            <span id="wordCounter">0/0</span>
+                            <button id="nextWord">Next</button>
+                        </div>
+                    </div>
+                    <div class="vocab-display">
+                        <div class="word-card">
+                            <h2 class="english-word"></h2>
+                            <div class="word-details">
+                                <p class="word-form"></p>
+                                <p class="english-meaning"></p>
+                                <p class="chinese-meaning"></p>
+                                <div class="example">
+                                    <p class="example-english"></p>
+                                    <p class="example-chinese"></p>
+                                </div>
                             </div>
                         </div>
                     </div>

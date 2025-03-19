@@ -4,6 +4,10 @@ let currentModel = 'deepseek-r1';
 // Add global variable for current question index
 let currentQuestionIndex = 0;
 
+// Add these variables at the top with other global variables
+let vocabularyList = [];
+let currentWordIndex = 0;
+
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
     console.log('Parsing questions from response:', response);
@@ -5900,3 +5904,73 @@ function loadPoemDetails(poem) {
 
 // If your code uses a different function to display poem details, 
 // ensure the sections are added and visible in that function instead.
+
+// Add this function with your other functions
+async function handleGenerateVocabulary() {
+    const selectedSchool = document.getElementById('schoolSelect').value;
+    const selectedGrade = document.getElementById('gradeSelect').value;
+    
+    const prompt = `Generate 10 English vocabulary words appropriate for ${selectedSchool} school ${selectedGrade} grade students. For each word, provide:
+    1. The word
+    2. Its part of speech
+    3. English meaning
+    4. Chinese meaning
+    5. An example sentence in English
+    6. Chinese translation of the example sentence
+    Format as JSON array.`;
+
+    try {
+        const response = await fetch('YOUR_DEEPSEEK_API_ENDPOINT', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer YOUR_API_KEY'
+            },
+            body: JSON.stringify({ prompt: prompt })
+        });
+
+        const data = await response.json();
+        vocabularyList = JSON.parse(data.response); // Assuming the API returns JSON string
+        currentWordIndex = 0;
+        displayCurrentWord();
+        updateWordCounter();
+    } catch (error) {
+        console.error('Error generating vocabulary:', error);
+    }
+}
+
+function displayCurrentWord() {
+    if (vocabularyList.length === 0) return;
+    
+    const word = vocabularyList[currentWordIndex];
+    document.querySelector('.english-word').textContent = word.word;
+    document.querySelector('.word-form').textContent = word.partOfSpeech;
+    document.querySelector('.english-meaning').textContent = word.englishMeaning;
+    document.querySelector('.chinese-meaning').textContent = word.chineseMeaning;
+    document.querySelector('.example-english').textContent = word.exampleEnglish;
+    document.querySelector('.example-chinese').textContent = word.exampleChinese;
+}
+
+function updateWordCounter() {
+    document.getElementById('wordCounter').textContent = 
+        `${currentWordIndex + 1}/${vocabularyList.length}`;
+}
+
+// Add these event listeners in your initialization code
+document.getElementById('generateVocabBtn').addEventListener('click', handleGenerateVocabulary);
+
+document.getElementById('prevWord').addEventListener('click', () => {
+    if (currentWordIndex > 0) {
+        currentWordIndex--;
+        displayCurrentWord();
+        updateWordCounter();
+    }
+});
+
+document.getElementById('nextWord').addEventListener('click', () => {
+    if (currentWordIndex < vocabularyList.length - 1) {
+        currentWordIndex++;
+        displayCurrentWord();
+        updateWordCounter();
+    }
+});

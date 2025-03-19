@@ -1760,4 +1760,105 @@ button:active {
 
 .poetry-header.scrolled {
     animation: stickyAppear 0.3s forwards;
+}
+
+.vocab-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.vocab-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+#generateVocabBtn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#generateVocabBtn:hover {
+    background-color: #45a049;
+}
+
+.navigation-buttons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.navigation-buttons button {
+    padding: 8px 15px;
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.navigation-buttons button:hover {
+    background-color: #007399;
+}
+
+#wordCounter {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.word-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.english-word {
+    font-size: 32px;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.word-details {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.word-form {
+    color: #666;
+    font-style: italic;
+}
+
+.english-meaning, .chinese-meaning {
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.example {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.example p {
+    margin: 10px 0;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.example-english {
+    color: #2c3e50;
+}
+
+.example-chinese {
+    color: #666;
 } 
