@@ -5,8 +5,8 @@ let currentModel = 'deepseek-r1';
 let currentQuestionIndex = 0;
 
 // Add these at the top of your script.js file if they don't exist
-let vocabularyWords = [];
-let currentWordIndex = 0;
+// let vocabularyWords = [];
+// let currentWordIndex = 0;
 
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
@@ -6236,3 +6236,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM fully loaded, initializing application...");
     init();
 });
+
+// Make sure we don't have multiple event listeners for DOMContentLoaded
+document.removeEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', init);
