@@ -4035,8 +4035,8 @@ function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, subm
                         <div class="error-message">
                             <i class="fas fa-exclamation-circle"></i>
                             抱歉，处理您的问题时出现了错误。请重试。
-                        </div>
-                    `;
+            </div>
+        `;
                     showSystemMessage('提交问题时出错，请重试。', 'error');
                 })
                 .finally(() => {
@@ -6075,9 +6075,10 @@ function showVocabularyError(message) {
 function handleTabSwitch(containerType) {
     console.log('Switching to tab:', containerType);
     
-    // First, hide all containers
+    // First, hide all tab content containers
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.remove('active');
+        content.style.display = 'none'; // Explicitly hide all tab content
     });
     
     // Remove the previous containers from DOM if they exist
@@ -6120,34 +6121,20 @@ function handleTabSwitch(containerType) {
         contentArea.appendChild(poetryContainer);
         if (typeof poetryButton !== 'undefined' && poetryButton) poetryButton.classList.add('active');
     } else if (containerType === 'vocabulary') {
-        // Show vocabulary content and activate the word button
+        // Show vocabulary content
         const vocabularyContent = document.getElementById('vocabulary-content');
         if (vocabularyContent) {
-            // Make sure to remove other content first
-            document.querySelectorAll('.tab-content').forEach(content => {
-                if (content !== vocabularyContent) {
-                    content.classList.remove('active');
-                    content.style.display = 'none';
-                }
-            });
-            
-            vocabularyContent.classList.add('active');
             vocabularyContent.style.display = 'block';
+            vocabularyContent.classList.add('active');
+            
+            // Make sure the wordButton is active
             if (wordButton) wordButton.classList.add('active');
         }
     } else if (containerType && document.getElementById(`${containerType}-content`)) {
+        // For other tab content
         const tabContent = document.getElementById(`${containerType}-content`);
-        
-        // Make sure to remove other content first
-        document.querySelectorAll('.tab-content').forEach(content => {
-            if (content !== tabContent) {
-                content.classList.remove('active');
-                content.style.display = 'none';
-            }
-        });
-        
-        tabContent.classList.add('active');
         tabContent.style.display = 'block';
+        tabContent.classList.add('active');
     }
     
     // Always update the UI state if these functions exist
@@ -6161,8 +6148,9 @@ function setupTabEventListeners() {
     const tabs = document.querySelectorAll('.tab');
     tabs.forEach(tab => {
         tab.addEventListener('click', function() {
-            console.log('Tab clicked:', tab.dataset.tab);
-            handleTabSwitch(tab.dataset.tab);
+            const tabType = tab.dataset.tab;
+            console.log('Tab clicked:', tabType);
+            handleTabSwitch(tabType);
         });
     });
     
