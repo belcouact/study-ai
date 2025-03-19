@@ -5906,17 +5906,33 @@ let wordHistory = [];
 let currentWordPage = 0;
 const wordsPerPage = 10;
 
-document.getElementById('words-tab').addEventListener('click', function() {
-    hideAllPanels();
-    document.getElementById('word-container').style.display = 'flex';
-    
-    // Update education context display
+document.getElementById('word-button').addEventListener('click', function() {
+    switchPanel('word-container');
     updateEducationContext();
 });
 
+function switchPanel(panelId) {
+    // ... existing code ...
+    
+    // Hide all containers
+    document.getElementById('qa-container').classList.add('hidden');
+    document.getElementById('create-container').classList.add('hidden');
+    document.getElementById('poetry-container').classList.add('hidden');
+    document.getElementById('word-container').style.display = 'none';
+    
+    // Show the selected container
+    if (panelId === 'qa-container' || panelId === 'create-container' || panelId === 'poetry-container') {
+        document.getElementById(panelId).classList.remove('hidden');
+    } else if (panelId === 'word-container') {
+        document.getElementById(panelId).style.display = 'flex';
+    }
+    
+    // ... existing code ...
+}
+
 function updateEducationContext() {
-    const school = document.getElementById('school-select').value;
-    const grade = document.getElementById('grade-select').value;
+    const school = document.getElementById('school-select-sidebar').value;
+    const grade = document.getElementById('grade-select-sidebar').value;
     
     if (school && grade) {
         document.getElementById('education-context').textContent = 
@@ -5926,20 +5942,16 @@ function updateEducationContext() {
     }
 }
 
-// Update context when school or grade changes
-document.getElementById('school-select').addEventListener('change', updateEducationContext);
-document.getElementById('grade-select').addEventListener('change', updateEducationContext);
-
-document.getElementById('generate-words').addEventListener('click', function() {
-    const school = document.getElementById('school-select').value;
-    const grade = document.getElementById('grade-select').value;
+document.getElementById('generate-words').addEventListener('click', async function() {
+    const school = document.getElementById('school-select-sidebar').value;
+    const grade = document.getElementById('grade-select-sidebar').value;
     
     if (!school || !grade) {
-        showToast('请先在侧边栏选择学校和年级', 'error');
+        showSystemMessage('请先在侧边栏选择学校和年级', 'error');
         return;
     }
     
-    generateWords(school, grade);
+    await generateWords(school, grade);
 });
 
 document.getElementById('prev-words').addEventListener('click', function() {
@@ -5968,34 +5980,72 @@ async function generateWords(school, grade) {
     document.getElementById('generate-words').disabled = true;
     
     try {
-        const response = await fetch(`${API_BASE_URL}/generate-words`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
-            },
-            body: JSON.stringify({
-                school: school,
-                grade: grade,
-                count: wordsPerPage
-            })
-        });
+        // Crafting prompt for vocabulary generation
+        const prompt = `Generate 10 English vocabulary words appropriate for ${school} ${grade} students in China. For each word, include:
+        1. The English word
+        2. Part of speech (noun, verb, adjective, etc.)
+        3. English meaning
+        4. Chinese meaning
+        5. Related forms (if applicable)
+        6. 2 example sentences with Chinese translations
+
+        Format the response as a JSON array of objects with the following structure:
+        [
+          {
+            "word": "example",
+            "partOfSpeech": "noun",
+            "englishMeaning": "a thing characteristic of its kind",
+            "chineseMeaning": "例子，榜样",
+            "relatedForms": "exemplify (verb), exemplary (adj)",
+            "examples": [
+              {
+                "english": "This is an example of good writing.",
+                "chinese": "这是优秀写作的一个例子。"
+              },
+              {
+                "english": "She set a good example for others to follow.",
+                "chinese": "她为他人树立了一个好榜样。"
+              }
+            ]
+          },
+          ...
+        ]
         
-        if (!response.ok) {
-            throw new Error('Failed to generate words');
+        Ensure the vocabulary level is appropriate for ${school} ${grade} students.`;
+        
+        const response = await fetchAIResponse(prompt);
+        let words;
+        
+        try {
+            // Extract the JSON array from the response
+            const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/) || 
+                             response.match(/```\n([\s\S]*?)\n```/) ||
+                             response.match(/\[([\s\S]*?)\]/);
+                             
+            if (jsonMatch) {
+                const jsonString = jsonMatch[0];
+                words = JSON.parse(jsonString);
+            } else {
+                // If no JSON format found, try to extract from the whole response
+                words = JSON.parse(response);
+            }
+            
+            // Add to history and display
+            wordHistory.push(words);
+            currentWordPage = wordHistory.length - 1;
+            displayWords(words);
+            updateWordNavigationButtons();
+        } catch (parseError) {
+            console.error('Error parsing words JSON:', parseError);
+            showSystemMessage('解析单词数据时出错，请重试', 'error');
+            wordsList.innerHTML = `<div class="error-message">
+                <p>抱歉，解析单词数据时遇到问题。</p>
+                <p>错误信息: ${parseError.message}</p>
+            </div>`;
         }
-        
-        const data = await response.json();
-        
-        // Add to history and display
-        wordHistory.push(data.words);
-        currentWordPage = wordHistory.length - 1;
-        displayWords(data.words);
-        updateWordNavigationButtons();
-        
     } catch (error) {
         console.error('Error generating words:', error);
-        showToast('生成单词时出错，请稍后再试', 'error');
+        showSystemMessage('生成单词时出错，请稍后再试', 'error');
         wordsList.innerHTML = `<div class="error-message">
             <p>抱歉，生成单词时遇到问题。</p>
             <p>错误信息: ${error.message}</p>
@@ -6048,3 +6098,21 @@ function updateWordNavigationButtons() {
     document.getElementById('prev-words').disabled = currentWordPage <= 0;
     document.getElementById('next-words').disabled = currentWordPage >= wordHistory.length - 1;
 }
+
+// Make sure to add these function calls to init()
+function addWordFeatureToInit() {
+    // Add event listeners for sidebar selection changes
+    document.getElementById('school-select-sidebar').addEventListener('change', updateEducationContext);
+    document.getElementById('grade-select-sidebar').addEventListener('change', updateEducationContext);
+}
+
+// Update init() function to include the word feature initialization
+function init() {
+    // ... existing init code ...
+    
+    addWordFeatureToInit();
+    
+    // ... remaining init code ...
+}
+
+// ... existing code ...
