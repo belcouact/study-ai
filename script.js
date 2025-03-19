@@ -6018,3 +6018,84 @@ function handleTabSwitch(containerType) {
         }
     }
 }
+
+function handleTabSwitch(containerType) {
+    // Hide all tab content
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    
+    // Show the selected tab content
+    const selectedTab = document.getElementById(containerType);
+    if (selectedTab) {
+        selectedTab.style.display = 'block';
+    }
+    
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Add active class to the clicked button
+    document.querySelector(`.tab-button[data-tab="${containerType}"]`).classList.add('active');
+    
+    // Show/hide vocab container
+    if (containerType === '单词') {
+        const vocabContainer = document.querySelector('.vocab-container');
+        if (vocabContainer) {
+            vocabContainer.style.display = 'block';
+        }
+    }
+}
+
+function setupEventListeners() {
+    // ... existing code ...
+    
+    // Add event listener for tab buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const tabId = e.target.getAttribute('data-tab');
+            handleTabSwitch(tabId);
+        });
+    });
+    
+    // Add event listener for vocab button
+    const generateVocabBtn = document.getElementById('generateVocabBtn');
+    if (generateVocabBtn) {
+        generateVocabBtn.addEventListener('click', handleGenerateVocabulary);
+    }
+    
+    // Add event listeners for vocab navigation buttons
+    const prevWordBtn = document.getElementById('prevWord');
+    const nextWordBtn = document.getElementById('nextWord');
+    
+    if (prevWordBtn) {
+        prevWordBtn.addEventListener('click', () => {
+            if (currentWordIndex > 0) {
+                currentWordIndex--;
+                displayCurrentWord();
+                updateWordCounter();
+            }
+        });
+    }
+    
+    if (nextWordBtn) {
+        nextWordBtn.addEventListener('click', () => {
+            if (currentWordIndex < vocabularyList.length - 1) {
+                currentWordIndex++;
+                displayCurrentWord();
+                updateWordCounter();
+            }
+        });
+    }
+    
+    // Initialize - hide vocab container by default
+    const vocabContainer = document.querySelector('.vocab-container');
+    if (vocabContainer) {
+        vocabContainer.style.display = 'none';
+    }
+}
+
+// Make sure this is called during initialization
+// If you have an init() function, ensure setupEventListeners() is called there
+// ... existing code ...
