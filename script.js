@@ -5914,7 +5914,19 @@ function initVocabularyTab() {
     const nextWordButton = document.getElementById('next-word');
 
     vocabButton.addEventListener('click', () => {
-        showSection('vocab-container');
+        // Hide all containers
+        document.querySelectorAll('.container, .content-section').forEach(container => {
+            container.style.display = 'none';
+        });
+        
+        // Show vocabulary container
+        vocabContainer.style.display = 'flex';
+        
+        // Update active button
+        document.querySelectorAll('.panel-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        vocabButton.classList.add('active');
     });
 
     generateVocabButton.addEventListener('click', handleGenerateVocabularyClick);
@@ -6086,12 +6098,14 @@ function showSection(sectionId) {
     const containers = document.querySelectorAll('.content-section, .container');
     containers.forEach(container => {
         container.style.display = 'none';
+        container.classList.add('hidden');
     });
     
     // Show the selected container
     const selectedContainer = document.getElementById(sectionId);
     if (selectedContainer) {
         selectedContainer.style.display = 'flex';
+        selectedContainer.classList.remove('hidden');
     }
     
     // Update active state for panel buttons
@@ -6121,10 +6135,36 @@ function initVocabularyTab() {
     const nextWordButton = document.getElementById('next-word');
 
     vocabButton.addEventListener('click', () => {
-        showSection('vocab-container');
+        // Hide all containers
+        document.querySelectorAll('.container, .content-section').forEach(container => {
+            container.style.display = 'none';
+        });
+        
+        // Show vocabulary container
+        vocabContainer.style.display = 'flex';
+        
+        // Update active button
+        document.querySelectorAll('.panel-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        vocabButton.classList.add('active');
     });
 
-    // ... rest of existing function ...
+    generateVocabButton.addEventListener('click', handleGenerateVocabularyClick);
+    
+    prevWordButton.addEventListener('click', () => {
+        if (currentWordIndex > 0) {
+            currentWordIndex--;
+            displayCurrentWord();
+        }
+    });
+    
+    nextWordButton.addEventListener('click', () => {
+        if (currentWordIndex < vocabularyWords.length - 1) {
+            currentWordIndex++;
+            displayCurrentWord();
+        }
+    });
 }
 
 // ... rest of existing code ...

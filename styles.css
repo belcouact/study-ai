@@ -1767,6 +1767,11 @@ button:active {
     display: none;
     flex-direction: column;
     height: 100%;
+    width: 100%;
+}
+
+#vocab-container.hidden {
+    display: none;
 }
 
 .vocab-header {
