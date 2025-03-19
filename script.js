@@ -4,9 +4,15 @@ let currentModel = 'deepseek-r1';
 // Add global variable for current question index
 let currentQuestionIndex = 0;
 
-// Global variables
-let vocabularyWords = [];
-let currentWordIndex = 0;
+// Add these global variables if they don't exist elsewhere
+// You can add these at the top of your script
+if (typeof vocabularyWords === 'undefined') {
+    var vocabularyWords = [];
+}
+
+if (typeof currentWordIndex === 'undefined') {
+    var currentWordIndex = 0;
+}
 
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
@@ -5198,7 +5204,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const qaButton = document.getElementById('qa-button');
     const createButton = document.getElementById('create-button');
     const wordButton = document.getElementById('word-button');
-
+    
     // Get the content area where containers should be placed
     const contentArea = document.querySelector('.content-area');
     
@@ -5938,6 +5944,10 @@ function loadPoemDetails(poem) {
     analysisSection.style.display = 'block';
 }
 
+// Global variables
+let vocabularyWords = [];
+let currentWordIndex = 0;
+
 // Add event listeners after DOM loads
 document.addEventListener('DOMContentLoaded', function() {
     // ... existing code ...
@@ -5988,8 +5998,8 @@ async function handleLoadVocabularyClick() {
         
         // Display words
         if (words && words.length > 0) {
-            vocabularyWords = words;
-            currentWordIndex = 0;
+        vocabularyWords = words;
+        currentWordIndex = 0;
             displayWordCard(currentWordIndex);
             updateNavigationControls();
         } else {
@@ -6046,31 +6056,75 @@ async function fetchVocabularyWords(school, grade) {
 function parseVocabularyResponse(text) {
     console.log('Parsing vocabulary response:', text);
     
-    // Try to find and parse JSON in the response
     try {
-        // Look for JSON code blocks or direct JSON content
-        const jsonMatch = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/) || 
-                         text.match(/(\{[\s\S]*"words"[\s\S]*\})/);
+        // First, handle the case where text might already be parsed JSON
+        if (typeof text === 'object') {
+            if (Array.isArray(text)) {
+                return text; // Already an array of words
+            } else if (text.words && Array.isArray(text.words)) {
+                return text.words; // Object with words array
+            }
+        }
         
-        if (jsonMatch) {
-            const jsonContent = jsonMatch[1];
-            const parsed = JSON.parse(jsonContent);
+        // Try to find and parse JSON in the response
+        if (typeof text === 'string') {
+            // Check for malformed JSON at the start/end of the string
+            let jsonString = text.trim();
             
-            if (parsed.words && Array.isArray(parsed.words)) {
-                console.log('Successfully parsed JSON words:', parsed.words);
-                return parsed.words;
+            // If the string appears to be JSON but has trailing text, clean it up
+            if (jsonString.startsWith('[') && !jsonString.endsWith(']')) {
+                const lastBracketIndex = jsonString.lastIndexOf(']');
+                if (lastBracketIndex > 0) {
+                    jsonString = jsonString.substring(0, lastBracketIndex + 1);
+                }
+            }
+            
+            // Look for JSON code blocks
+            const jsonMatch = jsonString.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+            if (jsonMatch) {
+                jsonString = jsonMatch[1];
+            }
+            
+            // Try parsing the JSON
+            try {
+                const parsed = JSON.parse(jsonString);
+                if (Array.isArray(parsed)) {
+                    console.log('Successfully parsed JSON array:', parsed);
+                    return parsed;
+                } else if (parsed.words && Array.isArray(parsed.words)) {
+                    console.log('Successfully parsed JSON with words property:', parsed.words);
+                    return parsed.words;
+                }
+            } catch (e) {
+                console.warn('JSON parse error:', e);
+                
+                // Try more aggressive cleaning - find anything that looks like a JSON array
+                const arrayMatch = jsonString.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                if (arrayMatch) {
+                    try {
+                        const cleanedJson = arrayMatch[0];
+                        const parsed = JSON.parse(cleanedJson);
+                        if (Array.isArray(parsed)) {
+                            console.log('Successfully parsed cleaned JSON array:', parsed);
+                            return parsed;
+                        }
+                    } catch (innerE) {
+                        console.warn('Cleaned JSON parse error:', innerE);
+                    }
+                }
             }
         }
     } catch (e) {
         console.warn('Failed to parse JSON from response:', e);
     }
     
-    // If all extraction methods fail, return mock data
-    console.warn('Could not parse vocabulary words from response');
+    // If all parsing attempts fail, return mock data
+    console.warn('Could not parse vocabulary words from response, using mock data');
     // return getMockVocabularyWords();
 }
 
 // Keep the mock data function for fallback
+/*
 function getMockVocabularyWords() {
     return [
         {
@@ -6105,6 +6159,7 @@ function getMockVocabularyWords() {
         }
     ];
 }
+*/
 
 // Function to display a vocabulary word card
 function displayWordCard(index) {
@@ -6116,19 +6171,19 @@ function displayWordCard(index) {
         return;
     }
     
-    // Create word card HTML - handle both API response format and our mock data format
-    const english = word.word || word.english;
+    // Handle both API response format (word, definition) and mock data format (english, englishMeaning)
+    const english = word.word || word.english || '';
     const form = word.part_of_speech || word.form || 'n/a';
-    const englishMeaning = word.english_definition || word.englishMeaning || '';
+    const englishMeaning = word.definition || word.english_definition || word.englishMeaning || '';
     const chineseMeaning = word.chinese_translation || word.chineseMeaning || '';
     
     // Handle examples in either format
     let examples = [];
     if (word.example_sentences && Array.isArray(word.example_sentences)) {
         examples = word.example_sentences.map(example => {
-            // If example is a string with both English and Chinese separated by a delimiter
+            // If example is a string with both English and Chinese
             if (typeof example === 'string') {
-                const parts = example.split(/[。.]\s*(?=[\u4e00-\u9fa5])/);
+                const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
                 if (parts.length >= 2) {
                     return {
                         english: parts[0].trim(),
@@ -6161,12 +6216,24 @@ function displayWordCard(index) {
                 </div>
             </div>
             <div class="word-examples">
-                ${examples.map(example => `
-                    <div class="example-item">
-                        <div class="example-english">${example.english || example}</div>
-                        <div class="example-chinese">${example.chinese || ''}</div>
-                    </div>
-                `).join('')}
+                ${examples.map(example => {
+                    if (typeof example === 'string') {
+                        const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
+                        return `
+                            <div class="example-item">
+                                <div class="example-english">${parts[0] || example}</div>
+                                <div class="example-chinese">${parts[1] || ''}</div>
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="example-item">
+                                <div class="example-english">${example.english || ''}</div>
+                                <div class="example-chinese">${example.chinese || ''}</div>
+                            </div>
+                        `;
+                    }
+                }).join('')}
             </div>
         </div>
     `;
