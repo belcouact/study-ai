@@ -5161,11 +5161,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const poetryContainer = document.getElementById('poetry-container');
     const qaContainer = document.getElementById('qa-container');
     const createContainer = document.getElementById('create-container');
+    const wordContainer = document.getElementById('word-container');
     
     // Store original parent nodes
     let poetryParent = null;
     let qaParent = null;
     let createParent = null;
+    let wordParent = null;
     
     if (poetryContainer) {
         poetryParent = poetryContainer.parentNode;
@@ -5182,12 +5184,17 @@ document.addEventListener('DOMContentLoaded', function() {
     if (createContainer) {
         createParent = createContainer.parentNode;
     }
+
+    if (wordContainer) {
+        wordParent = wordContainer.parentNode;
+    }
     
     // Get all buttons
     const poetryButton = document.getElementById('poetry-button');
     const qaButton = document.getElementById('qa-button');
     const createButton = document.getElementById('create-button');
-    
+    const wordButton = document.getElementById('word-button');
+
     // Get the content area where containers should be placed
     const contentArea = document.querySelector('.content-area');
     
@@ -5207,15 +5214,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (poetryContainer && poetryContainer.parentNode) {
             poetryContainer.parentNode.removeChild(poetryContainer);
         }
-        
-        // Get vocabulary container
-        const vocabularyContent = document.getElementById('vocabulary-content');
-        
+
+        if (wordContainer && wordContainer.parentNode) {
+            wordContainer.parentNode.removeChild(wordContainer);
+        }
+                
         // Reset active states for sidebar buttons
         if (qaButton) qaButton.classList.remove('active');
         if (createButton) createButton.classList.remove('active');
         if (poetryButton) poetryButton.classList.remove('active');
-        const wordButton = document.getElementById('word-button');
         if (wordButton) wordButton.classList.remove('active');
         
         // Reset active states for tab elements if they exist
@@ -5231,9 +5238,6 @@ document.addEventListener('DOMContentLoaded', function() {
             content.classList.remove('active');
         });
         
-        // Hide all content containers
-        if (vocabularyContent) vocabularyContent.classList.add('hidden');
-        
         // Set the appropriate container active based on containerType
         if (containerType === 'qa') {
             contentArea.appendChild(qaContainer);
@@ -5244,7 +5248,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (containerType === 'poetry') {
             contentArea.appendChild(poetryContainer);
             poetryButton.classList.add('active');
-        } else if (containerType === 'vocabulary' || containerType === 'word') {
+        } else if (containerType === 'word') {
             // Show vocabulary content
             if (vocabularyContent) {
                 vocabularyContent.classList.remove('hidden');
@@ -5254,7 +5258,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // For other tab content that follows the naming pattern
             document.getElementById(`${containerType}-content`).classList.add('active');
         }
-
     }
     
     // Add event listeners to buttons
@@ -5276,6 +5279,13 @@ document.addEventListener('DOMContentLoaded', function() {
         poetryButton.addEventListener('click', function() {
             console.log('Poetry button clicked');
             handleTabSwitch('poetry');
+        });
+    }
+
+    if (wordButton) {
+        wordButton.addEventListener('click', function() {
+            console.log('Word button clicked');
+            handleTabSwitch('word');
         });
     }
     
@@ -5906,8 +5916,6 @@ function loadPoemDetails(poem) {
     // Make sections visible
     backgroundSection.style.display = 'block';
     analysisSection.style.display = 'block';
-    
-    // ... rest of existing code ...
 }
 
 // Global variables
@@ -6069,199 +6077,6 @@ function showVocabularyError(message) {
     `;
 }
 
-// ... existing code ...
-
-// Update the handleTabSwitch function to properly handle the vocabulary tab
-/*
-function handleTabSwitch(containerType) {
-    console.log('Switching to tab:', containerType);
-    
-    // First, hide all tab content containers
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-        content.style.display = 'none'; // Explicitly hide all tab content
-    });
-    
-    // Remove the previous containers from DOM if they exist
-    if (typeof qaContainer !== 'undefined' && qaContainer && qaContainer.parentNode) {
-        qaContainer.parentNode.removeChild(qaContainer);
-    }
-    
-    if (typeof createContainer !== 'undefined' && createContainer && createContainer.parentNode) {
-        createContainer.parentNode.removeChild(createContainer);
-    }
-    
-    if (typeof poetryContainer !== 'undefined' && poetryContainer && poetryContainer.parentNode) {
-        poetryContainer.parentNode.removeChild(poetryContainer);
-    }
-    
-    // Reset active states for sidebar buttons
-    if (typeof qaButton !== 'undefined' && qaButton) qaButton.classList.remove('active');
-    if (typeof createButton !== 'undefined' && createButton) createButton.classList.remove('active');
-    if (typeof poetryButton !== 'undefined' && poetryButton) poetryButton.classList.remove('active');
-    
-    const wordButton = document.getElementById('word-button');
-    if (wordButton) wordButton.classList.remove('active');
-    
-    // Reset active states for tabs
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-        if (tab.dataset.tab === containerType) {
-            tab.classList.add('active');
-        }
-    });
-    
-    // Handle specific container types
-    if (containerType === 'qa' && typeof qaContainer !== 'undefined' && qaContainer) {
-        contentArea.appendChild(qaContainer);
-        if (typeof qaButton !== 'undefined' && qaButton) qaButton.classList.add('active');
-    } else if (containerType === 'create' && typeof createContainer !== 'undefined' && createContainer) {
-        contentArea.appendChild(createContainer);
-        if (typeof createButton !== 'undefined' && createButton) createButton.classList.add('active');
-    } else if (containerType === 'poetry' && typeof poetryContainer !== 'undefined' && poetryContainer) {
-        contentArea.appendChild(poetryContainer);
-        if (typeof poetryButton !== 'undefined' && poetryButton) poetryButton.classList.add('active');
-    } else if (containerType === 'vocabulary') {
-        // Show vocabulary content
-        const vocabularyContent = document.getElementById('vocabulary-content');
-        if (vocabularyContent) {
-            vocabularyContent.style.display = 'block';
-            vocabularyContent.classList.add('active');
-            
-            // Make sure the wordButton is active
-            if (wordButton) wordButton.classList.add('active');
-        }
-    } else if (containerType && document.getElementById(`${containerType}-content`)) {
-        // For other tab content
-        const tabContent = document.getElementById(`${containerType}-content`);
-        tabContent.style.display = 'block';
-        tabContent.classList.add('active');
-    }
-    
-    // Always update the UI state if these functions exist
-    if (typeof handleResize === 'function') handleResize();
-    if (typeof resetContentArea === 'function') resetContentArea();
-}
-*/
-
-// Add this code to make sure the vocabulary tab is properly handled
-function setupTabEventListeners() {
-    // Tab switching for any additional tabs using data-tab attributes
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            const tabType = tab.dataset.tab;
-            console.log('Tab clicked:', tabType);
-            handleTabSwitch(tabType);
-        });
-    });
-    
-    // Add specific handler for word button if it exists
-    const wordButton = document.getElementById('word-button');
-    if (wordButton) {
-        wordButton.addEventListener('click', function() {
-            console.log('Word button clicked');
-            handleTabSwitch('vocabulary');
-        });
-    }
-}
-
-// Call this function in your init or setupEventListeners function
-// Add this line to your setupEventListeners function
-setupTabEventListeners();
-
-/*
-// Fix the handleTabSwitch function to avoid reference errors
-function handleTabSwitch(containerType) {
-    console.log('Switching to tab:', containerType);
-    
-    // Check if these variables exist in the global scope
-    // If they don't exist, we can safely skip the related code
-    try {
-        // First, remove all containers from DOM to ensure clean state
-        if (typeof qaContainer !== 'undefined' && qaContainer && qaContainer.parentNode) {
-            qaContainer.parentNode.removeChild(qaContainer);
-        }
-        
-        if (typeof createContainer !== 'undefined' && createContainer && createContainer.parentNode) {
-            createContainer.parentNode.removeChild(createContainer);
-        }
-        
-        if (typeof poetryContainer !== 'undefined' && poetryContainer && poetryContainer.parentNode) {
-            poetryContainer.parentNode.removeChild(poetryContainer);
-        }
-        
-        // Reset active states for sidebar buttons
-        if (typeof qaButton !== 'undefined' && qaButton) qaButton.classList.remove('active');
-        if (typeof createButton !== 'undefined' && createButton) createButton.classList.remove('active');
-        if (typeof poetryButton !== 'undefined' && poetryButton) poetryButton.classList.remove('active');
-    } catch (e) {
-        console.log('Some container elements are not defined:', e.message);
-    }
-    
-    // This code should work regardless of the variables above
-    const wordButton = document.getElementById('word-button');
-    if (wordButton) wordButton.classList.remove('active');
-    
-    // Reset active states for tabs
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-        if (tab.dataset.tab === containerType) {
-            tab.classList.add('active');
-        }
-    });
-    
-    // Reset active states for tab content
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-        // Also remove any hidden class that might be preventing display
-        content.classList.remove('hidden');
-    });
-    
-    // Handle specific container types
-    try {
-        if (containerType === 'qa' && typeof qaContainer !== 'undefined' && qaContainer) {
-            contentArea.appendChild(qaContainer);
-            if (typeof qaButton !== 'undefined' && qaButton) qaButton.classList.add('active');
-        } else if (containerType === 'create' && typeof createContainer !== 'undefined' && createContainer) {
-            contentArea.appendChild(createContainer);
-            if (typeof createButton !== 'undefined' && createButton) createButton.classList.add('active');
-        } else if (containerType === 'poetry' && typeof poetryContainer !== 'undefined' && poetryContainer) {
-            contentArea.appendChild(poetryContainer);
-            if (typeof poetryButton !== 'undefined' && poetryButton) poetryButton.classList.add('active');
-        }
-    } catch (e) {
-        console.log('Error handling container type:', e.message);
-    }
-    
-    // Handle vocabulary tab and other tab-based content
-    if (containerType === 'vocabulary') {
-        console.log('Showing vocabulary content');
-        const vocabularyContent = document.getElementById('vocabulary-content');
-        if (vocabularyContent) {
-            // Make sure to remove any classes that might hide it
-            vocabularyContent.classList.remove('hidden');
-            vocabularyContent.classList.add('active');
-            vocabularyContent.style.display = 'block';
-            if (wordButton) wordButton.classList.add('active');
-            
-            // Debug log to check if the content exists
-            console.log('Vocabulary content element:', vocabularyContent);
-        } else {
-            console.warn('Vocabulary content element not found!');
-        }
-    } else if (containerType && document.getElementById(`${containerType}-content`)) {
-        const contentElement = document.getElementById(`${containerType}-content`);
-        contentElement.classList.remove('hidden');
-        contentElement.classList.add('active');
-    }
-    
-    // Always update the UI state if these functions exist
-    if (typeof handleResize === 'function') handleResize();
-    if (typeof resetContentArea === 'function') resetContentArea();
-}
-*/
-
 // Add this function to make sure the vocabulary tab is initialized
 function ensureVocabularyTabSetup() {
     // Check if the vocabulary content exists
@@ -6327,69 +6142,3 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup tab event listeners
     setupTabEventListeners();
 });
-
-// Locate the existing handleTabSwitch function at line 5195
-// Turn it into a global function
-window.handleTabSwitch = function(containerType) {
-    console.log('Switching to tab:', containerType);
-    
-    // Reset active states for tabs
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-        if (tab.dataset.tab === containerType) {
-            tab.classList.add('active');
-        }
-    });
-    
-    // Hide all tab content first
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    
-    // Handle specific container types
-    if (containerType === 'qa') {
-        if (typeof qaContainer !== 'undefined' && qaContainer) {
-            if (typeof contentArea !== 'undefined') {
-                contentArea.appendChild(qaContainer);
-            }
-            if (typeof qaButton !== 'undefined') qaButton.classList.add('active');
-        }
-    } else if (containerType === 'create') {
-        if (typeof createContainer !== 'undefined' && createContainer) {
-            if (typeof contentArea !== 'undefined') {
-                contentArea.appendChild(createContainer);
-            }
-            if (typeof createButton !== 'undefined') createButton.classList.add('active');
-        }
-    } else if (containerType === 'poetry') {
-        if (typeof poetryContainer !== 'undefined' && poetryContainer) {
-            if (typeof contentArea !== 'undefined') {
-                contentArea.appendChild(poetryContainer);
-            }
-            if (typeof poetryButton !== 'undefined') poetryButton.classList.add('active');
-        }
-    } else if (containerType === 'vocabulary') {
-        // Show vocabulary content
-        const vocabularyContent = document.getElementById('vocabulary-content');
-        if (vocabularyContent) {
-            vocabularyContent.classList.add('active');
-            
-            // Hide other tab content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                if (content !== vocabularyContent) {
-                    content.classList.remove('active');
-                }
-            });
-            
-            const wordButton = document.getElementById('word-button');
-            if (wordButton) wordButton.classList.add('active');
-        }
-    } else if (containerType && document.getElementById(`${containerType}-content`)) {
-        const contentElement = document.getElementById(`${containerType}-content`);
-        contentElement.classList.add('active');
-    }
-    
-    // Call UI update functions if they exist
-    if (typeof handleResize === 'function') handleResize();
-    if (typeof resetContentArea === 'function') resetContentArea();
-};
