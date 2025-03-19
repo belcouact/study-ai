@@ -23,7 +23,6 @@
                 <button id="qa-button" class="panel-button active">问答</button>
                 <button id="create-button" class="panel-button">测验</button>
                 <button id="poetry-button" class="panel-button">诗词</button>
-                <button id="vocabulary-button" class="panel-button" onclick="console.log('Vocabulary button clicked via inline handler')">单词</button>
                 
                 <!-- Dropdown Frames -->
                 <div class="dropdown-frames">
@@ -226,29 +225,6 @@
                                 <div class="poem-explanation"></div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Vocabulary Container -->
-            <div id="vocabulary-container" class="container hidden">
-                <div class="vocabulary-container">
-                    <div class="vocabulary-settings">
-                        <button id="generate-vocabulary" class="primary-button">生成词汇表</button>
-                    </div>
-                    <div class="vocabulary-navigation" style="display: none;">
-                        <button id="prev-word" class="nav-button">← 上一个</button>
-                        <span id="word-counter">1 / 10</span>
-                        <button id="next-word" class="nav-button">下一个 →</button>
-                    </div>
-                    <div id="vocabulary-result">
-                        <div id="vocabulary-empty-state" class="empty-state">
-                            <i class="fas fa-book-open empty-state-icon"></i>
-                            <h3>准备好学习词汇了吗？</h3>
-                            <p>使用左侧边栏选择学校类型和年级，然后点击"生成词汇表"按钮生成适合您学习阶段的英语单词。</p>
-                        </div>
-                        <div class="loading-spinner" style="display: none;">加载中...</div>
-                        <div id="word-display"></div>
                     </div>
                 </div>
             </div>
