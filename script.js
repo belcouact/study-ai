@@ -6316,3 +6316,98 @@ function ensureSidebarEducationSelects() {
         });
     }
 }
+
+// Update or add this function if it doesn't exist
+function ensureSidebarEducationSelects() {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) {
+        console.error('Sidebar not found');
+        return;
+    }
+    
+    // Check if school and grade selects already exist
+    if (document.getElementById('school-select') && document.getElementById('grade-select')) {
+        console.log('Education selects already exist');
+        return;
+    }
+    
+    console.log('Creating education selects in sidebar');
+    
+    // Create education context section
+    const educationSection = document.createElement('div');
+    educationSection.className = 'sidebar-section education-context';
+    educationSection.innerHTML = `
+        <h3>教育背景</h3>
+        <div class="form-group">
+            <label for="school-select">学校类型</label>
+            <select id="school-select" class="form-control">
+                <option value="primary">小学</option>
+                <option value="middle">初中</option>
+                <option value="high">高中</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="grade-select">年级</label>
+            <select id="grade-select" class="form-control">
+                <option value="1">1年级</option>
+                <option value="2">2年级</option>
+                <option value="3">3年级</option>
+                <option value="4">4年级</option>
+                <option value="5">5年级</option>
+                <option value="6">6年级</option>
+            </select>
+        </div>
+    `;
+    
+    // Add the section to the sidebar
+    sidebar.appendChild(educationSection);
+    
+    // Setup change event for school to update grade options
+    const schoolSelect = document.getElementById('school-select');
+    const gradeSelect = document.getElementById('grade-select');
+    
+    if (schoolSelect && gradeSelect) {
+        schoolSelect.addEventListener('change', function() {
+            const school = this.value;
+            updateGradeOptions(school, gradeSelect);
+        });
+        
+        // Initialize grade options based on default school
+        updateGradeOptions(schoolSelect.value, gradeSelect);
+    }
+}
+
+// Helper function to update grade options based on school
+function updateGradeOptions(school, gradeSelect) {
+    // Clear existing options
+    gradeSelect.innerHTML = '';
+    
+    // Add options based on school
+    if (school === 'primary') {
+        for (let i = 1; i <= 6; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `${i}年级`;
+            gradeSelect.appendChild(option);
+        }
+    } else if (school === 'middle') {
+        for (let i = 1; i <= 3; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `初${i}`;
+            gradeSelect.appendChild(option);
+        }
+    } else if (school === 'high') {
+        for (let i = 1; i <= 3; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `高${i}`;
+            gradeSelect.appendChild(option);
+        }
+    }
+    
+    // Select first option by default
+    if (gradeSelect.options.length > 0) {
+        gradeSelect.selectedIndex = 0;
+    }
+}
