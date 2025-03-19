@@ -5900,3 +5900,151 @@ function loadPoemDetails(poem) {
 
 // If your code uses a different function to display poem details, 
 // ensure the sections are added and visible in that function instead.
+
+// Word learning feature
+let wordHistory = [];
+let currentWordPage = 0;
+const wordsPerPage = 10;
+
+document.getElementById('words-tab').addEventListener('click', function() {
+    hideAllPanels();
+    document.getElementById('word-container').style.display = 'flex';
+    
+    // Update education context display
+    updateEducationContext();
+});
+
+function updateEducationContext() {
+    const school = document.getElementById('school-select').value;
+    const grade = document.getElementById('grade-select').value;
+    
+    if (school && grade) {
+        document.getElementById('education-context').textContent = 
+            `${school} - ${grade}`;
+    } else {
+        document.getElementById('education-context').textContent = '未选择';
+    }
+}
+
+// Update context when school or grade changes
+document.getElementById('school-select').addEventListener('change', updateEducationContext);
+document.getElementById('grade-select').addEventListener('change', updateEducationContext);
+
+document.getElementById('generate-words').addEventListener('click', function() {
+    const school = document.getElementById('school-select').value;
+    const grade = document.getElementById('grade-select').value;
+    
+    if (!school || !grade) {
+        showToast('请先在侧边栏选择学校和年级', 'error');
+        return;
+    }
+    
+    generateWords(school, grade);
+});
+
+document.getElementById('prev-words').addEventListener('click', function() {
+    if (currentWordPage > 0) {
+        currentWordPage--;
+        displayWords(wordHistory[currentWordPage]);
+        updateWordNavigationButtons();
+    }
+});
+
+document.getElementById('next-words').addEventListener('click', function() {
+    if (currentWordPage < wordHistory.length - 1) {
+        currentWordPage++;
+        displayWords(wordHistory[currentWordPage]);
+        updateWordNavigationButtons();
+    }
+});
+
+async function generateWords(school, grade) {
+    const wordsList = document.getElementById('words-list');
+    const loadingIndicator = document.getElementById('words-loading');
+    
+    // Show loading indicator
+    wordsList.innerHTML = '';
+    loadingIndicator.style.display = 'flex';
+    document.getElementById('generate-words').disabled = true;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/generate-words`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+            },
+            body: JSON.stringify({
+                school: school,
+                grade: grade,
+                count: wordsPerPage
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to generate words');
+        }
+        
+        const data = await response.json();
+        
+        // Add to history and display
+        wordHistory.push(data.words);
+        currentWordPage = wordHistory.length - 1;
+        displayWords(data.words);
+        updateWordNavigationButtons();
+        
+    } catch (error) {
+        console.error('Error generating words:', error);
+        showToast('生成单词时出错，请稍后再试', 'error');
+        wordsList.innerHTML = `<div class="error-message">
+            <p>抱歉，生成单词时遇到问题。</p>
+            <p>错误信息: ${error.message}</p>
+        </div>`;
+    } finally {
+        loadingIndicator.style.display = 'none';
+        document.getElementById('generate-words').disabled = false;
+    }
+}
+
+function displayWords(words) {
+    const wordsList = document.getElementById('words-list');
+    wordsList.innerHTML = '';
+    
+    words.forEach(word => {
+        const wordCard = document.createElement('div');
+        wordCard.className = 'word-card';
+        
+        const wordHtml = `
+            <div class="word-english">${word.word}</div>
+            <div class="word-info">
+                <span class="word-part">${word.partOfSpeech}</span>
+            </div>
+            <div class="word-meaning">
+                <div class="word-english-meaning">${word.englishMeaning}</div>
+                <div class="word-chinese-meaning">${word.chineseMeaning}</div>
+            </div>
+            ${word.relatedForms ? `
+                <div class="word-related">
+                    <span class="related-title">相关形式:</span> ${word.relatedForms}
+                </div>
+            ` : ''}
+            <div class="word-examples">
+                <div class="example-title">例句:</div>
+                ${word.examples.map(example => `
+                    <div class="example-item">
+                        <div class="example-english">${example.english}</div>
+                        <div class="example-chinese">${example.chinese}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        wordCard.innerHTML = wordHtml;
+        wordsList.appendChild(wordCard);
+    });
+}
+
+function updateWordNavigationButtons() {
+    document.getElementById('prev-words').disabled = currentWordPage <= 0;
+    document.getElementById('next-words').disabled = currentWordPage >= wordHistory.length - 1;
+}
