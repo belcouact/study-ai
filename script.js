@@ -5913,18 +5913,20 @@ function initVocabularyTab() {
     const prevWordButton = document.getElementById('prev-word');
     const nextWordButton = document.getElementById('next-word');
 
-    vocabButton.addEventListener('click', () => {
+    vocabButton.addEventListener('click', function() {
         // Hide all containers
-        document.querySelectorAll('.container, .content-section').forEach(container => {
+        const containers = document.querySelectorAll('.container');
+        containers.forEach(container => {
             container.style.display = 'none';
         });
         
         // Show vocabulary container
         vocabContainer.style.display = 'flex';
         
-        // Update active button
-        document.querySelectorAll('.panel-button').forEach(btn => {
-            btn.classList.remove('active');
+        // Update active state for buttons
+        const buttons = document.querySelectorAll('.panel-button');
+        buttons.forEach(button => {
+            button.classList.remove('active');
         });
         vocabButton.classList.add('active');
     });
@@ -6134,18 +6136,20 @@ function initVocabularyTab() {
     const prevWordButton = document.getElementById('prev-word');
     const nextWordButton = document.getElementById('next-word');
 
-    vocabButton.addEventListener('click', () => {
+    vocabButton.addEventListener('click', function() {
         // Hide all containers
-        document.querySelectorAll('.container, .content-section').forEach(container => {
+        const containers = document.querySelectorAll('.container');
+        containers.forEach(container => {
             container.style.display = 'none';
         });
         
         // Show vocabulary container
         vocabContainer.style.display = 'flex';
         
-        // Update active button
-        document.querySelectorAll('.panel-button').forEach(btn => {
-            btn.classList.remove('active');
+        // Update active state for buttons
+        const buttons = document.querySelectorAll('.panel-button');
+        buttons.forEach(button => {
+            button.classList.remove('active');
         });
         vocabButton.classList.add('active');
     });
