@@ -4373,7 +4373,7 @@ function getSimplifiedContextSummary() {
         // const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
         const poetryType = document.getElementById('poetry-type-select').value;
         const poetryStyle = document.getElementById('poetry-style-select').value;
-
+        
         console.log(`Generating poems for: ${school} ${grade}, Type: ${poetryType}, Style: ${poetryStyle}`);
         
         // Show loading state
@@ -6300,6 +6300,10 @@ function navigateWordCard(direction) {
         } else {
             currentCard.classList.add('slide-right-exit');
         }
+        
+        // Preserve the container height during transition
+        const cardHeight = currentCard.offsetHeight;
+        container.style.minHeight = `${cardHeight}px`;
         
         // After exit animation completes, update and show new card
         setTimeout(() => {
