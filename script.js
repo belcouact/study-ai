@@ -4275,6 +4275,9 @@ function getSimplifiedContextSummary() {
         
         // Poetry buttons
         setupPoetryButtons();
+        
+        // Add this to your setupEventListeners function
+        setupWordTabEventListener();
     }
 
 // ... existing code ...
@@ -6163,3 +6166,77 @@ function init() {
 }
 
 // ... existing code ...
+
+function switchPanel(panelId) {
+    // Hide all panels
+    const panels = [
+        'qa-container',
+        'create-container',
+        'poetry-container',
+        'word-container'
+    ];
+    
+    panels.forEach(panel => {
+        const element = document.getElementById(panel);
+        if (element) {
+            if (panel === 'word-container') {
+                element.style.display = 'none';
+            } else {
+                element.classList.add('hidden');
+            }
+        }
+    });
+    
+    // Show the selected panel
+    const selectedPanel = document.getElementById(panelId);
+    if (selectedPanel) {
+        if (panelId === 'word-container') {
+            selectedPanel.style.display = 'flex';
+        } else {
+            selectedPanel.classList.remove('hidden');
+        }
+    }
+    
+    // Update active tab/button state
+    const tabMapping = {
+        'qa-container': 'qa-tab',
+        'create-container': 'create-tab', 
+        'poetry-container': 'poetry-tab',
+        'word-container': 'words-tab'
+    };
+    
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+        if (tab) tab.classList.remove('active');
+    });
+    
+    // Add active class to the current tab
+    const currentTabId = tabMapping[panelId];
+    if (currentTabId) {
+        const currentTab = document.getElementById(currentTabId);
+        if (currentTab) {
+            currentTab.classList.add('active');
+        }
+    }
+}
+
+// Add this to your setupEventListeners function
+function setupWordTabEventListener() {
+    const wordsTab = document.getElementById('words-tab');
+    if (wordsTab) {
+        wordsTab.addEventListener('click', function() {
+            switchPanel('word-container');
+            updateEducationContext();
+        });
+    }
+}
+
+// Make sure this gets called in your init function
+function init() {
+    // ... existing code ...
+    
+    setupWordTabEventListener();
+    addWordFeatureToInit();
+    
+    // ... remaining init code ...
+}
