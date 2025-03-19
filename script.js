@@ -5928,20 +5928,20 @@ function initVocabularyTab() {
     vocabButton.addEventListener('click', function() {
         console.log("Vocabulary button clicked!");
         
-        // Hide all containers
-        const containers = document.querySelectorAll('.container');
-        console.log("Found containers:", containers.length);
-        containers.forEach(container => {
+        // Hide ALL containers including qa-container, create-container, poetry-container
+        const allContainers = document.querySelectorAll('.container');
+        console.log("Found containers:", allContainers.length);
+        allContainers.forEach(container => {
             container.style.display = 'none';
         });
         
-        // Show vocabulary container
+        // Show vocabulary container only
         console.log("Setting vocab container display to flex:", vocabContainer);
         vocabContainer.style.display = 'flex';
         
         // Update active state for buttons
-        const buttons = document.querySelectorAll('.panel-button');
-        console.log("Found panel buttons:", buttons.length);
+        const buttons = document.querySelectorAll('.panel-button, .sidebar-button');
+        console.log("Found buttons:", buttons.length);
         buttons.forEach(button => {
             button.classList.remove('active');
         });
@@ -5976,11 +5976,19 @@ async function handleGenerateVocabularyClick() {
         
         vocabDisplay.innerHTML = '<div class="loading">正在生成词汇，请稍候...</div>';
         
-        // Get selected school and grade
-        const schoolSelect = document.getElementById('school-select');
-        const gradeSelect = document.getElementById('grade-select');
+        // Get selected school and grade - Fix the element selection
+        const schoolSelect = document.getElementById('school-select-sidebar');
+        const gradeSelect = document.getElementById('grade-select-sidebar');
+        
+        // Add null checks
+        if (!schoolSelect || !gradeSelect) {
+            throw new Error('无法找到学校或年级选择框');
+        }
+        
         const school = schoolSelect.value;
         const grade = gradeSelect.value;
+        
+        console.log("Generating vocabulary for:", { school, grade });
         
         // Call API to generate vocabulary
         const words = await generateVocabulary(school, grade);
@@ -6124,7 +6132,6 @@ function showSection(sectionId) {
     const selectedContainer = document.getElementById(sectionId);
     if (selectedContainer) {
         selectedContainer.style.display = 'flex';
-        selectedContainer.classList.remove('hidden');
     }
     
     // Update active state for panel buttons
@@ -6240,3 +6247,92 @@ document.addEventListener('DOMContentLoaded', function() {
 // Make sure we don't have multiple event listeners for DOMContentLoaded
 document.removeEventListener('DOMContentLoaded', init);
 document.addEventListener('DOMContentLoaded', init);
+
+// Update the click handlers for other tab buttons
+function updateTabClickHandlers() {
+    // Q&A Tab
+    document.getElementById('qa-button').addEventListener('click', function() {
+        document.querySelectorAll('.container').forEach(container => {
+            container.style.display = 'none';
+        });
+        document.getElementById('qa-container').style.display = 'flex';
+        
+        // Update active buttons
+        document.querySelectorAll('.panel-button, .sidebar-button').forEach(button => {
+            button.classList.remove('active');
+        });
+        this.classList.add('active');
+    });
+    
+    // Create Tab
+    document.getElementById('create-button').addEventListener('click', function() {
+        document.querySelectorAll('.container').forEach(container => {
+            container.style.display = 'none';
+        });
+        document.getElementById('create-container').style.display = 'flex';
+        
+        // Update active buttons
+        document.querySelectorAll('.panel-button, .sidebar-button').forEach(button => {
+            button.classList.remove('active');
+        });
+        this.classList.add('active');
+    });
+    
+    // Poetry Tab
+    document.getElementById('poetry-button').addEventListener('click', function() {
+        document.querySelectorAll('.container').forEach(container => {
+            container.style.display = 'none';
+        });
+        document.getElementById('poetry-container').style.display = 'flex';
+        
+        // Update active buttons
+        document.querySelectorAll('.panel-button, .sidebar-button').forEach(button => {
+            button.classList.remove('active');
+        });
+        this.classList.add('active');
+    });
+}
+
+// Call this function in your init function
+function init() {
+    // ... existing code ...
+    
+    // Update tab click handlers
+    updateTabClickHandlers();
+    
+    // Initialize vocabulary tab
+    initVocabularyTab();
+    
+    // ... rest of existing code ...
+}
+
+function showSection(sectionId) {
+    // Hide all containers first
+    const containers = document.querySelectorAll('.container');
+    containers.forEach(container => {
+        container.style.display = 'none';
+    });
+    
+    // Show the selected container
+    const selectedContainer = document.getElementById(sectionId);
+    if (selectedContainer) {
+        selectedContainer.style.display = 'flex';
+    }
+    
+    // Update active state for buttons
+    const buttons = document.querySelectorAll('.panel-button, .sidebar-button');
+    buttons.forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Find the button that corresponds to this section and make it active
+    if (sectionId === 'vocab-container') {
+        document.getElementById('vocab-button').classList.add('active');
+    } else if (sectionId === 'qa-container') {
+        document.getElementById('qa-button').classList.add('active');
+    } else if (sectionId === 'create-container') {
+        document.getElementById('create-button').classList.add('active');
+    } else if (sectionId === 'poetry-container') {
+        document.getElementById('poetry-button').classList.add('active');
+    }
+}
