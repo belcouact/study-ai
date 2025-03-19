@@ -6050,57 +6050,69 @@ async function generateWords(school, grade) {
           }
         ]
         
+        Return ONLY valid JSON - no explanations or other text.
         Ensure the vocabulary level is appropriate for ${school} ${grade} students.`;
         
-        // Use the existing fetchAIResponse function
-        const response = await fetchAIResponse(prompt);
-        
-        // Try to parse JSON from response
+        // Using existing fetchAIResponse function from line 160
+        const responseData = await fetchAIResponse(prompt);
         let words;
-        try {
-            // First try: parse the entire response as JSON
-            words = JSON.parse(response);
-        } catch (e) {
-            // Second try: extract JSON from a code block if it exists
-            const jsonRegex = /```(?:json)?\s*([\s\S]*?)\s*```/;
-            const match = response.match(jsonRegex);
-            
-            if (match && match[1]) {
-                words = JSON.parse(match[1]);
-            } else {
-                // Third try: find JSON array pattern in the text
-                const arrayRegex = /\[\s*\{[\s\S]*\}\s*\]/;
-                const arrayMatch = response.match(arrayRegex);
+
+        // Handle different response formats
+        if (typeof responseData === 'string') {
+            // If it's a string, we need to parse it
+            try {
+                // Try to parse as direct JSON first
+                words = JSON.parse(responseData);
+            } catch (parseError) {
+                console.log("Direct JSON parse failed, trying to extract JSON from text");
                 
-                if (arrayMatch) {
-                    words = JSON.parse(arrayMatch[0]);
+                // Try to extract from markdown code block
+                let jsonStr = responseData;
+                const codeBlockMatch = /```(?:json)?\s*([\s\S]*?)\s*```/.exec(responseData);
+                if (codeBlockMatch && codeBlockMatch[1]) {
+                    jsonStr = codeBlockMatch[1];
+                }
+                
+                // Clean up potential text around the JSON
+                jsonStr = jsonStr.trim();
+                
+                // If it starts with [ and ends with ], try to parse it
+                if (jsonStr.startsWith('[') && jsonStr.endsWith(']')) {
+                    try {
+                        words = JSON.parse(jsonStr);
+                    } catch (e) {
+                        console.error("JSON extraction failed:", e);
+                        throw new Error("Could not parse JSON from response");
+                    }
                 } else {
-                    // If we can't parse JSON, create a fallback structure
-                    throw new Error("Could not parse JSON from AI response");
+                    // Last resort: try to find JSON array pattern
+                    const jsonMatch = /\[\s*{[\s\S]*}\s*\]/.exec(jsonStr);
+                    if (jsonMatch) {
+                        try {
+                            words = JSON.parse(jsonMatch[0]);
+                        } catch (e) {
+                            console.error("JSON regex extraction failed:", e);
+                            throw new Error("Could not parse JSON from response");
+                        }
+                    } else {
+                        throw new Error("No valid JSON found in response");
+                    }
                 }
             }
+        } else if (typeof responseData === 'object') {
+            // If it's already an object (perhaps fetchAIResponse already parsed it)
+            words = responseData;
+        } else {
+            throw new Error("Unexpected response format from AI");
         }
         
-        // Verify that words is an array before using forEach
+        // Ensure words is an array
         if (!Array.isArray(words)) {
-            console.error("Words is not an array:", words);
-            showSystemMessage("AI response format error. Expected array of words.", "error");
-            
-            // Create a fallback array if needed
             if (typeof words === 'object' && words !== null) {
-                // If it's an object but not an array, wrap it in an array
+                // If it's an object, convert to array with this single object
                 words = [words];
             } else {
-                // Create a sample fallback
-                words = [{
-                    word: "Error parsing response",
-                    partOfSpeech: "error",
-                    englishMeaning: "Could not parse AI response",
-                    chineseMeaning: "无法解析AI响应",
-                    examples: [
-                        { english: "Please try again.", chinese: "请重试。" }
-                    ]
-                }];
+                throw new Error("AI response is not in the expected array format");
             }
         }
         
@@ -6116,6 +6128,7 @@ async function generateWords(school, grade) {
         wordsList.innerHTML = `<div class="error-message">
             <p>抱歉，生成单词时遇到问题。</p>
             <p>错误信息: ${error.message}</p>
+            <p>请确保网络连接正常，然后重试。</p>
         </div>`;
     } finally {
         loadingIndicator.style.display = 'none';
@@ -6423,4 +6436,45 @@ function init() {
     
     // Start with the default panel
     switchPanel('qa-container');
+}
+
+// Replace ALL tab event listener functions with this single implementation
+function setupTabEventListeners() {
+    // Get tab elements
+    const qaTab = document.getElementById('qa-tab');
+    const createTab = document.getElementById('create-tab');
+    const poetryTab = document.getElementById('poetry-tab');
+    const wordsTab = document.getElementById('words-tab');
+    
+    // Remove existing event listeners (if any)
+    if (qaTab) {
+        qaTab.replaceWith(qaTab.cloneNode(true));
+        document.getElementById('qa-tab').addEventListener('click', function() {
+            switchPanel('qa-container');
+        });
+    }
+    
+    if (createTab) {
+        createTab.replaceWith(createTab.cloneNode(true));
+        document.getElementById('create-tab').addEventListener('click', function() {
+            switchPanel('create-container');
+        });
+    }
+    
+    if (poetryTab) {
+        poetryTab.replaceWith(poetryTab.cloneNode(true));
+        document.getElementById('poetry-tab').addEventListener('click', function() {
+            switchPanel('poetry-container');
+        });
+    }
+    
+    if (wordsTab) {
+        wordsTab.replaceWith(wordsTab.cloneNode(true));
+        document.getElementById('words-tab').addEventListener('click', function() {
+            switchPanel('word-container');
+            updateEducationContext(); // Update education context when showing word container
+        });
+    }
+    
+    console.log("Tab event listeners have been set up");
 }
