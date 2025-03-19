@@ -5993,12 +5993,14 @@ function updateEducationContext() {
     const school = document.getElementById('school-select-sidebar').value;
     const grade = document.getElementById('grade-select-sidebar').value;
     
+    /*
     if (school && grade) {
         document.getElementById('education-context').textContent = 
             `${school} - ${grade}`;
     } else {
         document.getElementById('education-context').textContent = '未选择';
     }
+    */
 }
 
 document.getElementById('generate-words').addEventListener('click', async function() {
