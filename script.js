@@ -6020,42 +6020,18 @@ async function fetchVocabularyWords(school, grade) {
         
         // Use the existing fetchAIResponse function
         const response = await fetchAIResponse(prompt);
+        console.log('Raw API response for vocabulary:', response);
         
-        // Parse the response to extract the vocabulary words
-        let words = [];
-        
-        try {
-            // First, try to parse as JSON directly
-            if (typeof response === 'string') {
-                // If response contains a JSON object, extract it
-                const jsonMatch = response.match(/```json\s*(\{[\s\S]*?\})\s*```/) || 
-                                 response.match(/\{[\s\S]*"words"[\s\S]*\}/);
-                
-                if (jsonMatch) {
-                    const jsonStr = jsonMatch[1] || jsonMatch[0];
-                    const data = JSON.parse(jsonStr);
-                    words = data.words || [];
-                } else {
-                    // Try to extract structured data some other way
-                    console.log('Could not find JSON in response, trying to parse manually');
-                    words = extractVocabularyFromText(response);
-                }
-            } else if (typeof response === 'object') {
-                // If response is already an object with words property
-                words = response.words || [];
-            }
-        } catch (error) {
-            console.error('Error parsing vocabulary response:', error);
-            words = extractVocabularyFromText(response);
+        // Check if response is in the expected format
+        if (response && response.choices && response.choices[0] && response.choices[0].message) {
+            const messageContent = response.choices[0].message.content;
+            return parseVocabularyResponse(messageContent);
+        } else if (typeof response === 'string') {
+            return parseVocabularyResponse(response);
+        } else {
+            console.warn('Unexpected API response format:', response);
+            return getMockVocabularyWords();
         }
-        
-        // If we couldn't parse any words, provide mock data for testing
-        if (!words || words.length === 0) {
-            console.warn('Could not parse vocabulary words from response, using mock data');
-            words = getMockVocabularyWords();
-        }
-        
-        return words;
     } catch (error) {
         console.error('Error in fetchVocabularyWords:', error);
         // Return mock data on error for testing
@@ -6063,90 +6039,243 @@ async function fetchVocabularyWords(school, grade) {
     }
 }
 
-// Helper function to extract vocabulary from text response
-function extractVocabularyFromText(text) {
-    // This is a fallback parser for unstructured text responses
-    const words = [];
+// Helper function to parse vocabulary response
+function parseVocabularyResponse(text) {
+    console.log('Parsing vocabulary response:', text);
     
-    // Try to identify word sections (look for numbered items or word headings)
-    const wordSections = text.split(/\d+\.\s+|\n\n+/g).filter(section => section.trim());
-    
-    for (let section of wordSections) {
-        // Skip sections that don't look like vocabulary entries
-        if (!section.match(/[a-zA-Z]+/)) continue;
+    // Try to find and parse JSON in the response
+    try {
+        // Look for JSON code blocks or direct JSON content
+        const jsonMatch = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/) || 
+                         text.match(/(\{[\s\S]*"words"[\s\S]*\})/);
         
-        try {
-            const lines = section.split('\n').map(line => line.trim()).filter(line => line);
+        if (jsonMatch) {
+            const jsonContent = jsonMatch[1];
+            const parsed = JSON.parse(jsonContent);
             
-            // First line likely contains the word and part of speech
-            const firstLine = lines[0] || '';
-            const wordMatch = firstLine.match(/^([a-zA-Z]+)(?:\s+\(([^)]+)\))?/);
-            
-            if (!wordMatch) continue;
-            
-            const english = wordMatch[1];
-            const form = wordMatch[2] || 'n.';
-            
-            // Look for definitions and examples
-            let englishMeaning = '';
-            let chineseMeaning = '';
-            const examples = [];
-            
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i];
-                
-                // Look for Chinese text (contains Chinese characters)
-                if (/[\u4e00-\u9fa5]/.test(line) && !chineseMeaning) {
-                    chineseMeaning = line;
-                } 
-                // Look for example sentences (often start with an identifiable pattern)
-                else if (line.match(/^Example|^例句|^e\.g\./i)) {
-                    const exampleParts = line.split(/[:：]/);
-                    if (exampleParts.length >= 2) {
-                        const englishPart = exampleParts[1].trim();
-                        const chinesePart = lines[i+1] && /[\u4e00-\u9fa5]/.test(lines[i+1]) ? lines[i+1] : '';
-                        
-                        if (englishPart) {
-                            examples.push({
-                                english: englishPart,
-                                chinese: chinesePart
-                            });
-                            
-                            // Skip the next line if it was the Chinese translation
-                            if (chinesePart === lines[i+1]) i++;
-                        }
-                    }
-                }
-                // If we haven't found English meaning yet and it's not Chinese, must be English definition
-                else if (!englishMeaning && !/[\u4e00-\u9fa5]/.test(line)) {
-                    englishMeaning = line;
-                }
+            if (parsed.words && Array.isArray(parsed.words)) {
+                console.log('Successfully parsed JSON words:', parsed.words);
+                return parsed.words;
             }
-            
-            // Ensure we have at least some example
-            if (examples.length === 0) {
-                examples.push({
-                    english: `This is an example using the word "${english}".`,
-                    chinese: `这是一个使用"${english}"的例子。`
-                });
-            }
-            
-            // Add the word to our collection
-            words.push({
-                english,
-                form,
-                englishMeaning: englishMeaning || `Definition of ${english}`,
-                chineseMeaning: chineseMeaning || `${english}的中文意思`,
-                examples
-            });
-            
-        } catch (e) {
-            console.warn('Error parsing word section:', e);
-            // Continue to try parsing other sections
         }
+    } catch (e) {
+        console.warn('Failed to parse JSON from response:', e);
     }
     
-    return words;
+    // If JSON parsing failed, try to extract structured data
+    const words = extractVocabularyFromText(text);
+    
+    if (words && words.length > 0) {
+        console.log('Extracted vocabulary words from text:', words);
+        return words;
+    }
+    
+    // If all extraction methods fail, return mock data
+    console.warn('Could not parse vocabulary words from response, using mock data');
+    return getMockVocabularyWords();
+}
+
+// Add this line at the top of your script to declare globals
+// Global variables for vocabulary feature
+let vocabularyWords = [];
+let currentWordIndex = 0;
+
+// Update handleLoadVocabularyClick to properly call these functions
+async function handleLoadVocabularyClick() {
+    const loadBtn = document.getElementById('load-vocabulary-btn');
+    loadBtn.disabled = true;
+    loadBtn.textContent = '加载中...';
+    
+    try {
+        // Get education context from sidebar
+        const schoolSelect = document.getElementById('school-select');
+        const gradeSelect = document.getElementById('grade-select');
+        
+        // Check if the elements exist before accessing their values
+        if (!schoolSelect || !gradeSelect) {
+            console.error('School or grade select elements not found');
+            throw new Error('未找到学校或年级选择器，请确保已经设置好教育背景');
+        }
+        
+        const school = schoolSelect.value;
+        const grade = gradeSelect.value;
+        
+        // Validate that we have values
+        if (!school || !grade) {
+            throw new Error('请先在侧边栏选择学校和年级');
+        }
+        
+        console.log('Fetching vocabulary for school:', school, 'grade:', grade);
+        
+        // Fetch vocabulary words from API
+        const words = await fetchVocabularyWords(school, grade);
+        
+        // Display words
+        if (words && words.length > 0) {
+            vocabularyWords = words;
+            currentWordIndex = 0;
+            displayWordCard(currentWordIndex);
+            updateNavigationControls();
+        } else {
+            showVocabularyError('无法获取单词数据');
+        }
+    } catch (error) {
+        console.error('Error loading vocabulary:', error);
+        showVocabularyError(error.message || '获取单词时出错');
+    } finally {
+        loadBtn.disabled = false;
+        loadBtn.textContent = '加载词汇';
+    }
+}
+
+// Add these missing functions for the vocabulary feature
+
+// Function to display a vocabulary word card
+function displayWordCard(index) {
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    const word = vocabularyWords[index];
+    
+    if (!word) {
+        vocabularyContainer.innerHTML = '<div class="initial-message">无单词数据</div>';
+        return;
+    }
+    
+    // Create word card HTML
+    const cardHTML = `
+        <div class="word-card">
+            <div class="word-header">
+                <div class="word-english">${word.english}</div>
+                <div class="word-form">${word.form || 'n/a'}</div>
+            </div>
+            <div class="word-meanings">
+                <div class="meaning-row">
+                    <div class="meaning-label">英文释义:</div>
+                    <div class="meaning-content">${word.englishMeaning}</div>
+                </div>
+                <div class="meaning-row">
+                    <div class="meaning-label">中文释义:</div>
+                    <div class="meaning-content">${word.chineseMeaning}</div>
+                </div>
+            </div>
+            <div class="word-examples">
+                ${word.examples.map(example => `
+                    <div class="example-item">
+                        <div class="example-english">${example.english}</div>
+                        <div class="example-chinese">${example.chinese}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    vocabularyContainer.innerHTML = cardHTML;
+    
+    // Update counter
+    document.getElementById('word-counter').textContent = `${index + 1}/${vocabularyWords.length}`;
+}
+
+// Function to show error messages in the vocabulary container
+function showVocabularyError(message) {
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    vocabularyContainer.innerHTML = `
+        <div class="error-message">
+            <p>${message}</p>
+            <p>请稍后再试</p>
+        </div>
+    `;
+}
+
+// Function to update navigation controls for vocabulary
+function updateNavigationControls() {
+    const prevBtn = document.getElementById('prev-word-btn');
+    const nextBtn = document.getElementById('next-word-btn');
+    
+    if (!prevBtn || !nextBtn) return;
+    
+    prevBtn.disabled = currentWordIndex === 0;
+    nextBtn.disabled = currentWordIndex === vocabularyWords.length - 1;
+}
+
+// Function to navigate between word cards
+function navigateWordCard(direction) {
+    const newIndex = currentWordIndex + direction;
+    
+    if (newIndex >= 0 && newIndex < vocabularyWords.length) {
+        currentWordIndex = newIndex;
+        displayWordCard(currentWordIndex);
+        updateNavigationControls();
+    }
+}
+
+// Update the fetchVocabularyWords function to better parse the API response
+async function fetchVocabularyWords(school, grade) {
+    try {
+        // Create a prompt for the vocabulary generation
+        const prompt = `Generate 10 English vocabulary words appropriate for ${school} school students in grade ${grade}. 
+        For each word, include:
+        1. The English word
+        2. Part of speech (noun, verb, adjective, etc.)
+        3. English meaning/definition
+        4. Chinese meaning/translation
+        5. Two example sentences using the word (with Chinese translations)
+
+        Format the response as a structured JSON object with an array of word objects.`;
+        
+        // Use the existing fetchAIResponse function
+        const response = await fetchAIResponse(prompt);
+        console.log('Raw API response for vocabulary:', response);
+        
+        // Check if response is in the expected format
+        if (response && response.choices && response.choices[0] && response.choices[0].message) {
+            const messageContent = response.choices[0].message.content;
+            return parseVocabularyResponse(messageContent);
+        } else if (typeof response === 'string') {
+            return parseVocabularyResponse(response);
+        } else {
+            console.warn('Unexpected API response format:', response);
+            return getMockVocabularyWords();
+        }
+    } catch (error) {
+        console.error('Error in fetchVocabularyWords:', error);
+        // Return mock data on error for testing
+        return getMockVocabularyWords();
+    }
+}
+
+// Helper function to parse vocabulary response
+function parseVocabularyResponse(text) {
+    console.log('Parsing vocabulary response:', text);
+    
+    // Try to find and parse JSON in the response
+    try {
+        // Look for JSON code blocks or direct JSON content
+        const jsonMatch = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/) || 
+                         text.match(/(\{[\s\S]*"words"[\s\S]*\})/);
+        
+        if (jsonMatch) {
+            const jsonContent = jsonMatch[1];
+            const parsed = JSON.parse(jsonContent);
+            
+            if (parsed.words && Array.isArray(parsed.words)) {
+                console.log('Successfully parsed JSON words:', parsed.words);
+                return parsed.words;
+            }
+        }
+    } catch (e) {
+        console.warn('Failed to parse JSON from response:', e);
+    }
+    
+    // If JSON parsing failed, try to extract structured data
+    const words = extractVocabularyFromText(text);
+    
+    if (words && words.length > 0) {
+        console.log('Extracted vocabulary words from text:', words);
+        return words;
+    }
+    
+    // If all extraction methods fail, return mock data
+    console.warn('Could not parse vocabulary words from response, using mock data');
+    return getMockVocabularyWords();
 }
 
 // Keep the mock data function for fallback
