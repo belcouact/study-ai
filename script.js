@@ -6072,6 +6072,7 @@ function showVocabularyError(message) {
 // ... existing code ...
 
 // Update the handleTabSwitch function to properly handle the vocabulary tab
+/*
 function handleTabSwitch(containerType) {
     console.log('Switching to tab:', containerType);
     
@@ -6141,6 +6142,7 @@ function handleTabSwitch(containerType) {
     if (typeof handleResize === 'function') handleResize();
     if (typeof resetContentArea === 'function') resetContentArea();
 }
+*/
 
 // Add this code to make sure the vocabulary tab is properly handled
 function setupTabEventListeners() {
@@ -6168,6 +6170,7 @@ function setupTabEventListeners() {
 // Add this line to your setupEventListeners function
 setupTabEventListeners();
 
+/*
 // Fix the handleTabSwitch function to avoid reference errors
 function handleTabSwitch(containerType) {
     console.log('Switching to tab:', containerType);
@@ -6257,6 +6260,7 @@ function handleTabSwitch(containerType) {
     if (typeof handleResize === 'function') handleResize();
     if (typeof resetContentArea === 'function') resetContentArea();
 }
+*/
 
 // Add this function to make sure the vocabulary tab is initialized
 function ensureVocabularyTabSetup() {
