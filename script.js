@@ -5181,82 +5181,50 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleTabSwitch(containerType) {
         console.log('Switching to tab:', containerType);
         
-        // First, remove all containers from DOM to ensure clean state
-        if (qaContainer && qaContainer.parentNode) {
-            qaContainer.parentNode.removeChild(qaContainer);
+        // Hide all containers first
+        document.getElementById('qa-container').classList.add('hidden');
+        document.getElementById('create-container').classList.add('hidden');
+        document.getElementById('poetry-container').classList.add('hidden');
+        
+        // For word container, use style.display property
+        const wordContainer = document.getElementById('word-container');
+        if (wordContainer) {
+            wordContainer.style.display = 'none';
         }
         
-        if (createContainer && createContainer.parentNode) {
-            createContainer.parentNode.removeChild(createContainer);
-        }
-        
-        if (poetryContainer && poetryContainer.parentNode) {
-            poetryContainer.parentNode.removeChild(poetryContainer);
-        }
-
-        if (wordContainer && wordContainer.parentNode) {
-            wordContainer.parentNode.removeChild(wordContainer);
-        }
-        
-        // Reset active states
-        if (qaButton) qaButton.classList.remove('active');
-        if (createButton) createButton.classList.remove('active');
-        if (poetryButton) poetryButton.classList.remove('active');
-        if (wordButton) wordButton.classList.remove('active');
-        
-        // Add only the appropriate container to the content area
-        if (containerType === 'qa' && qaContainer && contentArea) {
-            contentArea.appendChild(qaContainer);
-            if (qaButton) qaButton.classList.add('active');
-            console.log('QA container added to content area');
-            
-            // Ensure poetry container is not present
-            const existingPoetryContainer = document.getElementById('poetry-container');
-            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
-                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
+        // Show the selected container
+        if (containerType === 'qa') {
+            document.getElementById('qa-container').classList.remove('hidden');
+        } else if (containerType === 'create') {
+            document.getElementById('create-container').classList.remove('hidden');
+        } else if (containerType === 'poetry') {
+            document.getElementById('poetry-container').classList.remove('hidden');
+        } else if (containerType === 'word') {
+            // For word container, use style.display = 'flex'
+            if (wordContainer) {
+                wordContainer.style.display = 'flex';
+                // Update education context when showing the word container
+                updateEducationContext();
             }
-        } else if (containerType === 'create' && createContainer && contentArea) {
-            contentArea.appendChild(createContainer);
-            if (createButton) createButton.classList.add('active');
-            console.log('Create container added to content area');
-            
-            // Ensure poetry container is not present
-            const existingPoetryContainer = document.getElementById('poetry-container');
-            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
-                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
+        }
+        
+        // Update active tab styling
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Add active class to the current tab
+        if (containerType === 'qa') {
+            document.getElementById('qa-tab').classList.add('active');
+        } else if (containerType === 'create') {
+            document.getElementById('create-tab').classList.add('active');
+        } else if (containerType === 'poetry') {
+            document.getElementById('poetry-tab').classList.add('active');
+        } else if (containerType === 'word') {
+            const wordTab = document.getElementById('words-tab');
+            if (wordTab) {
+                wordTab.classList.add('active');
             }
-            
-            // Show empty state on test page
-            const questionsDisplayContainer = document.getElementById('questions-display-container');
-            const emptyState = document.getElementById('empty-state');
-            
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.classList.remove('hidden');
-                
-                if (emptyState) {
-                    emptyState.classList.remove('hidden');
-                }
-            }
-        } else if (containerType === 'poetry' && poetryContainer && contentArea) {
-            contentArea.appendChild(poetryContainer);
-            if (poetryButton) poetryButton.classList.add('active');
-            console.log('Poetry container added to content area');
-            
-            // After switching to poetry tab, add event listener to learn poetry button
-            setTimeout(() => {
-                const learnPoetryButton = document.getElementById('learn-poetry-button');
-                if (learnPoetryButton) {
-                    // Remove any existing event listeners
-                    const newButton = learnPoetryButton.cloneNode(true);
-                    learnPoetryButton.parentNode.replaceChild(newButton, learnPoetryButton);
-                    
-                    // Add new event listener
-                    newButton.addEventListener('click', function() {
-                        console.log('Learn poetry button clicked');
-                        handleLearnPoetryClick();
-                    });
-                }
-            }, 100);
         }
     }
     
@@ -5993,14 +5961,12 @@ function updateEducationContext() {
     const school = document.getElementById('school-select-sidebar').value;
     const grade = document.getElementById('grade-select-sidebar').value;
     
-    /*
     if (school && grade) {
         document.getElementById('education-context').textContent = 
             `${school} - ${grade}`;
     } else {
         document.getElementById('education-context').textContent = '未选择';
     }
-    */
 }
 
 document.getElementById('generate-words').addEventListener('click', async function() {
@@ -6196,7 +6162,7 @@ function displayWords(words) {
             ${safeWord.relatedForms ? `
                 <div class="word-related">
                     <span class="related-title">相关形式:</span> ${safeWord.relatedForms}
-                </div>
+            </div>
             ` : ''}
             <div class="word-examples">
                 <div class="example-title">例句:</div>
@@ -6206,8 +6172,8 @@ function displayWords(words) {
                         <div class="example-chinese">${example.chinese || ""}</div>
                     </div>
                 `).join('')}
-            </div>
-        `;
+        </div>
+    `;
         
         wordCard.innerHTML = wordHtml;
         wordsList.appendChild(wordCard);
@@ -6500,117 +6466,32 @@ function setupTabEventListeners() {
     console.log("Tab event listeners have been set up");
 }
 
-function handleTabSwitch(containerType) {
-    // Get the content area and container elements
-    const contentArea = document.querySelector('.content');
-    const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
-    const poetryContainer = document.getElementById('poetry-container');
-    const wordContainer = document.getElementById('word-container');
+// Update the event listeners to use handleTabSwitch
+function setupEventListeners() {
+    // ... existing code ...
     
-    // Get the tab buttons
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    const poetryButton = document.getElementById('poetry-button');
-    const wordButton = document.getElementById('words-tab');  // Using words-tab ID
+    // QA tab
+    document.getElementById('qa-tab').addEventListener('click', function() {
+        handleTabSwitch('qa');
+    });
     
-    if (contentArea) {
-        // Remove active class from all buttons
-        if (qaButton) qaButton.classList.remove('active');
-        if (createButton) createButton.classList.remove('active');
-        if (poetryButton) poetryButton.classList.remove('active');
-        if (wordButton) wordButton.classList.remove('active');
-        
-        // Add only the appropriate container to the content area
-        if (containerType === 'qa' && qaContainer && contentArea) {
-            contentArea.appendChild(qaContainer);
-            if (qaButton) qaButton.classList.add('active');
-            console.log('QA container added to content area');
-            
-            // Remove other containers
-            removeContainerIfPresent('poetry-container');
-            removeContainerIfPresent('word-container');
-            
-        } else if (containerType === 'create' && createContainer && contentArea) {
-            contentArea.appendChild(createContainer);
-            if (createButton) createButton.classList.add('active');
-            console.log('Create container added to content area');
-            
-            // Remove other containers
-            removeContainerIfPresent('poetry-container');
-            removeContainerIfPresent('word-container');
-            
-            // Show empty state on test page
-            const questionsDisplayContainer = document.getElementById('questions-display-container');
-            const emptyState = document.getElementById('empty-state');
-            
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.classList.remove('hidden');
-                
-                if (emptyState) {
-                    emptyState.classList.remove('hidden');
-                }
-            }
-            
-        } else if (containerType === 'poetry' && poetryContainer && contentArea) {
-            contentArea.appendChild(poetryContainer);
-            if (poetryButton) poetryButton.classList.add('active');
-            console.log('Poetry container added to content area');
-            
-            // Remove word container
-            removeContainerIfPresent('word-container');
-            
-        } else if (containerType === 'word' && wordContainer && contentArea) {
-            contentArea.appendChild(wordContainer);
-            if (wordButton) wordButton.classList.add('active');
-            console.log('Word container added to content area');
-            
-            // Remove poetry container
-            removeContainerIfPresent('poetry-container');
-            
-            // Update education context AFTER the word container is added to the DOM
-            setTimeout(updateEducationContext, 0);
-        }
-    }
-}
-
-// Helper function to remove a container from the DOM if it exists
-function removeContainerIfPresent(containerId) {
-    const container = document.getElementById(containerId);
-    if (container && container.parentNode) {
-        container.parentNode.removeChild(container);
-    }
-}
-
-function setupTabEventListeners() {
-    const qaTab = document.getElementById('qa-tab');
-    const createTab = document.getElementById('create-tab');
-    const poetryTab = document.getElementById('poetry-tab');
-    const wordsTab = document.getElementById('words-tab');
+    // Create tab
+    document.getElementById('create-tab').addEventListener('click', function() {
+        handleTabSwitch('create');
+    });
     
-    if (qaTab) {
-        qaTab.addEventListener('click', function() {
-            handleTabSwitch('qa');
-        });
-    }
+    // Poetry tab
+    document.getElementById('poetry-tab').addEventListener('click', function() {
+        handleTabSwitch('poetry');
+    });
     
-    if (createTab) {
-        createTab.addEventListener('click', function() {
-            handleTabSwitch('create');
-        });
-    }
-    
-    if (poetryTab) {
-        poetryTab.addEventListener('click', function() {
-            handleTabSwitch('poetry');
-        });
-    }
-    
-    if (wordsTab) {
-        wordsTab.addEventListener('click', function() {
+    // Word tab
+    const wordTab = document.getElementById('words-tab');
+    if (wordTab) {
+        wordTab.addEventListener('click', function() {
             handleTabSwitch('word');
         });
     }
     
-    console.log("Tab event listeners have been set up using handleTabSwitch");
+    // ... remaining code ...
 }
