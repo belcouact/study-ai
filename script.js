@@ -6073,11 +6073,87 @@ function updateNavButtons() {
 function init() {
     // ... existing code ...
     
-    initTextTab();
-    initQuestionsTab();
     initVocabularyTab(); // Add this line
     
     // ... existing code ...
 }
 
 // ... existing code ...
+
+// Function to show a specific section and hide others
+function showSection(sectionId) {
+    // Hide all containers first
+    const containers = document.querySelectorAll('.content-section, .container');
+    containers.forEach(container => {
+        container.style.display = 'none';
+    });
+    
+    // Show the selected container
+    const selectedContainer = document.getElementById(sectionId);
+    if (selectedContainer) {
+        selectedContainer.style.display = 'flex';
+    }
+    
+    // Update active state for panel buttons
+    const buttons = document.querySelectorAll('.panel-button');
+    buttons.forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Find the button that corresponds to this section and make it active
+    if (sectionId === 'vocab-container') {
+        document.getElementById('vocab-button').classList.add('active');
+    } else if (sectionId === 'qa-container') {
+        document.getElementById('qa-button').classList.add('active');
+    } else if (sectionId === 'create-container') {
+        document.getElementById('create-button').classList.add('active');
+    } else if (sectionId === 'poetry-container') {
+        document.getElementById('poetry-button').classList.add('active');
+    }
+}
+
+// Fix for the initVocabularyTab function
+function initVocabularyTab() {
+    const vocabButton = document.getElementById('vocab-button');
+    const vocabContainer = document.getElementById('vocab-container');
+    const generateVocabButton = document.getElementById('generate-vocab-button');
+    const prevWordButton = document.getElementById('prev-word');
+    const nextWordButton = document.getElementById('next-word');
+
+    vocabButton.addEventListener('click', () => {
+        showSection('vocab-container');
+    });
+
+    // ... rest of existing function ...
+}
+
+// ... rest of existing code ...
+
+function init() {
+    // ... existing code ...
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Initialize panel management
+    document.getElementById('qa-button').addEventListener('click', () => {
+        showSection('qa-container');
+    });
+    
+    document.getElementById('create-button').addEventListener('click', () => {
+        showSection('create-container');
+    });
+    
+    document.getElementById('poetry-button').addEventListener('click', () => {
+        showSection('poetry-container');
+    });
+    
+    document.getElementById('vocab-button').addEventListener('click', () => {
+        showSection('vocab-container');
+    });
+    
+    // Show Q&A container by default
+    showSection('qa-container');
+    
+    // ... existing code ...
+}
