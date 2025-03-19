@@ -5935,9 +5935,8 @@ function initVocabularyTab() {
             container.style.display = 'none';
         });
         
-        // Show vocabulary container only
-        console.log("Setting vocab container display to flex:", vocabContainer);
-        vocabContainer.style.display = 'flex';
+        // Also specifically hide vocab-container by ID to ensure it's hidden
+        document.getElementById('vocab-container').style.display = 'flex';
         
         // Update active state for buttons
         const buttons = document.querySelectorAll('.panel-button, .sidebar-button');
@@ -5948,6 +5947,7 @@ function initVocabularyTab() {
         vocabButton.classList.add('active');
     });
 
+    // Rest of the function remains the same...
     generateVocabButton.addEventListener('click', handleGenerateVocabularyClick);
     
     prevWordButton.addEventListener('click', () => {
@@ -6012,11 +6012,26 @@ async function handleGenerateVocabularyClick() {
 
 // Function to generate vocabulary using DeepSeek API
 async function generateVocabulary(school, grade) {
-    const response = await fetch(API_BASE_URL, {
+    // Get the API base URL from the environment variable
+    const apiBaseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 
+                        (typeof process !== 'undefined' && process.env && process.env.API_BASE_URL) || 
+                        'https://api.deepseek.com/v1/chat/completions';  // Fallback URL
+    
+    // Get the API key from the environment variable
+    const apiKey = typeof DEEPSEEK_API_KEY !== 'undefined' ? DEEPSEEK_API_KEY : 
+                  (typeof process !== 'undefined' && process.env && process.env.DEEPSEEK_API_KEY) || '';
+    
+    console.log("Using API base URL:", apiBaseUrl);
+    
+    if (!apiKey) {
+        throw new Error("API key not found. Please provide DEEPSEEK_API_KEY.");
+    }
+    
+    const response = await fetch(apiBaseUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+            'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
             model: "deepseek-chat",
@@ -6336,3 +6351,42 @@ function showSection(sectionId) {
         document.getElementById('poetry-button').classList.add('active');
     }
 }
+
+// Update the qa-button click handler
+document.getElementById('qa-button').addEventListener('click', function() {
+    // Hide all containers
+    const allContainers = document.querySelectorAll('.container');
+    allContainers.forEach(container => {
+        container.style.display = 'none';
+    });
+    
+    // Explicitly hide vocab-container
+    document.getElementById('vocab-container').style.display = 'none';
+    
+    // Show qa-container
+    document.getElementById('qa-container').style.display = 'flex';
+    
+    // Update active buttons
+    document.querySelectorAll('.panel-button, .sidebar-button').forEach(button => {
+        button.classList.remove('active');
+    });
+    this.classList.add('active');
+});
+
+function init() {
+    // ... existing code ...
+    
+    // Initialize vocabulary tab
+    initVocabularyTab();
+    
+    // Make sure to show the default container and hide others
+    document.querySelectorAll('.container').forEach(container => {
+        container.style.display = 'none';
+    });
+    document.getElementById('qa-container').style.display = 'flex';
+    
+    // ... rest of existing code ...
+}
+
+// Make sure this is at the end of your file
+document.addEventListener('DOMContentLoaded', init);
