@@ -6169,11 +6169,20 @@ function displayWordCard(index) {
     const word = vocabularyWords[index];
     
     if (!word) {
-        vocabularyContainer.innerHTML = '<div class="initial-message">无单词数据</div>';
+        vocabularyContainer.innerHTML = `
+            <div class="initial-message">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#CBD5E0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+                <p>无单词数据</p>
+                <p>点击"加载词汇"按钮开始学习英语单词</p>
+            </div>
+        `;
         return;
     }
     
-    // Handle both API response format (word, definition) and mock data format (english, englishMeaning)
+    // Handle both API response format and our mock data format
     const english = word.word || word.english || '';
     const form = word.part_of_speech || word.form || 'n/a';
     const englishMeaning = word.definition || word.english_definition || word.englishMeaning || '';
@@ -6270,9 +6279,45 @@ function updateNavigationControls() {
 
 // Function to navigate between word cards
 function navigateWordCard(direction) {
-    const newIndex = currentWordIndex + direction;
+    if (vocabularyWords.length === 0) return;
     
-    if (newIndex >= 0 && newIndex < vocabularyWords.length) {
+    const newIndex = currentWordIndex + direction;
+    if (newIndex < 0 || newIndex >= vocabularyWords.length) return;
+    
+    const container = document.getElementById('vocabulary-container');
+    const currentCard = container.querySelector('.word-card');
+    
+    if (currentCard) {
+        // Apply exit animation based on direction
+        if (direction > 0) {
+            currentCard.classList.add('slide-left-exit');
+        } else {
+            currentCard.classList.add('slide-right-exit');
+        }
+        
+        // After exit animation completes, update and show new card
+        setTimeout(() => {
+            currentWordIndex = newIndex;
+            displayWordCard(currentWordIndex);
+            updateNavigationControls();
+            
+            // Apply enter animation to new card
+            const newCard = container.querySelector('.word-card');
+            if (newCard) {
+                if (direction > 0) {
+                    newCard.classList.add('slide-left-enter');
+                } else {
+                    newCard.classList.add('slide-right-enter');
+                }
+                
+                // Remove animation classes after they complete
+                setTimeout(() => {
+                    newCard.classList.remove('slide-left-enter', 'slide-right-enter');
+                }, 400);
+            }
+        }, 300);
+    } else {
+        // If no current card, just show the new one
         currentWordIndex = newIndex;
         displayWordCard(currentWordIndex);
         updateNavigationControls();
