@@ -6,6 +6,7 @@ let currentQuestionIndex = 0;
 
 // Add these global variables if they don't exist elsewhere
 // You can add these at the top of your script
+/*
 if (typeof vocabularyWords === 'undefined') {
     var vocabularyWords = [];
 }
@@ -13,6 +14,7 @@ if (typeof vocabularyWords === 'undefined') {
 if (typeof currentWordIndex === 'undefined') {
     var currentWordIndex = 0;
 }
+*/
 
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
