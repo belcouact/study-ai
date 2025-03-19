@@ -5913,53 +5913,37 @@ document.getElementById('word-button').addEventListener('click', function() {
 
 function switchPanel(panelId) {
     // Update active tab styling
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
+    document.querySelectorAll('.panel-button').forEach(button => {
+        button.classList.remove('active');
     });
     
-    // Find the tab corresponding to this panel and make it active
-    const tabMap = {
-        'qa-container': 'qa-tab',
-        'create-container': 'create-tab',
-        'poetry-container': 'poetry-tab',
-        'word-container': 'words-tab'
+    // Add active class to the clicked button
+    const buttonMap = {
+        'qa-container': 'qa-button',
+        'create-container': 'create-button',
+        'poetry-container': 'poetry-button',
+        'word-container': 'word-button'
     };
     
-    const tabId = tabMap[panelId];
-    if (tabId) {
-        const tabElement = document.getElementById(tabId);
-        if (tabElement) {
-            tabElement.classList.add('active');
+    const buttonId = buttonMap[panelId];
+    if (buttonId) {
+        const buttonElement = document.getElementById(buttonId);
+        if (buttonElement) {
+            buttonElement.classList.add('active');
         }
     }
     
     // Hide all containers
-    const containers = [
-        'qa-container', 
-        'create-container', 
-        'poetry-container', 
-        'word-container'
-    ];
-    
-    containers.forEach(containerId => {
-        const container = document.getElementById(containerId);
-        if (container) {
-            if (containerId === 'word-container') {
-                container.style.display = 'none';
-            } else {
-                container.classList.add('hidden');
-            }
-        }
-    });
+    document.getElementById('qa-container').classList.add('hidden');
+    document.getElementById('create-container').classList.add('hidden');
+    document.getElementById('poetry-container').classList.add('hidden');
+    document.getElementById('word-container').style.display = 'none';
     
     // Show the selected container
-    const selectedContainer = document.getElementById(panelId);
-    if (selectedContainer) {
-        if (panelId === 'word-container') {
-            selectedContainer.style.display = 'flex';
-        } else {
-            selectedContainer.classList.remove('hidden');
-        }
+    if (panelId === 'word-container') {
+        document.getElementById(panelId).style.display = 'flex';
+    } else {
+        document.getElementById(panelId).classList.remove('hidden');
     }
 }
 
@@ -6046,21 +6030,41 @@ async function generateWords(school, grade) {
         
         Ensure the vocabulary level is appropriate for ${school} ${grade} students.`;
         
-        const response = await fetchAIResponse(prompt);
-        let words;
+        const responseData = await fetchAIResponse(prompt);
         
+        // Since fetchAIResponse might return JSON, not a string
+        if (typeof responseData !== 'string') {
+            // If the response is already JSON data
+            const words = responseData;
+            wordHistory.push(words);
+            currentWordPage = wordHistory.length - 1;
+            displayWords(words);
+            updateWordNavigationButtons();
+            return;
+        }
+        
+        // If it's a string, extract JSON from it
         try {
-            // Extract the JSON array from the response
-            const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/) || 
-                             response.match(/```\n([\s\S]*?)\n```/) ||
-                             response.match(/\[([\s\S]*?)\]/);
-                             
-            if (jsonMatch) {
-                const jsonString = jsonMatch[0];
-                words = JSON.parse(jsonString);
+            let words;
+            
+            // Try to find JSON in the response using different patterns
+            const jsonRegex = /\[\s*{[\s\S]*}\s*\]/m;
+            const match = responseData.match(jsonRegex);
+            
+            if (match) {
+                // Found JSON-like content, try to parse it
+                words = JSON.parse(match[0]);
             } else {
-                // If no JSON format found, try to extract from the whole response
-                words = JSON.parse(response);
+                // Try to extract content between triple backticks
+                const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/;
+                const codeMatch = responseData.match(codeBlockRegex);
+                
+                if (codeMatch && codeMatch[1]) {
+                    words = JSON.parse(codeMatch[1]);
+                } else {
+                    // Last resort: try parsing the whole response
+                    words = JSON.parse(responseData);
+                }
             }
             
             // Add to history and display
@@ -6071,18 +6075,28 @@ async function generateWords(school, grade) {
         } catch (parseError) {
             console.error('Error parsing words JSON:', parseError);
             showSystemMessage('解析单词数据时出错，请重试', 'error');
-            wordsList.innerHTML = `<div class="error-message">
-                <p>抱歉，解析单词数据时遇到问题。</p>
-                <p>错误信息: ${parseError.message}</p>
-            </div>`;
+            
+            // Display raw response for debugging
+            wordsList.innerHTML = `
+                <div class="error-message">
+                    <p>抱歉，解析单词数据时遇到问题。</p>
+                    <p>错误信息: ${parseError.message}</p>
+                    <div class="raw-response">
+                        <h4>原始响应:</h4>
+                        <pre>${responseData}</pre>
+                    </div>
+                </div>
+            `;
         }
     } catch (error) {
         console.error('Error generating words:', error);
         showSystemMessage('生成单词时出错，请稍后再试', 'error');
-        wordsList.innerHTML = `<div class="error-message">
-            <p>抱歉，生成单词时遇到问题。</p>
-            <p>错误信息: ${error.message}</p>
-        </div>`;
+        wordsList.innerHTML = `
+            <div class="error-message">
+                <p>抱歉，生成单词时遇到问题。</p>
+                <p>错误信息: ${error.message}</p>
+            </div>
+        `;
     } finally {
         loadingIndicator.style.display = 'none';
         document.getElementById('generate-words').disabled = false;
