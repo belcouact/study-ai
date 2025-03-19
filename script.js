@@ -6333,3 +6333,138 @@ function navigateWordCard(direction) {
         updateNavigationControls();
     }
 }
+
+// Fix the handleLearnPoetryClick function by adding a poemState definition
+async function handleLearnPoetryClick() {
+    const poetryType = document.getElementById('poetry-type').value;
+    const poetryStyle = document.getElementById('poetry-style').value;
+    const poetryDynasty = document.getElementById('poetry-dynasty').value;
+    
+    if (!poetryType || !poetryStyle) {
+        showSystemMessage('请选择诗歌类型和风格', 'error');
+        return;
+    }
+    
+    const loadingElement = document.getElementById('poetry-loading');
+    if (loadingElement) loadingElement.classList.remove('hidden');
+    
+    const emptyState = document.querySelector('.poetry-empty-state');
+    if (emptyState) emptyState.classList.add('hidden');
+    
+    try {
+        // Define poemState here - this is what's missing
+        const poemState = {
+            currentPoemIndex: 0,
+            poems: []
+        };
+        
+        const response = await fetchPoems(poetryType, poetryStyle, poetryDynasty);
+        
+        if (response && Array.isArray(response)) {
+            console.log(`Successfully parsed ${response.length} poems`);
+            poemState.poems = response;
+            
+            if (poemState.poems.length > 0) {
+                displayPoem(poemState.poems[0]);
+                setupPoemNavigation(poemState);
+            } else {
+                showSystemMessage('没有找到符合条件的诗词', 'error');
+            }
+        } else {
+            throw new Error('Failed to parse poems from response');
+        }
+    } catch (error) {
+        console.error('Error generating poems:', error);
+        showSystemMessage('生成诗词时出错，请稍后再试', 'error');
+    } finally {
+        if (loadingElement) loadingElement.classList.add('hidden');
+    }
+}
+
+// Helper function to display a poem
+function displayPoem(poem) {
+    const poetryDisplay = document.getElementById('poetry-display');
+    if (!poetryDisplay) return;
+    
+    // Clear previous content
+    poetryDisplay.innerHTML = '';
+    
+    // Create poem display elements
+    const poemDisplay = document.createElement('div');
+    poemDisplay.className = 'poem-display';
+    
+    poemDisplay.innerHTML = `
+        <h2 class="poem-title">${poem.title || '无标题'}</h2>
+        <div class="poem-author">${poem.author || '佚名'} ${poem.dynasty ? `· ${poem.dynasty}` : ''}</div>
+        <div class="poem-content">${formatPoemContent(poem.content)}</div>
+        
+        <div class="poem-section poem-background-section">
+            <h3>诗词背景</h3>
+            <div class="poem-background">${poem.background || '暂无背景信息'}</div>
+        </div>
+        
+        <div class="poem-section poem-analysis-section">
+            <h3>诗词赏析</h3>
+            <div class="poem-explanation">${poem.explanation || '暂无赏析信息'}</div>
+        </div>
+    `;
+    
+    poetryDisplay.appendChild(poemDisplay);
+    
+    // Add animation classes
+    setTimeout(() => {
+        const sections = poemDisplay.querySelectorAll('.poem-section');
+        sections.forEach((section, index) => {
+            setTimeout(() => {
+                section.classList.add('animate-in');
+            }, index * 200);
+        });
+    }, 800);
+}
+
+// Helper function to format poem content with line breaks
+function formatPoemContent(content) {
+    if (!content) return '暂无内容';
+    
+    // Split by line breaks and wrap each line in a span for hover effects
+    return content.split('\n')
+        .map(line => `<span class="poem-line">${line || '&nbsp;'}</span>`)
+        .join('');
+}
+
+// Helper function to set up poem navigation
+function setupPoemNavigation(poemState) {
+    const prevBtn = document.getElementById('prev-poem-btn');
+    const nextBtn = document.getElementById('next-poem-btn');
+    const counter = document.getElementById('poem-counter');
+    
+    if (!prevBtn || !nextBtn || !counter) return;
+    
+    // Update counter
+    counter.textContent = `${poemState.currentPoemIndex + 1} / ${poemState.poems.length}`;
+    
+    // Update button states
+    prevBtn.disabled = poemState.currentPoemIndex === 0;
+    nextBtn.disabled = poemState.currentPoemIndex === poemState.poems.length - 1;
+    
+    // Set up event listeners
+    prevBtn.onclick = () => {
+        if (poemState.currentPoemIndex > 0) {
+            poemState.currentPoemIndex--;
+            displayPoem(poemState.poems[poemState.currentPoemIndex]);
+            counter.textContent = `${poemState.currentPoemIndex + 1} / ${poemState.poems.length}`;
+            prevBtn.disabled = poemState.currentPoemIndex === 0;
+            nextBtn.disabled = false;
+        }
+    };
+    
+    nextBtn.onclick = () => {
+        if (poemState.currentPoemIndex < poemState.poems.length - 1) {
+            poemState.currentPoemIndex++;
+            displayPoem(poemState.poems[poemState.currentPoemIndex]);
+            counter.textContent = `${poemState.currentPoemIndex + 1} / ${poemState.poems.length}`;
+            nextBtn.disabled = poemState.currentPoemIndex === poemState.poems.length - 1;
+            prevBtn.disabled = false;
+        }
+    };
+}
