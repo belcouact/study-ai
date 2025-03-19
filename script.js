@@ -4,6 +4,10 @@ let currentModel = 'deepseek-r1';
 // Add global variable for current question index
 let currentQuestionIndex = 0;
 
+// Add these at the top of your script.js file if they don't exist
+let vocabularyWords = [];
+let currentWordIndex = 0;
+
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
     console.log('Parsing questions from response:', response);
@@ -5913,18 +5917,31 @@ function initVocabularyTab() {
     const prevWordButton = document.getElementById('prev-word');
     const nextWordButton = document.getElementById('next-word');
 
+    console.log("Initializing vocabulary tab:", {
+        vocabButton,
+        vocabContainer,
+        generateVocabButton,
+        prevWordButton,
+        nextWordButton
+    });
+
     vocabButton.addEventListener('click', function() {
+        console.log("Vocabulary button clicked!");
+        
         // Hide all containers
         const containers = document.querySelectorAll('.container');
+        console.log("Found containers:", containers.length);
         containers.forEach(container => {
             container.style.display = 'none';
         });
         
         // Show vocabulary container
+        console.log("Setting vocab container display to flex:", vocabContainer);
         vocabContainer.style.display = 'flex';
         
         // Update active state for buttons
         const buttons = document.querySelectorAll('.panel-button');
+        console.log("Found panel buttons:", buttons.length);
         buttons.forEach(button => {
             button.classList.remove('active');
         });
@@ -6204,3 +6221,18 @@ function init() {
 
 // Make sure initialization happens when the DOM is ready
 document.addEventListener('DOMContentLoaded', init);
+
+function init() {
+    // ... existing code ...
+    
+    // Make sure to call initVocabularyTab explicitly
+    initVocabularyTab();
+    
+    // ... rest of existing init code ...
+}
+
+// At the very end of your script.js file, add:
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM fully loaded, initializing application...");
+    init();
+});
