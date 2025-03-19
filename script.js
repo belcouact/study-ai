@@ -5915,38 +5915,58 @@ document.getElementById('word-button').addEventListener('click', function() {
 });
 
 function switchPanel(panelId) {
-    // Update active tab styling
-    document.querySelectorAll('.panel-button').forEach(button => {
-        button.classList.remove('active');
+    // Find all panel containers
+    const panels = [
+        'qa-container',
+        'create-container',
+        'poetry-container',
+        'word-container'
+    ];
+    
+    // Hide all panels first
+    panels.forEach(panel => {
+        const element = document.getElementById(panel);
+        if (element) {
+            // For word-container, we use display style
+            if (panel === 'word-container') {
+                element.style.display = 'none';
+            } else {
+                // For other containers, we use the hidden class
+                element.classList.add('hidden');
+            }
+        }
     });
     
-    // Add active class to the clicked button
-    const buttonMap = {
-        'qa-container': 'qa-button',
-        'create-container': 'create-button',
-        'poetry-container': 'poetry-button',
-        'word-container': 'word-button'
-    };
-    
-    const buttonId = buttonMap[panelId];
-    if (buttonId) {
-        const buttonElement = document.getElementById(buttonId);
-        if (buttonElement) {
-            buttonElement.classList.add('active');
+    // Then show only the selected panel
+    const selectedPanel = document.getElementById(panelId);
+    if (selectedPanel) {
+        if (panelId === 'word-container') {
+            selectedPanel.style.display = 'flex';
+        } else {
+            selectedPanel.classList.remove('hidden');
         }
     }
     
-    // Hide all containers
-    document.getElementById('qa-container').classList.add('hidden');
-    document.getElementById('create-container').classList.add('hidden');
-    document.getElementById('poetry-container').classList.add('hidden');
-    document.getElementById('word-container').style.display = 'none';
+    // Update active tab styling
+    const tabMapping = {
+        'qa-container': 'qa-tab',
+        'create-container': 'create-tab', 
+        'poetry-container': 'poetry-tab',
+        'word-container': 'words-tab'
+    };
     
-    // Show the selected container
-    if (panelId === 'word-container') {
-        document.getElementById(panelId).style.display = 'flex';
-    } else {
-        document.getElementById(panelId).classList.remove('hidden');
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Add active class to the current tab
+    const currentTabId = tabMapping[panelId];
+    if (currentTabId) {
+        const currentTab = document.getElementById(currentTabId);
+        if (currentTab) {
+            currentTab.classList.add('active');
+        }
     }
 }
 
@@ -6027,79 +6047,76 @@ async function generateWords(school, grade) {
                 "chinese": "她为他人树立了一个好榜样。"
               }
             ]
-          },
-          ...
+          }
         ]
         
         Ensure the vocabulary level is appropriate for ${school} ${grade} students.`;
         
-        const responseData = await fetchAIResponse(prompt);
+        // Use the existing fetchAIResponse function
+        const response = await fetchAIResponse(prompt);
         
-        // Since fetchAIResponse might return JSON, not a string
-        if (typeof responseData !== 'string') {
-            // If the response is already JSON data
-            const words = responseData;
-            wordHistory.push(words);
-            currentWordPage = wordHistory.length - 1;
-            displayWords(words);
-            updateWordNavigationButtons();
-            return;
-        }
-        
-        // If it's a string, extract JSON from it
+        // Try to parse JSON from response
+        let words;
         try {
-            let words;
+            // First try: parse the entire response as JSON
+            words = JSON.parse(response);
+        } catch (e) {
+            // Second try: extract JSON from a code block if it exists
+            const jsonRegex = /```(?:json)?\s*([\s\S]*?)\s*```/;
+            const match = response.match(jsonRegex);
             
-            // Try to find JSON in the response using different patterns
-            const jsonRegex = /\[\s*{[\s\S]*}\s*\]/m;
-            const match = responseData.match(jsonRegex);
-            
-            if (match) {
-                // Found JSON-like content, try to parse it
-                words = JSON.parse(match[0]);
+            if (match && match[1]) {
+                words = JSON.parse(match[1]);
             } else {
-                // Try to extract content between triple backticks
-                const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/;
-                const codeMatch = responseData.match(codeBlockRegex);
+                // Third try: find JSON array pattern in the text
+                const arrayRegex = /\[\s*\{[\s\S]*\}\s*\]/;
+                const arrayMatch = response.match(arrayRegex);
                 
-                if (codeMatch && codeMatch[1]) {
-                    words = JSON.parse(codeMatch[1]);
+                if (arrayMatch) {
+                    words = JSON.parse(arrayMatch[0]);
                 } else {
-                    // Last resort: try parsing the whole response
-                    words = JSON.parse(responseData);
+                    // If we can't parse JSON, create a fallback structure
+                    throw new Error("Could not parse JSON from AI response");
                 }
             }
-            
-            // Add to history and display
-            wordHistory.push(words);
-            currentWordPage = wordHistory.length - 1;
-            displayWords(words);
-            updateWordNavigationButtons();
-        } catch (parseError) {
-            console.error('Error parsing words JSON:', parseError);
-            showSystemMessage('解析单词数据时出错，请重试', 'error');
-            
-            // Display raw response for debugging
-            wordsList.innerHTML = `
-                <div class="error-message">
-                    <p>抱歉，解析单词数据时遇到问题。</p>
-                    <p>错误信息: ${parseError.message}</p>
-                    <div class="raw-response">
-                        <h4>原始响应:</h4>
-                        <pre>${responseData}</pre>
-                    </div>
-                </div>
-            `;
         }
+        
+        // Verify that words is an array before using forEach
+        if (!Array.isArray(words)) {
+            console.error("Words is not an array:", words);
+            showSystemMessage("AI response format error. Expected array of words.", "error");
+            
+            // Create a fallback array if needed
+            if (typeof words === 'object' && words !== null) {
+                // If it's an object but not an array, wrap it in an array
+                words = [words];
+            } else {
+                // Create a sample fallback
+                words = [{
+                    word: "Error parsing response",
+                    partOfSpeech: "error",
+                    englishMeaning: "Could not parse AI response",
+                    chineseMeaning: "无法解析AI响应",
+                    examples: [
+                        { english: "Please try again.", chinese: "请重试。" }
+                    ]
+                }];
+            }
+        }
+        
+        // Add to history and display
+        wordHistory.push(words);
+        currentWordPage = wordHistory.length - 1;
+        displayWords(words);
+        updateWordNavigationButtons();
+        
     } catch (error) {
         console.error('Error generating words:', error);
         showSystemMessage('生成单词时出错，请稍后再试', 'error');
-        wordsList.innerHTML = `
-            <div class="error-message">
-                <p>抱歉，生成单词时遇到问题。</p>
-                <p>错误信息: ${error.message}</p>
-            </div>
-        `;
+        wordsList.innerHTML = `<div class="error-message">
+            <p>抱歉，生成单词时遇到问题。</p>
+            <p>错误信息: ${error.message}</p>
+        </div>`;
     } finally {
         loadingIndicator.style.display = 'none';
         document.getElementById('generate-words').disabled = false;
@@ -6110,30 +6127,49 @@ function displayWords(words) {
     const wordsList = document.getElementById('words-list');
     wordsList.innerHTML = '';
     
-    words.forEach(word => {
+    // Double-check that words is an array
+    if (!Array.isArray(words)) {
+        console.error("Words is not an array in displayWords:", words);
+        wordsList.innerHTML = `<div class="error-message">
+            <p>数据格式错误，无法显示单词。</p>
+        </div>`;
+        return;
+    }
+    
+    words.forEach((word, index) => {
         const wordCard = document.createElement('div');
         wordCard.className = 'word-card';
         
+        // Make sure all required properties exist
+        const safeWord = {
+            word: word.word || "Unknown",
+            partOfSpeech: word.partOfSpeech || "N/A",
+            englishMeaning: word.englishMeaning || "No definition available",
+            chineseMeaning: word.chineseMeaning || "无可用定义",
+            relatedForms: word.relatedForms || "",
+            examples: Array.isArray(word.examples) ? word.examples : []
+        };
+        
         const wordHtml = `
-            <div class="word-english">${word.word}</div>
+            <div class="word-english">${safeWord.word}</div>
             <div class="word-info">
-                <span class="word-part">${word.partOfSpeech}</span>
+                <span class="word-part">${safeWord.partOfSpeech}</span>
             </div>
             <div class="word-meaning">
-                <div class="word-english-meaning">${word.englishMeaning}</div>
-                <div class="word-chinese-meaning">${word.chineseMeaning}</div>
+                <div class="word-english-meaning">${safeWord.englishMeaning}</div>
+                <div class="word-chinese-meaning">${safeWord.chineseMeaning}</div>
             </div>
-            ${word.relatedForms ? `
+            ${safeWord.relatedForms ? `
                 <div class="word-related">
-                    <span class="related-title">相关形式:</span> ${word.relatedForms}
+                    <span class="related-title">相关形式:</span> ${safeWord.relatedForms}
                 </div>
             ` : ''}
             <div class="word-examples">
                 <div class="example-title">例句:</div>
-                ${word.examples.map(example => `
+                ${safeWord.examples.map(example => `
                     <div class="example-item">
-                        <div class="example-english">${example.english}</div>
-                        <div class="example-chinese">${example.chinese}</div>
+                        <div class="example-english">${example.english || ""}</div>
+                        <div class="example-chinese">${example.chinese || ""}</div>
                     </div>
                 `).join('')}
             </div>
@@ -6239,4 +6275,152 @@ function init() {
     addWordFeatureToInit();
     
     // ... remaining init code ...
+}
+
+function setupTabEventListeners() {
+    // Setup QA tab
+    const qaTab = document.getElementById('qa-tab');
+    if (qaTab) {
+        qaTab.addEventListener('click', function() {
+            switchPanel('qa-container');
+        });
+    }
+    
+    // Setup Create tab
+    const createTab = document.getElementById('create-tab');
+    if (createTab) {
+        createTab.addEventListener('click', function() {
+            switchPanel('create-container');
+        });
+    }
+    
+    // Setup Poetry tab
+    const poetryTab = document.getElementById('poetry-tab');
+    if (poetryTab) {
+        poetryTab.addEventListener('click', function() {
+            switchPanel('poetry-container');
+        });
+    }
+    
+    // Setup Words tab
+    const wordsTab = document.getElementById('words-tab');
+    if (wordsTab) {
+        wordsTab.addEventListener('click', function() {
+            switchPanel('word-container');
+            updateEducationContext(); // Update education context when showing word container
+        });
+    }
+}
+
+// Make sure to call this in your init function
+function init() {
+    // ... existing code ...
+    
+    // Remove any duplicate switchPanel calls
+    setupTabEventListeners();
+    
+    // ... remaining init code ...
+}
+
+// Replace all existing switchPanel functions with this single implementation
+function switchPanel(panelId) {
+    console.log("Switching to panel:", panelId);
+    
+    // Hide all panels first
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    const poetryContainer = document.getElementById('poetry-container');
+    const wordContainer = document.getElementById('word-container');
+    
+    if (qaContainer) qaContainer.classList.add('hidden');
+    if (createContainer) createContainer.classList.add('hidden');
+    if (poetryContainer) poetryContainer.classList.add('hidden');
+    if (wordContainer) wordContainer.style.display = 'none';
+    
+    // Show the selected panel
+    const selectedPanel = document.getElementById(panelId);
+    if (selectedPanel) {
+        if (panelId === 'word-container') {
+            selectedPanel.style.display = 'flex';
+        } else {
+            selectedPanel.classList.remove('hidden');
+        }
+    }
+    
+    // Update active tab styling
+    document.querySelectorAll('.tab').forEach(tab => {
+        if (tab) tab.classList.remove('active');
+    });
+    
+    // Determine which tab to activate based on the panel
+    let tabToActivate;
+    if (panelId === 'qa-container') tabToActivate = 'qa-tab';
+    else if (panelId === 'create-container') tabToActivate = 'create-tab';
+    else if (panelId === 'poetry-container') tabToActivate = 'poetry-tab';
+    else if (panelId === 'word-container') tabToActivate = 'words-tab';
+    
+    if (tabToActivate) {
+        const tabElement = document.getElementById(tabToActivate);
+        if (tabElement) tabElement.classList.add('active');
+    }
+}
+
+// Replace all setupTabEventListeners functions with this implementation
+function setupTabEventListeners() {
+    const qaTab = document.getElementById('qa-tab');
+    const createTab = document.getElementById('create-tab');
+    const poetryTab = document.getElementById('poetry-tab');
+    const wordsTab = document.getElementById('words-tab');
+    
+    if (qaTab) {
+        qaTab.addEventListener('click', function() {
+            switchPanel('qa-container');
+        });
+    }
+    
+    if (createTab) {
+        createTab.addEventListener('click', function() {
+            switchPanel('create-container');
+        });
+    }
+    
+    if (poetryTab) {
+        poetryTab.addEventListener('click', function() {
+            switchPanel('poetry-container');
+        });
+    }
+    
+    if (wordsTab) {
+        wordsTab.addEventListener('click', function() {
+            switchPanel('word-container');
+            updateEducationContext();
+        });
+    }
+}
+
+// Make sure init is only defined once with all the necessary setup
+function init() {
+    console.log("Initializing application...");
+    // Include all necessary initialization functions
+    initializeFormLayout();
+    setupTabEventListeners();
+    setupNavigationButtons();
+    setupOptionButtons();
+    setupChatButtons();
+    setupOptimizeAndSubmitButtons();
+    
+    // Initialize sidebars, dropdowns, etc.
+    // ... other initialization code ...
+    
+    // Initialize word feature
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    const gradeSelect = document.getElementById('grade-select-sidebar');
+    
+    if (schoolSelect && gradeSelect) {
+        schoolSelect.addEventListener('change', updateEducationContext);
+        gradeSelect.addEventListener('change', updateEducationContext);
+    }
+    
+    // Start with the default panel
+    switchPanel('qa-container');
 }
