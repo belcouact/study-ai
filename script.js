@@ -6182,32 +6182,35 @@ function displayWordCard(index) {
         return;
     }
     
-    // Handle both API response format and our mock data format
+    // Safely extract word properties with fallbacks for all fields
     const english = word.word || word.english || '';
     const form = word.part_of_speech || word.form || 'n/a';
     const englishMeaning = word.definition || word.english_definition || word.englishMeaning || '';
     const chineseMeaning = word.chinese_translation || word.chineseMeaning || '';
     
-    // Handle examples in either format
+    // Process examples with fallbacks
     let examples = [];
     if (word.example_sentences && Array.isArray(word.example_sentences)) {
         examples = word.example_sentences.map(example => {
-            // If example is a string with both English and Chinese
             if (typeof example === 'string') {
                 const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
-                if (parts.length >= 2) {
-                    return {
-                        english: parts[0].trim(),
-                        chinese: parts[1].trim()
-                    };
-                }
-                return { english: example, chinese: '' };
+                return {
+                    english: parts[0] || example,
+                    chinese: parts[1] || ''
+                };
             }
-            // If example is already an object
             return example;
         });
     } else if (word.examples && Array.isArray(word.examples)) {
         examples = word.examples;
+    }
+    
+    // Ensure there's always at least one example
+    if (examples.length === 0) {
+        examples.push({
+            english: `Example using "${english}".`,
+            chinese: `使用"${english}"的例句。`
+        });
     }
     
     const cardHTML = `
@@ -6219,15 +6222,16 @@ function displayWordCard(index) {
             <div class="word-meanings">
                 <div class="meaning-row">
                     <div class="meaning-label">英文释义:</div>
-                    <div class="meaning-content">${englishMeaning}</div>
+                    <div class="meaning-content">${englishMeaning || '暂无英文释义'}</div>
                 </div>
                 <div class="meaning-row">
                     <div class="meaning-label">中文释义:</div>
-                    <div class="meaning-content">${chineseMeaning}</div>
+                    <div class="meaning-content">${chineseMeaning || '暂无中文释义'}</div>
                 </div>
             </div>
             <div class="word-examples">
                 ${examples.map(example => {
+                    // Handle both string and object formats
                     if (typeof example === 'string') {
                         const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
                         return `
