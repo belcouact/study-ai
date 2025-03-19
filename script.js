@@ -6090,6 +6090,8 @@ function ensureVocabularyTabSetup() {
             const newVocabContent = document.createElement('div');
             newVocabContent.id = 'vocabulary-content';
             newVocabContent.className = 'tab-content';
+            // Initially hide the content
+            newVocabContent.style.display = 'none';
             
             // Add initial content
             newVocabContent.innerHTML = `
@@ -6129,6 +6131,9 @@ function ensureVocabularyTabSetup() {
                 nextBtn.addEventListener('click', () => navigateWordCard(1));
             }
         }
+    } else {
+        // If it already exists, ensure it's hidden initially
+        vocabularyContent.style.display = 'none';
     }
 }
 
@@ -6138,6 +6143,73 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Make sure vocabulary tab is set up
     ensureVocabularyTabSetup();
+    
+    // Setup tab event listeners
+    setupTabEventListeners();
+});
+
+// Add this function definition right after ensureVocabularyTabSetup
+function setupTabEventListeners() {
+    // Tab switching for tab elements
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const tabName = tab.dataset.tab;
+            console.log('Tab clicked:', tabName);
+            
+            // First hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Show only the selected tab content
+            const selectedContent = document.getElementById(`${tabName}-content`);
+            if (selectedContent) {
+                selectedContent.style.display = 'block';
+            }
+            
+            // Update active state on tabs
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.remove('active');
+            });
+            tab.classList.add('active');
+            
+            // If we have a specific handleTabSwitch function available, call it
+            if (typeof handleTabSwitch === 'function') {
+                handleTabSwitch(tabName);
+            }
+        });
+    });
+    
+    // Hide all tab contents initially except for the active one
+    const activeTab = document.querySelector('.tab.active');
+    if (activeTab) {
+        const activeTabName = activeTab.dataset.tab;
+        document.querySelectorAll('.tab-content').forEach(content => {
+            if (content.id !== `${activeTabName}-content`) {
+                content.style.display = 'none';
+            }
+        });
+    } else {
+        // If no active tab, hide all content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.style.display = 'none';
+        });
+    }
+}
+
+// Update the DOMContentLoaded event handler
+document.addEventListener('DOMContentLoaded', function() {
+    // Your existing code...
+    
+    // Make sure vocabulary tab is set up
+    ensureVocabularyTabSetup();
+    
+    // Initially hide the vocabulary content
+    const vocabularyContent = document.getElementById('vocabulary-content');
+    if (vocabularyContent) {
+        vocabularyContent.style.display = 'none';
+    }
     
     // Setup tab event listeners
     setupTabEventListeners();
