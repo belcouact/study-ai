@@ -4275,9 +4275,6 @@ function getSimplifiedContextSummary() {
         
         // Poetry buttons
         setupPoetryButtons();
-        
-        // Add this to your setupEventListeners function
-        setupWordTabEventListener();
     }
 
 // ... existing code ...
@@ -5140,13 +5137,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const poetryContainer = document.getElementById('poetry-container');
     const qaContainer = document.getElementById('qa-container');
     const createContainer = document.getElementById('create-container');
-    const wordContainer = document.getElementById('word-container');
     
     // Store original parent nodes
     let poetryParent = null;
     let qaParent = null;
     let createParent = null;
-    let wordParent = null;
     
     if (poetryContainer) {
         poetryParent = poetryContainer.parentNode;
@@ -5163,16 +5158,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (createContainer) {
         createParent = createContainer.parentNode;
     }
-
-    if (wordContainer) {
-        wordParent = wordContainer.parentNode;
-    }
     
     // Get all buttons
     const poetryButton = document.getElementById('poetry-button');
     const qaButton = document.getElementById('qa-button');
     const createButton = document.getElementById('create-button');
-    const wordButton = document.getElementById('word-button');
     
     // Get the content area where containers should be placed
     const contentArea = document.querySelector('.content-area');
@@ -5181,50 +5171,77 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleTabSwitch(containerType) {
         console.log('Switching to tab:', containerType);
         
-        // Hide all containers first
-        document.getElementById('qa-container').classList.add('hidden');
-        document.getElementById('create-container').classList.add('hidden');
-        document.getElementById('poetry-container').classList.add('hidden');
-        
-        // For word container, use style.display property
-        const wordContainer = document.getElementById('word-container');
-        if (wordContainer) {
-            wordContainer.style.display = 'none';
+        // First, remove all containers from DOM to ensure clean state
+        if (qaContainer && qaContainer.parentNode) {
+            qaContainer.parentNode.removeChild(qaContainer);
         }
         
-        // Show the selected container
-        if (containerType === 'qa') {
-            document.getElementById('qa-container').classList.remove('hidden');
-        } else if (containerType === 'create') {
-            document.getElementById('create-container').classList.remove('hidden');
-        } else if (containerType === 'poetry') {
-            document.getElementById('poetry-container').classList.remove('hidden');
-        } else if (containerType === 'word') {
-            // For word container, use style.display = 'flex'
-            if (wordContainer) {
-                wordContainer.style.display = 'flex';
-                // Update education context when showing the word container
-                updateEducationContext();
-            }
+        if (createContainer && createContainer.parentNode) {
+            createContainer.parentNode.removeChild(createContainer);
         }
         
-        // Update active tab styling
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
+        if (poetryContainer && poetryContainer.parentNode) {
+            poetryContainer.parentNode.removeChild(poetryContainer);
+        }
         
-        // Add active class to the current tab
-        if (containerType === 'qa') {
-            document.getElementById('qa-tab').classList.add('active');
-        } else if (containerType === 'create') {
-            document.getElementById('create-tab').classList.add('active');
-        } else if (containerType === 'poetry') {
-            document.getElementById('poetry-tab').classList.add('active');
-        } else if (containerType === 'word') {
-            const wordTab = document.getElementById('words-tab');
-            if (wordTab) {
-                wordTab.classList.add('active');
+        // Reset active states
+        if (qaButton) qaButton.classList.remove('active');
+        if (createButton) createButton.classList.remove('active');
+        if (poetryButton) poetryButton.classList.remove('active');
+        
+        // Add only the appropriate container to the content area
+        if (containerType === 'qa' && qaContainer && contentArea) {
+            contentArea.appendChild(qaContainer);
+            if (qaButton) qaButton.classList.add('active');
+            console.log('QA container added to content area');
+            
+            // Ensure poetry container is not present
+            const existingPoetryContainer = document.getElementById('poetry-container');
+            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
+                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
             }
+        } else if (containerType === 'create' && createContainer && contentArea) {
+            contentArea.appendChild(createContainer);
+            if (createButton) createButton.classList.add('active');
+            console.log('Create container added to content area');
+            
+            // Ensure poetry container is not present
+            const existingPoetryContainer = document.getElementById('poetry-container');
+            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
+                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
+            }
+            
+            // Show empty state on test page
+            const questionsDisplayContainer = document.getElementById('questions-display-container');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (questionsDisplayContainer) {
+                questionsDisplayContainer.classList.remove('hidden');
+                
+                if (emptyState) {
+                    emptyState.classList.remove('hidden');
+                }
+            }
+        } else if (containerType === 'poetry' && poetryContainer && contentArea) {
+            contentArea.appendChild(poetryContainer);
+            if (poetryButton) poetryButton.classList.add('active');
+            console.log('Poetry container added to content area');
+            
+            // After switching to poetry tab, add event listener to learn poetry button
+            setTimeout(() => {
+                const learnPoetryButton = document.getElementById('learn-poetry-button');
+                if (learnPoetryButton) {
+                    // Remove any existing event listeners
+                    const newButton = learnPoetryButton.cloneNode(true);
+                    learnPoetryButton.parentNode.replaceChild(newButton, learnPoetryButton);
+                    
+                    // Add new event listener
+                    newButton.addEventListener('click', function() {
+                        console.log('Learn poetry button clicked');
+                        handleLearnPoetryClick();
+                    });
+                }
+            }, 100);
         }
     }
     
@@ -5247,13 +5264,6 @@ document.addEventListener('DOMContentLoaded', function() {
         poetryButton.addEventListener('click', function() {
             console.log('Poetry button clicked');
             handleTabSwitch('poetry');
-        });
-    }
-
-    if (wordButton) {
-        wordButton.addEventListener('click', function() {
-            console.log('Word button clicked');
-            handleTabSwitch('word');
         });
     }
     
@@ -5890,708 +5900,3 @@ function loadPoemDetails(poem) {
 
 // If your code uses a different function to display poem details, 
 // ensure the sections are added and visible in that function instead.
-
-// Word learning feature
-let wordHistory = [];
-let currentWordPage = 0;
-const wordsPerPage = 10;
-
-document.getElementById('word-button').addEventListener('click', function() {
-    switchPanel('word-container');
-    updateEducationContext();
-});
-
-function switchPanel(panelId) {
-    // Find all panel containers
-    const panels = [
-        'qa-container',
-        'create-container',
-        'poetry-container',
-        'word-container'
-    ];
-    
-    // Hide all panels first
-    panels.forEach(panel => {
-        const element = document.getElementById(panel);
-        if (element) {
-            // For word-container, we use display style
-            if (panel === 'word-container') {
-                element.style.display = 'none';
-            } else {
-                // For other containers, we use the hidden class
-                element.classList.add('hidden');
-            }
-        }
-    });
-    
-    // Then show only the selected panel
-    const selectedPanel = document.getElementById(panelId);
-    if (selectedPanel) {
-        if (panelId === 'word-container') {
-            selectedPanel.style.display = 'flex';
-        } else {
-            selectedPanel.classList.remove('hidden');
-        }
-    }
-    
-    // Update active tab styling
-    const tabMapping = {
-        'qa-container': 'qa-tab',
-        'create-container': 'create-tab', 
-        'poetry-container': 'poetry-tab',
-        'word-container': 'words-tab'
-    };
-    
-    // Remove active class from all tabs
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    
-    // Add active class to the current tab
-    const currentTabId = tabMapping[panelId];
-    if (currentTabId) {
-        const currentTab = document.getElementById(currentTabId);
-        if (currentTab) {
-            currentTab.classList.add('active');
-        }
-    }
-}
-
-function updateEducationContext() {
-    const school = document.getElementById('school-select-sidebar').value;
-    const grade = document.getElementById('grade-select-sidebar').value;
-    
-    if (school && grade) {
-        document.getElementById('education-context').textContent = 
-            `${school} - ${grade}`;
-    } else {
-        document.getElementById('education-context').textContent = '未选择';
-    }
-}
-
-document.getElementById('generate-words').addEventListener('click', async function() {
-    const school = document.getElementById('school-select-sidebar').value;
-    const grade = document.getElementById('grade-select-sidebar').value;
-    
-    if (!school || !grade) {
-        showSystemMessage('请先在侧边栏选择学校和年级', 'error');
-        return;
-    }
-    
-    await generateWords(school, grade);
-});
-
-document.getElementById('prev-words').addEventListener('click', function() {
-    if (currentWordPage > 0) {
-        currentWordPage--;
-        displayWords(wordHistory[currentWordPage]);
-        updateWordNavigationButtons();
-    }
-});
-
-document.getElementById('next-words').addEventListener('click', function() {
-    if (currentWordPage < wordHistory.length - 1) {
-        currentWordPage++;
-        displayWords(wordHistory[currentWordPage]);
-        updateWordNavigationButtons();
-    }
-});
-
-async function generateWords(school, grade) {
-    const wordsList = document.getElementById('words-list');
-    const loadingIndicator = document.getElementById('words-loading');
-    
-    // Show loading indicator
-    wordsList.innerHTML = '';
-    loadingIndicator.style.display = 'flex';
-    document.getElementById('generate-words').disabled = true;
-    
-    try {
-        // Crafting prompt for vocabulary generation
-        const prompt = `Generate 10 English vocabulary words appropriate for ${school} ${grade} students in China. For each word, include:
-        1. The English word
-        2. Part of speech (noun, verb, adjective, etc.)
-        3. English meaning
-        4. Chinese meaning
-        5. Related forms (if applicable)
-        6. 2 example sentences with Chinese translations
-
-        Format the response as a JSON array of objects with the following structure:
-        [
-          {
-            "word": "example",
-            "partOfSpeech": "noun",
-            "englishMeaning": "a thing characteristic of its kind",
-            "chineseMeaning": "例子，榜样",
-            "relatedForms": "exemplify (verb), exemplary (adj)",
-            "examples": [
-              {
-                "english": "This is an example of good writing.",
-                "chinese": "这是优秀写作的一个例子。"
-              },
-              {
-                "english": "She set a good example for others to follow.",
-                "chinese": "她为他人树立了一个好榜样。"
-              }
-            ]
-          }
-        ]
-        
-        Return ONLY valid JSON - no explanations or other text.
-        Ensure the vocabulary level is appropriate for ${school} ${grade} students.`;
-        
-        // Using existing fetchAIResponse function from line 160
-        const responseData = await fetchAIResponse(prompt);
-        let words;
-
-        // Handle different response formats
-        if (typeof responseData === 'string') {
-            // If it's a string, we need to parse it
-            try {
-                // Try to parse as direct JSON first
-                words = JSON.parse(responseData);
-            } catch (parseError) {
-                console.log("Direct JSON parse failed, trying to extract JSON from text");
-                
-                // Try to extract from markdown code block
-                let jsonStr = responseData;
-                const codeBlockMatch = /```(?:json)?\s*([\s\S]*?)\s*```/.exec(responseData);
-                if (codeBlockMatch && codeBlockMatch[1]) {
-                    jsonStr = codeBlockMatch[1];
-                }
-                
-                // Clean up potential text around the JSON
-                jsonStr = jsonStr.trim();
-                
-                // If it starts with [ and ends with ], try to parse it
-                if (jsonStr.startsWith('[') && jsonStr.endsWith(']')) {
-                    try {
-                        words = JSON.parse(jsonStr);
-                    } catch (e) {
-                        console.error("JSON extraction failed:", e);
-                        throw new Error("Could not parse JSON from response");
-                    }
-                } else {
-                    // Last resort: try to find JSON array pattern
-                    const jsonMatch = /\[\s*{[\s\S]*}\s*\]/.exec(jsonStr);
-                    if (jsonMatch) {
-                        try {
-                            words = JSON.parse(jsonMatch[0]);
-                        } catch (e) {
-                            console.error("JSON regex extraction failed:", e);
-                            throw new Error("Could not parse JSON from response");
-                        }
-                    } else {
-                        throw new Error("No valid JSON found in response");
-                    }
-                }
-            }
-        } else if (typeof responseData === 'object') {
-            // If it's already an object (perhaps fetchAIResponse already parsed it)
-            words = responseData;
-        } else {
-            throw new Error("Unexpected response format from AI");
-        }
-        
-        // Ensure words is an array
-        if (!Array.isArray(words)) {
-            if (typeof words === 'object' && words !== null) {
-                // If it's an object, convert to array with this single object
-                words = [words];
-            } else {
-                throw new Error("AI response is not in the expected array format");
-            }
-        }
-        
-        // Add to history and display
-        wordHistory.push(words);
-        currentWordPage = wordHistory.length - 1;
-        displayWords(words);
-        updateWordNavigationButtons();
-        
-    } catch (error) {
-        console.error('Error generating words:', error);
-        showSystemMessage('生成单词时出错，请稍后再试', 'error');
-        wordsList.innerHTML = `<div class="error-message">
-            <p>抱歉，生成单词时遇到问题。</p>
-            <p>错误信息: ${error.message}</p>
-            <p>请确保网络连接正常，然后重试。</p>
-        </div>`;
-    } finally {
-        loadingIndicator.style.display = 'none';
-        document.getElementById('generate-words').disabled = false;
-    }
-}
-
-function displayWords(words) {
-    const wordsList = document.getElementById('words-list');
-    wordsList.innerHTML = '';
-    
-    // Double-check that words is an array
-    if (!Array.isArray(words)) {
-        console.error("Words is not an array in displayWords:", words);
-        wordsList.innerHTML = `<div class="error-message">
-            <p>数据格式错误，无法显示单词。</p>
-        </div>`;
-        return;
-    }
-    
-    words.forEach((word, index) => {
-        const wordCard = document.createElement('div');
-        wordCard.className = 'word-card';
-        
-        // Make sure all required properties exist
-        const safeWord = {
-            word: word.word || "Unknown",
-            partOfSpeech: word.partOfSpeech || "N/A",
-            englishMeaning: word.englishMeaning || "No definition available",
-            chineseMeaning: word.chineseMeaning || "无可用定义",
-            relatedForms: word.relatedForms || "",
-            examples: Array.isArray(word.examples) ? word.examples : []
-        };
-        
-        const wordHtml = `
-            <div class="word-english">${safeWord.word}</div>
-            <div class="word-info">
-                <span class="word-part">${safeWord.partOfSpeech}</span>
-            </div>
-            <div class="word-meaning">
-                <div class="word-english-meaning">${safeWord.englishMeaning}</div>
-                <div class="word-chinese-meaning">${safeWord.chineseMeaning}</div>
-            </div>
-            ${safeWord.relatedForms ? `
-                <div class="word-related">
-                    <span class="related-title">相关形式:</span> ${safeWord.relatedForms}
-            </div>
-            ` : ''}
-            <div class="word-examples">
-                <div class="example-title">例句:</div>
-                ${safeWord.examples.map(example => `
-                    <div class="example-item">
-                        <div class="example-english">${example.english || ""}</div>
-                        <div class="example-chinese">${example.chinese || ""}</div>
-                    </div>
-                `).join('')}
-        </div>
-    `;
-        
-        wordCard.innerHTML = wordHtml;
-        wordsList.appendChild(wordCard);
-    });
-}
-
-function updateWordNavigationButtons() {
-    document.getElementById('prev-words').disabled = currentWordPage <= 0;
-    document.getElementById('next-words').disabled = currentWordPage >= wordHistory.length - 1;
-}
-
-// Make sure to add these function calls to init()
-function addWordFeatureToInit() {
-    // Add event listeners for sidebar selection changes
-    document.getElementById('school-select-sidebar').addEventListener('change', updateEducationContext);
-    document.getElementById('grade-select-sidebar').addEventListener('change', updateEducationContext);
-}
-
-// Update init() function to include the word feature initialization
-function init() {
-    // ... existing init code ...
-    
-    addWordFeatureToInit();
-    
-    // ... remaining init code ...
-}
-
-// ... existing code ...
-
-function switchPanel(panelId) {
-    // Hide all panels
-    const panels = [
-        'qa-container',
-        'create-container',
-        'poetry-container',
-        'word-container'
-    ];
-    
-    panels.forEach(panel => {
-        const element = document.getElementById(panel);
-        if (element) {
-            if (panel === 'word-container') {
-                element.style.display = 'none';
-            } else {
-                element.classList.add('hidden');
-            }
-        }
-    });
-    
-    // Show the selected panel
-    const selectedPanel = document.getElementById(panelId);
-    if (selectedPanel) {
-        if (panelId === 'word-container') {
-            selectedPanel.style.display = 'flex';
-        } else {
-            selectedPanel.classList.remove('hidden');
-        }
-    }
-    
-    // Update active tab/button state
-    const tabMapping = {
-        'qa-container': 'qa-tab',
-        'create-container': 'create-tab', 
-        'poetry-container': 'poetry-tab',
-        'word-container': 'words-tab'
-    };
-    
-    // Remove active class from all tabs
-    document.querySelectorAll('.tab').forEach(tab => {
-        if (tab) tab.classList.remove('active');
-    });
-    
-    // Add active class to the current tab
-    const currentTabId = tabMapping[panelId];
-    if (currentTabId) {
-        const currentTab = document.getElementById(currentTabId);
-        if (currentTab) {
-            currentTab.classList.add('active');
-        }
-    }
-}
-
-// Add this to your setupEventListeners function
-function setupWordTabEventListener() {
-    const wordsTab = document.getElementById('words-tab');
-    if (wordsTab) {
-        wordsTab.addEventListener('click', function() {
-            switchPanel('word-container');
-            updateEducationContext();
-        });
-    }
-}
-
-// Make sure this gets called in your init function
-function init() {
-    // ... existing code ...
-    
-    setupWordTabEventListener();
-    addWordFeatureToInit();
-    
-    // ... remaining init code ...
-}
-
-function setupTabEventListeners() {
-    // Setup QA tab
-    const qaTab = document.getElementById('qa-tab');
-    if (qaTab) {
-        qaTab.addEventListener('click', function() {
-            switchPanel('qa-container');
-        });
-    }
-    
-    // Setup Create tab
-    const createTab = document.getElementById('create-tab');
-    if (createTab) {
-        createTab.addEventListener('click', function() {
-            switchPanel('create-container');
-        });
-    }
-    
-    // Setup Poetry tab
-    const poetryTab = document.getElementById('poetry-tab');
-    if (poetryTab) {
-        poetryTab.addEventListener('click', function() {
-            switchPanel('poetry-container');
-        });
-    }
-    
-    // Setup Words tab
-    const wordsTab = document.getElementById('words-tab');
-    if (wordsTab) {
-        wordsTab.addEventListener('click', function() {
-            switchPanel('word-container');
-            updateEducationContext(); // Update education context when showing word container
-        });
-    }
-}
-
-// Make sure to call this in your init function
-function init() {
-    // ... existing code ...
-    
-    // Remove any duplicate switchPanel calls
-    setupTabEventListeners();
-    
-    // ... remaining init code ...
-}
-
-// Replace all existing switchPanel functions with this single implementation
-function switchPanel(panelId) {
-    console.log("Switching to panel:", panelId);
-    
-    // Hide all panels first
-    const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
-    const poetryContainer = document.getElementById('poetry-container');
-    const wordContainer = document.getElementById('word-container');
-    
-    if (qaContainer) qaContainer.classList.add('hidden');
-    if (createContainer) createContainer.classList.add('hidden');
-    if (poetryContainer) poetryContainer.classList.add('hidden');
-    if (wordContainer) wordContainer.style.display = 'none';
-    
-    // Show the selected panel
-    const selectedPanel = document.getElementById(panelId);
-    if (selectedPanel) {
-        if (panelId === 'word-container') {
-            selectedPanel.style.display = 'flex';
-        } else {
-            selectedPanel.classList.remove('hidden');
-        }
-    }
-    
-    // Update active tab styling
-    document.querySelectorAll('.tab').forEach(tab => {
-        if (tab) tab.classList.remove('active');
-    });
-    
-    // Determine which tab to activate based on the panel
-    let tabToActivate;
-    if (panelId === 'qa-container') tabToActivate = 'qa-tab';
-    else if (panelId === 'create-container') tabToActivate = 'create-tab';
-    else if (panelId === 'poetry-container') tabToActivate = 'poetry-tab';
-    else if (panelId === 'word-container') tabToActivate = 'words-tab';
-    
-    if (tabToActivate) {
-        const tabElement = document.getElementById(tabToActivate);
-        if (tabElement) tabElement.classList.add('active');
-    }
-}
-
-// Replace all setupTabEventListeners functions with this implementation
-function setupTabEventListeners() {
-    const qaTab = document.getElementById('qa-tab');
-    const createTab = document.getElementById('create-tab');
-    const poetryTab = document.getElementById('poetry-tab');
-    const wordsTab = document.getElementById('words-tab');
-    
-    if (qaTab) {
-        qaTab.addEventListener('click', function() {
-            switchPanel('qa-container');
-        });
-    }
-    
-    if (createTab) {
-        createTab.addEventListener('click', function() {
-            switchPanel('create-container');
-        });
-    }
-    
-    if (poetryTab) {
-        poetryTab.addEventListener('click', function() {
-            switchPanel('poetry-container');
-        });
-    }
-    
-    if (wordsTab) {
-        wordsTab.addEventListener('click', function() {
-            switchPanel('word-container');
-            updateEducationContext();
-        });
-    }
-}
-
-// Make sure init is only defined once with all the necessary setup
-function init() {
-    console.log("Initializing application...");
-    // Include all necessary initialization functions
-    initializeFormLayout();
-    setupTabEventListeners();
-    setupNavigationButtons();
-    setupOptionButtons();
-    setupChatButtons();
-    setupOptimizeAndSubmitButtons();
-    
-    // Initialize sidebars, dropdowns, etc.
-    // ... other initialization code ...
-    
-    // Initialize word feature
-    const schoolSelect = document.getElementById('school-select-sidebar');
-    const gradeSelect = document.getElementById('grade-select-sidebar');
-    
-    if (schoolSelect && gradeSelect) {
-        schoolSelect.addEventListener('change', updateEducationContext);
-        gradeSelect.addEventListener('change', updateEducationContext);
-    }
-    
-    // Start with the default panel
-    switchPanel('qa-container');
-}
-
-// Replace ALL tab event listener functions with this single implementation
-function setupTabEventListeners() {
-    // Get tab elements
-    const qaTab = document.getElementById('qa-tab');
-    const createTab = document.getElementById('create-tab');
-    const poetryTab = document.getElementById('poetry-tab');
-    const wordsTab = document.getElementById('words-tab');
-    
-    // Remove existing event listeners (if any)
-    if (qaTab) {
-        qaTab.replaceWith(qaTab.cloneNode(true));
-        document.getElementById('qa-tab').addEventListener('click', function() {
-            switchPanel('qa-container');
-        });
-    }
-    
-    if (createTab) {
-        createTab.replaceWith(createTab.cloneNode(true));
-        document.getElementById('create-tab').addEventListener('click', function() {
-            switchPanel('create-container');
-        });
-    }
-    
-    if (poetryTab) {
-        poetryTab.replaceWith(poetryTab.cloneNode(true));
-        document.getElementById('poetry-tab').addEventListener('click', function() {
-            switchPanel('poetry-container');
-        });
-    }
-    
-    if (wordsTab) {
-        wordsTab.replaceWith(wordsTab.cloneNode(true));
-        document.getElementById('words-tab').addEventListener('click', function() {
-            switchPanel('word-container');
-            updateEducationContext(); // Update education context when showing word container
-        });
-    }
-    
-    console.log("Tab event listeners have been set up");
-}
-
-// Update the event listeners to use handleTabSwitch
-function setupEventListeners() {
-    // ... existing code ...
-    
-    // QA tab
-    document.getElementById('qa-tab').addEventListener('click', function() {
-        handleTabSwitch('qa');
-    });
-    
-    // Create tab
-    document.getElementById('create-tab').addEventListener('click', function() {
-        handleTabSwitch('create');
-    });
-    
-    // Poetry tab
-    document.getElementById('poetry-tab').addEventListener('click', function() {
-        handleTabSwitch('poetry');
-    });
-    
-    // Word tab
-    const wordTab = document.getElementById('words-tab');
-    if (wordTab) {
-        wordTab.addEventListener('click', function() {
-            handleTabSwitch('word');
-        });
-    }
-    
-    // ... remaining code ...
-}
-
-function handleTabSwitch(containerType) {
-    // Get container elements
-    const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
-    const poetryContainer = document.getElementById('poetry-container');
-    const wordContainer = document.getElementById('word-container');
-
-    // Hide all containers with null checks
-    if (qaContainer) qaContainer.classList.add('hidden');
-    if (createContainer) createContainer.classList.add('hidden');
-    if (poetryContainer) poetryContainer.classList.add('hidden');
-    
-    // For word container, use style.display property
-    if (wordContainer) wordContainer.style.display = 'none';
-    
-    // Show the selected container
-    if (containerType === 'qa' && qaContainer) {
-        qaContainer.classList.remove('hidden');
-    } else if (containerType === 'create' && createContainer) {
-        createContainer.classList.remove('hidden');
-    } else if (containerType === 'poetry' && poetryContainer) {
-        poetryContainer.classList.remove('hidden');
-    } else if (containerType === 'word' && wordContainer) {
-        // For word container, use style.display = 'flex'
-        wordContainer.style.display = 'flex';
-        // Update education context when showing the word container
-        if (typeof updateEducationContext === 'function') {
-            updateEducationContext();
-        }
-    }
-    
-    // Update active tab styling
-    // Get tab elements
-    const qaTab = document.getElementById('qa-tab');
-    const createTab = document.getElementById('create-tab');
-    const poetryTab = document.getElementById('poetry-tab');
-    const wordTab = document.getElementById('words-tab');
-    
-    // Remove active class from all tabs with null checks
-    if (qaTab) qaTab.classList.remove('active');
-    if (createTab) createTab.classList.remove('active');
-    if (poetryTab) poetryTab.classList.remove('active');
-    if (wordTab) wordTab.classList.remove('active');
-    
-    // Add active class to the current tab
-    if (containerType === 'qa' && qaTab) {
-        qaTab.classList.add('active');
-    } else if (containerType === 'create' && createTab) {
-        createTab.classList.add('active');
-    } else if (containerType === 'poetry' && poetryTab) {
-        poetryTab.classList.add('active');
-    } else if (containerType === 'word' && wordTab) {
-        wordTab.classList.add('active');
-    }
-    
-    console.log("Switched to", containerType, "container");
-}
-
-// Add this to your setupEventListeners function
-function setupWordFeatureEventListeners() {
-    const generateWordsButton = document.getElementById('generate-words');
-    if (generateWordsButton) {
-        generateWordsButton.addEventListener('click', async function() {
-            const school = document.getElementById('school-select-sidebar').value;
-            const grade = document.getElementById('grade-select-sidebar').value;
-            
-            if (!school || !grade) {
-                showSystemMessage('请先在侧边栏选择学校和年级', 'error');
-                return;
-            }
-            
-            await generateWords(school, grade);
-        });
-    }
-    
-    // Set up word navigation buttons
-    const prevWordsButton = document.getElementById('prev-words');
-    const nextWordsButton = document.getElementById('next-words');
-    
-    if (prevWordsButton) {
-        prevWordsButton.addEventListener('click', function() {
-            if (currentWordPage > 0) {
-                currentWordPage--;
-                displayWords(wordHistory[currentWordPage]);
-                updateWordNavigationButtons();
-            }
-        });
-    }
-    
-    if (nextWordsButton) {
-        nextWordsButton.addEventListener('click', function() {
-            if (currentWordPage < wordHistory.length - 1) {
-                currentWordPage++;
-                displayWords(wordHistory[currentWordPage]);
-                updateWordNavigationButtons();
-            }
-        });
-    }
-}
