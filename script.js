@@ -5254,10 +5254,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // For other tab content that follows the naming pattern
             document.getElementById(`${containerType}-content`).classList.add('active');
         }
-        
-        // Always update the UI state
-        handleResize();
-        resetContentArea();
+
     }
     
     // Add event listeners to buttons
