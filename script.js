@@ -5935,28 +5935,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // ... existing code ...
 });
 
-// ... existing code ...
-
-// Tab switching function
-function handleTabSwitch(tabName) {
-    // ... existing code ...
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-        if (tab.dataset.tab === tabName) {
-            tab.classList.add('active');
-        }
-    });
-
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-
-    document.getElementById(`${tabName}-content`).classList.add('active');
-    // ... existing code ...
-}
-
-// ... existing code ...
-
 // Handle loading vocabulary words
 async function handleLoadVocabularyClick() {
     const loadBtn = document.getElementById('load-vocabulary-btn');
