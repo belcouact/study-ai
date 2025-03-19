@@ -5964,16 +5964,32 @@ async function handleLoadVocabularyClick() {
     
     try {
         // Get education context from sidebar
-        const school = document.getElementById('school-select').value;
-        const grade = document.getElementById('grade-select').value;
+        const schoolSelect = document.getElementById('school-select');
+        const gradeSelect = document.getElementById('grade-select');
+        
+        // Check if the elements exist before accessing their values
+        if (!schoolSelect || !gradeSelect) {
+            console.error('School or grade select elements not found');
+            throw new Error('未找到学校或年级选择器，请确保已经设置好教育背景');
+        }
+        
+        const school = schoolSelect.value;
+        const grade = gradeSelect.value;
+        
+        // Validate that we have values
+        if (!school || !grade) {
+            throw new Error('请先在侧边栏选择学校和年级');
+        }
+        
+        console.log('Fetching vocabulary for school:', school, 'grade:', grade);
         
         // Fetch vocabulary words from API
         const words = await fetchVocabularyWords(school, grade);
         
         // Display words
         if (words && words.length > 0) {
-        vocabularyWords = words;
-        currentWordIndex = 0;
+            vocabularyWords = words;
+            currentWordIndex = 0;
             displayWordCard(currentWordIndex);
             updateNavigationControls();
         } else {
@@ -5981,7 +5997,7 @@ async function handleLoadVocabularyClick() {
         }
     } catch (error) {
         console.error('Error loading vocabulary:', error);
-        showVocabularyError('获取单词时出错');
+        showVocabularyError(error.message || '获取单词时出错');
     } finally {
         loadBtn.disabled = false;
         loadBtn.textContent = '加载词汇';
@@ -6230,3 +6246,73 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup tab event listeners
     setupTabEventListeners();
 });
+
+// Add this new helper function to ensure the education selects exist in the sidebar
+function ensureSidebarEducationSelects() {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+    
+    // Check if the education select section already exists
+    let educationSection = sidebar.querySelector('.education-context');
+    
+    if (!educationSection) {
+        // Create the education context section
+        educationSection = document.createElement('div');
+        educationSection.className = 'education-context section';
+        educationSection.innerHTML = `
+            <h3>教育背景</h3>
+            <div class="form-group">
+                <label for="school-select">学校类型</label>
+                <select id="school-select" class="form-control">
+                    <option value="">请选择</option>
+                    <option value="primary">小学</option>
+                    <option value="middle">初中</option>
+                    <option value="high">高中</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="grade-select">年级</label>
+                <select id="grade-select" class="form-control">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        `;
+        
+        // Add it to the sidebar
+        sidebar.appendChild(educationSection);
+        
+        // Set up the grade options change when school changes
+        const schoolSelect = educationSection.querySelector('#school-select');
+        const gradeSelect = educationSection.querySelector('#grade-select');
+        
+        schoolSelect.addEventListener('change', function() {
+            // Clear existing options
+            gradeSelect.innerHTML = '<option value="">请选择</option>';
+            
+            // Add new options based on school
+            const school = this.value;
+            if (school === 'primary') {
+                for (let i = 1; i <= 6; i++) {
+                    const option = document.createElement('option');
+                    option.value = `${i}`;
+                    option.textContent = `${i}年级`;
+                    gradeSelect.appendChild(option);
+                }
+            } else if (school === 'middle') {
+                for (let i = 1; i <= 3; i++) {
+                    const option = document.createElement('option');
+                    option.value = `${i}`;
+                    option.textContent = `初${i}`;
+                    gradeSelect.appendChild(option);
+                }
+            } else if (school === 'high') {
+                for (let i = 1; i <= 3; i++) {
+                    const option = document.createElement('option');
+                    option.value = `${i}`;
+                    option.textContent = `高${i}`;
+                    gradeSelect.appendChild(option);
+                }
+            }
+        });
+    }
+}
