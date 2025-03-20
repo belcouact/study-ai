@@ -37,7 +37,7 @@ export async function onRequestPost(context) {
     }
     
     // Forward request to DeepSeek API
-    const apiBaseUrl = env.API_BASE_URL || "https://api.deepseek.com";
+    const apiBaseUrl = env.API_BASE_URL;
     
     // Check if the API_BASE_URL already includes the endpoint path
     let apiUrl;
@@ -69,7 +69,7 @@ export async function onRequestPost(context) {
         },
         body: JSON.stringify({
           //model: "deepseek-reasoner",
-          model: env.MODEL || "deepseek-reasoner",
+          model: env.MODEL,
           messages: body.messages,
           max_tokens: parseInt(env.MAX_TOKENS || "4096"),
           temperature: parseFloat(env.TEMPERATURE || "0.7")
