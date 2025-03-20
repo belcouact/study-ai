@@ -6231,20 +6231,6 @@ function displayWordCard(index) {
     const englishDef = word.definition || word.english_definition || word.englishMeaning || '';
     const chineseTrans = word.chinese_translation || word.chineseMeaning || '';
     
-    // Handle word family properly
-    let wordFamily = [];
-    if (word.word_family) {
-        if (Array.isArray(word.word_family)) {
-            // For array of strings or objects
-            wordFamily = word.word_family;
-        } else if (typeof word.word_family === 'object') {
-            // For object with key-value pairs
-            wordFamily = Object.entries(word.word_family).map(([key, value]) => {
-                return { word: key, translation: value };
-            });
-        }
-    }
-    
     // Handle collocations properly
     let collocations = [];
     if (word.common_collocations) {
@@ -6349,21 +6335,6 @@ function displayWordCard(index) {
                     }
                 }).join('')}
             </div>
-            
-            ${wordFamily.length > 0 ? `
-                <div class="word-family">
-                    <h3 class="section-title">词族</h3>
-                    <div class="word-family-items">
-                        ${wordFamily.map(item => {
-                            if (typeof item === 'string') {
-                                return `<span class="word-family-item">${item}</span>`;
-                            } else {
-                                return `<span class="word-family-item" title="${item.translation || ''}">${item.word || item}</span>`;
-                            }
-                        }).join('')}
-                    </div>
-                </div>
-            ` : ''}
             
             ${collocations.length > 0 ? `
                 <div class="collocations">
