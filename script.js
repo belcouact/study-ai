@@ -6131,112 +6131,73 @@ async function fetchVocabularyWords(school, grade) {
 
 // Optimize JSON parsing with error handling and caching
 function parseVocabularyResponse(text) {
-    console.log('Parsing vocabulary response');
+    console.log('Parsing vocabulary response:', text);
     
     try {
-        // Handle already parsed objects
+        // First, handle the case where text might already be parsed JSON
         if (typeof text === 'object') {
-            if (Array.isArray(text)) return text;
-            if (text.words && Array.isArray(text.words)) return text.words;
-            return getEnhancedMockVocabularyWords();
+            if (Array.isArray(text)) {
+                return text; // Already an array of words
+            } else if (text.words && Array.isArray(text.words)) {
+                return text.words; // Object with words array
+            }
         }
         
-        // For string responses, try to extract JSON with a more efficient regex
+        // Try to find and parse JSON in the response
         if (typeof text === 'string') {
-            // Try direct JSON parse first
+            // Check for malformed JSON at the start/end of the string
+            let jsonString = text.trim();
+            
+            // Look for JSON code blocks
+            const jsonMatch = jsonString.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+            if (jsonMatch) {
+                jsonString = jsonMatch[1].trim();
+            }
+            
+            // Try finding array brackets if no code block is found
+            if (!jsonMatch && jsonString.includes('[') && jsonString.includes(']')) {
+                const startBracket = jsonString.indexOf('[');
+                const endBracket = jsonString.lastIndexOf(']') + 1;
+                if (startBracket < endBracket) {
+                    jsonString = jsonString.substring(startBracket, endBracket);
+                }
+            }
+            
+            // Try parsing the JSON
             try {
-                const parsed = JSON.parse(text.trim());
-                if (Array.isArray(parsed)) return parsed;
-                if (parsed.words && Array.isArray(parsed.words)) return parsed.words;
+                const parsed = JSON.parse(jsonString);
+                if (Array.isArray(parsed)) {
+                    console.log('Successfully parsed JSON array:', parsed);
+                    return parsed;
+                } else if (parsed.words && Array.isArray(parsed.words)) {
+                    console.log('Successfully parsed JSON with words property:', parsed.words);
+                    return parsed.words;
+                }
             } catch (e) {
-                // If direct parse fails, try to extract JSON from markdown code blocks
-                const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || 
-                                 text.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                console.warn('JSON parse error:', e);
                 
-                if (jsonMatch) {
+                // Try more aggressive cleaning - find anything that looks like a JSON array
+                const arrayMatch = jsonString.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                if (arrayMatch) {
                     try {
-                        const extracted = jsonMatch[1] || jsonMatch[0];
-                        const parsed = JSON.parse(extracted.trim());
-                        if (Array.isArray(parsed)) return parsed;
-                        if (parsed.words && Array.isArray(parsed.words)) return parsed.words;
-                    } catch (innerErr) {
-                        console.warn('Error parsing extracted JSON:', innerErr);
+                        const cleanedJson = arrayMatch[0];
+                        const parsed = JSON.parse(cleanedJson);
+                        if (Array.isArray(parsed)) {
+                            console.log('Successfully parsed cleaned JSON array:', parsed);
+                            return parsed;
+                        }
+                    } catch (innerE) {
+                        console.warn('Cleaned JSON parse error:', innerE);
                     }
                 }
             }
         }
-        
-        // Fallback to mock data
-        return getEnhancedMockVocabularyWords();
-    } catch (error) {
-        console.error('Error in parseVocabularyResponse:', error);
-        return getEnhancedMockVocabularyWords();
+    } catch (e) {
+        console.warn('Failed to parse JSON from response:', e);
     }
-}
-
-// Updated mock data function with enhanced word structure
-function getEnhancedMockVocabularyWords() {
-    return [
-        {
-            word: "apple",
-            part_of_speech: "noun",
-            pronunciation: "/ˈæp.əl/",
-            definition: "A round fruit with red, yellow, or green skin and firm white flesh",
-            chinese_translation: "苹果",
-            example_sentences: [
-                "I eat an apple every day for breakfast.",
-                "The apple trees in our garden produce delicious fruit."
-            ],
-            word_family: ["applesauce", "apple-shaped", "apple-green"],
-            common_collocations: ["apple juice", "apple pie", "apple cider", "apple tree"],
-            synonyms: [
-                { word: "fruit", definition: "edible plant product" }
-            ],
-            antonyms: [],
-            learning_tips: "Remember 'An apple a day keeps the doctor away' to connect the word with health."
-        },
-        {
-            word: "happy",
-            part_of_speech: "adjective",
-            pronunciation: "/ˈhæp.i/",
-            definition: "Feeling or showing pleasure or contentment",
-            chinese_translation: "高兴的，快乐的",
-            example_sentences: [
-                "She had a happy smile on her face.",
-                "We were very happy when we heard the good news."
-            ],
-            word_family: ["happiness", "happily", "unhappy"],
-            common_collocations: ["happy birthday", "happy ending", "happy days", "happy life"],
-            synonyms: [
-                { word: "glad", definition: "feeling joy or pleasure" },
-                { word: "cheerful", definition: "noticeably happy and optimistic" }
-            ],
-            antonyms: [
-                { word: "sad", definition: "feeling or showing sorrow" },
-                { word: "unhappy", definition: "not happy or content" }
-            ],
-            learning_tips: "Think of the 'pp' in happy as two smiling faces to remember the meaning."
-        },
-        {
-            word: "book",
-            part_of_speech: "noun",
-            pronunciation: "/bʊk/",
-            definition: "A written or printed work consisting of pages bound together",
-            chinese_translation: "书",
-            example_sentences: [
-                "I'm reading an interesting book about space.",
-                "She wrote a book about her travels in Asia."
-            ],
-            word_family: ["booklet", "bookish", "bookshop", "bookmark"],
-            common_collocations: ["read a book", "write a book", "book lover", "book fair"],
-            synonyms: [
-                { word: "volume", definition: "a single book" },
-                { word: "publication", definition: "printed material offered for distribution" }
-            ],
-            antonyms: [],
-            learning_tips: "The 'oo' in book looks like two eyes reading a book."
-        }
-    ];
+    
+    // If all parsing attempts fail, return mock data
+    console.warn('Could not parse vocabulary words from response, using mock data');
 }
 
 // Function to display a vocabulary word card
@@ -6249,20 +6210,214 @@ function displayWordCard(index) {
         return;
     }
     
-    // Create document fragment to batch DOM operations
-    const fragment = document.createDocumentFragment();
-    const cardDiv = document.createElement('div');
-    cardDiv.className = 'word-card';
+    // Extract all fields from the word object
+    const english = word.word || word.english || '';
+    const form = word.part_of_speech || word.form || 'n/a';
+    const pronunciation = word.pronunciation || '';
+    const englishDef = word.definition || word.english_definition || word.englishMeaning || '';
+    const chineseTrans = word.chinese_translation || word.chineseMeaning || '';
     
-    // Add all HTML content to the card div
-    // ... (build HTML structure)
+    // Handle word family properly
+    let wordFamily = [];
+    if (word.word_family) {
+        if (Array.isArray(word.word_family)) {
+            // For array of strings or objects
+            wordFamily = word.word_family;
+        } else if (typeof word.word_family === 'object') {
+            // For object with key-value pairs
+            wordFamily = Object.entries(word.word_family).map(([key, value]) => {
+                return { word: key, translation: value };
+            });
+        }
+    }
     
-    // Append once to the fragment
-    fragment.appendChild(cardDiv);
+    // Handle collocations properly
+    let collocations = [];
+    if (word.common_collocations) {
+        if (Array.isArray(word.common_collocations)) {
+            // For array of strings or objects
+            collocations = word.common_collocations;
+        } else if (typeof word.common_collocations === 'object') {
+            // For object with key-value pairs
+            collocations = Object.entries(word.common_collocations).map(([key, value]) => {
+                return { phrase: key, translation: value };
+            });
+        }
+    }
     
-    // Clear container and append fragment (minimizes reflow/repaint)
-    vocabularyContainer.innerHTML = '';
-    vocabularyContainer.appendChild(fragment);
+    // Handle synonyms properly
+    let synonyms = [];
+    if (word.synonyms) {
+        if (Array.isArray(word.synonyms)) {
+            synonyms = word.synonyms;
+        } else if (typeof word.synonyms === 'object') {
+            synonyms = Object.entries(word.synonyms).map(([key, value]) => {
+                return { word: key, definition: value };
+            });
+        }
+    }
+    
+    // Handle antonyms properly
+    let antonyms = [];
+    if (word.antonyms) {
+        if (Array.isArray(word.antonyms)) {
+            antonyms = word.antonyms;
+        } else if (typeof word.antonyms === 'object') {
+            antonyms = Object.entries(word.antonyms).map(([key, value]) => {
+                return { word: key, definition: value };
+            });
+        }
+    }
+    
+    // Get learning tips
+    const learningTips = word.learning_tips || '';
+    
+    // Handle examples in different formats
+    let examples = [];
+    if (word.example_sentences && Array.isArray(word.example_sentences)) {
+        examples = word.example_sentences.map(example => {
+            if (typeof example === 'string') {
+                const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
+                if (parts.length >= 2) {
+                    return {
+                        english: parts[0].trim(),
+                        chinese: parts[1].trim()
+                    };
+                }
+                return { english: example, chinese: '' };
+            }
+            return example;
+        });
+    } else if (word.examples && Array.isArray(word.examples)) {
+        examples = word.examples;
+    }
+    
+    // Create the card with enhanced structure
+    const cardHTML = `
+        <div class="word-card">
+            <div class="word-header">
+                <div class="word-english">${english}</div>
+                <div class="word-details">
+                    <span class="word-form">${form}</span>
+                    ${pronunciation ? `<span class="word-pronunciation">${pronunciation}</span>` : ''}
+                </div>
+            </div>
+            
+            <div class="word-meanings">
+                <div class="meaning-row">
+                    <div class="meaning-label">英文释义:</div>
+                    <div class="meaning-content">${englishDef}</div>
+                </div>
+                <div class="meaning-row">
+                    <div class="meaning-label">中文释义:</div>
+                    <div class="meaning-content">${chineseTrans}</div>
+                </div>
+            </div>
+            
+            <div class="word-examples">
+                <h3 class="section-title">例句</h3>
+                ${examples.map((example, i) => {
+                    if (typeof example === 'string') {
+                        const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
+                        return `
+                            <div class="example-item">
+                                <div class="example-english">${parts[0] || example}</div>
+                                <div class="example-chinese">${parts[1] || ''}</div>
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="example-item">
+                                <div class="example-english">${example.english || ''}</div>
+                                <div class="example-chinese">${example.chinese || ''}</div>
+                            </div>
+                        `;
+                    }
+                }).join('')}
+            </div>
+            
+            ${wordFamily.length > 0 ? `
+                <div class="word-family">
+                    <h3 class="section-title">词族</h3>
+                    <div class="word-family-items">
+                        ${wordFamily.map(item => {
+                            if (typeof item === 'string') {
+                                return `<span class="word-family-item">${item}</span>`;
+                            } else {
+                                return `<span class="word-family-item" title="${item.translation || ''}">${item.word || item}</span>`;
+                            }
+                        }).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${collocations.length > 0 ? `
+                <div class="collocations">
+                    <h3 class="section-title">常见搭配</h3>
+                    <div class="collocation-items">
+                        ${collocations.map(item => {
+                            if (typeof item === 'string') {
+                                return `<span class="collocation-item">${item}</span>`;
+                            } else {
+                                return `<span class="collocation-item" title="${item.translation || ''}">${item.phrase || item}</span>`;
+                            }
+                        }).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            <div class="word-relationships">
+                ${synonyms.length > 0 ? `
+                    <div class="synonyms">
+                        <h3 class="section-title">近义词</h3>
+                        <div class="synonym-items">
+                            ${synonyms.map(syn => {
+                                if (typeof syn === 'string') {
+                                    return `<span class="synonym-item">${syn}</span>`;
+                                } else if (syn.word) {
+                                    return `<div class="synonym-container">
+                                        <span class="synonym-word">${syn.word}</span>
+                                        ${syn.definition ? `<span class="synonym-def">- ${syn.definition}</span>` : ''}
+                                    </div>`;
+                                } else {
+                                    return '';
+                                }
+                            }).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${antonyms.length > 0 ? `
+                    <div class="antonyms">
+                        <h3 class="section-title">反义词</h3>
+                        <div class="antonym-items">
+                            ${antonyms.map(ant => {
+                                if (typeof ant === 'string') {
+                                    return `<span class="antonym-item">${ant}</span>`;
+                                } else if (ant.word) {
+                                    return `<div class="antonym-container">
+                                        <span class="antonym-word">${ant.word}</span>
+                                        ${ant.definition ? `<span class="antonym-def">- ${ant.definition}</span>` : ''}
+                                    </div>`;
+                                } else {
+                                    return '';
+                                }
+                            }).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+            
+            ${learningTips ? `
+                <div class="learning-tips">
+                    <h3 class="section-title">记忆技巧</h3>
+                    <div class="tip-content">${learningTips}</div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    vocabularyContainer.innerHTML = cardHTML;
     
     // Update counter
     document.getElementById('word-counter').textContent = `${index + 1}/${vocabularyWords.length}`;
