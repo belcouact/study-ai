@@ -4311,6 +4311,9 @@ function getSimplifiedContextSummary() {
         tabs.forEach(tab => {
             tab.addEventListener('click', () => handleTabSwitch(tab.dataset.tab));
         });
+        
+        // Initialize create page with welcome message
+        initializeCreatePage();
     }
 
 // ... existing code ...
