@@ -41,6 +41,7 @@ export async function onRequestPost(context) {
     
     // Check if the API_BASE_URL already includes the endpoint path
     let apiUrl;
+    /*
     if (apiBaseUrl.includes('/chat/completions')) {
       // If the base URL already includes the endpoint path, use it as is
       apiUrl = apiBaseUrl;
@@ -48,7 +49,9 @@ export async function onRequestPost(context) {
       // Otherwise, append the endpoint path
       apiUrl = `${apiBaseUrl}/v1/chat/completions`;
     }
-    
+    */
+    apiUrl = apiBaseUrl;
+
     console.log(`Making request to: ${apiUrl}`);
     
     // Create an AbortController with a 300-second timeout
