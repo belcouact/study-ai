@@ -6224,20 +6224,64 @@ function displayWordCard(index) {
         return;
     }
     
-    // Handle both API response format and other formats
+    // Extract all fields from the word object
     const english = word.word || word.english || '';
     const form = word.part_of_speech || word.form || 'n/a';
     const pronunciation = word.pronunciation || '';
     const englishDef = word.definition || word.english_definition || word.englishMeaning || '';
     const chineseTrans = word.chinese_translation || word.chineseMeaning || '';
     
-    // Get word family or related forms
-    const wordFamily = word.word_family || [];
-    const collocations = word.common_collocations || [];
+    // Handle word family properly
+    let wordFamily = [];
+    if (word.word_family) {
+        if (Array.isArray(word.word_family)) {
+            // For array of strings or objects
+            wordFamily = word.word_family;
+        } else if (typeof word.word_family === 'object') {
+            // For object with key-value pairs
+            wordFamily = Object.entries(word.word_family).map(([key, value]) => {
+                return { word: key, translation: value };
+            });
+        }
+    }
     
-    // Get synonyms and antonyms
-    const synonyms = word.synonyms || [];
-    const antonyms = word.antonyms || [];
+    // Handle collocations properly
+    let collocations = [];
+    if (word.common_collocations) {
+        if (Array.isArray(word.common_collocations)) {
+            // For array of strings or objects
+            collocations = word.common_collocations;
+        } else if (typeof word.common_collocations === 'object') {
+            // For object with key-value pairs
+            collocations = Object.entries(word.common_collocations).map(([key, value]) => {
+                return { phrase: key, translation: value };
+            });
+        }
+    }
+    
+    // Handle synonyms properly
+    let synonyms = [];
+    if (word.synonyms) {
+        if (Array.isArray(word.synonyms)) {
+            synonyms = word.synonyms;
+        } else if (typeof word.synonyms === 'object') {
+            synonyms = Object.entries(word.synonyms).map(([key, value]) => {
+                return { word: key, definition: value };
+            });
+        }
+    }
+    
+    // Handle antonyms properly
+    let antonyms = [];
+    if (word.antonyms) {
+        if (Array.isArray(word.antonyms)) {
+            antonyms = word.antonyms;
+        } else if (typeof word.antonyms === 'object') {
+            antonyms = Object.entries(word.antonyms).map(([key, value]) => {
+                return { word: key, definition: value };
+            });
+        }
+    }
     
     // Get learning tips
     const learningTips = word.learning_tips || '';
@@ -6310,7 +6354,13 @@ function displayWordCard(index) {
                 <div class="word-family">
                     <h3 class="section-title">词族</h3>
                     <div class="word-family-items">
-                        ${wordFamily.map(item => `<span class="word-family-item">${item}</span>`).join('')}
+                        ${wordFamily.map(item => {
+                            if (typeof item === 'string') {
+                                return `<span class="word-family-item">${item}</span>`;
+                            } else {
+                                return `<span class="word-family-item" title="${item.translation || ''}">${item.word || item}</span>`;
+                            }
+                        }).join('')}
                     </div>
                 </div>
             ` : ''}
@@ -6319,7 +6369,13 @@ function displayWordCard(index) {
                 <div class="collocations">
                     <h3 class="section-title">常见搭配</h3>
                     <div class="collocation-items">
-                        ${collocations.map(item => `<span class="collocation-item">${item}</span>`).join('')}
+                        ${collocations.map(item => {
+                            if (typeof item === 'string') {
+                                return `<span class="collocation-item">${item}</span>`;
+                            } else {
+                                return `<span class="collocation-item" title="${item.translation || ''}">${item.phrase || item}</span>`;
+                            }
+                        }).join('')}
                     </div>
                 </div>
             ` : ''}
@@ -6332,11 +6388,13 @@ function displayWordCard(index) {
                             ${synonyms.map(syn => {
                                 if (typeof syn === 'string') {
                                     return `<span class="synonym-item">${syn}</span>`;
-                                } else {
+                                } else if (syn.word) {
                                     return `<div class="synonym-container">
                                         <span class="synonym-word">${syn.word}</span>
                                         ${syn.definition ? `<span class="synonym-def">- ${syn.definition}</span>` : ''}
                                     </div>`;
+                                } else {
+                                    return '';
                                 }
                             }).join('')}
                         </div>
@@ -6350,11 +6408,13 @@ function displayWordCard(index) {
                             ${antonyms.map(ant => {
                                 if (typeof ant === 'string') {
                                     return `<span class="antonym-item">${ant}</span>`;
-                                } else {
+                                } else if (ant.word) {
                                     return `<div class="antonym-container">
                                         <span class="antonym-word">${ant.word}</span>
                                         ${ant.definition ? `<span class="antonym-def">- ${ant.definition}</span>` : ''}
                                     </div>`;
+                                } else {
+                                    return '';
                                 }
                             }).join('')}
                         </div>
