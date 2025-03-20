@@ -4373,7 +4373,7 @@ function getSimplifiedContextSummary() {
         // const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
         poetryType = document.getElementById('poetry-type-select').value;
         poetryStyle = document.getElementById('poetry-style-select').value;
-
+        
         console.log(`Generating poems for: ${school} ${grade}, Type: ${poetryType}, Style: ${poetryStyle}`);
         
         // Show loading state
@@ -4603,7 +4603,7 @@ function getSimplifiedContextSummary() {
         }
     }
     */
-   
+
 // Initialize the application
 function init() {
     console.log('Initializing application...');
@@ -5975,7 +5975,8 @@ document.addEventListener('DOMContentLoaded', function() {
 async function handleLoadVocabularyClick() {
     const loadBtn = document.getElementById('load-vocabulary-btn');
     loadBtn.disabled = true;
-    loadBtn.textContent = '加载中...';
+    loadBtn.innerHTML = '<span class="loading-spinner"></span> 加载中...';
+    loadBtn.classList.add('loading');
     
     try {
         // Get education context from sidebar
@@ -6003,8 +6004,8 @@ async function handleLoadVocabularyClick() {
         
         // Display words
         if (words && words.length > 0) {
-        vocabularyWords = words;
-        currentWordIndex = 0;
+            vocabularyWords = words;
+            currentWordIndex = 0;
             displayWordCard(currentWordIndex);
             updateNavigationControls();
         } else {
@@ -6015,7 +6016,8 @@ async function handleLoadVocabularyClick() {
         showVocabularyError(error.message || '获取单词时出错');
     } finally {
         loadBtn.disabled = false;
-        loadBtn.textContent = '加载词汇';
+        loadBtn.innerHTML = '加载词汇';
+        loadBtn.classList.remove('loading');
     }
 }
 
@@ -6176,20 +6178,16 @@ function displayWordCard(index) {
         return;
     }
     
-    // Clear previous content with a fade-out effect
-    vocabularyContainer.style.opacity = '0';
-    
-    // Handle both API response format (word, definition) and mock data format (english, englishMeaning)
+    // Handle both API response format and other formats
     const english = word.word || word.english || '';
     const form = word.part_of_speech || word.form || 'n/a';
     const englishMeaning = word.definition || word.english_definition || word.englishMeaning || '';
     const chineseMeaning = word.chinese_translation || word.chineseMeaning || '';
     
-    // Handle examples in either format
+    // Handle examples in different formats
     let examples = [];
     if (word.example_sentences && Array.isArray(word.example_sentences)) {
         examples = word.example_sentences.map(example => {
-            // If example is a string with both English and Chinese
             if (typeof example === 'string') {
                 const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
                 if (parts.length >= 2) {
@@ -6200,27 +6198,31 @@ function displayWordCard(index) {
                 }
                 return { english: example, chinese: '' };
             }
-            // If example is already an object
             return example;
         });
     } else if (word.examples && Array.isArray(word.examples)) {
         examples = word.examples;
     }
     
-    // Create a color based on the first letter of the word for variety
-    const colors = [
-        '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6',
-        '#1abc9c', '#d35400', '#34495e', '#16a085', '#c0392b'
-    ];
+    // Limit to 2 examples for consistent card size
+    if (examples.length > 2) {
+        examples = examples.slice(0, 2);
+    }
     
-    const colorIndex = english.charCodeAt(0) % colors.length;
-    const wordColor = colors[colorIndex];
+    // If we have fewer than 2 examples, add placeholder(s)
+    while (examples.length < 2) {
+        examples.push({
+            english: "",
+            chinese: ""
+        });
+    }
     
+    // Create the card with animation delay classes for sequential animation
     const cardHTML = `
-        <div class="word-card" style="border-left-color: ${wordColor}">
+        <div class="word-card">
             <div class="word-header">
                 <div class="word-english">${english}</div>
-                <div class="word-form" style="background: linear-gradient(135deg, ${wordColor}, ${lightenColor(wordColor, 20)})">${form}</div>
+                <div class="word-form">${form}</div>
             </div>
             <div class="word-meanings">
                 <div class="meaning-row">
@@ -6234,17 +6236,19 @@ function displayWordCard(index) {
             </div>
             <div class="word-examples">
                 ${examples.map((example, i) => {
+                    if (!example.english && !example.chinese) return '';
+                    
                     if (typeof example === 'string') {
                         const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
                         return `
-                            <div class="example-item" style="animation-delay: ${i * 0.1}s">
+                            <div class="example-item" style="animation-delay: ${0.2 + i * 0.1}s">
                                 <div class="example-english">${parts[0] || example}</div>
                                 <div class="example-chinese">${parts[1] || ''}</div>
                             </div>
                         `;
                     } else {
                         return `
-                            <div class="example-item" style="animation-delay: ${i * 0.1}s">
+                            <div class="example-item" style="animation-delay: ${0.2 + i * 0.1}s">
                                 <div class="example-english">${example.english || ''}</div>
                                 <div class="example-chinese">${example.chinese || ''}</div>
                             </div>
@@ -6255,78 +6259,42 @@ function displayWordCard(index) {
         </div>
     `;
     
-    // Add the card to the container with a delay for animation
-    setTimeout(() => {
-        vocabularyContainer.innerHTML = cardHTML;
-        vocabularyContainer.style.opacity = '1';
-        
-        // Add interactive features after the card is added
-        const wordCard = vocabularyContainer.querySelector('.word-card');
-        if (wordCard) {
-            // Add pronunciation button if needed
-            const wordEnglish = wordCard.querySelector('.word-english');
-            if (wordEnglish) {
-                wordEnglish.addEventListener('click', () => {
-                    speakWord(english);
-                });
-                
-                // Add tooltip to indicate it's clickable
-                wordEnglish.title = '点击朗读单词';
-                wordEnglish.style.cursor = 'pointer';
-            }
-        }
-    }, 200);
+    // Add the card with an entrance animation
+    vocabularyContainer.innerHTML = cardHTML;
     
     // Update counter
     document.getElementById('word-counter').textContent = `${index + 1}/${vocabularyWords.length}`;
 }
 
-// Helper function to lighten a color
-function lightenColor(color, percent) {
-    // Convert hex to RGB
-    let r = parseInt(color.substring(1, 3), 16);
-    let g = parseInt(color.substring(3, 5), 16);
-    let b = parseInt(color.substring(5, 7), 16);
-    
-    // Lighten
-    r = Math.min(255, Math.floor(r + (255 - r) * (percent / 100)));
-    g = Math.min(255, Math.floor(g + (255 - g) * (percent / 100)));
-    b = Math.min(255, Math.floor(b + (255 - b) * (percent / 100)));
-    
-    // Convert back to hex
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+// Function to show error messages in the vocabulary container
+function showVocabularyError(message) {
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    vocabularyContainer.innerHTML = `
+        <div class="error-message">
+            <p>${message}</p>
+            <p>请稍后再试</p>
+        </div>
+    `;
 }
 
-// Function to speak the word (if browser supports speech synthesis)
-function speakWord(word) {
-    if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = 'en-US';
-        window.speechSynthesis.speak(utterance);
-        
-        // Visual feedback that the word is being spoken
-        const wordElement = document.querySelector('.word-english');
-        if (wordElement) {
-            wordElement.classList.add('speaking');
-            
-            utterance.onend = () => {
-                wordElement.classList.remove('speaking');
-            };
-        }
-    }
+// Function to update navigation controls for vocabulary
+function updateNavigationControls() {
+    const prevBtn = document.getElementById('prev-word-btn');
+    const nextBtn = document.getElementById('next-word-btn');
+    
+    if (!prevBtn || !nextBtn) return;
+    
+    prevBtn.disabled = currentWordIndex === 0;
+    nextBtn.disabled = currentWordIndex === vocabularyWords.length - 1;
 }
 
-// Add these styles to create the speaking effect
-const styleElement = document.createElement('style');
-styleElement.textContent = `
-    .word-english.speaking {
-        animation: pulse 1.5s infinite;
-    }
+// Function to navigate between word cards
+function navigateWordCard(direction) {
+    const newIndex = currentWordIndex + direction;
     
-    @keyframes pulse {
-        0% { color: #2a4365; }
-        50% { color: #3498db; }
-        100% { color: #2a4365; }
+    if (newIndex >= 0 && newIndex < vocabularyWords.length) {
+        currentWordIndex = newIndex;
+        displayWordCard(currentWordIndex);
+        updateNavigationControls();
     }
-`;
-document.head.appendChild(styleElement);
+}

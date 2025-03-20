@@ -231,21 +231,24 @@
             </div>
             
             <div id="vocabulary-content" class="tab-content">
-                <div class="section-title">词汇学习</div>
-                <div class="content-container">
-                    <div class="vocabulary-controls">
-                        <button id="load-vocabulary-btn" class="primary-button">加载词汇</button>
-                    </div>
+                <div class="vocabulary-container">
+                    <button id="load-vocabulary-btn" class="vocabulary-load-btn">加载词汇</button>
                     
-                    <div class="navigation-controls">
-                        <button id="prev-word-btn" class="nav-button" disabled>&lt;</button>
-                        <button id="next-word-btn" class="nav-button" disabled>&gt;</button>
-                        <span id="word-counter">0/0</span>
-                    </div>
-                    
-                    <div id="vocabulary-container">
-                        <div class="initial-message">
-                            点击"加载词汇"按钮开始学习英语单词
+                    <div class="vocabulary-card-container">
+                        <div id="vocabulary-container">
+                            <div class="initial-message">
+                                点击"加载词汇"按钮开始学习英语单词
+                            </div>
+                        </div>
+                        
+                        <div class="navigation-controls">
+                            <button id="prev-word-btn" class="nav-button" disabled>
+                                <span class="nav-arrow">&#10094;</span>
+                            </button>
+                            <span id="word-counter">0/0</span>
+                            <button id="next-word-btn" class="nav-button" disabled>
+                                <span class="nav-arrow">&#10095;</span>
+                            </button>
                         </div>
                     </div>
                 </div>
