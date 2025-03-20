@@ -6469,3 +6469,67 @@ function navigateWordCard(direction) {
         updateNavigationControls();
     }
 }
+
+// Add this function to display an initial welcome message on the create page
+function initializeCreatePage() {
+    const createContainer = document.getElementById('create-container');
+    if (!createContainer) return;
+    
+    // Check if we already have content in the container
+    if (createContainer.querySelector('.content-area') || 
+        createContainer.querySelector('.initial-message')) {
+        return;
+    }
+    
+    // Create and add the initial welcome message
+    const initialMessage = document.createElement('div');
+    initialMessage.className = 'initial-message create-welcome';
+    initialMessage.innerHTML = `
+        <div class="welcome-icon">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#3498db" stroke-width="2"/>
+                <path d="M8 12L11 15L16 9" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <h2>创建教育内容</h2>
+        <p>欢迎使用内容创建工具！您可以在这里创建各种教育资源，包括教案、练习题和学习材料。</p>
+        <div class="steps-container">
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h4>选择教育背景</h4>
+                    <p>在侧边栏中选择学校类型、年级和学科</p>
+                </div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h4>指定内容要求</h4>
+                    <p>填写您需要创建的内容类型和具体要求</p>
+                </div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h4>生成并优化</h4>
+                    <p>系统将生成内容，您可以进一步调整和优化</p>
+                </div>
+            </div>
+        </div>
+        <button id="start-creating-btn" class="create-start-btn">开始创建</button>
+    `;
+    
+    createContainer.appendChild(initialMessage);
+    
+    // Add event listener to the start creating button
+    const startCreatingBtn = document.getElementById('start-creating-btn');
+    if (startCreatingBtn) {
+        startCreatingBtn.addEventListener('click', function() {
+            initialMessage.style.display = 'none';
+            // Call the existing function to initialize the form
+            if (typeof initializeFormLayout === 'function') {
+                initializeFormLayout();
+            }
+        });
+    }
+}
