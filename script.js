@@ -6158,6 +6158,8 @@ function displayWordCard(index) {
         return;
     }
     
+    console.log('Displaying word data:', word);
+    
     // Extract all fields from the word object
     const english = word.word || word.english || '';
     const form = word.part_of_speech || word.form || 'n/a';
@@ -6165,80 +6167,70 @@ function displayWordCard(index) {
     const englishDef = word.definition || word.english_definition || word.englishMeaning || '';
     const chineseTrans = word.chinese_translation || word.chineseMeaning || '';
     
-    // Handle word family properly
+    // Process example sentences
+    let examples = [];
+    if (word.example_sentences) {
+        if (Array.isArray(word.example_sentences)) {
+            examples = word.example_sentences.map(example => {
+                if (typeof example === 'string') {
+                    // Try to extract Chinese translation in parentheses
+                    const match = example.match(/^(.*?)(?:\s*\(([^)]+)\))?$/);
+                    if (match) {
+                        return {
+                            english: match[1].trim(),
+                            chinese: match[2] ? match[2].trim() : ''
+                        };
+                    }
+                    return { english: example, chinese: '' };
+                }
+                return example;
+            });
+        } else if (typeof word.example_sentences === 'object') {
+            // Handle object format
+            examples = Object.values(word.example_sentences).map(example => {
+                if (typeof example === 'string') {
+                    const match = example.match(/^(.*?)(?:\s*\(([^)]+)\))?$/);
+                    if (match) {
+                        return {
+                            english: match[1].trim(), 
+                            chinese: match[2] ? match[2].trim() : ''
+                        };
+                    }
+                    return { english: example, chinese: '' };
+                }
+                return example;
+            });
+        }
+    }
+    
+    // Handle word family
     let wordFamily = [];
     if (word.word_family) {
         if (Array.isArray(word.word_family)) {
-            // For array of strings or objects
             wordFamily = word.word_family;
         } else if (typeof word.word_family === 'object') {
-            // For object with key-value pairs
-            wordFamily = Object.entries(word.word_family).map(([key, value]) => {
-                return { word: key, translation: value };
+            wordFamily = Object.entries(word.word_family).map(([type, word]) => {
+                return { type, word };
             });
         }
     }
     
-    // Handle collocations properly
+    // Handle collocations
     let collocations = [];
     if (word.common_collocations) {
         if (Array.isArray(word.common_collocations)) {
-            // For array of strings or objects
             collocations = word.common_collocations;
         } else if (typeof word.common_collocations === 'object') {
-            // For object with key-value pairs
-            collocations = Object.entries(word.common_collocations).map(([key, value]) => {
-                return { phrase: key, translation: value };
-            });
+            collocations = Object.values(word.common_collocations);
         }
     }
     
-    // Handle synonyms properly
-    let synonyms = [];
-    if (word.synonyms) {
-        if (Array.isArray(word.synonyms)) {
-            synonyms = word.synonyms;
-        } else if (typeof word.synonyms === 'object') {
-            synonyms = Object.entries(word.synonyms).map(([key, value]) => {
-                return { word: key, definition: value };
-            });
-        }
-    }
-    
-    // Handle antonyms properly
-    let antonyms = [];
-    if (word.antonyms) {
-        if (Array.isArray(word.antonyms)) {
-            antonyms = word.antonyms;
-        } else if (typeof word.antonyms === 'object') {
-            antonyms = Object.entries(word.antonyms).map(([key, value]) => {
-                return { word: key, definition: value };
-            });
-        }
-    }
+    // Handle synonyms and antonyms
+    let synonyms = processWordRelationships(word.synonyms);
+    let antonyms = processWordRelationships(word.antonyms);
     
     // Get learning tips
     const learningTips = word.learning_tips || '';
-    
-    // Handle examples in different formats
-    let examples = [];
-    if (word.example_sentences && Array.isArray(word.example_sentences)) {
-        examples = word.example_sentences.map(example => {
-            if (typeof example === 'string') {
-                const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
-                if (parts.length >= 2) {
-                    return {
-                        english: parts[0].trim(),
-                        chinese: parts[1].trim()
-                    };
-                }
-                return { english: example, chinese: '' };
-            }
-            return example;
-        });
-    } else if (word.examples && Array.isArray(word.examples)) {
-        examples = word.examples;
-    }
     
     // Create the card with enhanced structure
     const cardHTML = `
@@ -6262,27 +6254,22 @@ function displayWordCard(index) {
                 </div>
             </div>
             
-            <div class="word-examples">
-                <h3 class="section-title">例句</h3>
-                ${examples.map((example, i) => {
-                    if (typeof example === 'string') {
-                        const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
+            ${examples.length > 0 ? `
+                <div class="word-examples">
+                    <h3 class="section-title">例句</h3>
+                    ${examples.map(example => {
+                        const englishPart = typeof example === 'string' ? example : example.english || '';
+                        const chinesePart = typeof example === 'string' ? '' : example.chinese || '';
+                        
                         return `
                             <div class="example-item">
-                                <div class="example-english">${parts[0] || example}</div>
-                                <div class="example-chinese">${parts[1] || ''}</div>
+                                <div class="example-english">${englishPart}</div>
+                                ${chinesePart ? `<div class="example-chinese">${chinesePart}</div>` : ''}
                             </div>
                         `;
-                    } else {
-                        return `
-                            <div class="example-item">
-                                <div class="example-english">${example.english || ''}</div>
-                                <div class="example-chinese">${example.chinese || ''}</div>
-                            </div>
-                        `;
-                    }
-                }).join('')}
-            </div>
+                    }).join('')}
+                </div>
+            ` : ''}
             
             ${wordFamily.length > 0 ? `
                 <div class="word-family">
@@ -6291,8 +6278,11 @@ function displayWordCard(index) {
                         ${wordFamily.map(item => {
                             if (typeof item === 'string') {
                                 return `<span class="word-family-item">${item}</span>`;
+                            } else if (item.type && item.word) {
+                                return `<span class="word-family-item"><strong>${item.type}:</strong> ${item.word}</span>`;
                             } else {
-                                return `<span class="word-family-item" title="${item.translation || ''}">${item.word || item}</span>`;
+                                const wordText = typeof item === 'object' ? JSON.stringify(item) : item;
+                                return `<span class="word-family-item">${wordText}</span>`;
                             }
                         }).join('')}
                     </div>
@@ -6305,9 +6295,15 @@ function displayWordCard(index) {
                     <div class="collocation-items">
                         ${collocations.map(item => {
                             if (typeof item === 'string') {
+                                // Check if there's a translation in parentheses
+                                const match = item.match(/^(.*?)(?:\s*\(([^)]+)\))?$/);
+                                if (match) {
+                                    return `<span class="collocation-item" title="${match[2] || ''}">${match[1].trim()}</span>`;
+                                }
                                 return `<span class="collocation-item">${item}</span>`;
-                            } else {
-                                return `<span class="collocation-item" title="${item.translation || ''}">${item.phrase || item}</span>`;
+                            } else if (typeof item === 'object') {
+                                const itemText = Object.values(item)[0] || JSON.stringify(item);
+                                return `<span class="collocation-item">${itemText}</span>`;
                             }
                         }).join('')}
                     </div>
@@ -6322,12 +6318,19 @@ function displayWordCard(index) {
                             ${synonyms.map(syn => {
                                 if (typeof syn === 'string') {
                                     return `<span class="synonym-item">${syn}</span>`;
-                                } else if (syn.word) {
+                                } else if (syn.word && syn.definition) {
                                     return `<div class="synonym-container">
                                         <span class="synonym-word">${syn.word}</span>
-                                        ${syn.definition ? `<span class="synonym-def">- ${syn.definition}</span>` : ''}
+                                        <span class="synonym-def">- ${syn.definition}</span>
                                     </div>`;
                                 } else {
+                                    const keys = Object.keys(syn);
+                                    if (keys.length > 0) {
+                                        return `<div class="synonym-container">
+                                            <span class="synonym-word">${keys[0]}</span>
+                                            <span class="synonym-def">- ${syn[keys[0]]}</span>
+                                        </div>`;
+                                    }
                                     return '';
                                 }
                             }).join('')}
@@ -6342,12 +6345,19 @@ function displayWordCard(index) {
                             ${antonyms.map(ant => {
                                 if (typeof ant === 'string') {
                                     return `<span class="antonym-item">${ant}</span>`;
-                                } else if (ant.word) {
+                                } else if (ant.word && ant.definition) {
                                     return `<div class="antonym-container">
                                         <span class="antonym-word">${ant.word}</span>
-                                        ${ant.definition ? `<span class="antonym-def">- ${ant.definition}</span>` : ''}
+                                        <span class="antonym-def">- ${ant.definition}</span>
                                     </div>`;
                                 } else {
+                                    const keys = Object.keys(ant);
+                                    if (keys.length > 0) {
+                                        return `<div class="antonym-container">
+                                            <span class="antonym-word">${keys[0]}</span>
+                                            <span class="antonym-def">- ${ant[keys[0]]}</span>
+                                        </div>`;
+                                    }
                                     return '';
                                 }
                             }).join('')}
@@ -6369,6 +6379,36 @@ function displayWordCard(index) {
     
     // Update counter
     document.getElementById('word-counter').textContent = `${index + 1}/${vocabularyWords.length}`;
+}
+
+// Helper function to process word relationships (synonyms/antonyms)
+function processWordRelationships(items) {
+    if (!items) return [];
+    
+    if (Array.isArray(items)) {
+        return items.map(item => {
+            if (typeof item === 'string') {
+                return item;
+            } else if (typeof item === 'object') {
+                // Handle object format like {"assess": "to estimate quality"}
+                const keys = Object.keys(item);
+                if (keys.length > 0) {
+                    return { 
+                        word: keys[0], 
+                        definition: item[keys[0]] 
+                    };
+                }
+            }
+            return item;
+        }).filter(Boolean);
+    } else if (typeof items === 'object') {
+        // Handle object format
+        return Object.entries(items).map(([word, definition]) => {
+            return { word, definition };
+        });
+    }
+    
+    return [];
 }
 
 // Function to show error messages in the vocabulary container
