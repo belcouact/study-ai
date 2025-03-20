@@ -6141,19 +6141,24 @@ function parseVocabularyResponse(text) {
             return getEnhancedMockVocabularyWords();
         }
         
-        // For string responses, try to extract and fix JSON
+        // For string responses, try to extract JSON from markdown
         if (typeof text === 'string') {
-            // Try to fix common JSON syntax errors
             let jsonString = text.trim();
             
-            // Fix mismatched brackets in word_family (the specific error you encountered)
-            jsonString = jsonString.replace(/"word_family"\s*:\s*\{([^}]*)\]/g, '"word_family": {$1}');
+            // Special handling for markdown code blocks
+            if (jsonString.includes('```json')) {
+                const matches = jsonString.match(/```json\s*([\s\S]*?)```/);
+                if (matches && matches[1]) {
+                    jsonString = matches[1].trim();
+                }
+            } else if (jsonString.includes('```')) {
+                const matches = jsonString.match(/```\s*([\s\S]*?)```/);
+                if (matches && matches[1]) {
+                    jsonString = matches[1].trim();
+                }
+            }
             
-            // Fix other common errors
-            jsonString = jsonString.replace(/,\s*\}/g, '}'); // Remove trailing commas
-            jsonString = jsonString.replace(/\}\s*\{/g, '},{'); // Add comma between objects in array
-            
-            // Try direct JSON parse first with the fixed string
+            // Try direct JSON parse with the extracted content
             try {
                 const parsed = JSON.parse(jsonString);
                 if (Array.isArray(parsed)) return parsed;
@@ -6161,47 +6166,25 @@ function parseVocabularyResponse(text) {
             } catch (e) {
                 console.warn('Initial JSON parse error:', e);
                 
-                // Try to extract JSON from markdown code blocks or find array pattern
-                const jsonMatch = jsonString.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || 
-                                jsonString.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                
-                if (jsonMatch) {
+                // Try to find just the array part
+                const arrayMatch = jsonString.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                if (arrayMatch) {
                     try {
-                        let extracted = jsonMatch[1] || jsonMatch[0];
-                        // Apply the same fixes to the extracted JSON
-                        extracted = extracted.replace(/"word_family"\s*:\s*\{([^}]*)\]/g, '"word_family": {$1}');
-                        extracted = extracted.replace(/,\s*\}/g, '}');
-                        extracted = extracted.replace(/\}\s*\{/g, '},{');
-                        
-                        const parsed = JSON.parse(extracted.trim());
+                        const arrayJson = arrayMatch[0];
+                        const parsed = JSON.parse(arrayJson);
                         if (Array.isArray(parsed)) return parsed;
-                        if (parsed.words && Array.isArray(parsed.words)) return parsed.words;
                     } catch (innerErr) {
-                        console.warn('Cleaned JSON parse error:', innerErr);
-                        
-                        // Final attempt: try a more manual approach to fix the JSON
-                        try {
-                            const manuallyFixedJson = manuallyFixJson(jsonMatch[1] || jsonMatch[0]);
-                            const parsed = JSON.parse(manuallyFixedJson);
-                            if (Array.isArray(parsed)) return parsed;
-                            if (parsed.words && Array.isArray(parsed.words)) return parsed.words;
-                        } catch (finalErr) {
-                            console.error('Manual JSON fix failed:', finalErr);
-                        }
+                        console.warn('Array JSON parse error:', innerErr);
                     }
                 }
-            }
-            
-            // If all parsing attempts fail, try to reconstruct the words manually
-            try {
+                
+                // If all else fails, use our manual extraction
                 return extractVocabularyManually(jsonString);
-            } catch (extractErr) {
-                console.error('Manual extraction failed:', extractErr);
             }
         }
         
-        // Fallback to mock data if all else fails
-        console.warn('Could not parse vocabulary words from response, using mock data');
+        // Fallback to mock data
+        console.warn('Could not parse vocabulary response, using mock data');
         return getEnhancedMockVocabularyWords();
     } catch (error) {
         console.error('Error in parseVocabularyResponse:', error);
@@ -6395,3 +6378,200 @@ function setupResizeHandler() {
 
 // Call the setup function after page load
 document.addEventListener('DOMContentLoaded', setupResizeHandler);
+
+// Add after parseVocabularyResponse
+function displayWordCard(index) {
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    if (!vocabularyContainer) {
+        console.error('Vocabulary container not found');
+        return;
+    }
+    
+    const word = vocabularyWords[index];
+    
+    if (!word) {
+        vocabularyContainer.innerHTML = '<div class="initial-message">无单词数据</div>';
+        return;
+    }
+    
+    // Handle both API response format and other formats
+    const english = word.word || word.english || '';
+    const form = word.part_of_speech || word.form || 'n/a';
+    const pronunciation = word.pronunciation || '';
+    const englishDef = word.definition || word.english_definition || word.englishMeaning || '';
+    const chineseTrans = word.chinese_translation || word.chineseMeaning || '';
+    
+    // Handle word family
+    let wordFamily = [];
+    if (word.word_family) {
+        if (Array.isArray(word.word_family)) {
+            wordFamily = word.word_family;
+        } else if (typeof word.word_family === 'object') {
+            wordFamily = Object.entries(word.word_family).map(([key, value]) => {
+                return { type: key, word: value };
+            });
+        }
+    }
+    
+    // Handle collocations
+    let collocations = word.common_collocations || [];
+    
+    // Handle synonyms and antonyms
+    let synonyms = word.synonyms || [];
+    let antonyms = word.antonyms || [];
+    
+    // Handle examples
+    let examples = [];
+    if (word.example_sentences && Array.isArray(word.example_sentences)) {
+        examples = word.example_sentences.map(example => {
+            if (typeof example === 'string') {
+                // Try to split into English and Chinese parts
+                const match = example.match(/(.*?)\s*[\(（](.*?)[\)）]/);
+                if (match) {
+                    return {
+                        english: match[1].trim(),
+                        chinese: match[2].trim()
+                    };
+                }
+                return { english: example, chinese: '' };
+            }
+            return example;
+        });
+    } else if (word.examples && Array.isArray(word.examples)) {
+        examples = word.examples;
+    }
+    
+    // Learning tips
+    const learningTips = word.learning_tips || '';
+    
+    // Create the card HTML
+    const cardHTML = `
+        <div class="word-card">
+            <div class="word-header">
+                <div class="word-english">${english}</div>
+                <div class="word-details">
+                    <span class="word-form">${form}</span>
+                    ${pronunciation ? `<span class="word-pronunciation">${pronunciation}</span>` : ''}
+                </div>
+            </div>
+            
+            <div class="word-meanings">
+                <div class="meaning-row">
+                    <div class="meaning-label">英文释义:</div>
+                    <div class="meaning-content">${englishDef}</div>
+                </div>
+                <div class="meaning-row">
+                    <div class="meaning-label">中文释义:</div>
+                    <div class="meaning-content">${chineseTrans}</div>
+                </div>
+            </div>
+            
+            <div class="word-examples">
+                <h3 class="section-title">例句</h3>
+                ${examples.map((example) => {
+                    return `
+                        <div class="example-item">
+                            <div class="example-english">${example.english || example}</div>
+                            <div class="example-chinese">${example.chinese || ''}</div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+            
+            ${wordFamily.length > 0 ? `
+                <div class="word-family">
+                    <h3 class="section-title">词族</h3>
+                    <div class="word-family-items">
+                        ${wordFamily.map(item => {
+                            if (typeof item === 'string') {
+                                return `<span class="word-family-item">${item}</span>`;
+                            } else {
+                                return `<span class="word-family-item">${item.type}: ${item.word}</span>`;
+                            }
+                        }).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${collocations.length > 0 ? `
+                <div class="collocations">
+                    <h3 class="section-title">常见搭配</h3>
+                    <div class="collocation-items">
+                        ${collocations.map(item => `<span class="collocation-item">${item}</span>`).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            <div class="word-relationships">
+                ${synonyms.length > 0 ? `
+                    <div class="synonyms">
+                        <h3 class="section-title">近义词</h3>
+                        <div class="synonym-items">
+                            ${synonyms.map(syn => `<div class="synonym-container"><span class="synonym-word">${syn}</span></div>`).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${antonyms.length > 0 ? `
+                    <div class="antonyms">
+                        <h3 class="section-title">反义词</h3>
+                        <div class="antonym-items">
+                            ${antonyms.map(ant => `<div class="antonym-container"><span class="antonym-word">${ant}</span></div>`).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+            
+            ${learningTips ? `
+                <div class="learning-tips">
+                    <h3 class="section-title">记忆技巧</h3>
+                    <div class="tip-content">${learningTips}</div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    vocabularyContainer.innerHTML = cardHTML;
+    
+    // Update counter
+    const wordCounter = document.getElementById('word-counter');
+    if (wordCounter) {
+        wordCounter.textContent = `${index + 1}/${vocabularyWords.length}`;
+    }
+}
+
+function showVocabularyError(message) {
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    if (!vocabularyContainer) {
+        console.error('Vocabulary container not found');
+        return;
+    }
+    
+    vocabularyContainer.innerHTML = `
+        <div class="error-message">
+            <p>${message}</p>
+            <p>请稍后再试</p>
+        </div>
+    `;
+}
+
+// Add these navigation functions if they're missing
+function updateNavigationControls() {
+    const prevBtn = document.getElementById('prev-word-btn');
+    const nextBtn = document.getElementById('next-word-btn');
+    
+    if (!prevBtn || !nextBtn) return;
+    
+    prevBtn.disabled = currentWordIndex === 0;
+    nextBtn.disabled = currentWordIndex === vocabularyWords.length - 1;
+}
+
+function navigateWordCard(direction) {
+    const newIndex = currentWordIndex + direction;
+    
+    if (newIndex >= 0 && newIndex < vocabularyWords.length) {
+        currentWordIndex = newIndex;
+        displayWordCard(currentWordIndex);
+        updateNavigationControls();
+    }
+}
