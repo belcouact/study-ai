@@ -157,8 +157,8 @@
                 
                 <!-- Navigation controls moved to the bottom -->
                 <div class="navigation-controls">
-                    <button id="prev-question-button" class="nav-button" disabled>上一题</button>
-                    <button id="next-question-button" class="nav-button" disabled>下一题</button>
+                    <button id="prev-question-button" class="nav-button" disabled> < </button>
+                    <button id="next-question-button" class="nav-button" disabled> > </button>
                 </div>
             </div>
             
@@ -235,12 +235,7 @@
                     <button id="load-vocabulary-btn" class="vocabulary-load-btn">加载词汇</button>
                     
                     <div class="vocabulary-card-container">
-                        <div id="vocabulary-container">
-                            <div class="initial-message">
-                                点击"加载词汇"按钮开始学习英语单词
-                            </div>
-                        </div>
-                        
+                        <!-- Navigation Controls moved above the vocabulary container -->
                         <div class="navigation-controls">
                             <button id="prev-word-btn" class="nav-button" disabled>
                                 <span class="nav-arrow">&#10094;</span>
@@ -249,6 +244,12 @@
                             <button id="next-word-btn" class="nav-button" disabled>
                                 <span class="nav-arrow">&#10095;</span>
                             </button>
+                        </div>
+                        
+                        <div id="vocabulary-container">
+                            <div class="initial-message">
+                                点击"加载词汇"按钮开始学习英语单词
+                            </div>
                         </div>
                     </div>
                 </div>

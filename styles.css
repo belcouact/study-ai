@@ -1767,7 +1767,7 @@ button:active {
     display: flex;
     flex-direction: column;
     height: 100%;
-    background-color: #f7f9fc;
+    background-color: transparent;
     overflow: auto;
 }
 
@@ -1826,8 +1826,10 @@ button:active {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 0;
+    margin-top: 10px;
     flex: 1;
+    order: 1;
 }
 
 .initial-message {
@@ -1977,60 +1979,20 @@ button:active {
     font-size: 15px;
 }
 
-.navigation-controls {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.nav-button {
-    background-color: #f1f5f9;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
+.vocabulary-container .navigation-controls {
+    position: static;
+    margin-top: 0;
+    margin-bottom: 20px;
+    background: transparent;
+    box-shadow: none;
+    order: 0;
+    padding: 10px 0;
     justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    z-index: 5;
 }
 
-.nav-button:hover:not(:disabled) {
-    background-color: #3b82f6;
-    color: white;
-    transform: scale(1.1);
-}
-
-.nav-button:active:not(:disabled) {
-    transform: scale(0.95);
-}
-
-.nav-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.nav-arrow {
-    font-size: 18px;
-    font-weight: bold;
-}
-
-#word-counter {
-    font-size: 16px;
-    color: #64748b;
-    font-weight: 500;
-}
-
-.error-message {
-    background-color: #fee2e2;
-    border-left: 4px solid #ef4444;
-    padding: 20px;
-    border-radius: 10px;
-    color: #b91c1c;
-    text-align: center;
-    width: 100%;
+.vocabulary-container .navigation-controls:hover {
+    box-shadow: none;
 }
 
 /* Add this at the end of your CSS */
