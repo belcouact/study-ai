@@ -169,53 +169,52 @@ function parseQuestionsFromResponse(response) {
 }
 
 // Global function to fetch AI response for question generation
-async function fetchAIResponse(prompt) {
-    console.log('Fetching AI response with prompt:', prompt);
-    
+async function fetchAIResponse(prompt, sourceTab = null) {
     try {
-        // Show loading indicator if it exists
-        const loading = document.getElementById('loading');
-        if (loading) {
-            loading.classList.remove('hidden');
-        }
+        // Store the current active tab if none provided
+        const requestSourceTab = sourceTab || getCurrentActiveTab();
         
-        // Make the actual API call using the current API function and model
-        const apiEndpoint = `/api/${currentApiFunction}`;
-        const response = await fetch(apiEndpoint, {
+        // Get API settings
+        const API_BASE_URL = process.env.API_BASE_URL || 'https://api.deepseek.com';
+        const API_KEY = process.env.DEEPSEEK_API_KEY;
+        
+        // Prepare request body
+        const data = {
+            model: "deepseek-chat",
+            messages: [{ role: "user", content: prompt }],
+            temperature: 0.7,
+            max_tokens: 4000,
+        };
+        
+        // Make API request
+        const response = await fetch(`${API_BASE_URL}/v1/chat/completions`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${API_KEY}`
             },
-            body: JSON.stringify({
-                messages: [
-                    {
-                        role: "user",
-                        content: prompt
-                    }
-                ],
-                model: currentModel,
-                temperature: 0.7,
-                max_tokens: 4096
-            })
+            body: JSON.stringify(data)
         });
         
         if (!response.ok) {
-            throw new Error(`API call failed with status: ${response.status}`);
+            throw new Error(`API responded with status: ${response.status}`);
         }
         
-        const data = await response.json();
-        console.log('API response:', data);
-        return data;
+        const responseData = await response.json();
         
+        // Check if the source tab is still active before returning
+        if (requestSourceTab === getCurrentActiveTab()) {
+            return responseData;
+        } else {
+            // Store the result for later retrieval
+            window.pendingResponses = window.pendingResponses || {};
+            window.pendingResponses[requestSourceTab] = responseData;
+            console.log(`Response stored for tab: ${requestSourceTab} (currently inactive)`);
+            return null; // Return null to indicate response is stored but not processed
+        }
     } catch (error) {
-        console.error('Error in fetchAIResponse:', error);
-        throw error; // Re-throw the error to be handled by the caller
-    } finally {
-        // Hide loading indicator if it exists
-        const loading = document.getElementById('loading');
-        if (loading) {
-            loading.classList.add('hidden');
-        }
+        console.error('Error fetching AI response:', error);
+        throw error;
     }
 }
 
