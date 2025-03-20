@@ -6043,10 +6043,11 @@ For each word, please provide the following details in a structured JSON format:
 4. definition: Clear and concise English definition suitable for ${grade} grade ${school} students
 5. chinese_translation: The Chinese translation of the word
 6. example_sentences: Two example sentences showing practical usage of the word (with Chinese translation)
-7. common_collocations: Common phrases or expressions that use this word, with Chinese translation
-8. synonyms: 2-3 synonyms with simple definitions, with Chinese translation
-9. antonyms: 2-3 antonyms with simple definitions (if applicable), with Chinese translation
-10. learning_tips: A memory tip or learning strategy to help remember the word, with Chinese translation
+7. word_family: Related words from the same word family (e.g., nouns, verbs, adjectives derived from the same root, with Chinese translation)
+8. common_collocations: Common phrases or expressions that use this word, with Chinese translation
+9. synonyms: 2-3 synonyms with simple definitions, with Chinese translation
+10. antonyms: 2-3 antonyms with simple definitions (if applicable), with Chinese translation
+11. learning_tips: A memory tip or learning strategy to help remember the word, with Chinese translation
 
 Ensure the chosen words are age-appropriate and relevant to the ${grade} grade ${school} curriculum.
 
@@ -6145,72 +6146,6 @@ function parseVocabularyResponse(text) {
     
     // If all parsing attempts fail, return mock data
     console.warn('Could not parse vocabulary words from response');
-    // return getEnhancedMockVocabularyWords();
-}
-
-// Updated mock data function with enhanced word structure
-function getEnhancedMockVocabularyWords() {
-    return [
-        {
-            word: "apple",
-            part_of_speech: "noun",
-            pronunciation: "/ˈæp.əl/",
-            definition: "A round fruit with red, yellow, or green skin and firm white flesh",
-            chinese_translation: "苹果",
-            example_sentences: [
-                "I eat an apple every day for breakfast.",
-                "The apple trees in our garden produce delicious fruit."
-            ],
-            word_family: ["applesauce", "apple-shaped", "apple-green"],
-            common_collocations: ["apple juice", "apple pie", "apple cider", "apple tree"],
-            synonyms: [
-                { word: "fruit", definition: "edible plant product" }
-            ],
-            antonyms: [],
-            learning_tips: "Remember 'An apple a day keeps the doctor away' to connect the word with health."
-        },
-        {
-            word: "happy",
-            part_of_speech: "adjective",
-            pronunciation: "/ˈhæp.i/",
-            definition: "Feeling or showing pleasure or contentment",
-            chinese_translation: "高兴的，快乐的",
-            example_sentences: [
-                "She had a happy smile on her face.",
-                "We were very happy when we heard the good news."
-            ],
-            word_family: ["happiness", "happily", "unhappy"],
-            common_collocations: ["happy birthday", "happy ending", "happy days", "happy life"],
-            synonyms: [
-                { word: "glad", definition: "feeling joy or pleasure" },
-                { word: "cheerful", definition: "noticeably happy and optimistic" }
-            ],
-            antonyms: [
-                { word: "sad", definition: "feeling or showing sorrow" },
-                { word: "unhappy", definition: "not happy or content" }
-            ],
-            learning_tips: "Think of the 'pp' in happy as two smiling faces to remember the meaning."
-        },
-        {
-            word: "book",
-            part_of_speech: "noun",
-            pronunciation: "/bʊk/",
-            definition: "A written or printed work consisting of pages bound together",
-            chinese_translation: "书",
-            example_sentences: [
-                "I'm reading an interesting book about space.",
-                "She wrote a book about her travels in Asia."
-            ],
-            word_family: ["booklet", "bookish", "bookshop", "bookmark"],
-            common_collocations: ["read a book", "write a book", "book lover", "book fair"],
-            synonyms: [
-                { word: "volume", definition: "a single book" },
-                { word: "publication", definition: "printed material offered for distribution" }
-            ],
-            antonyms: [],
-            learning_tips: "The 'oo' in book looks like two eyes reading a book."
-        }
-    ];
 }
 
 // Function to display a vocabulary word card
@@ -6229,6 +6164,20 @@ function displayWordCard(index) {
     const pronunciation = word.pronunciation || '';
     const englishDef = word.definition || word.english_definition || word.englishMeaning || '';
     const chineseTrans = word.chinese_translation || word.chineseMeaning || '';
+    
+    // Handle word family properly
+    let wordFamily = [];
+    if (word.word_family) {
+        if (Array.isArray(word.word_family)) {
+            // For array of strings or objects
+            wordFamily = word.word_family;
+        } else if (typeof word.word_family === 'object') {
+            // For object with key-value pairs
+            wordFamily = Object.entries(word.word_family).map(([key, value]) => {
+                return { word: key, translation: value };
+            });
+        }
+    }
     
     // Handle collocations properly
     let collocations = [];
@@ -6315,32 +6264,40 @@ function displayWordCard(index) {
             
             <div class="word-examples">
                 <h3 class="section-title">例句</h3>
-                ${examples.length > 0 ? examples.map((example, i) => {
-                    let englishPart = '';
-                    let chinesePart = '';
-                    
+                ${examples.map((example, i) => {
                     if (typeof example === 'string') {
-                        // Try to split the string by looking for Chinese characters
-                        const match = example.match(/^(.*?)(?=[\u4e00-\u9fa5]|$)([\u4e00-\u9fa5].*)?$/);
-                        if (match) {
-                            englishPart = match[1] ? match[1].trim() : example;
-                            chinesePart = match[2] ? match[2].trim() : '';
-                        } else {
-                            englishPart = example;
-                        }
-                    } else if (example && typeof example === 'object') {
-                        englishPart = example.english || example.sentence || '';
-                        chinesePart = example.chinese || example.translation || '';
+                        const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
+                        return `
+                            <div class="example-item">
+                                <div class="example-english">${parts[0] || example}</div>
+                                <div class="example-chinese">${parts[1] || ''}</div>
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="example-item">
+                                <div class="example-english">${example.english || ''}</div>
+                                <div class="example-chinese">${example.chinese || ''}</div>
+                            </div>
+                        `;
                     }
-                    
-                    return `
-                        <div class="example-item">
-                            <div class="example-english">${englishPart}</div>
-                            ${chinesePart ? `<div class="example-chinese">${chinesePart}</div>` : ''}
-                        </div>
-                    `;
-                }).join('') : `<div class="no-examples">No example sentences available</div>`}
+                }).join('')}
             </div>
+            
+            ${wordFamily.length > 0 ? `
+                <div class="word-family">
+                    <h3 class="section-title">词族</h3>
+                    <div class="word-family-items">
+                        ${wordFamily.map(item => {
+                            if (typeof item === 'string') {
+                                return `<span class="word-family-item">${item}</span>`;
+                            } else {
+                                return `<span class="word-family-item" title="${item.translation || ''}">${item.word || item}</span>`;
+                            }
+                        }).join('')}
+                    </div>
+                </div>
+            ` : ''}
             
             ${collocations.length > 0 ? `
                 <div class="collocations">
