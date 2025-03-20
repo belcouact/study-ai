@@ -2190,4 +2190,36 @@ button:active {
         align-items: flex-start;
         gap: 8px;
     }
+}
+
+/* Add styles for the vocabulary loading message */
+.loading-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+}
+
+.vocabulary-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(52, 152, 219, 0.2);
+    border-radius: 50%;
+    border-top-color: var(--secondary-color, #3498db);
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 20px;
+}
+
+.loading-message p {
+    color: #64748b;
+    font-size: 18px;
+    margin: 5px 0;
+}
+
+.loading-message p:last-child {
+    color: #94a3b8;
+    font-size: 16px;
+    font-style: italic;
 } 

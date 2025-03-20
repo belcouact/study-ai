@@ -5974,9 +5974,19 @@ document.addEventListener('DOMContentLoaded', function() {
 // Handle loading vocabulary words
 async function handleLoadVocabularyClick() {
     const loadBtn = document.getElementById('load-vocabulary-btn');
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    
     loadBtn.disabled = true;
     loadBtn.innerHTML = '<span class="loading-spinner"></span> 加载中...';
-    loadBtn.classList.add('loading');
+    
+    // Display loading message in the vocabulary container
+    vocabularyContainer.innerHTML = `
+        <div class="initial-message loading-message">
+            <div class="loading-spinner vocabulary-spinner"></div>
+            <p>正在加载10个词汇，请耐心等待...</p>
+            <p>Loading ten vocabularies, please be patient...</p>
+        </div>
+    `;
     
     try {
         // Get education context from sidebar
@@ -6004,8 +6014,8 @@ async function handleLoadVocabularyClick() {
         
         // Display words
         if (words && words.length > 0) {
-        vocabularyWords = words;
-        currentWordIndex = 0;
+            vocabularyWords = words;
+            currentWordIndex = 0;
             displayWordCard(currentWordIndex);
             updateNavigationControls();
         } else {
@@ -6017,7 +6027,6 @@ async function handleLoadVocabularyClick() {
     } finally {
         loadBtn.disabled = false;
         loadBtn.innerHTML = '加载词汇';
-        loadBtn.classList.remove('loading');
     }
 }
 
