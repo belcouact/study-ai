@@ -2222,4 +2222,41 @@ button:active {
     color: #94a3b8;
     font-size: 16px;
     font-style: italic;
+}
+
+/* Styles for the create page welcome message */
+.create-welcome-message {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    padding: 25px 30px;
+    margin: 0 0 25px 0;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    border-left: 4px solid var(--secondary-color, #3498db);
+}
+
+.create-welcome-message.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.create-welcome-message h3 {
+    color: var(--primary-color, #2c3e50);
+    font-size: 20px;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.create-welcome-message p {
+    color: #64748b;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.create-welcome-message p:last-child {
+    margin-bottom: 0;
 } 

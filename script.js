@@ -6469,3 +6469,59 @@ function navigateWordCard(direction) {
         updateNavigationControls();
     }
 }
+
+// Add this function to display a welcome message on the create page
+function initializeCreatePageMessage() {
+    const createContainer = document.getElementById('create-container');
+    
+    // Find where to insert the welcome message (after the dropdowns/control panel)
+    const controlPanel = createContainer ? createContainer.querySelector('.control-panel') : null;
+    
+    if (createContainer && controlPanel) {
+        // Check if we already have a welcome message
+        if (createContainer.querySelector('.create-welcome-message')) {
+            return;
+        }
+        
+        // Create and add the welcome message
+        const welcomeMessage = document.createElement('div');
+        welcomeMessage.className = 'create-welcome-message';
+        welcomeMessage.innerHTML = `
+            <h3>欢迎使用内容创建工具</h3>
+            <p>使用本工具，您可以创建各种学习资源，包括练习题、教案和学习材料。</p>
+            <p>请从上方下拉菜单选择您需要的学校类型、年级和学科，然后点击"生成内容"按钮开始。</p>
+            <p>您也可以在侧边栏修改更多设置，以获得更符合您需求的内容。</p>
+        `;
+        
+        // Insert after the control panel
+        controlPanel.parentNode.insertBefore(welcomeMessage, controlPanel.nextSibling);
+        
+        // Add animation to make it appear smoothly
+        setTimeout(() => {
+            welcomeMessage.classList.add('visible');
+        }, 100);
+    }
+}
+
+// Find an appropriate initialization function to add our function call to
+function setupEventListeners() {
+    // ... existing code ...
+    
+    // Add welcome message to create page
+    if (document.getElementById('create-container')) {
+        initializeCreatePageMessage();
+    }
+    
+    // ... rest of the existing code ...
+}
+
+// Alternatively, if there's an existing function like initializeEmptyState(),
+// you can add the call there:
+function initializeEmptyState() {
+    // ... existing code ...
+    
+    // Initialize the create page with welcome message
+    initializeCreatePageMessage();
+    
+    // ... rest of the existing code ...
+}
