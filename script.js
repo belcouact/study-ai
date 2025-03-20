@@ -6176,6 +6176,9 @@ function displayWordCard(index) {
         return;
     }
     
+    // Clear previous content with a fade-out effect
+    vocabularyContainer.style.opacity = '0';
+    
     // Handle both API response format (word, definition) and mock data format (english, englishMeaning)
     const english = word.word || word.english || '';
     const form = word.part_of_speech || word.form || 'n/a';
@@ -6204,11 +6207,20 @@ function displayWordCard(index) {
         examples = word.examples;
     }
     
+    // Create a color based on the first letter of the word for variety
+    const colors = [
+        '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6',
+        '#1abc9c', '#d35400', '#34495e', '#16a085', '#c0392b'
+    ];
+    
+    const colorIndex = english.charCodeAt(0) % colors.length;
+    const wordColor = colors[colorIndex];
+    
     const cardHTML = `
-        <div class="word-card">
+        <div class="word-card" style="border-left-color: ${wordColor}">
             <div class="word-header">
                 <div class="word-english">${english}</div>
-                <div class="word-form">${form}</div>
+                <div class="word-form" style="background: linear-gradient(135deg, ${wordColor}, ${lightenColor(wordColor, 20)})">${form}</div>
             </div>
             <div class="word-meanings">
                 <div class="meaning-row">
@@ -6221,18 +6233,18 @@ function displayWordCard(index) {
                 </div>
             </div>
             <div class="word-examples">
-                ${examples.map(example => {
+                ${examples.map((example, i) => {
                     if (typeof example === 'string') {
                         const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
                         return `
-                            <div class="example-item">
+                            <div class="example-item" style="animation-delay: ${i * 0.1}s">
                                 <div class="example-english">${parts[0] || example}</div>
                                 <div class="example-chinese">${parts[1] || ''}</div>
                             </div>
                         `;
                     } else {
                         return `
-                            <div class="example-item">
+                            <div class="example-item" style="animation-delay: ${i * 0.1}s">
                                 <div class="example-english">${example.english || ''}</div>
                                 <div class="example-chinese">${example.chinese || ''}</div>
                             </div>
@@ -6243,41 +6255,78 @@ function displayWordCard(index) {
         </div>
     `;
     
-    vocabularyContainer.innerHTML = cardHTML;
+    // Add the card to the container with a delay for animation
+    setTimeout(() => {
+        vocabularyContainer.innerHTML = cardHTML;
+        vocabularyContainer.style.opacity = '1';
+        
+        // Add interactive features after the card is added
+        const wordCard = vocabularyContainer.querySelector('.word-card');
+        if (wordCard) {
+            // Add pronunciation button if needed
+            const wordEnglish = wordCard.querySelector('.word-english');
+            if (wordEnglish) {
+                wordEnglish.addEventListener('click', () => {
+                    speakWord(english);
+                });
+                
+                // Add tooltip to indicate it's clickable
+                wordEnglish.title = '点击朗读单词';
+                wordEnglish.style.cursor = 'pointer';
+            }
+        }
+    }, 200);
     
     // Update counter
     document.getElementById('word-counter').textContent = `${index + 1}/${vocabularyWords.length}`;
 }
 
-// Function to show error messages in the vocabulary container
-function showVocabularyError(message) {
-    const vocabularyContainer = document.getElementById('vocabulary-container');
-    vocabularyContainer.innerHTML = `
-        <div class="error-message">
-            <p>${message}</p>
-            <p>请稍后再试</p>
-        </div>
-    `;
+// Helper function to lighten a color
+function lightenColor(color, percent) {
+    // Convert hex to RGB
+    let r = parseInt(color.substring(1, 3), 16);
+    let g = parseInt(color.substring(3, 5), 16);
+    let b = parseInt(color.substring(5, 7), 16);
+    
+    // Lighten
+    r = Math.min(255, Math.floor(r + (255 - r) * (percent / 100)));
+    g = Math.min(255, Math.floor(g + (255 - g) * (percent / 100)));
+    b = Math.min(255, Math.floor(b + (255 - b) * (percent / 100)));
+    
+    // Convert back to hex
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
-// Function to update navigation controls for vocabulary
-function updateNavigationControls() {
-    const prevBtn = document.getElementById('prev-word-btn');
-    const nextBtn = document.getElementById('next-word-btn');
-    
-    if (!prevBtn || !nextBtn) return;
-    
-    prevBtn.disabled = currentWordIndex === 0;
-    nextBtn.disabled = currentWordIndex === vocabularyWords.length - 1;
-}
-
-// Function to navigate between word cards
-function navigateWordCard(direction) {
-    const newIndex = currentWordIndex + direction;
-    
-    if (newIndex >= 0 && newIndex < vocabularyWords.length) {
-        currentWordIndex = newIndex;
-        displayWordCard(currentWordIndex);
-        updateNavigationControls();
+// Function to speak the word (if browser supports speech synthesis)
+function speakWord(word) {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'en-US';
+        window.speechSynthesis.speak(utterance);
+        
+        // Visual feedback that the word is being spoken
+        const wordElement = document.querySelector('.word-english');
+        if (wordElement) {
+            wordElement.classList.add('speaking');
+            
+            utterance.onend = () => {
+                wordElement.classList.remove('speaking');
+            };
+        }
     }
 }
+
+// Add these styles to create the speaking effect
+const styleElement = document.createElement('style');
+styleElement.textContent = `
+    .word-english.speaking {
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { color: #2a4365; }
+        50% { color: #3498db; }
+        100% { color: #2a4365; }
+    }
+`;
+document.head.appendChild(styleElement);

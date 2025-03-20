@@ -1766,101 +1766,293 @@ button:active {
 #vocabulary-content .content-container {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    align-items: center;
+    position: relative;
+    min-height: 400px;
+    padding: 20px;
 }
 
 .vocabulary-controls {
+    width: 100%;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+#load-vocabulary-btn {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#load-vocabulary-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #2980b9, #3498db);
+}
+
+#load-vocabulary-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#load-vocabulary-btn:disabled {
+    background: #b3b3b3;
+    transform: none;
+    box-shadow: none;
+    cursor: not-allowed;
 }
 
 .navigation-controls {
+    position: absolute;
+    width: 100%;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0 20px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.nav-button {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #444;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: auto;
+}
+
+.nav-button:hover {
+    background-color: #f0f4f8;
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.nav-button:disabled {
+    background-color: rgba(220, 220, 220, 0.7);
+    color: #999;
+    transform: none;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+#word-counter {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    color: #718096;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 #vocabulary-container {
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    padding: 0 60px;
 }
 
 .initial-message {
     text-align: center;
-    color: #666;
-    margin: 50px 0;
-    font-size: 16px;
+    color: #718096;
+    font-size: 18px;
+    background-color: rgba(240, 244, 248, 0.7);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 500px;
 }
 
 .word-card {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+    background: linear-gradient(to bottom right, #ffffff, #f8fafc);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px;
     margin-bottom: 15px;
-    transition: transform 0.2s;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+    overflow: hidden;
+    border-left: 5px solid #3498db;
+    animation: cardAppear 0.5s forwards;
+}
+
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .word-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
 }
 
 .word-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 15px;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f4f8;
 }
 
 .word-english {
-    font-size: 24px;
+    font-size: 32px;
     font-weight: bold;
     color: #2a4365;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.word-english::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(to right, #3498db, #8e44ad);
+    transition: width 0.3s ease;
+}
+
+.word-card:hover .word-english::after {
+    width: 100%;
 }
 
 .word-form {
     font-size: 14px;
-    color: #718096;
-    background-color: #f0f4f8;
-    padding: 3px 8px;
-    border-radius: 12px;
+    color: white;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .word-meanings {
-    margin-bottom: 15px;
+    margin-bottom: 25px;
+    background-color: #f8fafc;
+    padding: 15px;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.word-card:hover .word-meanings {
+    transform: translateX(5px);
 }
 
 .meaning-row {
     display: flex;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 
 .meaning-label {
-    width: 70px;
+    width: 90px;
     font-weight: bold;
     color: #4a5568;
+    position: relative;
+}
+
+.meaning-label::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #cbd5e0;
 }
 
 .meaning-content {
     flex: 1;
+    color: #2d3748;
+    padding-left: 15px;
+    line-height: 1.5;
 }
 
 .word-examples {
-    border-top: 1px solid #e2e8f0;
-    padding-top: 15px;
+    position: relative;
+    border-top: 2px dashed #e2e8f0;
+    padding-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.word-examples::before {
+    content: '例句';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    background-color: white;
+    padding: 0 10px;
+    font-size: 12px;
+    color: #718096;
+}
+
+.word-card:hover .word-examples {
+    background-color: #f9fafb;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 0 -10px;
 }
 
 .example-item {
-    margin-bottom: 12px;
+    margin-bottom: 15px;
+    padding-left: 20px;
+    position: relative;
+    transition: transform 0.2s ease;
+}
+
+.example-item:hover {
+    transform: translateX(5px);
+}
+
+.example-item::before {
+    content: '•';
+    position: absolute;
+    left: 5px;
+    top: 0;
+    color: #3498db;
+    font-size: 18px;
 }
 
 .example-english {
     color: #2d3748;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
+    font-style: italic;
 }
 
 .example-chinese {
@@ -1868,20 +2060,24 @@ button:active {
     font-size: 14px;
 }
 
-.nav-button {
-    padding: 6px 12px;
-    background-color: #e2e8f0;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.error-message {
+    background-color: #fff5f5;
+    border-left: 4px solid #e53e3e;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    color: #c53030;
+    width: 100%;
+    max-width: 500px;
+    animation: shake 0.5s ease-in-out;
 }
 
-.nav-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
-#word-counter {
-    font-size: 14px;
-    color: #718096;
+.error-message p {
+    margin: 5px 0;
 } 
