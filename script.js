@@ -6118,12 +6118,9 @@ Format the response as a clean JSON array of word objects.`;
             return parseVocabularyResponse(response);
         } else {
             console.warn('Unexpected API response format:', response);
-            return getMockVocabularyWords();
         }
     } catch (error) {
         console.error('Error in fetchVocabularyWords:', error);
-        // Return mock data on error for testing
-        return getMockVocabularyWords();
     }
 }
 
