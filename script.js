@@ -1,21 +1,9 @@
 // API configuration variables
 let currentApiFunction = 'chat';
 // let currentModel = 'deepseek-r1';
-let currentModel = 'deepseek-r1-250120';
+let currentModel = 'deepseek-reasoner';
 // Add global variable for current question index
 let currentQuestionIndex = 0;
-
-// Add these global variables if they don't exist elsewhere
-// You can add these at the top of your script
-/*
-if (typeof vocabularyWords === 'undefined') {
-    var vocabularyWords = [];
-}
-
-if (typeof currentWordIndex === 'undefined') {
-    var currentWordIndex = 0;
-}
-*/
 
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
