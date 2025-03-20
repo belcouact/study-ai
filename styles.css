@@ -1854,6 +1854,7 @@ button:active {
     display: flex;
     flex-direction: column;
     animation: cardEntrance 0.6s ease-out;
+    gap: 15px;
 }
 
 @keyframes cardEntrance {
@@ -2035,4 +2036,141 @@ button:active {
 .vocabulary-load-btn.loading {
     padding-left: 20px;
     padding-right: 20px;
+}
+
+/* Additional styles for enhanced vocabulary cards */
+.word-card {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 100%;
+    min-height: 400px;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    animation: cardEntrance 0.6s ease-out;
+    gap: 15px;
+}
+
+.word-details {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.word-pronunciation {
+    font-family: monospace;
+    color: #64748b;
+    font-size: 16px;
+    background-color: #f1f5f9;
+    padding: 5px 12px;
+    border-radius: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e3a8a;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    height: 2px;
+    width: 40px;
+    background-color: #3b82f6;
+    border-radius: 2px;
+}
+
+.word-family, .collocations, .word-relationships, .learning-tips {
+    margin-top: 10px;
+    animation: fadeInUp 1.3s ease-out;
+}
+
+.word-family-items, .collocation-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.word-family-item, .collocation-item {
+    background-color: #eef2ff;
+    color: #4338ca;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.word-family-item:hover, .collocation-item:hover {
+    background-color: #4338ca;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.synonym-items, .antonym-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.synonym-container, .antonym-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+}
+
+.synonym-container:hover, .antonym-container:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.synonym-word, .antonym-word {
+    font-weight: 600;
+    color: #334155;
+}
+
+.synonym-def, .antonym-def {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.learning-tips {
+    background-color: #ecfdf5;
+    border-left: 4px solid #10b981;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.tip-content {
+    color: #065f46;
+    line-height: 1.6;
+}
+
+.word-relationships {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+@media (min-width: 768px) {
+    .word-relationships {
+        flex-direction: row;
+    }
+    
+    .synonyms, .antonyms {
+        width: 50%;
+    }
 } 
