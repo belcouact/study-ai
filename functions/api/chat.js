@@ -65,7 +65,8 @@ export async function onRequestPost(context) {
           "Authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: "deepseek-reasoner",
+          //model: "deepseek-reasoner",
+          model: env.MODEL || "deepseek-reasoner",
           messages: body.messages,
           max_tokens: parseInt(env.MAX_TOKENS || "4096"),
           temperature: parseFloat(env.TEMPERATURE || "0.7")
