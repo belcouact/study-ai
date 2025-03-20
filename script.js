@@ -6022,458 +6022,201 @@ async function handleLoadVocabularyClick() {
 // Fetch vocabulary words from API
 async function fetchVocabularyWords(school, grade) {
     try {
-        // Create a more detailed prompt for better vocabulary generation
-        const prompt = `Generate 5 English vocabulary words appropriate for ${school} school students in grade ${grade}. 
+        // Create a more structured prompt for consistent API responses
+        const prompt = `Generate 10 English vocabulary words appropriate for ${school} school students in grade ${grade}.
 
-For each word, please provide the following details in a structured JSON format:
-1. word: The English vocabulary word
-2. part_of_speech: The part of speech (noun, verb, adjective, adverb, etc.)
-3. pronunciation: The phonetic pronunciation using IPA symbols
-4. definition: Clear and concise English definition suitable for ${grade} grade ${school} students
-5. chinese_translation: The Chinese translation of the word
-6. example_sentences: Two example sentences showing practical usage of the word (with Chinese translation)
-7. word_family: Related words from the same word family (e.g., nouns, verbs, adjectives derived from the same root, with Chinese translation)
-8. common_collocations: Common phrases or expressions that use this word, with Chinese translation
-9. synonyms: 2-3 synonyms with simple definitions, with Chinese translation
-10. antonyms: 2-3 antonyms with simple definitions (if applicable), with Chinese translation
-11. learning_tips: A memory tip or learning strategy to help remember the word, with Chinese translation
+Please format your response as a valid JSON array with objects having the EXACT following structure for each word:
+\`\`\`json
+[
+  {
+    "word": "example",
+    "part_of_speech": "noun",
+    "pronunciation": "/ɪɡˈzæm.pəl/",
+    "definition": "A clear English definition",
+    "chinese_translation": "中文翻译",
+    "example_sentences": [
+      {
+        "english": "This is an example sentence.",
+        "chinese": "这是一个例句。"
+      },
+      {
+        "english": "Here is another example.",
+        "chinese": "这是另一个例句。"
+      }
+    ],
+    "word_family": {
+      "noun": "example (例子)",
+      "verb": "exemplify (例示)"
+    },
+    "common_collocations": [
+      "common example (常见例子)",
+      "good example (好例子)"
+    ],
+    "synonyms": [
+      {
+        "word": "instance",
+        "definition": "a particular case",
+        "chinese": "实例"
+      }
+    ],
+    "antonyms": [
+      {
+        "word": "opposite word",
+        "definition": "opposite definition",
+        "chinese": "反义词"
+      }
+    ],
+    "learning_tips": {
+      "tip": "A useful memory trick or learning strategy",
+      "chinese": "记忆技巧的中文翻译"
+    }
+  }
+]
+\`\`\`
 
-Ensure the chosen words are age-appropriate and relevant to the ${grade} grade ${school} curriculum.
+IMPORTANT:
+1. Ensure the JSON is valid and properly formatted with all fields.
+2. Do NOT include any explanatory text outside the JSON.
+3. Make sure all example sentences include both English and Chinese translations.
+4. Choose vocabulary appropriate for ${grade} grade ${school} school students.
+5. Strictly follow the format above for all keys and values.`;
 
-Format the response as a clean JSON array of word objects.`;
+        console.log('Fetching vocabulary with prompt:', prompt);
         
         // Use the existing fetchAIResponse function
         const response = await fetchAIResponse(prompt);
-        console.log('Raw API response for vocabulary:', response);
+        console.log('Raw API response type:', typeof response);
         
-        // Process the response to extract the vocabulary words
-        if (response && response.choices && response.choices[0] && response.choices[0].message) {
+        let wordData;
+        if (typeof response === 'object' && response.choices && response.choices[0] && response.choices[0].message) {
             const messageContent = response.choices[0].message.content;
-            return parseVocabularyResponse(messageContent);
-        } else if (typeof response === 'object' && Array.isArray(response)) {
-            // If response is already an array of words
-            return response;
+            wordData = extractJsonFromText(messageContent);
         } else if (typeof response === 'string') {
-            return parseVocabularyResponse(response);
+            wordData = extractJsonFromText(response);
+        } else if (Array.isArray(response)) {
+            wordData = response;
         } else {
             console.warn('Unexpected API response format:', response);
-            // return getMockVocabularyWords();
+            wordData = null;
+        }
+        
+        if (wordData && Array.isArray(wordData) && wordData.length > 0) {
+            console.log('Successfully parsed vocabulary data:', wordData);
+            return wordData;
+        } else {
+            console.warn('Could not extract valid vocabulary data from response');
+            return getMockVocabularyWords();
         }
     } catch (error) {
         console.error('Error in fetchVocabularyWords:', error);
-        // Return mock data on error for testing
-        // return getMockVocabularyWords();
-    }
-}
-
-// Helper function to parse vocabulary response
-function parseVocabularyResponse(text) {
-    console.log('Parsing vocabulary response, text type:', typeof text);
-    
-    // If text is already an object, just return it if it's an array
-    if (typeof text === 'object' && !text.choices) {
-        if (Array.isArray(text)) {
-            return text;
-        } else if (text.word) {
-            // It's a single word object, wrap it in array
-            return [text];
-        }
-    }
-    
-    if (!text) {
-        console.warn('Empty response text');
         return getMockVocabularyWords();
     }
-    
-    // Convert to string if it's an object
-    const textStr = typeof text === 'string' ? text : JSON.stringify(text);
+}
+
+// Helper function to extract JSON from text content
+function extractJsonFromText(text) {
+    if (!text) return null;
     
     try {
-        // First try to extract content from API response if it's in that format
-        let jsonText = textStr;
-        
-        if (textStr.includes('choices') && textStr.includes('message')) {
-            try {
-                const apiResponse = JSON.parse(textStr);
-                if (apiResponse.choices && apiResponse.choices[0] && apiResponse.choices[0].message) {
-                    jsonText = apiResponse.choices[0].message.content;
-                    console.log('Extracted content from API response');
-                }
-            } catch (e) {
-                console.warn('Failed to parse API response:', e);
-            }
-        }
-        
-        // Look for JSON code blocks
-        const codeBlockMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-        if (codeBlockMatch) {
-            jsonText = codeBlockMatch[1].trim();
-            console.log('Extracted JSON from code block');
-        }
-        
-        // Attempt to find an array in the text
-        const arrayMatch = jsonText.match(/\[\s*\{[\s\S]*?\}\s*\]/);
-        if (arrayMatch) {
-            jsonText = arrayMatch[0];
-            console.log('Extracted array from text');
-        }
-        
-        // Try to clean common formatting issues
-        const cleanedJson = cleanJsonString(jsonText);
-        
+        // First try: Direct parse if it's already JSON
         try {
-            // Try parsing the cleaned JSON
-            const parsed = JSON.parse(cleanedJson);
-            if (Array.isArray(parsed)) {
-                console.log('Successfully parsed array with', parsed.length, 'items');
-                return parsed;
-            } else if (parsed.word) {
-                // It's a single word object
-                console.log('Parsed single word object');
-                return [parsed];
-            }
-        } catch (parseError) {
-            console.warn('JSON parse error after cleaning:', parseError);
-            
-            // Try manual extraction of word objects
-            const wordObjects = extractWordObjects(jsonText);
-            if (wordObjects.length > 0) {
-                console.log('Extracted', wordObjects.length, 'word objects manually');
-                return wordObjects;
-            }
+            const parsed = JSON.parse(text);
+            if (Array.isArray(parsed)) return parsed;
+        } catch (e) {
+            // Not directly parseable JSON, continue to other methods
         }
-    } catch (e) {
-        console.warn('Error in parseVocabularyResponse:', e);
-    }
-    
-    // If all parsing attempts fail, use mock data
-    console.warn('Could not parse vocabulary words from response, using mock data');
-    return getMockVocabularyWords();
-}
-
-// Helper function to clean JSON string
-function cleanJsonString(jsonStr) {
-    // Make a copy of the string to work with
-    let cleaned = jsonStr.trim();
-    
-    // Remove any trailing characters that aren't part of valid JSON
-    // Find the last closing bracket or brace
-    const lastBracketPos = Math.max(
-        cleaned.lastIndexOf(']'),
-        cleaned.lastIndexOf('}')
-    );
-    
-    if (lastBracketPos > 0) {
-        cleaned = cleaned.substring(0, lastBracketPos + 1);
-    }
-    
-    // Fix unmatched quotes in property values
-    cleaned = cleaned.replace(/:\s*"([^"]*)(?=\s*[,}])/g, ':"$1"');
-    
-    // Fix single quotes used instead of double quotes
-    cleaned = cleaned.replace(/'/g, '"');
-    
-    // Fix trailing commas in arrays and objects
-    cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
-    
-    // If it seems to be an incomplete array of objects, try to complete it
-    if (cleaned.startsWith('{') && !cleaned.endsWith('}')) {
-        cleaned = '[' + cleaned + '}]';
-    }
-    
-    // If it starts with '[{' but doesn't end with '}]', complete it
-    if (cleaned.startsWith('[{') && !cleaned.endsWith('}]')) {
-        cleaned = cleaned + '}]';
-    }
-    
-    // If it's an array of objects but missing the outer brackets
-    if (cleaned.startsWith('{') && cleaned.endsWith('}')) {
-        cleaned = '[' + cleaned + ']';
-    }
-    
-    return cleaned;
-}
-
-// Helper function to manually extract word objects
-function extractWordObjects(text) {
-    const words = [];
-    
-    // Try to find patterns matching word objects
-    const wordPatterns = text.match(/{\s*"word"\s*:\s*"[^"]*"[\s\S]*?(?:}\s*,|\}\s*\])/g);
-    
-    if (wordPatterns) {
-        for (let wordPattern of wordPatterns) {
+        
+        // Second try: Extract JSON from code blocks
+        const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+        if (codeBlockMatch) {
             try {
-                // Clean up and parse each word object
-                let cleanedPattern = wordPattern.replace(/}\s*,\s*$/, '}');
-                cleanedPattern = cleanedPattern.replace(/}\s*\]\s*$/, '}');
-                
-                // Try to parse this individual object
-                const wordObj = JSON.parse(cleanedPattern);
-                if (wordObj.word) {
-                    words.push(wordObj);
-                }
+                const jsonContent = codeBlockMatch[1].trim();
+                const parsed = JSON.parse(jsonContent);
+                if (Array.isArray(parsed)) return parsed;
             } catch (e) {
-                console.warn('Failed to parse individual word object:', e);
-                
-                // Create a basic word object from what we can extract
-                const wordMatch = wordPattern.match(/"word"\s*:\s*"([^"]*)"/);
-                const posMatch = wordPattern.match(/"part_of_speech"\s*:\s*"([^"]*)"/);
-                const defMatch = wordPattern.match(/"definition"\s*:\s*"([^"]*)"/);
-                const transMatch = wordPattern.match(/"chinese_translation"\s*:\s*"([^"]*)"/);
-                
-                if (wordMatch) {
-                    const basicWord = {
-                        word: wordMatch[1],
-                        part_of_speech: posMatch ? posMatch[1] : '',
-                        definition: defMatch ? defMatch[1] : '',
-                        chinese_translation: transMatch ? transMatch[1] : ''
-                    };
-                    
-                    // Try to extract example sentences
-                    const examplesMatch = wordPattern.match(/"example_sentences"\s*:\s*(\[[\s\S]*?\])/);
-                    if (examplesMatch) {
-                        try {
-                            const examplesJson = cleanJsonString(examplesMatch[1]);
-                            basicWord.example_sentences = JSON.parse(examplesJson);
-                        } catch (ex) {
-                            basicWord.example_sentences = [];
-                        }
-                    }
-                    
-                    words.push(basicWord);
-                }
+                console.warn('Failed to parse JSON from code block:', e);
             }
         }
+        
+        // Third try: Look for array pattern in text
+        const arrayMatch = text.match(/\[\s*\{[\s\S]*\}\s*\]/);
+        if (arrayMatch) {
+            try {
+                const cleaned = cleanJsonString(arrayMatch[0]);
+                const parsed = JSON.parse(cleaned);
+                if (Array.isArray(parsed)) return parsed;
+            } catch (e) {
+                console.warn('Failed to parse JSON from array pattern:', e);
+            }
+        }
+        
+        // Final try: Manual extraction of word objects
+        return extractWordObjects(text);
+    } catch (error) {
+        console.error('Error extracting JSON from text:', error);
+        return null;
     }
-    
-    return words;
 }
 
-// Function to display a vocabulary word card
+// Update the displayWordCard function for more reliable rendering
 function displayWordCard(index) {
     const vocabularyContainer = document.getElementById('vocabulary-container');
     const word = vocabularyWords[index];
     
-    if (!word) {
+    if (!word || !word.word) {
         vocabularyContainer.innerHTML = '<div class="initial-message">无单词数据</div>';
         return;
     }
     
-    console.log('Displaying word data:', word);
+    // Safely extract all word properties with fallbacks
+    const wordData = {
+        english: safeGet(word, 'word', ''),
+        form: safeGet(word, 'part_of_speech', 'n/a'),
+        pronunciation: safeGet(word, 'pronunciation', ''),
+        definition: safeGet(word, 'definition', ''),
+        chinese: safeGet(word, 'chinese_translation', ''),
+        
+        // Process complex structures
+        examples: processExamples(word),
+        wordFamily: processWordFamily(word),
+        collocations: processCollocations(word),
+        synonyms: processSynonyms(word),
+        antonyms: processAntonyms(word),
+        learningTips: processLearningTips(word)
+    };
     
-    // Extract all fields from the word object
-    const english = word.word || word.english || '';
-    const form = word.part_of_speech || word.form || 'n/a';
-    const pronunciation = word.pronunciation || '';
-    const englishDef = word.definition || word.english_definition || word.englishMeaning || '';
-    const chineseTrans = word.chinese_translation || word.chineseMeaning || '';
-    
-    // Process example sentences
-    let examples = [];
-    if (word.example_sentences) {
-        if (Array.isArray(word.example_sentences)) {
-            examples = word.example_sentences.map(example => {
-                if (typeof example === 'string') {
-                    // Try to extract Chinese translation in parentheses
-                    const match = example.match(/^(.*?)(?:\s*\(([^)]+)\))?$/);
-                    if (match) {
-                        return {
-                            english: match[1].trim(),
-                            chinese: match[2] ? match[2].trim() : ''
-                        };
-                    }
-                    return { english: example, chinese: '' };
-                }
-                return example;
-            });
-        } else if (typeof word.example_sentences === 'object') {
-            // Handle object format
-            examples = Object.values(word.example_sentences).map(example => {
-                if (typeof example === 'string') {
-                    const match = example.match(/^(.*?)(?:\s*\(([^)]+)\))?$/);
-                    if (match) {
-                        return {
-                            english: match[1].trim(), 
-                            chinese: match[2] ? match[2].trim() : ''
-                        };
-                    }
-                    return { english: example, chinese: '' };
-                }
-                return example;
-            });
-        }
-    }
-    
-    // Handle word family
-    let wordFamily = [];
-    if (word.word_family) {
-        if (Array.isArray(word.word_family)) {
-            wordFamily = word.word_family;
-        } else if (typeof word.word_family === 'object') {
-            wordFamily = Object.entries(word.word_family).map(([type, word]) => {
-                return { type, word };
-            });
-        }
-    }
-    
-    // Handle collocations
-    let collocations = [];
-    if (word.common_collocations) {
-        if (Array.isArray(word.common_collocations)) {
-            collocations = word.common_collocations;
-        } else if (typeof word.common_collocations === 'object') {
-            collocations = Object.values(word.common_collocations);
-        }
-    }
-    
-    // Handle synonyms and antonyms
-    let synonyms = processWordRelationships(word.synonyms);
-    let antonyms = processWordRelationships(word.antonyms);
-    
-    // Get learning tips
-    const learningTips = word.learning_tips || '';
-    
-    // Create the card with enhanced structure
+    // Create the card HTML
     const cardHTML = `
         <div class="word-card">
             <div class="word-header">
-                <div class="word-english">${english}</div>
+                <div class="word-english">${wordData.english}</div>
                 <div class="word-details">
-                    <span class="word-form">${form}</span>
-                    ${pronunciation ? `<span class="word-pronunciation">${pronunciation}</span>` : ''}
+                    <span class="word-form">${wordData.form}</span>
+                    ${wordData.pronunciation ? `<span class="word-pronunciation">${wordData.pronunciation}</span>` : ''}
                 </div>
             </div>
             
             <div class="word-meanings">
                 <div class="meaning-row">
                     <div class="meaning-label">英文释义:</div>
-                    <div class="meaning-content">${englishDef}</div>
+                    <div class="meaning-content">${wordData.definition}</div>
                 </div>
                 <div class="meaning-row">
                     <div class="meaning-label">中文释义:</div>
-                    <div class="meaning-content">${chineseTrans}</div>
+                    <div class="meaning-content">${wordData.chinese}</div>
                 </div>
             </div>
             
-            ${examples.length > 0 ? `
-                <div class="word-examples">
-                    <h3 class="section-title">例句</h3>
-                    ${examples.map(example => {
-                        const englishPart = typeof example === 'string' ? example : example.english || '';
-                        const chinesePart = typeof example === 'string' ? '' : example.chinese || '';
-                        
-                        return `
-                            <div class="example-item">
-                                <div class="example-english">${englishPart}</div>
-                                ${chinesePart ? `<div class="example-chinese">${chinesePart}</div>` : ''}
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            ` : ''}
-            
-            ${wordFamily.length > 0 ? `
-                <div class="word-family">
-                    <h3 class="section-title">词族</h3>
-                    <div class="word-family-items">
-                        ${wordFamily.map(item => {
-                            if (typeof item === 'string') {
-                                return `<span class="word-family-item">${item}</span>`;
-                            } else if (item.type && item.word) {
-                                return `<span class="word-family-item"><strong>${item.type}:</strong> ${item.word}</span>`;
-                            } else {
-                                const wordText = typeof item === 'object' ? JSON.stringify(item) : item;
-                                return `<span class="word-family-item">${wordText}</span>`;
-                            }
-                        }).join('')}
-                    </div>
-                </div>
-            ` : ''}
-            
-            ${collocations.length > 0 ? `
-                <div class="collocations">
-                    <h3 class="section-title">常见搭配</h3>
-                    <div class="collocation-items">
-                        ${collocations.map(item => {
-                            if (typeof item === 'string') {
-                                // Check if there's a translation in parentheses
-                                const match = item.match(/^(.*?)(?:\s*\(([^)]+)\))?$/);
-                                if (match) {
-                                    return `<span class="collocation-item" title="${match[2] || ''}">${match[1].trim()}</span>`;
-                                }
-                                return `<span class="collocation-item">${item}</span>`;
-                            } else if (typeof item === 'object') {
-                                const itemText = Object.values(item)[0] || JSON.stringify(item);
-                                return `<span class="collocation-item">${itemText}</span>`;
-                            }
-                        }).join('')}
-                    </div>
-                </div>
-            ` : ''}
+            ${renderExamples(wordData.examples)}
+            ${renderWordFamily(wordData.wordFamily)}
+            ${renderCollocations(wordData.collocations)}
             
             <div class="word-relationships">
-                ${synonyms.length > 0 ? `
-                    <div class="synonyms">
-                        <h3 class="section-title">近义词</h3>
-                        <div class="synonym-items">
-                            ${synonyms.map(syn => {
-                                if (typeof syn === 'string') {
-                                    return `<span class="synonym-item">${syn}</span>`;
-                                } else if (syn.word && syn.definition) {
-                                    return `<div class="synonym-container">
-                                        <span class="synonym-word">${syn.word}</span>
-                                        <span class="synonym-def">- ${syn.definition}</span>
-                                    </div>`;
-                                } else {
-                                    const keys = Object.keys(syn);
-                                    if (keys.length > 0) {
-                                        return `<div class="synonym-container">
-                                            <span class="synonym-word">${keys[0]}</span>
-                                            <span class="synonym-def">- ${syn[keys[0]]}</span>
-                                        </div>`;
-                                    }
-                                    return '';
-                                }
-                            }).join('')}
-                        </div>
-                    </div>
-                ` : ''}
-                
-                ${antonyms.length > 0 ? `
-                    <div class="antonyms">
-                        <h3 class="section-title">反义词</h3>
-                        <div class="antonym-items">
-                            ${antonyms.map(ant => {
-                                if (typeof ant === 'string') {
-                                    return `<span class="antonym-item">${ant}</span>`;
-                                } else if (ant.word && ant.definition) {
-                                    return `<div class="antonym-container">
-                                        <span class="antonym-word">${ant.word}</span>
-                                        <span class="antonym-def">- ${ant.definition}</span>
-                                    </div>`;
-                                } else {
-                                    const keys = Object.keys(ant);
-                                    if (keys.length > 0) {
-                                        return `<div class="antonym-container">
-                                            <span class="antonym-word">${keys[0]}</span>
-                                            <span class="antonym-def">- ${ant[keys[0]]}</span>
-                                        </div>`;
-                                    }
-                                    return '';
-                                }
-                            }).join('')}
-                        </div>
-                    </div>
-                ` : ''}
+                ${renderSynonyms(wordData.synonyms)}
+                ${renderAntonyms(wordData.antonyms)}
             </div>
             
-            ${learningTips ? `
-                <div class="learning-tips">
-                    <h3 class="section-title">记忆技巧</h3>
-                    <div class="tip-content">${learningTips}</div>
-                </div>
-            ` : ''}
+            ${renderLearningTips(wordData.learningTips)}
         </div>
     `;
     
@@ -6483,65 +6226,368 @@ function displayWordCard(index) {
     document.getElementById('word-counter').textContent = `${index + 1}/${vocabularyWords.length}`;
 }
 
-// Helper function to process word relationships (synonyms/antonyms)
-function processWordRelationships(items) {
-    if (!items) return [];
+// Safe property getter with default value
+function safeGet(obj, path, defaultValue) {
+    if (!obj) return defaultValue;
     
-    if (Array.isArray(items)) {
-        return items.map(item => {
-            if (typeof item === 'string') {
-                return item;
-            } else if (typeof item === 'object') {
-                // Handle object format like {"assess": "to estimate quality"}
-                const keys = Object.keys(item);
-                if (keys.length > 0) {
-                    return { 
-                        word: keys[0], 
-                        definition: item[keys[0]] 
-                    };
-                }
-            }
-            return item;
-        }).filter(Boolean);
-    } else if (typeof items === 'object') {
-        // Handle object format
-        return Object.entries(items).map(([word, definition]) => {
-            return { word, definition };
-        });
+    // Handle dot notation for nested paths
+    const keys = path.split('.');
+    let current = obj;
+    
+    for (const key of keys) {
+        if (current === null || current === undefined || typeof current !== 'object') {
+            return defaultValue;
+        }
+        current = current[key];
     }
     
-    return [];
+    return current !== undefined && current !== null ? current : defaultValue;
 }
 
-// Function to show error messages in the vocabulary container
-function showVocabularyError(message) {
-    const vocabularyContainer = document.getElementById('vocabulary-container');
-    vocabularyContainer.innerHTML = `
-        <div class="error-message">
-            <p>${message}</p>
-            <p>请稍后再试</p>
+// Process example sentences from various formats
+function processExamples(word) {
+    const examples = [];
+    
+    try {
+        if (word.example_sentences) {
+            if (Array.isArray(word.example_sentences)) {
+                word.example_sentences.forEach(example => {
+                    if (typeof example === 'string') {
+                        // Handle string format with parentheses for Chinese
+                        const match = example.match(/^(.*?)(?:\s*\((.*?)\))?$/);
+                        if (match) {
+                            examples.push({
+                                english: match[1].trim(),
+                                chinese: match[2] ? match[2].trim() : ''
+                            });
+                        } else {
+                            examples.push({ english: example, chinese: '' });
+                        }
+                    } else if (example && typeof example === 'object') {
+                        // Handle object format
+                        examples.push({
+                            english: example.english || example.sentence || '',
+                            chinese: example.chinese || example.translation || ''
+                        });
+                    }
+                });
+            } else if (typeof word.example_sentences === 'object') {
+                // Handle object with numbered keys
+                Object.values(word.example_sentences).forEach(example => {
+                    if (typeof example === 'string') {
+                        const match = example.match(/^(.*?)(?:\s*\((.*?)\))?$/);
+                        if (match) {
+                            examples.push({
+                                english: match[1].trim(),
+                                chinese: match[2] ? match[2].trim() : ''
+                            });
+                        } else {
+                            examples.push({ english: example, chinese: '' });
+                        }
+                    } else if (example && typeof example === 'object') {
+                        examples.push({
+                            english: example.english || example.sentence || '',
+                            chinese: example.chinese || example.translation || ''
+                        });
+                    }
+                });
+            }
+        }
+    } catch (e) {
+        console.warn('Error processing examples:', e);
+    }
+    
+    return examples;
+}
+
+// Process word family from various formats
+function processWordFamily(word) {
+    const wordFamilyItems = [];
+    
+    try {
+        if (word.word_family) {
+            if (Array.isArray(word.word_family)) {
+                word.word_family.forEach(item => {
+                    if (typeof item === 'string') {
+                        wordFamilyItems.push({ word: item });
+                    } else if (item && typeof item === 'object') {
+                        const keys = Object.keys(item);
+                        if (keys.length > 0) {
+                            wordFamilyItems.push({ 
+                                type: keys[0], 
+                                word: item[keys[0]] 
+                            });
+                        }
+                    }
+                });
+            } else if (typeof word.word_family === 'object') {
+                Object.entries(word.word_family).forEach(([type, value]) => {
+                    wordFamilyItems.push({ type, word: value });
+                });
+            }
+        }
+    } catch (e) {
+        console.warn('Error processing word family:', e);
+    }
+    
+    return wordFamilyItems;
+}
+
+// Process collocations from various formats
+function processCollocations(word) {
+    const collocations = [];
+    
+    try {
+        if (word.common_collocations) {
+            if (Array.isArray(word.common_collocations)) {
+                word.common_collocations.forEach(item => {
+                    if (typeof item === 'string') {
+                        // Handle parentheses format
+                        const match = item.match(/^(.*?)(?:\s*\((.*?)\))?$/);
+                        if (match) {
+                            collocations.push({
+                                phrase: match[1].trim(),
+                                translation: match[2] ? match[2].trim() : ''
+                            });
+                        } else {
+                            collocations.push({ phrase: item });
+                        }
+                    } else if (item && typeof item === 'object') {
+                        const keys = Object.keys(item);
+                        if (keys.length > 0) {
+                            collocations.push({
+                                phrase: keys[0],
+                                translation: item[keys[0]]
+                            });
+                        }
+                    }
+                });
+            } else if (typeof word.common_collocations === 'object') {
+                Object.entries(word.common_collocations).forEach(([phrase, translation]) => {
+                    collocations.push({ phrase, translation });
+                });
+            }
+        }
+    } catch (e) {
+        console.warn('Error processing collocations:', e);
+    }
+    
+    return collocations;
+}
+
+// Process synonyms from various formats
+function processSynonyms(word) {
+    return processWordRelationship(word.synonyms);
+}
+
+// Process antonyms from various formats
+function processAntonyms(word) {
+    return processWordRelationship(word.antonyms);
+}
+
+// Generic processor for word relationships (synonyms/antonyms)
+function processWordRelationship(items) {
+    const processed = [];
+    
+    try {
+        if (items) {
+            if (Array.isArray(items)) {
+                items.forEach(item => {
+                    if (typeof item === 'string') {
+                        processed.push({ word: item });
+                    } else if (item && typeof item === 'object') {
+                        if (item.word) {
+                            processed.push({
+                                word: item.word,
+                                definition: item.definition || '',
+                                chinese: item.chinese || ''
+                            });
+                        } else {
+                            const keys = Object.keys(item);
+                            if (keys.length > 0) {
+                                const key = keys[0];
+                                const value = item[key];
+                                
+                                // Try to extract Chinese in parentheses
+                                let definition = value;
+                                let chinese = '';
+                                
+                                if (typeof value === 'string') {
+                                    const match = value.match(/^(.*?)(?:\s*\((.*?)\))?$/);
+                                    if (match) {
+                                        definition = match[1].trim();
+                                        chinese = match[2] ? match[2].trim() : '';
+                                    }
+                                }
+                                
+                                processed.push({
+                                    word: key,
+                                    definition,
+                                    chinese
+                                });
+                            }
+                        }
+                    }
+                });
+            } else if (typeof items === 'object') {
+                Object.entries(items).forEach(([word, value]) => {
+                    // Try to extract Chinese in parentheses
+                    let definition = value;
+                    let chinese = '';
+                    
+                    if (typeof value === 'string') {
+                        const match = value.match(/^(.*?)(?:\s*\((.*?)\))?$/);
+                        if (match) {
+                            definition = match[1].trim();
+                            chinese = match[2] ? match[2].trim() : '';
+                        }
+                    }
+                    
+                    processed.push({
+                        word,
+                        definition,
+                        chinese
+                    });
+                });
+            }
+        }
+    } catch (e) {
+        console.warn('Error processing word relationship:', e);
+    }
+    
+    return processed;
+}
+
+// Process learning tips from various formats
+function processLearningTips(word) {
+    try {
+        if (word.learning_tips) {
+            if (typeof word.learning_tips === 'string') {
+                // Handle parentheses format
+                const match = word.learning_tips.match(/^(.*?)(?:\s*\((.*?)\))?$/);
+                if (match) {
+                    return {
+                        tip: match[1].trim(),
+                        chinese: match[2] ? match[2].trim() : ''
+                    };
+                }
+                return { tip: word.learning_tips };
+            } else if (typeof word.learning_tips === 'object') {
+                return {
+                    tip: word.learning_tips.tip || word.learning_tips.english || '',
+                    chinese: word.learning_tips.chinese || ''
+                };
+            }
+        }
+    } catch (e) {
+        console.warn('Error processing learning tips:', e);
+    }
+    
+    return { tip: '', chinese: '' };
+}
+
+// Render example sentences section
+function renderExamples(examples) {
+    if (!examples || examples.length === 0) return '';
+    
+    return `
+        <div class="word-examples">
+            <h3 class="section-title">例句</h3>
+            ${examples.map(example => `
+                <div class="example-item">
+                    <div class="example-english">${example.english}</div>
+                    ${example.chinese ? `<div class="example-chinese">${example.chinese}</div>` : ''}
+                </div>
+            `).join('')}
         </div>
     `;
 }
 
-// Function to update navigation controls for vocabulary
-function updateNavigationControls() {
-    const prevBtn = document.getElementById('prev-word-btn');
-    const nextBtn = document.getElementById('next-word-btn');
+// Render word family section
+function renderWordFamily(wordFamily) {
+    if (!wordFamily || wordFamily.length === 0) return '';
     
-    if (!prevBtn || !nextBtn) return;
-    
-    prevBtn.disabled = currentWordIndex === 0;
-    nextBtn.disabled = currentWordIndex === vocabularyWords.length - 1;
+    return `
+        <div class="word-family">
+            <h3 class="section-title">词族</h3>
+            <div class="word-family-items">
+                ${wordFamily.map(item => `
+                    <span class="word-family-item" title="${item.translation || ''}">
+                        ${item.type ? `<strong>${item.type}:</strong> ` : ''}${item.word}
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+    `;
 }
 
-// Function to navigate between word cards
-function navigateWordCard(direction) {
-    const newIndex = currentWordIndex + direction;
+// Render collocations section
+function renderCollocations(collocations) {
+    if (!collocations || collocations.length === 0) return '';
     
-    if (newIndex >= 0 && newIndex < vocabularyWords.length) {
-        currentWordIndex = newIndex;
-        displayWordCard(currentWordIndex);
-        updateNavigationControls();
-    }
+    return `
+        <div class="collocations">
+            <h3 class="section-title">常见搭配</h3>
+            <div class="collocation-items">
+                ${collocations.map(item => `
+                    <span class="collocation-item" title="${item.translation || ''}">
+                        ${item.phrase}
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// Render synonyms section
+function renderSynonyms(synonyms) {
+    if (!synonyms || synonyms.length === 0) return '';
+    
+    return `
+        <div class="synonyms">
+            <h3 class="section-title">近义词</h3>
+            <div class="synonym-items">
+                ${synonyms.map(syn => `
+                    <div class="synonym-container">
+                        <span class="synonym-word">${syn.word}</span>
+                        ${syn.definition ? `<span class="synonym-def">- ${syn.definition}</span>` : ''}
+                        ${syn.chinese ? `<span class="synonym-chinese">${syn.chinese}</span>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// Render antonyms section
+function renderAntonyms(antonyms) {
+    if (!antonyms || antonyms.length === 0) return '';
+    
+    return `
+        <div class="antonyms">
+            <h3 class="section-title">反义词</h3>
+            <div class="antonym-items">
+                ${antonyms.map(ant => `
+                    <div class="antonym-container">
+                        <span class="antonym-word">${ant.word}</span>
+                        ${ant.definition ? `<span class="antonym-def">- ${ant.definition}</span>` : ''}
+                        ${ant.chinese ? `<span class="antonym-chinese">${ant.chinese}</span>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// Render learning tips section
+function renderLearningTips(tips) {
+    if (!tips || !tips.tip) return '';
+    
+    return `
+        <div class="learning-tips">
+            <h3 class="section-title">记忆技巧</h3>
+            <div class="tip-content">${tips.tip}</div>
+            ${tips.chinese ? `<div class="tip-content-chinese">${tips.chinese}</div>` : ''}
+        </div>
+    `;
 }
