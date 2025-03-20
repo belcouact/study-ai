@@ -4036,8 +4036,8 @@ function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, subm
                         <div class="error-message">
                             <i class="fas fa-exclamation-circle"></i>
                             抱歉，处理您的问题时出现了错误。请重试。
-                        </div>
-                    `;
+            </div>
+        `;
                     showSystemMessage('提交问题时出错，请重试。', 'error');
                 })
                 .finally(() => {
@@ -6068,73 +6068,186 @@ Format the response as a clean JSON array of word objects.`;
 
 // Helper function to parse vocabulary response
 function parseVocabularyResponse(text) {
-    console.log('Parsing vocabulary response:', text);
+    console.log('Parsing vocabulary response, text type:', typeof text);
+    
+    // If text is already an object, just return it if it's an array
+    if (typeof text === 'object' && !text.choices) {
+        if (Array.isArray(text)) {
+            return text;
+        } else if (text.word) {
+            // It's a single word object, wrap it in array
+            return [text];
+        }
+    }
+    
+    if (!text) {
+        console.warn('Empty response text');
+        return getMockVocabularyWords();
+    }
+    
+    // Convert to string if it's an object
+    const textStr = typeof text === 'string' ? text : JSON.stringify(text);
     
     try {
-        // First, handle the case where text might already be parsed JSON
-        if (typeof text === 'object') {
-            if (Array.isArray(text)) {
-                return text; // Already an array of words
-            } else if (text.words && Array.isArray(text.words)) {
-                return text.words; // Object with words array
+        // First try to extract content from API response if it's in that format
+        let jsonText = textStr;
+        
+        if (textStr.includes('choices') && textStr.includes('message')) {
+            try {
+                const apiResponse = JSON.parse(textStr);
+                if (apiResponse.choices && apiResponse.choices[0] && apiResponse.choices[0].message) {
+                    jsonText = apiResponse.choices[0].message.content;
+                    console.log('Extracted content from API response');
+                }
+            } catch (e) {
+                console.warn('Failed to parse API response:', e);
             }
         }
         
-        // Try to find and parse JSON in the response
-        if (typeof text === 'string') {
-            // Check for malformed JSON at the start/end of the string
-            let jsonString = text.trim();
-            
-            // Look for JSON code blocks
-            const jsonMatch = jsonString.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-            if (jsonMatch) {
-                jsonString = jsonMatch[1].trim();
+        // Look for JSON code blocks
+        const codeBlockMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+        if (codeBlockMatch) {
+            jsonText = codeBlockMatch[1].trim();
+            console.log('Extracted JSON from code block');
+        }
+        
+        // Attempt to find an array in the text
+        const arrayMatch = jsonText.match(/\[\s*\{[\s\S]*?\}\s*\]/);
+        if (arrayMatch) {
+            jsonText = arrayMatch[0];
+            console.log('Extracted array from text');
+        }
+        
+        // Try to clean common formatting issues
+        const cleanedJson = cleanJsonString(jsonText);
+        
+        try {
+            // Try parsing the cleaned JSON
+            const parsed = JSON.parse(cleanedJson);
+            if (Array.isArray(parsed)) {
+                console.log('Successfully parsed array with', parsed.length, 'items');
+                return parsed;
+            } else if (parsed.word) {
+                // It's a single word object
+                console.log('Parsed single word object');
+                return [parsed];
             }
+        } catch (parseError) {
+            console.warn('JSON parse error after cleaning:', parseError);
             
-            // Try finding array brackets if no code block is found
-            if (!jsonMatch && jsonString.includes('[') && jsonString.includes(']')) {
-                const startBracket = jsonString.indexOf('[');
-                const endBracket = jsonString.lastIndexOf(']') + 1;
-                if (startBracket < endBracket) {
-                    jsonString = jsonString.substring(startBracket, endBracket);
-                }
-            }
-            
-            // Try parsing the JSON
-            try {
-                const parsed = JSON.parse(jsonString);
-                if (Array.isArray(parsed)) {
-                    console.log('Successfully parsed JSON array:', parsed);
-                    return parsed;
-                } else if (parsed.words && Array.isArray(parsed.words)) {
-                    console.log('Successfully parsed JSON with words property:', parsed.words);
-                    return parsed.words;
-                }
-            } catch (e) {
-                console.warn('JSON parse error:', e);
-                
-                // Try more aggressive cleaning - find anything that looks like a JSON array
-                const arrayMatch = jsonString.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                if (arrayMatch) {
-                    try {
-                        const cleanedJson = arrayMatch[0];
-                        const parsed = JSON.parse(cleanedJson);
-                        if (Array.isArray(parsed)) {
-                            console.log('Successfully parsed cleaned JSON array:', parsed);
-                            return parsed;
-                        }
-                    } catch (innerE) {
-                        console.warn('Cleaned JSON parse error:', innerE);
-                    }
-                }
+            // Try manual extraction of word objects
+            const wordObjects = extractWordObjects(jsonText);
+            if (wordObjects.length > 0) {
+                console.log('Extracted', wordObjects.length, 'word objects manually');
+                return wordObjects;
             }
         }
     } catch (e) {
-        console.warn('Failed to parse JSON from response:', e);
+        console.warn('Error in parseVocabularyResponse:', e);
     }
     
-    // If all parsing attempts fail, return mock data
-    console.warn('Could not parse vocabulary words from response');
+    // If all parsing attempts fail, use mock data
+    console.warn('Could not parse vocabulary words from response, using mock data');
+    return getMockVocabularyWords();
+}
+
+// Helper function to clean JSON string
+function cleanJsonString(jsonStr) {
+    // Make a copy of the string to work with
+    let cleaned = jsonStr.trim();
+    
+    // Remove any trailing characters that aren't part of valid JSON
+    // Find the last closing bracket or brace
+    const lastBracketPos = Math.max(
+        cleaned.lastIndexOf(']'),
+        cleaned.lastIndexOf('}')
+    );
+    
+    if (lastBracketPos > 0) {
+        cleaned = cleaned.substring(0, lastBracketPos + 1);
+    }
+    
+    // Fix unmatched quotes in property values
+    cleaned = cleaned.replace(/:\s*"([^"]*)(?=\s*[,}])/g, ':"$1"');
+    
+    // Fix single quotes used instead of double quotes
+    cleaned = cleaned.replace(/'/g, '"');
+    
+    // Fix trailing commas in arrays and objects
+    cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
+    
+    // If it seems to be an incomplete array of objects, try to complete it
+    if (cleaned.startsWith('{') && !cleaned.endsWith('}')) {
+        cleaned = '[' + cleaned + '}]';
+    }
+    
+    // If it starts with '[{' but doesn't end with '}]', complete it
+    if (cleaned.startsWith('[{') && !cleaned.endsWith('}]')) {
+        cleaned = cleaned + '}]';
+    }
+    
+    // If it's an array of objects but missing the outer brackets
+    if (cleaned.startsWith('{') && cleaned.endsWith('}')) {
+        cleaned = '[' + cleaned + ']';
+    }
+    
+    return cleaned;
+}
+
+// Helper function to manually extract word objects
+function extractWordObjects(text) {
+    const words = [];
+    
+    // Try to find patterns matching word objects
+    const wordPatterns = text.match(/{\s*"word"\s*:\s*"[^"]*"[\s\S]*?(?:}\s*,|\}\s*\])/g);
+    
+    if (wordPatterns) {
+        for (let wordPattern of wordPatterns) {
+            try {
+                // Clean up and parse each word object
+                let cleanedPattern = wordPattern.replace(/}\s*,\s*$/, '}');
+                cleanedPattern = cleanedPattern.replace(/}\s*\]\s*$/, '}');
+                
+                // Try to parse this individual object
+                const wordObj = JSON.parse(cleanedPattern);
+                if (wordObj.word) {
+                    words.push(wordObj);
+                }
+            } catch (e) {
+                console.warn('Failed to parse individual word object:', e);
+                
+                // Create a basic word object from what we can extract
+                const wordMatch = wordPattern.match(/"word"\s*:\s*"([^"]*)"/);
+                const posMatch = wordPattern.match(/"part_of_speech"\s*:\s*"([^"]*)"/);
+                const defMatch = wordPattern.match(/"definition"\s*:\s*"([^"]*)"/);
+                const transMatch = wordPattern.match(/"chinese_translation"\s*:\s*"([^"]*)"/);
+                
+                if (wordMatch) {
+                    const basicWord = {
+                        word: wordMatch[1],
+                        part_of_speech: posMatch ? posMatch[1] : '',
+                        definition: defMatch ? defMatch[1] : '',
+                        chinese_translation: transMatch ? transMatch[1] : ''
+                    };
+                    
+                    // Try to extract example sentences
+                    const examplesMatch = wordPattern.match(/"example_sentences"\s*:\s*(\[[\s\S]*?\])/);
+                    if (examplesMatch) {
+                        try {
+                            const examplesJson = cleanJsonString(examplesMatch[1]);
+                            basicWord.example_sentences = JSON.parse(examplesJson);
+                        } catch (ex) {
+                            basicWord.example_sentences = [];
+                        }
+                    }
+                    
+                    words.push(basicWord);
+                }
+            }
+        }
+    }
+    
+    return words;
 }
 
 // Function to display a vocabulary word card
