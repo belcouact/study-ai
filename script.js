@@ -206,17 +206,67 @@ async function fetchAIResponse(prompt) {
         const data = await response.json();
         console.log('API response:', data);
         return data;
-        
     } catch (error) {
         console.error('Error in fetchAIResponse:', error);
-        throw error; // Re-throw the error to be handled by the caller
-    } finally {
+        
         // Hide loading indicator if it exists
         const loading = document.getElementById('loading');
         if (loading) {
             loading.classList.add('hidden');
         }
+        
+        // Display error in popup
+        showErrorPopup('API 请求错误', error.message);
+        
+        throw error; // Re-throw the error to be handled by the caller
     }
+}
+
+// Add a function to display error popups
+function showErrorPopup(title, message) {
+    // Check if we already have an error popup
+    let errorPopup = document.getElementById('error-popup');
+    
+    // If not, create one
+    if (!errorPopup) {
+        errorPopup = document.createElement('div');
+        errorPopup.id = 'error-popup';
+        errorPopup.className = 'error-popup';
+        document.body.appendChild(errorPopup);
+    }
+    
+    // Set the content of the popup
+    errorPopup.innerHTML = `
+        <div class="error-popup-content">
+            <div class="error-popup-header">
+                <h3>${title}</h3>
+                <button class="error-close-btn">&times;</button>
+            </div>
+            <div class="error-popup-body">
+                <p>${message}</p>
+            </div>
+            <div class="error-popup-footer">
+                <button class="error-ok-btn">确定</button>
+            </div>
+        </div>
+    `;
+    
+    // Show the popup
+    errorPopup.style.display = 'flex';
+    
+    // Add event listeners to close buttons
+    const closeBtn = errorPopup.querySelector('.error-close-btn');
+    const okBtn = errorPopup.querySelector('.error-ok-btn');
+    
+    const closePopup = () => {
+        errorPopup.style.display = 'none';
+    };
+    
+    closeBtn.addEventListener('click', closePopup);
+    okBtn.addEventListener('click', closePopup);
+    
+    // Automatically close the popup after 8 seconds
+    setTimeout(closePopup, 8000);
 }
 
 // Function to extract content from API response
