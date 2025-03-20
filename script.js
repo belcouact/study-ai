@@ -173,6 +173,7 @@ async function fetchAIResponse(prompt, sourceTab = null) {
     try {
         // Store the current active tab if none provided
         const requestSourceTab = sourceTab || getCurrentActiveTab();
+        console.log(`API request from tab: ${requestSourceTab}`);
         
         // Get API settings
         const API_BASE_URL = process.env.API_BASE_URL || 'https://api.deepseek.com';
@@ -202,15 +203,18 @@ async function fetchAIResponse(prompt, sourceTab = null) {
         
         const responseData = await response.json();
         
-        // Check if the source tab is still active before returning
+        // Check if the source tab is still active
         if (requestSourceTab === getCurrentActiveTab()) {
+            console.log('Tab still active, returning response normally');
             return responseData;
         } else {
             // Store the result for later retrieval
             window.pendingResponses = window.pendingResponses || {};
             window.pendingResponses[requestSourceTab] = responseData;
             console.log(`Response stored for tab: ${requestSourceTab} (currently inactive)`);
-            return null; // Return null to indicate response is stored but not processed
+            
+            // Return null to indicate that the response is stored but not processed
+            return null;
         }
     } catch (error) {
         console.error('Error fetching AI response:', error);
@@ -6023,6 +6027,9 @@ async function handleLoadVocabularyClick() {
 // Fetch vocabulary words from API
 async function fetchVocabularyWords(school, grade) {
     try {
+        // Get the current active tab for tracking
+        const sourceTab = getCurrentActiveTab();
+        
         // Create a more detailed prompt for better vocabulary generation
         const prompt = `Generate 10 English vocabulary words appropriate for ${school} school students in grade ${grade}. 
 
@@ -6043,9 +6050,16 @@ Ensure the chosen words are age-appropriate and relevant to the ${grade} grade $
 
 Format the response as a clean JSON array of word objects.`;
         
-        // Use the existing fetchAIResponse function
-        const response = await fetchAIResponse(prompt);
+        // Pass the source tab to fetchAIResponse
+        const response = await fetchAIResponse(prompt, sourceTab);
         console.log('Raw API response for vocabulary:', response);
+        
+        // Check if we're still on the vocabulary tab
+        if (getCurrentActiveTab() !== sourceTab) {
+            console.log('Tab changed during API call, response may be handled later');
+            // We'll let the pending response system handle this
+            return null;
+        }
         
         // Process the response to extract the vocabulary words
         if (response && response.choices && response.choices[0] && response.choices[0].message) {
@@ -6058,12 +6072,12 @@ Format the response as a clean JSON array of word objects.`;
             return parseVocabularyResponse(response);
         } else {
             console.warn('Unexpected API response format:', response);
-            return getMockVocabularyWords();
+            return getEnhancedMockVocabularyWords();
         }
     } catch (error) {
         console.error('Error in fetchVocabularyWords:', error);
         // Return mock data on error for testing
-        return getMockVocabularyWords();
+        return getEnhancedMockVocabularyWords();
     }
 }
 
@@ -6397,5 +6411,173 @@ function navigateWordCard(direction) {
         currentWordIndex = newIndex;
         displayWordCard(currentWordIndex);
         updateNavigationControls();
+    }
+}
+
+// Add this function to detect the currently active tab
+function getCurrentActiveTab() {
+    // Check tab-content elements to determine which one is active/visible
+    const vocabularyContent = document.getElementById('vocabulary-content');
+    if (vocabularyContent && vocabularyContent.style.display === 'block') {
+        return 'vocabulary';
+    }
+    
+    // Check if poetry container is in the DOM and visible
+    const poetryContainer = document.getElementById('poetry-container');
+    if (poetryContainer && !poetryContainer.classList.contains('hidden') && 
+        poetryContainer.parentNode) {
+        return 'poetry';
+    }
+    
+    // Check if qa container is in the DOM and visible
+    const qaContainer = document.getElementById('qa-container');
+    if (qaContainer && qaContainer.parentNode) {
+        return 'qa';
+    }
+    
+    // Check if create container is in the DOM and visible
+    const createContainer = document.getElementById('create-container');
+    if (createContainer && createContainer.parentNode) {
+        return 'create';
+    }
+    
+    // Also check for other tab content elements
+    const tabContents = document.querySelectorAll('.tab-content');
+    for (const content of tabContents) {
+        if (content.classList.contains('active') || content.style.display === 'block') {
+            // Extract tab name from the content ID (format: "tabname-content")
+            const tabName = content.id.replace('-content', '');
+            if (tabName) return tabName;
+        }
+    }
+    
+    // Check which tab is marked as active in the tab container
+    const activeTab = document.querySelector('.tab.active');
+    if (activeTab && activeTab.dataset.tab) {
+        return activeTab.dataset.tab;
+    }
+    
+    // Default fallback
+    return 'unknown';
+}
+
+// Update handleTabSwitch to check for pending responses (around line 5216)
+function handleTabSwitch(containerType) {
+    console.log('Switching to tab:', containerType);
+    
+    // First, hide all containers
+    if (qaContainer && qaContainer.parentNode) {
+        qaContainer.parentNode.removeChild(qaContainer);
+    }
+    
+    if (createContainer && createContainer.parentNode) {
+        createContainer.parentNode.removeChild(createContainer);
+    }
+    
+    if (poetryContainer && poetryContainer.parentNode) {
+        poetryContainer.parentNode.removeChild(poetryContainer);
+    }
+    
+    // Hide all tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    // Reset active states for sidebar buttons
+    if (qaButton) qaButton.classList.remove('active');
+    if (createButton) createButton.classList.remove('active');
+    if (poetryButton) poetryButton.classList.remove('active');
+    const wordButton = document.getElementById('word-button');
+    if (wordButton) wordButton.classList.remove('active');
+    
+    // Set the appropriate button active based on containerType
+    if (containerType === 'qa' && qaButton) {
+        qaButton.classList.add('active');
+        contentArea.appendChild(qaContainer);
+    } else if (containerType === 'create' && createButton) {
+        createButton.classList.add('active');
+        contentArea.appendChild(createContainer);
+    } else if (containerType === 'poetry' && poetryButton) {
+        poetryButton.classList.add('active');
+        contentArea.appendChild(poetryContainer);
+    } else if (containerType === 'vocabulary') {
+        // Show vocabulary content
+        const vocabularyContent = document.getElementById('vocabulary-content');
+        if (vocabularyContent) {
+            vocabularyContent.style.display = 'block';
+            if (wordButton) wordButton.classList.add('active');
+        }
+    }
+    
+    // Also handle tab selection for any tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.tab === containerType) {
+            tab.classList.add('active');
+        }
+    });
+    
+    // Show tab content if it exists
+    if (containerType !== 'vocabulary' && containerType !== 'qa' && 
+        containerType !== 'create' && containerType !== 'poetry') {
+        const tabContent = document.getElementById(`${containerType}-content`);
+        if (tabContent) {
+            tabContent.style.display = 'block';
+        }
+    }
+    
+    // Check for pending responses for this tab
+    checkForPendingResponses(containerType);
+    
+    // Always update the UI state
+    if (typeof handleResize === 'function') handleResize();
+    if (typeof resetContentArea === 'function') resetContentArea();
+}
+
+// Add this function to check for pending responses
+function checkForPendingResponses(tabName) {
+    // Check if there are pending responses for this tab
+    if (window.pendingResponses && window.pendingResponses[tabName]) {
+        console.log(`Found pending response for tab: ${tabName}`);
+        const response = window.pendingResponses[tabName];
+        delete window.pendingResponses[tabName];
+        
+        // Process the response based on tab type
+        if (tabName === 'vocabulary') {
+            processPendingVocabularyResponse(response);
+        } else if (tabName === 'poetry') {
+            // Handle poetry response if needed
+            console.log('Pending poetry response found, processing...');
+            // Add poetry handling code here if needed
+        } else if (tabName === 'create' || tabName === 'qa') {
+            // Handle other tab responses if needed
+            console.log(`Pending ${tabName} response found, processing...`);
+            // Add other response handling code here if needed
+        }
+    }
+}
+
+// Add this function to process vocabulary responses
+function processPendingVocabularyResponse(response) {
+    // Handle vocabulary response
+    console.log('Processing pending vocabulary response');
+    if (response && response.choices && response.choices[0] && response.choices[0].message) {
+        const messageContent = response.choices[0].message.content;
+        const words = parseVocabularyResponse(messageContent);
+        
+        if (words && words.length > 0) {
+            vocabularyWords = words;
+            currentWordIndex = 0;
+            displayWordCard(currentWordIndex);
+            updateNavigationControls();
+            
+            // Update load button state
+            const loadBtn = document.getElementById('load-vocabulary-btn');
+            if (loadBtn) {
+                loadBtn.disabled = false;
+                loadBtn.innerHTML = '加载词汇';
+                loadBtn.classList.remove('loading');
+            }
+        }
     }
 }
