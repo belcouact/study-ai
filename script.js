@@ -5251,24 +5251,21 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (containerType === 'create' && createButton) {
             createButton.classList.add('active');
             contentArea.appendChild(createContainer);
+            
+            // Add the welcome message to the create page if needed
+            setTimeout(() => {
+                initializeCreatePage();
+            }, 100);
+            
         } else if (containerType === 'poetry' && poetryButton) {
             poetryButton.classList.add('active');
             contentArea.appendChild(poetryContainer);
-        } else if (containerType === 'vocabulary' && wordButton) {
-            wordButton.classList.add('active');
-            
+        } else if (containerType === 'vocabulary') {
             // Show vocabulary content
             const vocabularyContent = document.getElementById('vocabulary-content');
             if (vocabularyContent) {
                 vocabularyContent.style.display = 'block';
-            } else {
-                console.warn('Vocabulary content not found!');
-                // Create it if it doesn't exist
-                ensureVocabularyTabSetup();
-                const newVocabularyContent = document.getElementById('vocabulary-content');
-                if (newVocabularyContent) {
-                    newVocabularyContent.style.display = 'block';
-                }
+                if (wordButton) wordButton.classList.add('active');
             }
         }
         
@@ -5279,15 +5276,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 tab.classList.add('active');
             }
         });
-        
-        // Show tab content if it exists
-        if (containerType !== 'vocabulary' && containerType !== 'qa' && 
-            containerType !== 'create' && containerType !== 'poetry') {
-            const tabContent = document.getElementById(`${containerType}-content`);
-            if (tabContent) {
-                tabContent.style.display = 'block';
-            }
-        }
         
         // Always update the UI state
         if (typeof handleResize === 'function') handleResize();
@@ -6475,64 +6463,89 @@ function navigateWordCard(direction) {
 
 // Add this function to display an initial welcome message on the create page
 function initializeCreatePage() {
+    console.log("Initializing create page with welcome message");
     const createContainer = document.getElementById('create-container');
-    if (!createContainer) return;
     
-    // Check if we already have content in the container
-    if (createContainer.querySelector('.content-area') || 
-        createContainer.querySelector('.initial-message')) {
+    if (!createContainer) {
+        console.warn("Create container not found");
         return;
     }
     
-    // Create and add the initial welcome message
+    // Make sure we don't already have content in the container
+    if (createContainer.querySelector('.content-area') || 
+        createContainer.querySelector('.question-form-container') ||
+        createContainer.querySelector('.create-welcome')) {
+        console.log("Create page already has content, skipping welcome message");
+        return;
+    }
+    
+    // Clear any existing content
+    createContainer.innerHTML = '';
+    
+    // Create and add the initial welcome message without the start button
     const initialMessage = document.createElement('div');
     initialMessage.className = 'initial-message create-welcome';
     initialMessage.innerHTML = `
         <div class="welcome-icon">
             <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#3498db" stroke-width="2"/>
-                <path d="M8 12L11 15L16 9" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9 7H5C3.89543 7 3 7.89543 3 9V18C3 19.1046 3.89543 20 5 20H19C20.1046 20 21 19.1046 21 18V9C21 7.89543 20.1046 7 19 7H15" stroke="#3498db" stroke-width="2" stroke-linecap="round"/>
+                <path d="M12 15L12 3M12 3L9 6M12 3L15 6" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </div>
-        <h2>创建教育内容</h2>
-        <p>欢迎使用内容创建工具！您可以在这里创建各种教育资源，包括教案、练习题和学习材料。</p>
+        <h2>创建考试试题</h2>
+        <p>欢迎使用试题创建工具！您可以在这里快速生成适合学生水平的测试题，包括选择题、填空题和解答题等多种题型。</p>
         <div class="steps-container">
             <div class="step-item">
                 <div class="step-number">1</div>
                 <div class="step-content">
                     <h4>选择教育背景</h4>
-                    <p>在侧边栏中选择学校类型、年级和学科</p>
+                    <p>在侧边栏中选择学校类型、年级和学科，确保生成的试题符合学生水平</p>
                 </div>
             </div>
             <div class="step-item">
                 <div class="step-number">2</div>
                 <div class="step-content">
-                    <h4>指定内容要求</h4>
-                    <p>填写您需要创建的内容类型和具体要求</p>
+                    <h4>设置试题要求</h4>
+                    <p>指定题型、数量、难度及知识点等详细要求</p>
                 </div>
             </div>
             <div class="step-item">
                 <div class="step-number">3</div>
                 <div class="step-content">
-                    <h4>生成并优化</h4>
-                    <p>系统将生成内容，您可以进一步调整和优化</p>
+                    <h4>生成和调整</h4>
+                    <p>系统将生成试题，您可以进一步优化并下载使用</p>
                 </div>
             </div>
         </div>
-        <button id="start-creating-btn" class="create-start-btn">开始创建</button>
     `;
     
+    // Append to the container
     createContainer.appendChild(initialMessage);
     
-    // Add event listener to the start creating button
-    const startCreatingBtn = document.getElementById('start-creating-btn');
-    if (startCreatingBtn) {
-        startCreatingBtn.addEventListener('click', function() {
-            initialMessage.style.display = 'none';
-            // Call the existing function to initialize the form
-            if (typeof initializeFormLayout === 'function') {
-                initializeFormLayout();
-            }
-        });
+    // Initialize the form layout automatically without button click
+    // Call after a short delay to ensure smooth rendering
+    setTimeout(() => {
+        if (typeof initializeFormLayout === 'function') {
+            console.log("Auto-initializing form layout");
+            initializeFormLayout();
+        } else {
+            console.warn("initializeFormLayout function not found");
+        }
+    }, 200);
+}
+
+// Add this to the setupEventListeners function to initialize create page when loaded directly
+function setupEventListeners() {
+    // ... existing code ...
+    
+    // Initialize create page with welcome message if we're on the create page
+    if (document.getElementById('create-container') && 
+        document.querySelector('.tab[data-tab="create"].active')) {
+        console.log("Create tab is active, initializing welcome message");
+        setTimeout(() => {
+            initializeCreatePage();
+        }, 100);
     }
+    
+    // ... rest of existing code ...
 }
