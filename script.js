@@ -169,8 +169,7 @@ async function fetchAIResponse(prompt) {
         }
         
         // Make the actual API call using the current API function and model
-        // const apiEndpoint = `/api/${currentApiFunction}`;
-        const apiEndpoint = "https://ark.cn-beijing.volces.com/api/v3";
+        const apiEndpoint = `/api/${currentApiFunction}`;
         const response = await fetch(apiEndpoint, {
             method: 'POST',
             headers: {
