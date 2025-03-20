@@ -170,6 +170,8 @@ function parseQuestionsFromResponse(response) {
 
 // Global function to fetch AI response for question generation
 async function fetchAIResponse(prompt) {
+    console.log('Fetching AI response with prompt:', prompt);
+    
     try {
         // Show loading indicator if it exists
         const loading = document.getElementById('loading');
@@ -177,11 +179,12 @@ async function fetchAIResponse(prompt) {
             loading.classList.remove('hidden');
         }
         
-        const response = await fetch(API_URL, {
+        // Make the actual API call using the current API function and model
+        const apiEndpoint = `/api/${currentApiFunction}`;
+        const response = await fetch(apiEndpoint, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${API_KEY}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 messages: [
@@ -197,10 +200,7 @@ async function fetchAIResponse(prompt) {
         });
         
         if (!response.ok) {
-            const errorMessage = `API call failed with status: ${response.status}`;
-            // Show error popup using the existing showSystemMessage function
-            showSystemMessage(errorMessage, 'error');
-            throw new Error(errorMessage);
+            throw new Error(`API call failed with status: ${response.status}`);
         }
         
         const data = await response.json();
@@ -209,16 +209,6 @@ async function fetchAIResponse(prompt) {
         
     } catch (error) {
         console.error('Error in fetchAIResponse:', error);
-        
-        // Display error popup
-        let errorMessage = 'An error occurred while fetching the AI response.';
-        if (error.message) {
-            errorMessage += ` ${error.message}`;
-        }
-        
-        // Show error popup using the existing showSystemMessage function
-        showSystemMessage(errorMessage, 'error');
-        
         throw error; // Re-throw the error to be handled by the caller
     } finally {
         // Hide loading indicator if it exists
