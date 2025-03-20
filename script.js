@@ -6043,11 +6043,10 @@ For each word, please provide the following details in a structured JSON format:
 4. definition: Clear and concise English definition suitable for ${grade} grade ${school} students
 5. chinese_translation: The Chinese translation of the word
 6. example_sentences: Two example sentences showing practical usage of the word (with Chinese translation)
-7. word_family: Related words from the same word family (e.g., nouns, verbs, adjectives derived from the same root, with Chinese translation)
-8. common_collocations: Common phrases or expressions that use this word, with Chinese translation
-9. synonyms: 2-3 synonyms with simple definitions, with Chinese translation
-10. antonyms: 2-3 antonyms with simple definitions (if applicable), with Chinese translation
-11. learning_tips: A memory tip or learning strategy to help remember the word, with Chinese translation
+7. common_collocations: Common phrases or expressions that use this word, with Chinese translation
+8. synonyms: 2-3 synonyms with simple definitions, with Chinese translation
+9. antonyms: 2-3 antonyms with simple definitions (if applicable), with Chinese translation
+10. learning_tips: A memory tip or learning strategy to help remember the word, with Chinese translation
 
 Ensure the chosen words are age-appropriate and relevant to the ${grade} grade ${school} curriculum.
 
@@ -6145,8 +6144,8 @@ function parseVocabularyResponse(text) {
     }
     
     // If all parsing attempts fail, return mock data
-    console.warn('Could not parse vocabulary words from response, using mock data');
-    return getEnhancedMockVocabularyWords();
+    console.warn('Could not parse vocabulary words from response');
+    // return getEnhancedMockVocabularyWords();
 }
 
 // Updated mock data function with enhanced word structure
