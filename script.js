@@ -6316,24 +6316,31 @@ function displayWordCard(index) {
             
             <div class="word-examples">
                 <h3 class="section-title">例句</h3>
-                ${examples.map((example, i) => {
+                ${examples.length > 0 ? examples.map((example, i) => {
+                    let englishPart = '';
+                    let chinesePart = '';
+                    
                     if (typeof example === 'string') {
-                        const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
-                        return `
-                            <div class="example-item">
-                                <div class="example-english">${parts[0] || example}</div>
-                                <div class="example-chinese">${parts[1] || ''}</div>
-                            </div>
-                        `;
-                    } else {
-                        return `
-                            <div class="example-item">
-                                <div class="example-english">${example.english || ''}</div>
-                                <div class="example-chinese">${example.chinese || ''}</div>
-                            </div>
-                        `;
+                        // Try to split the string by looking for Chinese characters
+                        const match = example.match(/^(.*?)(?=[\u4e00-\u9fa5]|$)([\u4e00-\u9fa5].*)?$/);
+                        if (match) {
+                            englishPart = match[1] ? match[1].trim() : example;
+                            chinesePart = match[2] ? match[2].trim() : '';
+                        } else {
+                            englishPart = example;
+                        }
+                    } else if (example && typeof example === 'object') {
+                        englishPart = example.english || example.sentence || '';
+                        chinesePart = example.chinese || example.translation || '';
                     }
-                }).join('')}
+                    
+                    return `
+                        <div class="example-item">
+                            <div class="example-english">${englishPart}</div>
+                            ${chinesePart ? `<div class="example-chinese">${chinesePart}</div>` : ''}
+                        </div>
+                    `;
+                }).join('') : `<div class="no-examples">No example sentences available</div>`}
             </div>
             
             ${collocations.length > 0 ? `
