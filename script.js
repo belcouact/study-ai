@@ -6131,411 +6131,242 @@ async function fetchVocabularyWords(school, grade) {
 
 // Optimize JSON parsing with error handling and caching
 function parseVocabularyResponse(text) {
-    console.log('Parsing vocabulary response:', text);
+    console.log('Parsing vocabulary response');
     
     try {
-        // First, handle the case where text might already be parsed JSON
+        // Handle already parsed objects
         if (typeof text === 'object') {
-            if (Array.isArray(text)) {
-                return text; // Already an array of words
-            } else if (text.words && Array.isArray(text.words)) {
-                return text.words; // Object with words array
+            if (Array.isArray(text)) return text;
+            if (text.words && Array.isArray(text.words)) return text.words;
+            return getEnhancedMockVocabularyWords();
+        }
+        
+        // For string responses, try to extract and fix JSON
+        if (typeof text === 'string') {
+            // Try to fix common JSON syntax errors
+            let jsonString = text.trim();
+            
+            // Fix mismatched brackets in word_family (the specific error you encountered)
+            jsonString = jsonString.replace(/"word_family"\s*:\s*\{([^}]*)\]/g, '"word_family": {$1}');
+            
+            // Fix other common errors
+            jsonString = jsonString.replace(/,\s*\}/g, '}'); // Remove trailing commas
+            jsonString = jsonString.replace(/\}\s*\{/g, '},{'); // Add comma between objects in array
+            
+            // Try direct JSON parse first with the fixed string
+            try {
+                const parsed = JSON.parse(jsonString);
+                if (Array.isArray(parsed)) return parsed;
+                if (parsed.words && Array.isArray(parsed.words)) return parsed.words;
+            } catch (e) {
+                console.warn('Initial JSON parse error:', e);
+                
+                // Try to extract JSON from markdown code blocks or find array pattern
+                const jsonMatch = jsonString.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || 
+                                jsonString.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                
+                if (jsonMatch) {
+                    try {
+                        let extracted = jsonMatch[1] || jsonMatch[0];
+                        // Apply the same fixes to the extracted JSON
+                        extracted = extracted.replace(/"word_family"\s*:\s*\{([^}]*)\]/g, '"word_family": {$1}');
+                        extracted = extracted.replace(/,\s*\}/g, '}');
+                        extracted = extracted.replace(/\}\s*\{/g, '},{');
+                        
+                        const parsed = JSON.parse(extracted.trim());
+                        if (Array.isArray(parsed)) return parsed;
+                        if (parsed.words && Array.isArray(parsed.words)) return parsed.words;
+                    } catch (innerErr) {
+                        console.warn('Cleaned JSON parse error:', innerErr);
+                        
+                        // Final attempt: try a more manual approach to fix the JSON
+                        try {
+                            const manuallyFixedJson = manuallyFixJson(jsonMatch[1] || jsonMatch[0]);
+                            const parsed = JSON.parse(manuallyFixedJson);
+                            if (Array.isArray(parsed)) return parsed;
+                            if (parsed.words && Array.isArray(parsed.words)) return parsed.words;
+                        } catch (finalErr) {
+                            console.error('Manual JSON fix failed:', finalErr);
+                        }
+                    }
+                }
+            }
+            
+            // If all parsing attempts fail, try to reconstruct the words manually
+            try {
+                return extractVocabularyManually(jsonString);
+            } catch (extractErr) {
+                console.error('Manual extraction failed:', extractErr);
             }
         }
         
-        // Try to find and parse JSON in the response
-        if (typeof text === 'string') {
-            // Check for malformed JSON at the start/end of the string
-            let jsonString = text.trim();
-            
-            // Look for JSON code blocks
-            const jsonMatch = jsonString.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-            if (jsonMatch) {
-                jsonString = jsonMatch[1].trim();
+        // Fallback to mock data if all else fails
+        console.warn('Could not parse vocabulary words from response, using mock data');
+        return getEnhancedMockVocabularyWords();
+    } catch (error) {
+        console.error('Error in parseVocabularyResponse:', error);
+        return getEnhancedMockVocabularyWords();
+    }
+}
+
+// Helper function to manually fix JSON with common syntax errors
+function manuallyFixJson(jsonStr) {
+    // Replace all instances of wrong bracket combinations
+    let fixed = jsonStr;
+    
+    // Fix word_family issue (] instead of })
+    fixed = fixed.replace(/"word_family"\s*:\s*\{([^}]*)\]/g, '"word_family": {$1}');
+    
+    // Balance brackets and braces
+    const bracketStack = [];
+    const fixedChars = [];
+    const openings = {'(': ')', '[': ']', '{': '}'};
+    const closings = {')': '(', ']': '[', '}': '{'};
+    
+    for (let i = 0; i < fixed.length; i++) {
+        const char = fixed[i];
+        if (char in openings) {
+            bracketStack.push(char);
+            fixedChars.push(char);
+        } else if (char in closings) {
+            if (bracketStack.length === 0) {
+                // Skip unmatched closing bracket
+                continue;
             }
             
-            // Try finding array brackets if no code block is found
-            if (!jsonMatch && jsonString.includes('[') && jsonString.includes(']')) {
-                const startBracket = jsonString.indexOf('[');
-                const endBracket = jsonString.lastIndexOf(']') + 1;
-                if (startBracket < endBracket) {
-                    jsonString = jsonString.substring(startBracket, endBracket);
-                }
+            const lastOpening = bracketStack.pop();
+            if (closings[char] !== lastOpening) {
+                // Replace with correct closing bracket
+                fixedChars.push(openings[lastOpening]);
+                bracketStack.push(lastOpening); // Put it back, we didn't use it
+            } else {
+                fixedChars.push(char);
             }
+        } else {
+            fixedChars.push(char);
+        }
+    }
+    
+    // Add any missing closing brackets
+    while (bracketStack.length > 0) {
+        const lastOpening = bracketStack.pop();
+        fixedChars.push(openings[lastOpening]);
+    }
+    
+    fixed = fixedChars.join('');
+    
+    // Fix other common issues
+    fixed = fixed.replace(/,\s*\}/g, '}'); // Remove trailing commas
+    fixed = fixed.replace(/\}\s*\{/g, '},{'); // Add comma between objects in array
+    fixed = fixed.replace(/,\s*,/g, ','); // Remove duplicate commas
+    fixed = fixed.replace(/"\s*:/g, '":'); // Fix spacing around colons
+    fixed = fixed.replace(/:\s*"/g, ':"'); // Fix spacing around colons
+    
+    return fixed;
+}
+
+// Helper function to manually extract vocabulary words when JSON parsing fails
+function extractVocabularyManually(text) {
+    const words = [];
+    
+    // Look for word patterns in the text
+    const wordSections = text.split(/\{[^{]*"word":/g);
+    
+    for (let i = 1; i < wordSections.length; i++) { // Skip the first split which might be empty
+        const section = '{' + wordSections[i]; // Add back the opening brace
+        
+        try {
+            // Extract individual fields using regex
+            const wordMatch = section.match(/"word"\s*:\s*"([^"]*)"/);
+            const posMatch = section.match(/"part_of_speech"\s*:\s*"([^"]*)"/);
+            const pronMatch = section.match(/"pronunciation"\s*:\s*"([^"]*)"/);
+            const defMatch = section.match(/"definition"\s*:\s*"([^"]*)"/);
+            const chineseMatch = section.match(/"chinese_translation"\s*:\s*"([^"]*)"/);
             
-            // Try parsing the JSON
-            try {
-                const parsed = JSON.parse(jsonString);
-                if (Array.isArray(parsed)) {
-                    console.log('Successfully parsed JSON array:', parsed);
-                    return parsed;
-                } else if (parsed.words && Array.isArray(parsed.words)) {
-                    console.log('Successfully parsed JSON with words property:', parsed.words);
-                    return parsed.words;
-                }
-            } catch (e) {
-                console.warn('JSON parse error:', e);
+            if (wordMatch) {
+                const word = {
+                    word: wordMatch[1],
+                    part_of_speech: posMatch ? posMatch[1] : '',
+                    pronunciation: pronMatch ? pronMatch[1] : '',
+                    definition: defMatch ? defMatch[1] : '',
+                    chinese_translation: chineseMatch ? chineseMatch[1] : '',
+                    example_sentences: extractExampleSentences(section),
+                    word_family: {},
+                    common_collocations: extractArrayItems(section, 'common_collocations'),
+                    synonyms: extractArrayItems(section, 'synonyms'),
+                    antonyms: extractArrayItems(section, 'antonyms'),
+                    learning_tips: extractStringField(section, 'learning_tips')
+                };
                 
-                // Try more aggressive cleaning - find anything that looks like a JSON array
-                const arrayMatch = jsonString.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                if (arrayMatch) {
-                    try {
-                        const cleanedJson = arrayMatch[0];
-                        const parsed = JSON.parse(cleanedJson);
-                        if (Array.isArray(parsed)) {
-                            console.log('Successfully parsed cleaned JSON array:', parsed);
-                            return parsed;
-                        }
-                    } catch (innerE) {
-                        console.warn('Cleaned JSON parse error:', innerE);
+                // Extract word family
+                const wordFamilyMatch = section.match(/"word_family"\s*:\s*\{([^}]*)\}/);
+                if (wordFamilyMatch) {
+                    const familyStr = wordFamilyMatch[1];
+                    const familyPairs = familyStr.match(/"([^"]*)"\s*:\s*"([^"]*)"/g);
+                    
+                    if (familyPairs) {
+                        familyPairs.forEach(pair => {
+                            const keyValue = pair.match(/"([^"]*)"\s*:\s*"([^"]*)"/);
+                            if (keyValue) {
+                                word.word_family[keyValue[1]] = keyValue[2];
+                            }
+                        });
                     }
                 }
-            }
-        }
-    } catch (e) {
-        console.warn('Failed to parse JSON from response:', e);
-    }
-    
-    // If all parsing attempts fail, return mock data
-    console.warn('Could not parse vocabulary words from response, using mock data');
-}
-
-// Function to display a vocabulary word card
-function displayWordCard(index) {
-    const vocabularyContainer = document.getElementById('vocabulary-container');
-    const word = vocabularyWords[index];
-    
-    if (!word) {
-        vocabularyContainer.innerHTML = '<div class="initial-message">无单词数据</div>';
-        return;
-    }
-    
-    // Extract all fields from the word object
-    const english = word.word || word.english || '';
-    const form = word.part_of_speech || word.form || 'n/a';
-    const pronunciation = word.pronunciation || '';
-    const englishDef = word.definition || word.english_definition || word.englishMeaning || '';
-    const chineseTrans = word.chinese_translation || word.chineseMeaning || '';
-    
-    // Handle word family properly
-    let wordFamily = [];
-    if (word.word_family) {
-        if (Array.isArray(word.word_family)) {
-            // For array of strings or objects
-            wordFamily = word.word_family;
-        } else if (typeof word.word_family === 'object') {
-            // For object with key-value pairs
-            wordFamily = Object.entries(word.word_family).map(([key, value]) => {
-                return { word: key, translation: value };
-            });
-        }
-    }
-    
-    // Handle collocations properly
-    let collocations = [];
-    if (word.common_collocations) {
-        if (Array.isArray(word.common_collocations)) {
-            // For array of strings or objects
-            collocations = word.common_collocations;
-        } else if (typeof word.common_collocations === 'object') {
-            // For object with key-value pairs
-            collocations = Object.entries(word.common_collocations).map(([key, value]) => {
-                return { phrase: key, translation: value };
-            });
-        }
-    }
-    
-    // Handle synonyms properly
-    let synonyms = [];
-    if (word.synonyms) {
-        if (Array.isArray(word.synonyms)) {
-            synonyms = word.synonyms;
-        } else if (typeof word.synonyms === 'object') {
-            synonyms = Object.entries(word.synonyms).map(([key, value]) => {
-                return { word: key, definition: value };
-            });
-        }
-    }
-    
-    // Handle antonyms properly
-    let antonyms = [];
-    if (word.antonyms) {
-        if (Array.isArray(word.antonyms)) {
-            antonyms = word.antonyms;
-        } else if (typeof word.antonyms === 'object') {
-            antonyms = Object.entries(word.antonyms).map(([key, value]) => {
-                return { word: key, definition: value };
-            });
-        }
-    }
-    
-    // Get learning tips
-    const learningTips = word.learning_tips || '';
-    
-    // Handle examples in different formats
-    let examples = [];
-    if (word.example_sentences && Array.isArray(word.example_sentences)) {
-        examples = word.example_sentences.map(example => {
-            if (typeof example === 'string') {
-                const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
-                if (parts.length >= 2) {
-                    return {
-                        english: parts[0].trim(),
-                        chinese: parts[1].trim()
-                    };
-                }
-                return { english: example, chinese: '' };
-            }
-            return example;
-        });
-    } else if (word.examples && Array.isArray(word.examples)) {
-        examples = word.examples;
-    }
-    
-    // Create the card with enhanced structure
-    const cardHTML = `
-        <div class="word-card">
-            <div class="word-header">
-                <div class="word-english">${english}</div>
-                <div class="word-details">
-                    <span class="word-form">${form}</span>
-                    ${pronunciation ? `<span class="word-pronunciation">${pronunciation}</span>` : ''}
-                </div>
-            </div>
-            
-            <div class="word-meanings">
-                <div class="meaning-row">
-                    <div class="meaning-label">英文释义:</div>
-                    <div class="meaning-content">${englishDef}</div>
-                </div>
-                <div class="meaning-row">
-                    <div class="meaning-label">中文释义:</div>
-                    <div class="meaning-content">${chineseTrans}</div>
-                </div>
-            </div>
-            
-            <div class="word-examples">
-                <h3 class="section-title">例句</h3>
-                ${examples.map((example, i) => {
-                    if (typeof example === 'string') {
-                        const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
-                        return `
-                            <div class="example-item">
-                                <div class="example-english">${parts[0] || example}</div>
-                                <div class="example-chinese">${parts[1] || ''}</div>
-                            </div>
-                        `;
-                    } else {
-                        return `
-                            <div class="example-item">
-                                <div class="example-english">${example.english || ''}</div>
-                                <div class="example-chinese">${example.chinese || ''}</div>
-                            </div>
-                        `;
-                    }
-                }).join('')}
-            </div>
-            
-            ${wordFamily.length > 0 ? `
-                <div class="word-family">
-                    <h3 class="section-title">词族</h3>
-                    <div class="word-family-items">
-                        ${wordFamily.map(item => {
-                            if (typeof item === 'string') {
-                                return `<span class="word-family-item">${item}</span>`;
-                            } else {
-                                return `<span class="word-family-item" title="${item.translation || ''}">${item.word || item}</span>`;
-                            }
-                        }).join('')}
-                    </div>
-                </div>
-            ` : ''}
-            
-            ${collocations.length > 0 ? `
-                <div class="collocations">
-                    <h3 class="section-title">常见搭配</h3>
-                    <div class="collocation-items">
-                        ${collocations.map(item => {
-                            if (typeof item === 'string') {
-                                return `<span class="collocation-item">${item}</span>`;
-                            } else {
-                                return `<span class="collocation-item" title="${item.translation || ''}">${item.phrase || item}</span>`;
-                            }
-                        }).join('')}
-                    </div>
-                </div>
-            ` : ''}
-            
-            <div class="word-relationships">
-                ${synonyms.length > 0 ? `
-                    <div class="synonyms">
-                        <h3 class="section-title">近义词</h3>
-                        <div class="synonym-items">
-                            ${synonyms.map(syn => {
-                                if (typeof syn === 'string') {
-                                    return `<span class="synonym-item">${syn}</span>`;
-                                } else if (syn.word) {
-                                    return `<div class="synonym-container">
-                                        <span class="synonym-word">${syn.word}</span>
-                                        ${syn.definition ? `<span class="synonym-def">- ${syn.definition}</span>` : ''}
-                                    </div>`;
-                                } else {
-                                    return '';
-                                }
-                            }).join('')}
-                        </div>
-                    </div>
-                ` : ''}
                 
-                ${antonyms.length > 0 ? `
-                    <div class="antonyms">
-                        <h3 class="section-title">反义词</h3>
-                        <div class="antonym-items">
-                            ${antonyms.map(ant => {
-                                if (typeof ant === 'string') {
-                                    return `<span class="antonym-item">${ant}</span>`;
-                                } else if (ant.word) {
-                                    return `<div class="antonym-container">
-                                        <span class="antonym-word">${ant.word}</span>
-                                        ${ant.definition ? `<span class="antonym-def">- ${ant.definition}</span>` : ''}
-                                    </div>`;
-                                } else {
-                                    return '';
-                                }
-                            }).join('')}
-                        </div>
-                    </div>
-                ` : ''}
-            </div>
-            
-            ${learningTips ? `
-                <div class="learning-tips">
-                    <h3 class="section-title">记忆技巧</h3>
-                    <div class="tip-content">${learningTips}</div>
-                </div>
-            ` : ''}
-        </div>
-    `;
-    
-    vocabularyContainer.innerHTML = cardHTML;
-    
-    // Update counter
-    document.getElementById('word-counter').textContent = `${index + 1}/${vocabularyWords.length}`;
-}
-
-// Function to show error messages in the vocabulary container
-function showVocabularyError(message) {
-    const vocabularyContainer = document.getElementById('vocabulary-container');
-    vocabularyContainer.innerHTML = `
-        <div class="error-message">
-            <p>${message}</p>
-            <p>请稍后再试</p>
-        </div>
-    `;
-}
-
-// Function to update navigation controls for vocabulary
-function updateNavigationControls() {
-    const prevBtn = document.getElementById('prev-word-btn');
-    const nextBtn = document.getElementById('next-word-btn');
-    
-    if (!prevBtn || !nextBtn) return;
-    
-    prevBtn.disabled = currentWordIndex === 0;
-    nextBtn.disabled = currentWordIndex === vocabularyWords.length - 1;
-}
-
-// Function to navigate between word cards
-function navigateWordCard(direction) {
-    const newIndex = currentWordIndex + direction;
-    
-    if (newIndex >= 0 && newIndex < vocabularyWords.length) {
-        currentWordIndex = newIndex;
-        displayWordCard(currentWordIndex);
-        updateNavigationControls();
-    }
-}
-
-// Lazy load components that aren't needed immediately
-function initPage() {
-    // Initial setup for visible components
-    
-    // Lazy load other components
-    setTimeout(() => {
-        // Load non-critical components
-        setupPoetryFeatures();
-        setupVocabularyFeatures();
-    }, 100);
-}
-
-// Unified tab switching function
-function handleTabSwitch(containerType) {
-    console.log('Switching to tab:', containerType);
-    
-    // Hide all content containers
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.style.display = 'none';
-    });
-    
-    // Remove containers that should be completely removed
-    const containersToRemove = ['qaContainer', 'createContainer'];
-    containersToRemove.forEach(containerName => {
-        if (window[containerName] && window[containerName].parentNode) {
-            window[containerName].parentNode.removeChild(window[containerName]);
+                words.push(word);
+            }
+        } catch (e) {
+            console.warn('Error extracting word manually:', e);
         }
-    });
-    
-    // Reset active states for all buttons
-    document.querySelectorAll('.panel-button').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    // Set the active tab
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-        if (tab.dataset.tab === containerType) {
-            tab.classList.add('active');
-        }
-    });
-    
-    // Show the appropriate content
-    switch(containerType) {
-        case 'qa':
-            if (window.qaContainer && window.contentArea) {
-                contentArea.appendChild(qaContainer);
-            }
-            if (window.qaButton) qaButton.classList.add('active');
-            break;
-        case 'create':
-            if (window.createContainer && window.contentArea) {
-                contentArea.appendChild(createContainer);
-            }
-            if (window.createButton) createButton.classList.add('active');
-            break;
-        case 'poetry':
-            const poetryContainer = document.getElementById('poetry-container');
-            if (poetryContainer) poetryContainer.style.display = 'flex';
-            if (window.poetryButton) poetryButton.classList.add('active');
-            break;
-        case 'vocabulary':
-            const vocabularyContent = document.getElementById('vocabulary-content');
-            if (vocabularyContent) {
-                vocabularyContent.style.display = 'flex';
-                if (vocabularyContent.innerHTML.trim() === '') {
-                    initializeVocabularyContent(vocabularyContent);
-                }
-            }
-            const wordButton = document.getElementById('word-button');
-            if (wordButton) wordButton.classList.add('active');
-            break;
-        default:
-            const content = document.getElementById(`${containerType}-content`);
-            if (content) content.style.display = 'block';
     }
     
-    // Update UI state
-    if (typeof handleResize === 'function') handleResize();
-    if (typeof resetContentArea === 'function') resetContentArea();
+    return words.length > 0 ? words : getEnhancedMockVocabularyWords();
+}
+
+// Helper function to extract example sentences
+function extractExampleSentences(text) {
+    const examples = [];
+    const exampleMatch = text.match(/"example_sentences"\s*:\s*\[(.*?)\]/s);
+    
+    if (exampleMatch) {
+        const exampleStr = exampleMatch[1];
+        const exampleItems = exampleStr.match(/"([^"]*)"/g);
+        
+        if (exampleItems) {
+            exampleItems.forEach(item => {
+                const example = item.replace(/^"|"$/g, '');
+                examples.push(example);
+            });
+        }
+    }
+    
+    return examples;
+}
+
+// Helper function to extract array items
+function extractArrayItems(text, fieldName) {
+    const items = [];
+    const match = text.match(new RegExp(`"${fieldName}"\\s*:\\s*\\[(.*?)\\]`, 's'));
+    
+    if (match) {
+        const itemsStr = match[1];
+        const itemMatches = itemsStr.match(/"([^"]*)"/g);
+        
+        if (itemMatches) {
+            itemMatches.forEach(item => {
+                items.push(item.replace(/^"|"$/g, ''));
+            });
+        }
+    }
+    
+    return items;
+}
+
+// Helper function to extract a string field
+function extractStringField(text, fieldName) {
+    const match = text.match(new RegExp(`"${fieldName}"\\s*:\\s*"([^"]*)"`, 's'));
+    return match ? match[1] : '';
 }
 
 // Debounce function to limit how often a function can be called
@@ -6551,41 +6382,16 @@ function debounce(func, wait) {
     };
 }
 
-// Apply debouncing to handlers that may be called frequently
-const debouncedHandleResize = debounce(handleResize, 100);
-window.addEventListener('resize', debouncedHandleResize);
-
-// Properly clean up event listeners
-function cleanupComponent() {
-    // Store references to event listeners so they can be removed
-    if (this.eventListeners) {
-        this.eventListeners.forEach(({element, type, listener}) => {
-            if (element) {
-                element.removeEventListener(type, listener);
-            }
-        });
-        this.eventListeners = [];
+// Only set up the debounced resize handler if handleResize exists
+function setupResizeHandler() {
+    if (typeof window.handleResize === 'function') {
+        const debouncedHandleResize = debounce(window.handleResize, 100);
+        window.addEventListener('resize', debouncedHandleResize);
+        console.log('Resize handler set up successfully');
+    } else {
+        console.log('handleResize function not found, skipping debounce setup');
     }
 }
 
-// When switching tabs, clean up resources from previous tab
-function handleTabSwitch(containerType) {
-    // Clean up previous tab resources
-    if (currentTab && typeof cleanup[currentTab] === 'function') {
-        cleanup[currentTab]();
-    }
-    
-    // Rest of tab switching logic...
-    currentTab = containerType;
-}
-
-// Cleanup functions for each tab
-const cleanup = {
-    vocabulary: function() {
-        // Clear large data objects when leaving vocabulary tab
-        if (vocabularyWords && vocabularyWords.length > 20) {
-            vocabularyWords = vocabularyWords.slice(0, 20); // Keep only needed items
-        }
-    },
-    // Other cleanup functions...
-};
+// Call the setup function after page load
+document.addEventListener('DOMContentLoaded', setupResizeHandler);
