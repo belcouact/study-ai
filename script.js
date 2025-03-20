@@ -1,3 +1,7 @@
+// Add this at the beginning of your script to define API settings globally
+window.API_BASE_URL = window.API_BASE_URL || 'https://api.deepseek.com'; // Replace with your actual API URL
+window.DEEPSEEK_API_KEY = window.DEEPSEEK_API_KEY || 'your-api-key-here'; // Replace with your actual API key
+
 // API configuration variables
 let currentApiFunction = 'chat';
 let currentModel = 'deepseek-r1';
@@ -176,8 +180,14 @@ async function fetchAIResponse(prompt, sourceTab = null) {
         console.log(`API request from tab: ${requestSourceTab}`);
         
         // Get API settings
-        const API_BASE_URL = process.env.API_BASE_URL || 'https://api.deepseek.com';
-        const API_KEY = process.env.DEEPSEEK_API_KEY;
+        // Use window variables instead of process.env which isn't available in browser
+        const API_BASE_URL = window.API_BASE_URL || 'https://api.deepseek.com';
+        const API_KEY = window.DEEPSEEK_API_KEY;
+        
+        if (!API_KEY) {
+            console.error('API key is missing');
+            throw new Error('API key not configured');
+        }
         
         // Prepare request body
         const data = {
