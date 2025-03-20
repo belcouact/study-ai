@@ -4346,7 +4346,7 @@ function getSimplifiedContextSummary() {
     }
 
 // ... existing code ...
-
+    /*
     // Function to handle learn poetry button click
     async function handleLearnPoetryClick() {
         console.log('Learn poetry button clicked');
@@ -4602,7 +4602,8 @@ function getSimplifiedContextSummary() {
             showSystemMessage('生成诗词时出错，请稍后再试', 'error');
         }
     }
-
+    */
+   
 // Initialize the application
 function init() {
     console.log('Initializing application...');
