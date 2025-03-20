@@ -6033,12 +6033,12 @@ For each word, please provide the following details in a structured JSON format:
 3. pronunciation: The phonetic pronunciation using IPA symbols
 4. definition: Clear and concise English definition suitable for ${grade} grade ${school} students
 5. chinese_translation: The Chinese translation of the word
-6. example_sentences: Two example sentences showing practical usage of the word
-7. word_family: Related words from the same word family (e.g., nouns, verbs, adjectives derived from the same root)
-8. common_collocations: Common phrases or expressions that use this word
-9. synonyms: 2-3 synonyms with simple definitions
-10. antonyms: 2-3 antonyms with simple definitions (if applicable)
-11. learning_tips: A memory tip or learning strategy to help remember the word
+6. example_sentences: Two example sentences showing practical usage of the word (with Chinese translation)
+7. word_family: Related words from the same word family (e.g., nouns, verbs, adjectives derived from the same root, with Chinese translation)
+8. common_collocations: Common phrases or expressions that use this word, with Chinese translation
+9. synonyms: 2-3 synonyms with simple definitions, with Chinese translation
+10. antonyms: 2-3 antonyms with simple definitions (if applicable), with Chinese translation
+11. learning_tips: A memory tip or learning strategy to help remember the word, with Chinese translation
 
 Ensure the chosen words are age-appropriate and relevant to the ${grade} grade ${school} curriculum.
 
@@ -6215,7 +6215,7 @@ function displayWordCard(index) {
         return;
     }
     
-    // Extract all fields from the word object
+    // Handle both API response format and other formats
     const english = word.word || word.english || '';
     const form = word.part_of_speech || word.form || 'n/a';
     const pronunciation = word.pronunciation || '';
@@ -6253,7 +6253,7 @@ function displayWordCard(index) {
         examples = word.examples;
     }
     
-    // Create the enhanced word card HTML
+    // Create the card with enhanced structure
     const cardHTML = `
         <div class="word-card">
             <div class="word-header">
@@ -6281,14 +6281,14 @@ function displayWordCard(index) {
                     if (typeof example === 'string') {
                         const parts = example.split(/\s+(?=[\u4e00-\u9fa5])/);
                         return `
-                            <div class="example-item" style="animation-delay: ${0.2 + i * 0.1}s">
+                            <div class="example-item">
                                 <div class="example-english">${parts[0] || example}</div>
                                 <div class="example-chinese">${parts[1] || ''}</div>
                             </div>
                         `;
                     } else {
                         return `
-                            <div class="example-item" style="animation-delay: ${0.2 + i * 0.1}s">
+                            <div class="example-item">
                                 <div class="example-english">${example.english || ''}</div>
                                 <div class="example-chinese">${example.chinese || ''}</div>
                             </div>
