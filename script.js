@@ -6087,20 +6087,24 @@ async function handleLoadVocabularyClick() {
 async function fetchVocabularyWords(school, grade) {
     try {
         // Create a prompt for the vocabulary generation
-        const prompt = `Generate 10 English vocabulary words appropriate for ${school} school students in grade ${grade}. 
-        For each word, include:
-        1. The English word
-        2. Part of speech (noun, verb, adjective, etc.)
-        3. Pronunciation (IPA)
-        4. Definition in English
-        5. Chinese translation
-        6. Two example sentences using the word with Chinese translations
-        7. Word family (related words)
-        8. Common collocations
-        9. Synonyms and antonyms
-        10. A memory tip to help remember the word
+        const prompt = `Generate 5 English vocabulary words appropriate for ${school} school students in grade ${grade}. 
 
-        Format the response as a clean JSON array.`;
+        For each word, please provide the following details in a structured JSON format:
+        1. word: The English vocabulary word
+        2. part_of_speech: The part of speech (noun, verb, adjective, adverb, etc.)
+        3. pronunciation: The phonetic pronunciation using IPA symbols
+        4. definition: Clear and concise English definition suitable for ${grade} grade ${school} students
+        5. chinese_translation: The Chinese translation of the word
+        6. example_sentences: Two example sentences showing practical usage of the word (with Chinese translation)
+        7. word_family: Related words from the same word family (e.g., nouns, verbs, adjectives derived from the same root, with Chinese translation)
+        8. common_collocations: Common phrases or expressions that use this word, with Chinese translation
+        9. synonyms: 2-3 synonyms with simple definitions, with Chinese translation
+        10. antonyms: 2-3 antonyms with simple definitions (if applicable), with Chinese translation
+        11. learning_tips: A memory tip or learning strategy to help remember the word, with Chinese translation
+        
+        Ensure the chosen words are age-appropriate and relevant to the ${grade} grade ${school} curriculum.
+        
+        Format the response as a clean JSON array of word objects.`;
         
         // Use the existing fetchAIResponse function
         const response = await fetchAIResponse(prompt);
