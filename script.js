@@ -5983,8 +5983,8 @@ async function handleLoadVocabularyClick() {
     vocabularyContainer.innerHTML = `
         <div class="initial-message loading-message">
             <div class="loading-spinner vocabulary-spinner"></div>
-            <p>正在加载10个词汇，请耐心等待...</p>
-            <p>Loading ten vocabularies, please be patient...</p>
+            <p>正在加载5个词汇，请耐心等待...</p>
+            <p>Loading five vocabularies, please be patient...</p>
         </div>
     `;
     
@@ -6034,7 +6034,7 @@ async function handleLoadVocabularyClick() {
 async function fetchVocabularyWords(school, grade) {
     try {
         // Create a more detailed prompt for better vocabulary generation
-        const prompt = `Generate 10 English vocabulary words appropriate for ${school} school students in grade ${grade}. 
+        const prompt = `Generate 5 English vocabulary words appropriate for ${school} school students in grade ${grade}. 
 
 For each word, please provide the following details in a structured JSON format:
 1. word: The English vocabulary word
