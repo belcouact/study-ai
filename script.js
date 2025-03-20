@@ -5437,7 +5437,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // We'll rely solely on the direct event listeners set up in setupPoemNavigationButtons
     
     // Function to handle learn poetry button click
-    async function handleLearnPoetryClick() {
+    window.handleLearnPoetryClick = async function () {
         console.log('Learn poetry button clicked - function invoked');
         
         // Get user's educational context
