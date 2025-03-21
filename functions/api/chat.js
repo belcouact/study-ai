@@ -47,7 +47,6 @@ export async function onRequestPost(context) {
     } else {
       // Otherwise, append the endpoint path
       apiUrl = `${apiBaseUrl}/v1/chat/completions`;
-      apiUrl = apiBaseUrl;
     }
     
     // Create an AbortController with a 300-second timeout
