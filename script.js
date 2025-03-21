@@ -4035,8 +4035,8 @@ function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, subm
                         <div class="error-message">
                             <i class="fas fa-exclamation-circle"></i>
                             抱歉，处理您的问题时出现了错误。请重试。
-            </div>
-        `;
+                        </div>
+                    `;
                     showSystemMessage('提交问题时出错，请重试。', 'error');
                 })
                 .finally(() => {
@@ -4275,30 +4275,6 @@ function getSimplifiedContextSummary() {
         
         // Poetry buttons
         setupPoetryButtons();
-        
-        // Button click handlers for sidebar navigation
-        if (qaButton) {
-            qaButton.addEventListener('click', () => handleTabSwitch('qa'));
-        }
-        
-        if (createButton) {
-            createButton.addEventListener('click', () => handleTabSwitch('create'));
-        }
-        
-        if (poetryButton) {
-            poetryButton.addEventListener('click', () => handleTabSwitch('poetry'));
-        }
-        
-        const wordButton = document.getElementById('word-button');
-        if (wordButton) {
-            wordButton.addEventListener('click', () => handleTabSwitch('vocabulary'));
-        }
-        
-        // Tab switching for any additional tabs using data-tab attributes
-        const tabs = document.querySelectorAll('.tab');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => handleTabSwitch(tab.dataset.tab));
-        });
     }
 
 // ... existing code ...
@@ -4334,7 +4310,7 @@ function getSimplifiedContextSummary() {
     }
 
 // ... existing code ...
-    /*
+
     // Function to handle learn poetry button click
     async function handleLearnPoetryClick() {
         console.log('Learn poetry button clicked');
@@ -4357,10 +4333,8 @@ function getSimplifiedContextSummary() {
         }
         
         // Get poetry type and style
-        // const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
-        // const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
-        poetryType = document.getElementById('poetry-type-select').value;
-        poetryStyle = document.getElementById('poetry-style-select').value;
+        const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
+        const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
         
         console.log(`Generating poems for: ${school} ${grade}, Type: ${poetryType}, Style: ${poetryStyle}`);
         
@@ -4590,7 +4564,6 @@ function getSimplifiedContextSummary() {
             showSystemMessage('生成诗词时出错，请稍后再试', 'error');
         }
     }
-    */
 
 // Initialize the application
 function init() {
@@ -5164,13 +5137,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const poetryContainer = document.getElementById('poetry-container');
     const qaContainer = document.getElementById('qa-container');
     const createContainer = document.getElementById('create-container');
-    const wordContainer = document.getElementById('word-container');
     
     // Store original parent nodes
     let poetryParent = null;
     let qaParent = null;
     let createParent = null;
-    let wordParent = null;
     
     if (poetryContainer) {
         poetryParent = poetryContainer.parentNode;
@@ -5187,16 +5158,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (createContainer) {
         createParent = createContainer.parentNode;
     }
-
-    if (wordContainer) {
-        wordParent = wordContainer.parentNode;
-    }
     
     // Get all buttons
     const poetryButton = document.getElementById('poetry-button');
     const qaButton = document.getElementById('qa-button');
     const createButton = document.getElementById('create-button');
-    const wordButton = document.getElementById('word-button');
     
     // Get the content area where containers should be placed
     const contentArea = document.querySelector('.content-area');
@@ -5205,7 +5171,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleTabSwitch(containerType) {
         console.log('Switching to tab:', containerType);
         
-        // First, hide all containers
+        // First, remove all containers from DOM to ensure clean state
         if (qaContainer && qaContainer.parentNode) {
             qaContainer.parentNode.removeChild(qaContainer);
         }
@@ -5218,65 +5184,65 @@ document.addEventListener('DOMContentLoaded', function() {
             poetryContainer.parentNode.removeChild(poetryContainer);
         }
         
-        // Hide all tab content
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.style.display = 'none';
-        });
-        
-        // Reset active states for sidebar buttons
+        // Reset active states
         if (qaButton) qaButton.classList.remove('active');
         if (createButton) createButton.classList.remove('active');
         if (poetryButton) poetryButton.classList.remove('active');
-        if (wordButton) wordButton.classList.remove('active');
         
-        // Set the appropriate button active based on containerType
-        if (containerType === 'qa' && qaButton) {
-            qaButton.classList.add('active');
+        // Add only the appropriate container to the content area
+        if (containerType === 'qa' && qaContainer && contentArea) {
             contentArea.appendChild(qaContainer);
-        } else if (containerType === 'create' && createButton) {
-            createButton.classList.add('active');
-            contentArea.appendChild(createContainer);
-        } else if (containerType === 'poetry' && poetryButton) {
-            poetryButton.classList.add('active');
-            contentArea.appendChild(poetryContainer);
-        } else if (containerType === 'vocabulary' && wordButton) {
-            wordButton.classList.add('active');
+            if (qaButton) qaButton.classList.add('active');
+            console.log('QA container added to content area');
             
-            // Show vocabulary content
-            const vocabularyContent = document.getElementById('vocabulary-content');
-            if (vocabularyContent) {
-                vocabularyContent.style.display = 'block';
-            } else {
-                console.warn('Vocabulary content not found!');
-                // Create it if it doesn't exist
-                ensureVocabularyTabSetup();
-                const newVocabularyContent = document.getElementById('vocabulary-content');
-                if (newVocabularyContent) {
-                    newVocabularyContent.style.display = 'block';
+            // Ensure poetry container is not present
+            const existingPoetryContainer = document.getElementById('poetry-container');
+            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
+                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
+            }
+        } else if (containerType === 'create' && createContainer && contentArea) {
+            contentArea.appendChild(createContainer);
+            if (createButton) createButton.classList.add('active');
+            console.log('Create container added to content area');
+            
+            // Ensure poetry container is not present
+            const existingPoetryContainer = document.getElementById('poetry-container');
+            if (existingPoetryContainer && existingPoetryContainer.parentNode) {
+                existingPoetryContainer.parentNode.removeChild(existingPoetryContainer);
+            }
+            
+            // Show empty state on test page
+            const questionsDisplayContainer = document.getElementById('questions-display-container');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (questionsDisplayContainer) {
+                questionsDisplayContainer.classList.remove('hidden');
+                
+                if (emptyState) {
+                    emptyState.classList.remove('hidden');
                 }
             }
+        } else if (containerType === 'poetry' && poetryContainer && contentArea) {
+            contentArea.appendChild(poetryContainer);
+            if (poetryButton) poetryButton.classList.add('active');
+            console.log('Poetry container added to content area');
+            
+            // After switching to poetry tab, add event listener to learn poetry button
+            setTimeout(() => {
+                const learnPoetryButton = document.getElementById('learn-poetry-button');
+                if (learnPoetryButton) {
+                    // Remove any existing event listeners
+                    const newButton = learnPoetryButton.cloneNode(true);
+                    learnPoetryButton.parentNode.replaceChild(newButton, learnPoetryButton);
+                    
+                    // Add new event listener
+                    newButton.addEventListener('click', function() {
+                        console.log('Learn poetry button clicked');
+                        handleLearnPoetryClick();
+                    });
+                }
+            }, 100);
         }
-        
-        // Also handle tab selection for any tabs
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.classList.remove('active');
-            if (tab.dataset.tab === containerType) {
-                tab.classList.add('active');
-            }
-        });
-        
-        // Show tab content if it exists
-        if (containerType !== 'vocabulary' && containerType !== 'qa' && 
-            containerType !== 'create' && containerType !== 'poetry') {
-            const tabContent = document.getElementById(`${containerType}-content`);
-            if (tabContent) {
-                tabContent.style.display = 'block';
-            }
-        }
-        
-        // Always update the UI state
-        if (typeof handleResize === 'function') handleResize();
-        if (typeof resetContentArea === 'function') resetContentArea();
     }
     
     // Add event listeners to buttons
@@ -5298,13 +5264,6 @@ document.addEventListener('DOMContentLoaded', function() {
         poetryButton.addEventListener('click', function() {
             console.log('Poetry button clicked');
             handleTabSwitch('poetry');
-        });
-    }
-
-    if (wordButton) {
-        wordButton.addEventListener('click', function() {
-            console.log('Word button clicked');
-            handleTabSwitch('vocabulary');  // Changed from 'word' to 'vocabulary'
         });
     }
     
@@ -5425,7 +5384,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // We'll rely solely on the direct event listeners set up in setupPoemNavigationButtons
     
     // Function to handle learn poetry button click
-    window.handleLearnPoetryClick = async function () {
+    async function handleLearnPoetryClick() {
         console.log('Learn poetry button clicked - function invoked');
         
         // Get user's educational context
@@ -5935,658 +5894,9 @@ function loadPoemDetails(poem) {
     // Make sections visible
     backgroundSection.style.display = 'block';
     analysisSection.style.display = 'block';
+    
+    // ... rest of existing code ...
 }
 
-// Global variables
-let vocabularyWords = [];
-let currentWordIndex = 0;
-
-// Add event listeners after DOM loads
-document.addEventListener('DOMContentLoaded', function() {
-    // ... existing code ...
-    
-    // Tab switching
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => handleTabSwitch(tab.dataset.tab));
-    });
-    
-    // Add vocabulary related event listeners
-    document.getElementById('load-vocabulary-btn').addEventListener('click', handleLoadVocabularyClick);
-    document.getElementById('next-word-btn').addEventListener('click', () => navigateWordCard(1));
-    document.getElementById('prev-word-btn').addEventListener('click', () => navigateWordCard(-1));
-    
-    // ... existing code ...
-});
-
-// Handle loading vocabulary words
-async function handleLoadVocabularyClick() {
-    const loadBtn = document.getElementById('load-vocabulary-btn');
-    const vocabularyContainer = document.getElementById('vocabulary-container');
-    
-    loadBtn.disabled = true;
-    loadBtn.innerHTML = '<span class="loading-spinner"></span> 加载中...';
-    
-    // Display loading message in the vocabulary container
-    vocabularyContainer.innerHTML = `
-        <div class="initial-message loading-message">
-            <div class="loading-spinner vocabulary-spinner"></div>
-            <p>正在加载5个词汇，请耐心等待...</p>
-            <p>Loading five vocabularies, please be patient...</p>
-        </div>
-    `;
-    
-    try {
-        // Get education context from sidebar
-        const schoolSelect = document.getElementById('school-select-sidebar');
-        const gradeSelect = document.getElementById('grade-select-sidebar');
-        
-        // Check if the elements exist before accessing their values
-        if (!schoolSelect || !gradeSelect) {
-            console.error('School or grade select elements not found');
-            throw new Error('未找到学校或年级选择器，请确保已经设置好教育背景');
-        }
-        
-        const school = schoolSelect.value;
-        const grade = gradeSelect.value;
-        
-        // Validate that we have values
-        if (!school || !grade) {
-            throw new Error('请先在侧边栏选择学校和年级');
-        }
-        
-        console.log('Fetching vocabulary for school:', school, 'grade:', grade);
-        
-        // Fetch vocabulary words from API
-        const words = await fetchVocabularyWords(school, grade);
-        
-        // Display words
-        if (words && words.length > 0) {
-        vocabularyWords = words;
-        currentWordIndex = 0;
-            displayWordCard(currentWordIndex);
-            updateNavigationControls();
-        } else {
-            showVocabularyError('无法获取单词数据');
-        }
-    } catch (error) {
-        console.error('Error loading vocabulary:', error);
-        showVocabularyError(error.message || '获取单词时出错');
-    } finally {
-        loadBtn.disabled = false;
-        loadBtn.innerHTML = '加载词汇';
-    }
-}
-
-// Fetch vocabulary words from API
-async function fetchVocabularyWords(school, grade) {
-    try {
-        // Create a more structured prompt for consistent API responses
-        const prompt = `Generate 10 English vocabulary words appropriate for ${school} school students in grade ${grade}.
-
-Please format your response as a valid JSON array with objects having the EXACT following structure for each word:
-\`\`\`json
-[
-  {
-    "word": "example",
-    "part_of_speech": "noun",
-    "pronunciation": "/ɪɡˈzæm.pəl/",
-    "definition": "A clear English definition",
-    "chinese_translation": "中文翻译",
-    "example_sentences": [
-      {
-        "english": "This is an example sentence.",
-        "chinese": "这是一个例句。"
-      },
-      {
-        "english": "Here is another example.",
-        "chinese": "这是另一个例句。"
-      }
-    ],
-    "word_family": {
-      "noun": "example (例子)",
-      "verb": "exemplify (例示)"
-    },
-    "common_collocations": [
-      "common example (常见例子)",
-      "good example (好例子)"
-    ],
-    "synonyms": [
-      {
-        "word": "instance",
-        "definition": "a particular case",
-        "chinese": "实例"
-      }
-    ],
-    "antonyms": [
-      {
-        "word": "opposite word",
-        "definition": "opposite definition",
-        "chinese": "反义词"
-      }
-    ],
-    "learning_tips": {
-      "tip": "A useful memory trick or learning strategy",
-      "chinese": "记忆技巧的中文翻译"
-    }
-  }
-]
-\`\`\`
-
-IMPORTANT:
-1. Ensure the JSON is valid and properly formatted with all fields.
-2. Do NOT include any explanatory text outside the JSON.
-3. Make sure all example sentences include both English and Chinese translations.
-4. Choose vocabulary appropriate for ${grade} grade ${school} school students.
-5. Strictly follow the format above for all keys and values.`;
-
-        console.log('Fetching vocabulary with prompt:', prompt);
-        
-        // Use the existing fetchAIResponse function
-        const response = await fetchAIResponse(prompt);
-        console.log('Raw API response type:', typeof response);
-        
-        let wordData;
-        if (typeof response === 'object' && response.choices && response.choices[0] && response.choices[0].message) {
-            const messageContent = response.choices[0].message.content;
-            wordData = extractJsonFromText(messageContent);
-        } else if (typeof response === 'string') {
-            wordData = extractJsonFromText(response);
-        } else if (Array.isArray(response)) {
-            wordData = response;
-        } else {
-            console.warn('Unexpected API response format:', response);
-            wordData = null;
-        }
-        
-        if (wordData && Array.isArray(wordData) && wordData.length > 0) {
-            console.log('Successfully parsed vocabulary data:', wordData);
-            return wordData;
-        } else {
-            console.warn('Could not extract valid vocabulary data from response');
-            return getMockVocabularyWords();
-        }
-    } catch (error) {
-        console.error('Error in fetchVocabularyWords:', error);
-        return getMockVocabularyWords();
-    }
-}
-
-// Helper function to extract JSON from text content
-function extractJsonFromText(text) {
-    if (!text) return null;
-    
-    try {
-        // First try: Direct parse if it's already JSON
-        try {
-            const parsed = JSON.parse(text);
-            if (Array.isArray(parsed)) return parsed;
-        } catch (e) {
-            // Not directly parseable JSON, continue to other methods
-        }
-        
-        // Second try: Extract JSON from code blocks
-        const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-        if (codeBlockMatch) {
-            try {
-                const jsonContent = codeBlockMatch[1].trim();
-                const parsed = JSON.parse(jsonContent);
-                if (Array.isArray(parsed)) return parsed;
-            } catch (e) {
-                console.warn('Failed to parse JSON from code block:', e);
-            }
-        }
-        
-        // Third try: Look for array pattern in text
-        const arrayMatch = text.match(/\[\s*\{[\s\S]*\}\s*\]/);
-        if (arrayMatch) {
-            try {
-                const cleaned = cleanJsonString(arrayMatch[0]);
-                const parsed = JSON.parse(cleaned);
-                if (Array.isArray(parsed)) return parsed;
-            } catch (e) {
-                console.warn('Failed to parse JSON from array pattern:', e);
-            }
-        }
-        
-        // Final try: Manual extraction of word objects
-        return extractWordObjects(text);
-    } catch (error) {
-        console.error('Error extracting JSON from text:', error);
-        return null;
-    }
-}
-
-// Update the displayWordCard function for more reliable rendering
-function displayWordCard(index) {
-    const vocabularyContainer = document.getElementById('vocabulary-container');
-    const word = vocabularyWords[index];
-    
-    if (!word || !word.word) {
-        vocabularyContainer.innerHTML = '<div class="initial-message">无单词数据</div>';
-        return;
-    }
-    
-    // Safely extract all word properties with fallbacks
-    const wordData = {
-        english: safeGet(word, 'word', ''),
-        form: safeGet(word, 'part_of_speech', 'n/a'),
-        pronunciation: safeGet(word, 'pronunciation', ''),
-        definition: safeGet(word, 'definition', ''),
-        chinese: safeGet(word, 'chinese_translation', ''),
-        
-        // Process complex structures
-        examples: processExamples(word),
-        wordFamily: processWordFamily(word),
-        collocations: processCollocations(word),
-        synonyms: processSynonyms(word),
-        antonyms: processAntonyms(word),
-        learningTips: processLearningTips(word)
-    };
-    
-    // Create the card HTML
-    const cardHTML = `
-        <div class="word-card">
-            <div class="word-header">
-                <div class="word-english">${wordData.english}</div>
-                <div class="word-details">
-                    <span class="word-form">${wordData.form}</span>
-                    ${wordData.pronunciation ? `<span class="word-pronunciation">${wordData.pronunciation}</span>` : ''}
-                </div>
-            </div>
-            
-            <div class="word-meanings">
-                <div class="meaning-row">
-                    <div class="meaning-label">英文释义:</div>
-                    <div class="meaning-content">${wordData.definition}</div>
-                </div>
-                <div class="meaning-row">
-                    <div class="meaning-label">中文释义:</div>
-                    <div class="meaning-content">${wordData.chinese}</div>
-                </div>
-            </div>
-            
-            ${renderExamples(wordData.examples)}
-            ${renderWordFamily(wordData.wordFamily)}
-            ${renderCollocations(wordData.collocations)}
-            
-            <div class="word-relationships">
-                ${renderSynonyms(wordData.synonyms)}
-                ${renderAntonyms(wordData.antonyms)}
-            </div>
-            
-            ${renderLearningTips(wordData.learningTips)}
-        </div>
-    `;
-    
-    vocabularyContainer.innerHTML = cardHTML;
-    
-    // Update counter
-    document.getElementById('word-counter').textContent = `${index + 1}/${vocabularyWords.length}`;
-}
-
-// Safe property getter with default value
-function safeGet(obj, path, defaultValue) {
-    if (!obj) return defaultValue;
-    
-    // Handle dot notation for nested paths
-    const keys = path.split('.');
-    let current = obj;
-    
-    for (const key of keys) {
-        if (current === null || current === undefined || typeof current !== 'object') {
-            return defaultValue;
-        }
-        current = current[key];
-    }
-    
-    return current !== undefined && current !== null ? current : defaultValue;
-}
-
-// Process example sentences from various formats
-function processExamples(word) {
-    const examples = [];
-    
-    try {
-        if (word.example_sentences) {
-            if (Array.isArray(word.example_sentences)) {
-                word.example_sentences.forEach(example => {
-                    if (typeof example === 'string') {
-                        // Handle string format with parentheses for Chinese
-                        const match = example.match(/^(.*?)(?:\s*\((.*?)\))?$/);
-                        if (match) {
-                            examples.push({
-                                english: match[1].trim(),
-                                chinese: match[2] ? match[2].trim() : ''
-                            });
-                        } else {
-                            examples.push({ english: example, chinese: '' });
-                        }
-                    } else if (example && typeof example === 'object') {
-                        // Handle object format
-                        examples.push({
-                            english: example.english || example.sentence || '',
-                            chinese: example.chinese || example.translation || ''
-                        });
-                    }
-                });
-            } else if (typeof word.example_sentences === 'object') {
-                // Handle object with numbered keys
-                Object.values(word.example_sentences).forEach(example => {
-                    if (typeof example === 'string') {
-                        const match = example.match(/^(.*?)(?:\s*\((.*?)\))?$/);
-                        if (match) {
-                            examples.push({
-                                english: match[1].trim(),
-                                chinese: match[2] ? match[2].trim() : ''
-                            });
-                        } else {
-                            examples.push({ english: example, chinese: '' });
-                        }
-                    } else if (example && typeof example === 'object') {
-                        examples.push({
-                            english: example.english || example.sentence || '',
-                            chinese: example.chinese || example.translation || ''
-                        });
-                    }
-                });
-            }
-        }
-    } catch (e) {
-        console.warn('Error processing examples:', e);
-    }
-    
-    return examples;
-}
-
-// Process word family from various formats
-function processWordFamily(word) {
-    const wordFamilyItems = [];
-    
-    try {
-        if (word.word_family) {
-            if (Array.isArray(word.word_family)) {
-                word.word_family.forEach(item => {
-                    if (typeof item === 'string') {
-                        wordFamilyItems.push({ word: item });
-                    } else if (item && typeof item === 'object') {
-                        const keys = Object.keys(item);
-                        if (keys.length > 0) {
-                            wordFamilyItems.push({ 
-                                type: keys[0], 
-                                word: item[keys[0]] 
-                            });
-                        }
-                    }
-                });
-            } else if (typeof word.word_family === 'object') {
-                Object.entries(word.word_family).forEach(([type, value]) => {
-                    wordFamilyItems.push({ type, word: value });
-                });
-            }
-        }
-    } catch (e) {
-        console.warn('Error processing word family:', e);
-    }
-    
-    return wordFamilyItems;
-}
-
-// Process collocations from various formats
-function processCollocations(word) {
-    const collocations = [];
-    
-    try {
-        if (word.common_collocations) {
-            if (Array.isArray(word.common_collocations)) {
-                word.common_collocations.forEach(item => {
-                    if (typeof item === 'string') {
-                        // Handle parentheses format
-                        const match = item.match(/^(.*?)(?:\s*\((.*?)\))?$/);
-                        if (match) {
-                            collocations.push({
-                                phrase: match[1].trim(),
-                                translation: match[2] ? match[2].trim() : ''
-                            });
-                        } else {
-                            collocations.push({ phrase: item });
-                        }
-                    } else if (item && typeof item === 'object') {
-                        const keys = Object.keys(item);
-                        if (keys.length > 0) {
-                            collocations.push({
-                                phrase: keys[0],
-                                translation: item[keys[0]]
-                            });
-                        }
-                    }
-                });
-            } else if (typeof word.common_collocations === 'object') {
-                Object.entries(word.common_collocations).forEach(([phrase, translation]) => {
-                    collocations.push({ phrase, translation });
-                });
-            }
-        }
-    } catch (e) {
-        console.warn('Error processing collocations:', e);
-    }
-    
-    return collocations;
-}
-
-// Process synonyms from various formats
-function processSynonyms(word) {
-    return processWordRelationship(word.synonyms);
-}
-
-// Process antonyms from various formats
-function processAntonyms(word) {
-    return processWordRelationship(word.antonyms);
-}
-
-// Generic processor for word relationships (synonyms/antonyms)
-function processWordRelationship(items) {
-    const processed = [];
-    
-    try {
-        if (items) {
-            if (Array.isArray(items)) {
-                items.forEach(item => {
-                    if (typeof item === 'string') {
-                        processed.push({ word: item });
-                    } else if (item && typeof item === 'object') {
-                        if (item.word) {
-                            processed.push({
-                                word: item.word,
-                                definition: item.definition || '',
-                                chinese: item.chinese || ''
-                            });
-                        } else {
-                            const keys = Object.keys(item);
-                            if (keys.length > 0) {
-                                const key = keys[0];
-                                const value = item[key];
-                                
-                                // Try to extract Chinese in parentheses
-                                let definition = value;
-                                let chinese = '';
-                                
-                                if (typeof value === 'string') {
-                                    const match = value.match(/^(.*?)(?:\s*\((.*?)\))?$/);
-                                    if (match) {
-                                        definition = match[1].trim();
-                                        chinese = match[2] ? match[2].trim() : '';
-                                    }
-                                }
-                                
-                                processed.push({
-                                    word: key,
-                                    definition,
-                                    chinese
-                                });
-                            }
-                        }
-                    }
-                });
-            } else if (typeof items === 'object') {
-                Object.entries(items).forEach(([word, value]) => {
-                    // Try to extract Chinese in parentheses
-                    let definition = value;
-                    let chinese = '';
-                    
-                    if (typeof value === 'string') {
-                        const match = value.match(/^(.*?)(?:\s*\((.*?)\))?$/);
-                        if (match) {
-                            definition = match[1].trim();
-                            chinese = match[2] ? match[2].trim() : '';
-                        }
-                    }
-                    
-                    processed.push({
-                        word,
-                        definition,
-                        chinese
-                    });
-                });
-            }
-        }
-    } catch (e) {
-        console.warn('Error processing word relationship:', e);
-    }
-    
-    return processed;
-}
-
-// Process learning tips from various formats
-function processLearningTips(word) {
-    try {
-        if (word.learning_tips) {
-            if (typeof word.learning_tips === 'string') {
-                // Handle parentheses format
-                const match = word.learning_tips.match(/^(.*?)(?:\s*\((.*?)\))?$/);
-                if (match) {
-                    return {
-                        tip: match[1].trim(),
-                        chinese: match[2] ? match[2].trim() : ''
-                    };
-                }
-                return { tip: word.learning_tips };
-            } else if (typeof word.learning_tips === 'object') {
-                return {
-                    tip: word.learning_tips.tip || word.learning_tips.english || '',
-                    chinese: word.learning_tips.chinese || ''
-                };
-            }
-        }
-    } catch (e) {
-        console.warn('Error processing learning tips:', e);
-    }
-    
-    return { tip: '', chinese: '' };
-}
-
-// Render example sentences section
-function renderExamples(examples) {
-    if (!examples || examples.length === 0) return '';
-    
-    return `
-        <div class="word-examples">
-            <h3 class="section-title">例句</h3>
-            ${examples.map(example => `
-                <div class="example-item">
-                    <div class="example-english">${example.english}</div>
-                    ${example.chinese ? `<div class="example-chinese">${example.chinese}</div>` : ''}
-                </div>
-            `).join('')}
-        </div>
-    `;
-}
-
-// Render word family section
-function renderWordFamily(wordFamily) {
-    if (!wordFamily || wordFamily.length === 0) return '';
-    
-    return `
-        <div class="word-family">
-            <h3 class="section-title">词族</h3>
-            <div class="word-family-items">
-                ${wordFamily.map(item => `
-                    <span class="word-family-item" title="${item.translation || ''}">
-                        ${item.type ? `<strong>${item.type}:</strong> ` : ''}${item.word}
-                    </span>
-                `).join('')}
-            </div>
-        </div>
-    `;
-}
-
-// Render collocations section
-function renderCollocations(collocations) {
-    if (!collocations || collocations.length === 0) return '';
-    
-    return `
-        <div class="collocations">
-            <h3 class="section-title">常见搭配</h3>
-            <div class="collocation-items">
-                ${collocations.map(item => `
-                    <span class="collocation-item" title="${item.translation || ''}">
-                        ${item.phrase}
-                    </span>
-                `).join('')}
-            </div>
-        </div>
-    `;
-}
-
-// Render synonyms section
-function renderSynonyms(synonyms) {
-    if (!synonyms || synonyms.length === 0) return '';
-    
-    return `
-        <div class="synonyms">
-            <h3 class="section-title">近义词</h3>
-            <div class="synonym-items">
-                ${synonyms.map(syn => `
-                    <div class="synonym-container">
-                        <span class="synonym-word">${syn.word}</span>
-                        ${syn.definition ? `<span class="synonym-def">- ${syn.definition}</span>` : ''}
-                        ${syn.chinese ? `<span class="synonym-chinese">${syn.chinese}</span>` : ''}
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
-}
-
-// Render antonyms section
-function renderAntonyms(antonyms) {
-    if (!antonyms || antonyms.length === 0) return '';
-    
-    return `
-        <div class="antonyms">
-            <h3 class="section-title">反义词</h3>
-            <div class="antonym-items">
-                ${antonyms.map(ant => `
-                    <div class="antonym-container">
-                        <span class="antonym-word">${ant.word}</span>
-                        ${ant.definition ? `<span class="antonym-def">- ${ant.definition}</span>` : ''}
-                        ${ant.chinese ? `<span class="antonym-chinese">${ant.chinese}</span>` : ''}
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
-}
-
-// Render learning tips section
-function renderLearningTips(tips) {
-    if (!tips || !tips.tip) return '';
-    
-    return `
-        <div class="learning-tips">
-            <h3 class="section-title">记忆技巧</h3>
-            <div class="tip-content">${tips.tip}</div>
-            ${tips.chinese ? `<div class="tip-content-chinese">${tips.chinese}</div>` : ''}
-        </div>
-    `;
-}
+// If your code uses a different function to display poem details, 
+// ensure the sections are added and visible in that function instead.
