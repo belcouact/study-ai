@@ -46,10 +46,9 @@ export async function onRequestPost(context) {
       apiUrl = apiBaseUrl;
     } else {
       // Otherwise, append the endpoint path
-      apiUrl = `${apiBaseUrl}/v1/chat/completions`;
+      //apiUrl = `${apiBaseUrl}/v1/chat/completions`;
+      apiUrl = apiBaseUrl;
     }
-    apiUrl = apiBaseUrl;
-
     console.log(`Making request to: ${apiUrl}`);
     
     // Create an AbortController with a 300-second timeout
