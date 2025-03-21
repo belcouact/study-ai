@@ -77,6 +77,9 @@ export async function onRequestPost(context) {
         signal: controller.signal
       });
       
+      console.log(`base url: ${apiUrl}`);
+      console.log(`base url: ${env.MODEL}`);
+
       // Clear the timeout
       clearTimeout(timeoutId);
       
