@@ -46,10 +46,9 @@ export async function onRequestPost(context) {
       apiUrl = apiBaseUrl;
     } else {
       // Otherwise, append the endpoint path
-      //apiUrl = `${apiBaseUrl}/v1/chat/completions`;
+      apiUrl = `${apiBaseUrl}/v1/chat/completions`;
       apiUrl = apiBaseUrl;
     }
-    console.log(`Making request to: ${apiUrl}`);
     
     // Create an AbortController with a 300-second timeout
     const controller = new AbortController();
@@ -65,8 +64,7 @@ export async function onRequestPost(context) {
           "Authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          //model: "deepseek-reasoner",
-          model: env.MODEL,
+          model: "deepseek-reasoner",
           messages: body.messages,
           max_tokens: parseInt(env.MAX_TOKENS || "4096"),
           temperature: parseFloat(env.TEMPERATURE || "0.7")
