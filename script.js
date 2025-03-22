@@ -6004,13 +6004,13 @@ async function handleLoadVocabularyClick() {
         vocabularyWords = words;
         currentWordIndex = 0;
             displayWordCard(currentWordIndex);
-            updateNavigationControls();
+            updateNavigationButtons();
         } else {
             showVocabularyError('无法获取单词数据');
         }
     } catch (error) {
         console.error('Error loading vocabulary:', error);
-        loadingMessage.innerHTML = `
+        vocabularyContainer.innerHTML = `
             <div class="error-message" style="color: #dc3545; padding: 15px;">
                 <i class="fas fa-exclamation-circle"></i>
                 <p>加载词汇时出错: ${error.message}</p>
