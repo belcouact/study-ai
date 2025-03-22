@@ -6104,11 +6104,11 @@ IMPORTANT:
             return wordData;
         } else {
             console.warn('Could not extract valid vocabulary data from response');
-            return getMockVocabularyWords();
+            //return getMockVocabularyWords();
         }
     } catch (error) {
         console.error('Error in fetchVocabularyWords:', error);
-        return getMockVocabularyWords();
+        //return getMockVocabularyWords();
     }
 }
 
