@@ -385,7 +385,7 @@ function displayCurrentQuestion() {
     const question = questions[currentQuestionIndex];
     console.log('Current question:', question);
     
-    // Only create or show questions container if we're on the create tab
+    // Get the create container once at the start
     const createContainer = document.getElementById('create-container');
     if (!createContainer || createContainer.style.display === 'none') {
         console.log('Not on create tab, skipping question display');
@@ -968,8 +968,7 @@ function displayCurrentQuestion() {
         }
     }
     
-    // Ensure create container has enough space and smooth scrolling
-    const createContainer = document.getElementById('create-container');
+    // Use the existing createContainer reference
     if (createContainer) {
         createContainer.style.cssText = `
             min-height: 100vh;
