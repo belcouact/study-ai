@@ -2241,4 +2241,22 @@ button:active {
     border-radius: 6px;
     font-size: 14px;
     background-color: white;
+}
+
+.vocabulary-select-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vocabulary-select-group label {
+    font-size: 14px;
+    color: #4a5568;
+    white-space: nowrap;
+}
+
+.vocabulary-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
 } 
