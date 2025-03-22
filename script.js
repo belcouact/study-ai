@@ -6777,3 +6777,89 @@ langToggle.onclick = function() {
         langToggle.textContent = 'English';
     }
 }
+
+let quotes = [];
+let currentQuoteIndex = 0;
+
+async function fetchInspirationalQuotes() {
+    try {
+        const prompt = `Please provide 10 inspirational quotes that are less than 20 words each. For each quote, provide both English and Chinese translations. Format the response as a JSON array with objects containing 'english' and 'chinese' properties.`;
+        
+        const apiEndpoint = `/api/${currentApiFunction}`;
+        const response = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                messages: [
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ],
+                model: currentModel
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        const content = data.choices[0].message.content;
+        
+        // Parse the JSON response from the content
+        const parsedContent = JSON.parse(content);
+        quotes = parsedContent.slice(0, 10); // Ensure we only take 10 quotes
+        displayQuote(0);
+    } catch (error) {
+        console.error('Error fetching quotes:', error);
+        // Display error message in the quote frame
+        document.getElementById('quote-english').textContent = 'Failed to load quote';
+        document.getElementById('quote-chinese').textContent = '无法加载名言';
+    }
+}
+
+function displayQuote(index) {
+    if (quotes.length === 0) return;
+    
+    currentQuoteIndex = index;
+    const quote = quotes[index];
+    
+    // Animate the transition
+    const englishElement = document.getElementById('quote-english');
+    const chineseElement = document.getElementById('quote-chinese');
+    
+    englishElement.style.opacity = '0';
+    chineseElement.style.opacity = '0';
+    
+    setTimeout(() => {
+        englishElement.textContent = quote.english;
+        chineseElement.textContent = quote.chinese;
+        englishElement.style.opacity = '1';
+        chineseElement.style.opacity = '1';
+    }, 200);
+    
+    // Update navigation buttons
+    document.getElementById('prev-quote').disabled = index === 0;
+    document.getElementById('next-quote').disabled = index === quotes.length - 1;
+}
+
+function navigateQuote(direction) {
+    const newIndex = currentQuoteIndex + direction;
+    if (newIndex >= 0 && newIndex < quotes.length) {
+        displayQuote(newIndex);
+    }
+}
+
+// Add event listeners when the document loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initial fetch of quotes
+    fetchInspirationalQuotes();
+    
+    // Setup navigation buttons
+    document.getElementById('prev-quote').addEventListener('click', () => navigateQuote(-1));
+    document.getElementById('next-quote').addEventListener('click', () => navigateQuote(1));
+    document.getElementById('refresh-quote').addEventListener('click', fetchInspirationalQuotes);
+});

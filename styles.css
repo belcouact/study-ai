@@ -2292,4 +2292,73 @@ button:active {
 .content-section ul, .content-section ol {
     margin-left: 20px;
     margin-bottom: 20px;
+}
+
+.quote-frame {
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    transition: all 0.3s ease;
+}
+
+.quote-frame:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+#quote-content {
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.quote-text {
+    color: white;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 0;
+    opacity: 0.9;
+}
+
+#quote-chinese {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.quote-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.quote-nav-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.quote-nav-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.quote-nav-btn i {
+    font-size: 0.8rem;
+}
+
+#refresh-quote i {
+    font-size: 0.75rem;
 } 
