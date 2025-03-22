@@ -211,7 +211,7 @@ body {
     margin: 0.5rem 0 1rem 0;
 }
 
-.sidebar-frame {
+.sidebar-frame, .quote-frame {
     background-color: rgba(255, 255, 255, 0.03);
     border-radius: 8px;
     padding: 0.8rem;
@@ -219,6 +219,7 @@ body {
     width: 100%;
     box-sizing: border-box;
     border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 1rem;
 }
 
 .frame-title {
@@ -2324,12 +2325,12 @@ button:active {
 }
 
 .quote-frame {
-    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     margin: 0;
 }
 
 .quote-frame:hover {
-    border-color: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.4);
     background-color: rgba(255, 255, 255, 0.05);
 }
 
