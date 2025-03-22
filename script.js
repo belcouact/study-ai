@@ -6003,12 +6003,14 @@ async function handleLoadVocabularyClick() {
         if (words && words.length > 0) {
             vocabularyWords = words;
             currentWordIndex = 0;
-            displayWordCard(currentWordIndex);
             
-            // Set up navigation buttons
+            // Display the first word
+            displayWordCard(currentWordIndex);
+
+            // Set up navigation buttons with direct event listeners
             const prevButton = document.getElementById('prev-word-btn');
             const nextButton = document.getElementById('next-word-btn');
-            
+
             if (prevButton) {
                 prevButton.onclick = () => {
                     if (currentWordIndex > 0) {
@@ -6017,8 +6019,9 @@ async function handleLoadVocabularyClick() {
                         updateNavigationControls();
                     }
                 };
+                prevButton.disabled = currentWordIndex <= 0;
             }
-            
+
             if (nextButton) {
                 nextButton.onclick = () => {
                     if (currentWordIndex < vocabularyWords.length - 1) {
@@ -6027,22 +6030,16 @@ async function handleLoadVocabularyClick() {
                         updateNavigationControls();
                     }
                 };
+                nextButton.disabled = currentWordIndex >= vocabularyWords.length - 1;
             }
-            
-            // Initialize navigation controls
-            updateNavigationControls();
-        } else {
-            showVocabularyError('无法获取单词数据');
+
+            // Make sure buttons are visible and styled properly
+            if (prevButton) prevButton.style.display = 'block';
+            if (nextButton) nextButton.style.display = 'block';
         }
     } catch (error) {
         console.error('Error loading vocabulary:', error);
-        vocabularyContainer.innerHTML = `
-            <div class="error-message" style="color: #dc3545; padding: 15px;">
-                <i class="fas fa-exclamation-circle"></i>
-                <p>加载词汇时出错: ${error.message}</p>
-                <p>Error loading vocabulary: ${error.message}</p>
-            </div>
-        `;
+        showVocabularyError(error.message);
     } finally {
         loadBtn.disabled = false;
         loadBtn.innerHTML = '加载词汇';
@@ -6641,35 +6638,18 @@ function navigateWordCard(direction) {
 function updateNavigationControls() {
     const prevButton = document.getElementById('prev-word-btn');
     const nextButton = document.getElementById('next-word-btn');
-    
+    const wordCounter = document.getElementById('word-counter');
+
     if (prevButton) {
         prevButton.disabled = currentWordIndex <= 0;
-        // Add click handler if it doesn't exist
-        if (!prevButton.onclick) {
-            prevButton.onclick = () => {
-                if (currentWordIndex > 0) {
-                    currentWordIndex--;
-                    displayWordCard(currentWordIndex);
-                }
-            };
-        }
+        prevButton.style.cursor = currentWordIndex <= 0 ? 'not-allowed' : 'pointer';
     }
-    
+
     if (nextButton) {
         nextButton.disabled = currentWordIndex >= vocabularyWords.length - 1;
-        // Add click handler if it doesn't exist
-        if (!nextButton.onclick) {
-            nextButton.onclick = () => {
-                if (currentWordIndex < vocabularyWords.length - 1) {
-                    currentWordIndex++;
-                    displayWordCard(currentWordIndex);
-                }
-            };
-        }
+        nextButton.style.cursor = currentWordIndex >= vocabularyWords.length - 1 ? 'not-allowed' : 'pointer';
     }
-    
-    // Update word counter if it exists
-    const wordCounter = document.getElementById('word-counter');
+
     if (wordCounter && vocabularyWords.length > 0) {
         wordCounter.textContent = `${currentWordIndex + 1} / ${vocabularyWords.length}`;
     }
