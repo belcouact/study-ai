@@ -63,11 +63,11 @@
             
             <!-- Footer text -->
             <div class="panel-footer">
-                <a href="https://yuanbao.tencent.com/chat/naQivTmsDa" target="_blank" style="text-decoration: underline;">腾讯元宝</a>
+                <a href="https://yuanbao.tencent.com/chat/naQivTmsDa" target="_blank" style="text-decoration: underline; color: white;">腾讯元宝</a>
                 &nbsp;|&nbsp;
-                <a href="https://tongyi.aliyun.com/qianwen/" target="_blank" style="text-decoration: underline;">通义千问</a>
+                <a href="https://tongyi.aliyun.com/qianwen/" target="_blank" style="text-decoration: underline; color: white;">通义千问</a>
                 &nbsp;|&nbsp;
-                <a href="#" target="_blank" style="text-decoration: underline;">关于本站</a>
+                <a href="#" onclick="openAboutModal(event)" style="text-decoration: underline; color: white;">关于本站</a>
             </div>
         </div>
         
@@ -261,5 +261,63 @@
     </div>
     <!-- Load script at the end with defer -->
     <script src="script.js" defer></script>
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="langToggle" class="lang-toggle">English</button>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="chineseContent" class="content-section">
+                    <h2>关于本站</h2>
+                    <p>这是一个由好奇心、探索欲与热忱促成的小小实验项目，它始于几个萦绕心头的问题：</p>
+                    <ol>
+                        <li>生成式AI如此强大，如何让它适配个性化需求？</li>
+                        <li>在AI时代，编程与创造是否真的人人可为？</li>
+                        <li>如何利用AI帮助孩子学习？</li>
+                    </ol>
+                    <p>以下是实践过程中的一些感悟：</p>
+                    <ul>
+                        <li>拒绝躺平，开启思考</li>
+                        <li>不要拖延，立即行动</li>
+                        <li>无惧试错，在实践中成长</li>
+                        <li>永不言弃，探索不止</li>
+                        <li>坚信自己，终有所成</li>
+                    </ul>
+                    <p>项目所用到的工具（这些都是实践过程中现学现用的）：</p>
+                    <ul>
+                        <li>内容提供：DeepSeek</li>
+                        <li>代码：Claude-3.7-sonnet</li>
+                        <li>编译器：Cursor / VS Code</li>
+                        <li>网页部署：Github / Cloudflare</li>
+                    </ul>
+                </div>
+                <div id="englishContent" class="content-section" style="display: none;">
+                    <h2>About this website</h2>
+                    <p>This is a small experimental project fueled by curiosity, exploration, and passion. It began with several lingering questions:</p>
+                    <ol>
+                        <li>With generative AI being so powerful, how can we adapt it to personalized needs?</li>
+                        <li>In the AI era, can programming and creation truly become accessible to everyone?</li>
+                        <li>How can we leverage AI to assist children's learning?</li>
+                    </ol>
+                    <p>Here are some insights gained during implementation:</p>
+                    <ul>
+                        <li>Reject complacency, start thinking</li>
+                        <li>Resist procrastination, take immediate action</li>
+                        <li>Embrace trial and error, grow through practice</li>
+                        <li>Never give up, keep exploring</li>
+                        <li>Believe in yourself, success will follow</li>
+                    </ul>
+                    <p>Tools used in the project (all learned during implementation):</p>
+                    <ul>
+                        <li>Content provider: DeepSeek</li>
+                        <li>Coding: Claude-3.7-sonnet</li>
+                        <li>Code Editor: Cursor / VS Code</li>
+                        <li>Web deployment: Github / Cloudflare</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html> 

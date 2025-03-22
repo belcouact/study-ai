@@ -6738,3 +6738,42 @@ function handleTabSwitch(containerType) {
             break;
     }
 }
+
+function openAboutModal(event) {
+    event.preventDefault();
+    document.getElementById('aboutModal').style.display = 'block';
+}
+
+// Get modal elements
+const modal = document.getElementById('aboutModal');
+const closeBtn = document.getElementsByClassName('close')[0];
+const langToggle = document.getElementById('langToggle');
+const chineseContent = document.getElementById('chineseContent');
+const englishContent = document.getElementById('englishContent');
+
+// Close modal when clicking the X
+closeBtn.onclick = function() {
+    modal.style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Toggle language
+let isEnglish = false;
+langToggle.onclick = function() {
+    isEnglish = !isEnglish;
+    if (isEnglish) {
+        chineseContent.style.display = 'none';
+        englishContent.style.display = 'block';
+        langToggle.textContent = '中文';
+    } else {
+        chineseContent.style.display = 'block';
+        englishContent.style.display = 'none';
+        langToggle.textContent = 'English';
+    }
+}
