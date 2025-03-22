@@ -5970,7 +5970,7 @@ async function handleLoadVocabularyClick() {
     vocabularyContainer.innerHTML = `
         <div class="initial-message loading-message">
             <div class="loading-spinner vocabulary-spinner"></div>
-            <p>正在加载5个词汇，请耐心等待...</p>
+            <p>词汇加载中，请耐心等待...</p>
             <p>Loading five vocabularies, please be patient...</p>
         </div>
     `;
@@ -6613,12 +6613,24 @@ async function handleLoadVocabularyClick() {
     // ... existing code ...
     try {
         const loadingMessage = document.querySelector('.initial-message.loading-message');
-        loadingMessage.innerHTML = 'Loading vocabulary... <div class="spinner"></div>';
+        loadingMessage.innerHTML = `
+            <div class="loading-spinner vocabulary-spinner"></div>
+            <p>正在加载5个词汇，请耐心等待...</p>
+            <p>Loading five vocabularies, please be patient...</p>
+        `;
         loadingMessage.style.display = 'block';
         
         // ... existing API call or loading logic ...
     } catch (error) {
-        showVocabularyError(error.message);
+        const loadingMessage = document.querySelector('.initial-message.loading-message');
+        loadingMessage.innerHTML = `
+            <div class="error-message" style="color: #dc3545; padding: 15px;">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>加载词汇时出错: ${error.message}</p>
+                <p>Error loading vocabulary: ${error.message}</p>
+            </div>
+        `;
+        loadingMessage.style.display = 'block';
         console.error('Error loading vocabulary:', error);
     }
     // ... existing code ...
