@@ -6001,9 +6001,36 @@ async function handleLoadVocabularyClick() {
         
         // Display words
         if (words && words.length > 0) {
-        vocabularyWords = words;
-        currentWordIndex = 0;
+            vocabularyWords = words;
+            currentWordIndex = 0;
             displayWordCard(currentWordIndex);
+            
+            // Set up navigation buttons
+            const prevButton = document.getElementById('prev-word-btn');
+            const nextButton = document.getElementById('next-word-btn');
+            
+            if (prevButton) {
+                prevButton.onclick = () => {
+                    if (currentWordIndex > 0) {
+                        currentWordIndex--;
+                        displayWordCard(currentWordIndex);
+                        updateNavigationControls();
+                    }
+                };
+            }
+            
+            if (nextButton) {
+                nextButton.onclick = () => {
+                    if (currentWordIndex < vocabularyWords.length - 1) {
+                        currentWordIndex++;
+                        displayWordCard(currentWordIndex);
+                        updateNavigationControls();
+                    }
+                };
+            }
+            
+            // Initialize navigation controls
+            updateNavigationControls();
         } else {
             showVocabularyError('无法获取单词数据');
         }
@@ -6617,10 +6644,28 @@ function updateNavigationControls() {
     
     if (prevButton) {
         prevButton.disabled = currentWordIndex <= 0;
+        // Add click handler if it doesn't exist
+        if (!prevButton.onclick) {
+            prevButton.onclick = () => {
+                if (currentWordIndex > 0) {
+                    currentWordIndex--;
+                    displayWordCard(currentWordIndex);
+                }
+            };
+        }
     }
     
     if (nextButton) {
         nextButton.disabled = currentWordIndex >= vocabularyWords.length - 1;
+        // Add click handler if it doesn't exist
+        if (!nextButton.onclick) {
+            nextButton.onclick = () => {
+                if (currentWordIndex < vocabularyWords.length - 1) {
+                    currentWordIndex++;
+                    displayWordCard(currentWordIndex);
+                }
+            };
+        }
     }
     
     // Update word counter if it exists
