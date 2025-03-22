@@ -3000,9 +3000,55 @@ function moveContentCreationToTop() {
 
 // Function to initialize empty state on the test page
 function initializeEmptyState() {
-    // Function completely removed to disable empty state functionality
-    console.log('Empty state functionality disabled');
-    return; // Do nothing
+    console.log('Initializing empty state');
+    
+    const createContainer = document.getElementById('create-container');
+    if (!createContainer) {
+        console.error('Create container not found');
+        return;
+    }
+
+    // Check if empty state already exists
+    let emptyState = createContainer.querySelector('.empty-state');
+    if (!emptyState) {
+        // Create empty state element
+        emptyState = document.createElement('div');
+        emptyState.className = 'empty-state';
+        emptyState.innerHTML = `
+            <div class="empty-state-content" style="
+                text-align: center;
+                padding: 40px 20px;
+                color: #718096;
+            ">
+                <i class="fas fa-file-alt" style="
+                    font-size: 48px;
+                    margin-bottom: 20px;
+                    color: #A0AEC0;
+                "></i>
+                <h3 style="
+                    margin-bottom: 10px;
+                    color: #4A5568;
+                    font-size: 18px;
+                ">开始创建题目</h3>
+                <p style="
+                    margin-bottom: 20px;
+                    font-size: 14px;
+                ">请在左侧设置参数后点击"出题"按钮生成题目</p>
+            </div>
+        `;
+        
+        // Insert empty state at the beginning of create container
+        createContainer.insertBefore(emptyState, createContainer.firstChild);
+    }
+
+    // Make sure empty state is visible
+    emptyState.style.display = 'block';
+    
+    // Hide questions display container if it exists
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    if (questionsDisplayContainer) {
+        questionsDisplayContainer.classList.add('hidden');
+    }
 }
 
 // Add event listeners for the optimize and submit buttons in the chat interface
