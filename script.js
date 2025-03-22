@@ -6783,7 +6783,24 @@ let currentQuoteIndex = 0;
 
 async function fetchInspirationalQuotes() {
     try {
-        const prompt = `Please provide 10 inspirational quotes that are less than 20 words each. For each quote, provide both English and Chinese translations. Format the response as a JSON array with objects containing 'english' and 'chinese' properties.`;
+        // Show initial loading message
+        const englishElement = document.getElementById('quote-english');
+        const chineseElement = document.getElementById('quote-chinese');
+        
+        if (englishElement && chineseElement) {
+            englishElement.textContent = "Loading today's inspirational quote...";
+            chineseElement.textContent = "加载今日名言...";
+            englishElement.style.opacity = '0.7';
+            chineseElement.style.opacity = '0.7';
+        }
+
+        const prompt = `Please provide 10 inspirational quotes that are less than 20 words each. For each quote, provide both English and Chinese translations. The response must be a valid JSON array with this exact format:
+        [
+          {
+            "english": "quote in English",
+            "chinese": "quote in Chinese"
+          }
+        ]`;
         
         const apiEndpoint = `/api/${currentApiFunction}`;
         const response = await fetch(apiEndpoint, {
@@ -6807,19 +6824,83 @@ async function fetchInspirationalQuotes() {
         }
 
         const data = await response.json();
+        if (!data || !data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+            throw new Error('Invalid API response format');
+        }
+
         const content = data.choices[0].message.content;
         
-        // Parse the JSON response from the content
-        const parsedContent = JSON.parse(content);
-        quotes = parsedContent.slice(0, 10); // Ensure we only take 10 quotes
+        // Try to parse the JSON content
+        let parsedContent;
+        try {
+            // First attempt: direct JSON parse
+            parsedContent = JSON.parse(content);
+        } catch (parseError) {
+            // Second attempt: try to extract JSON from the text
+            const jsonMatch = content.match(/\[\s*\{[\s\S]*\}\s*\]/);
+            if (jsonMatch) {
+                parsedContent = JSON.parse(jsonMatch[0]);
+            } else {
+                throw new Error('Could not parse quotes from response');
+            }
+        }
+
+        // Validate the parsed content
+        if (!Array.isArray(parsedContent) || parsedContent.length === 0) {
+            throw new Error('No valid quotes found in response');
+        }
+
+        // Ensure each quote has required properties
+        quotes = parsedContent
+            .filter(quote => quote && quote.english && quote.chinese)
+            .slice(0, 10); // Take only first 10 valid quotes
+
+        if (quotes.length === 0) {
+            throw new Error('No valid quotes found after filtering');
+        }
+
         displayQuote(0);
     } catch (error) {
         console.error('Error fetching quotes:', error);
-        // Display error message in the quote frame
-        document.getElementById('quote-english').textContent = 'Failed to load quote';
-        document.getElementById('quote-chinese').textContent = '无法加载名言';
+        
+        // Display error message with retry button
+        const englishElement = document.getElementById('quote-english');
+        const chineseElement = document.getElementById('quote-chinese');
+        
+        if (englishElement && chineseElement) {
+            englishElement.innerHTML = 'Failed to load quote. <button onclick="fetchInspirationalQuotes()" class="retry-button">Retry</button>';
+            chineseElement.innerHTML = '无法加载名言。<button onclick="fetchInspirationalQuotes()" class="retry-button">重试</button>';
+            englishElement.style.opacity = '1';
+            chineseElement.style.opacity = '1';
+        }
+
+        // Disable navigation buttons when there's an error
+        const prevButton = document.getElementById('prev-quote');
+        const nextButton = document.getElementById('next-quote');
+        if (prevButton) prevButton.disabled = true;
+        if (nextButton) nextButton.disabled = true;
     }
 }
+
+// Add CSS for the retry button
+const style = document.createElement('style');
+style.textContent = `
+    .retry-button {
+        margin-left: 10px;
+        padding: 4px 8px;
+        background-color: #4299e1;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: background-color 0.2s;
+    }
+    .retry-button:hover {
+        background-color: #3182ce;
+    }
+`;
+document.head.appendChild(style);
 
 function displayQuote(index) {
     if (quotes.length === 0) return;
