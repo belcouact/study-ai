@@ -6792,7 +6792,13 @@ async function fetchInspirationalQuotes() {
         document.getElementById('next-quote').disabled = true;
         document.getElementById('refresh-quote').disabled = true;
 
-        const prompt = `Please provide 10 inspirational quotes that are less than 20 words each. For each quote, provide both English and Chinese translations.`;
+        const prompt = `Generate 10 inspirational quotes. For each quote, provide English and Chinese translations. Format the response exactly like this example:
+[
+    {
+        "english": "Success is not final, failure is not fatal.",
+        "chinese": "成功不是终点，失败也并非致命。"
+    }
+]`;
         
         const apiEndpoint = `/api/${currentApiFunction}`;
         const response = await fetch(apiEndpoint, {
@@ -6818,16 +6824,48 @@ async function fetchInspirationalQuotes() {
         const data = await response.json();
         const content = data.choices[0].message.content;
         
-        // Parse the JSON response from the content
-        const parsedContent = JSON.parse(content);
-        quotes = parsedContent.slice(0, 10); // Ensure we only take 10 quotes
-        currentQuoteIndex = 0;  // Reset the index
-        displayQuote(0);
+        // Try to extract JSON array from the response
+        let parsedContent;
+        try {
+            // First attempt: direct JSON parse
+            parsedContent = JSON.parse(content);
+        } catch (parseError) {
+            // Second attempt: try to find JSON array in the text
+            const jsonMatch = content.match(/\[\s*\{[\s\S]*\}\s*\]/);
+            if (jsonMatch) {
+                parsedContent = JSON.parse(jsonMatch[0]);
+            } else {
+                // Third attempt: try to parse the response as a structured format
+                const quotes = content.split('\n\n').map(quote => {
+                    const [english, chinese] = quote.split('\n').map(line => 
+                        line.replace(/^(English|Chinese): /, '').trim()
+                    );
+                    return { english, chinese };
+                }).filter(quote => quote.english && quote.chinese);
+                
+                if (quotes.length > 0) {
+                    parsedContent = quotes;
+                } else {
+                    throw new Error('Could not parse quotes from response');
+                }
+            }
+        }
 
-        // Re-enable buttons after loading
-        document.getElementById('refresh-quote').disabled = false;
-        document.getElementById('prev-quote').disabled = true; // Disabled because we're at first quote
-        document.getElementById('next-quote').disabled = false;
+        // Validate and clean the quotes
+        quotes = parsedContent
+            .filter(quote => quote && quote.english && quote.chinese)
+            .map(quote => ({
+                english: quote.english.replace(/^["']|["']$/g, ''),  // Remove quotes if present
+                chinese: quote.chinese.replace(/^["']|["']$/g, '')
+            }))
+            .slice(0, 10);  // Ensure we only take 10 quotes
+
+        if (quotes.length === 0) {
+            throw new Error('No valid quotes found in response');
+        }
+
+        currentQuoteIndex = 0;
+        displayQuote(0);
 
     } catch (error) {
         console.error('Error fetching quotes:', error);
@@ -6836,7 +6874,8 @@ async function fetchInspirationalQuotes() {
             <p class="quote-text">Failed to load quote</p>
             <p class="quote-text">无法加载名言</p>
         `;
-        // Re-enable refresh button on error
+    } finally {
+        // Re-enable refresh button
         document.getElementById('refresh-quote').disabled = false;
     }
 }
