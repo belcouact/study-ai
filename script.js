@@ -3003,15 +3003,16 @@ function initializeEmptyState() {
     console.log('Initializing empty state');
     
     const createContainer = document.getElementById('create-container');
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
+    
     if (!createContainer) {
         console.error('Create container not found');
         return;
     }
 
-    // Check if empty state already exists
+    // Create empty state if it doesn't exist
     let emptyState = createContainer.querySelector('.empty-state');
     if (!emptyState) {
-        // Create empty state element
         emptyState = document.createElement('div');
         emptyState.className = 'empty-state';
         emptyState.innerHTML = `
@@ -3041,13 +3042,11 @@ function initializeEmptyState() {
         createContainer.insertBefore(emptyState, createContainer.firstChild);
     }
 
-    // Make sure empty state is visible
+    // Make sure empty state is visible and questions container is hidden
     emptyState.style.display = 'block';
     
-    // Hide questions display container if it exists
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
     if (questionsDisplayContainer) {
-        questionsDisplayContainer.style.display = 'none'; // Changed from adding 'hidden' class
+        questionsDisplayContainer.style.display = 'none';
     }
 }
 
