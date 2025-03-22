@@ -6010,7 +6010,13 @@ async function handleLoadVocabularyClick() {
         }
     } catch (error) {
         console.error('Error loading vocabulary:', error);
-        showVocabularyError(error.message || '获取单词时出错');
+        loadingMessage.innerHTML = `
+            <div class="error-message" style="color: #dc3545; padding: 15px;">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>加载词汇时出错: ${error.message}</p>
+                <p>Error loading vocabulary: ${error.message}</p>
+            </div>
+        `;
     } finally {
         loadBtn.disabled = false;
         loadBtn.innerHTML = '加载词汇';
@@ -6588,50 +6594,4 @@ function renderLearningTips(tips) {
             ${tips.chinese ? `<div class="tip-content-chinese">${tips.chinese}</div>` : ''}
         </div>
     `;
-}
-
-// Add these new functions before handleLoadVocabularyClick
-function showVocabularyError(message) {
-    const loadingMessage = document.querySelector('.initial-message.loading-message');
-    loadingMessage.innerHTML = `<div class="error-message">Error: ${message}</div>`;
-}
-
-function updateNavigationControls(totalWords) {
-    const prevButton = document.querySelector('.nav-button.prev');
-    const nextButton = document.querySelector('.nav-button.next');
-    const wordCounter = document.getElementById('word-counter');
-    
-    if (prevButton && nextButton && wordCounter) {
-        prevButton.disabled = currentWordIndex === 0;
-        nextButton.disabled = currentWordIndex >= totalWords - 1;
-        wordCounter.textContent = `${currentWordIndex + 1} / ${totalWords}`;
-    }
-}
-
-// Update the handleLoadVocabularyClick function
-async function handleLoadVocabularyClick() {
-    // ... existing code ...
-    try {
-        const loadingMessage = document.querySelector('.initial-message.loading-message');
-        loadingMessage.innerHTML = `
-            <div class="loading-spinner vocabulary-spinner"></div>
-            <p>正在加载5个词汇，请耐心等待...</p>
-            <p>Loading five vocabularies, please be patient...</p>
-        `;
-        loadingMessage.style.display = 'block';
-        
-        // ... existing API call or loading logic ...
-    } catch (error) {
-        const loadingMessage = document.querySelector('.initial-message.loading-message');
-        loadingMessage.innerHTML = `
-            <div class="error-message" style="color: #dc3545; padding: 15px;">
-                <i class="fas fa-exclamation-circle"></i>
-                <p>加载词汇时出错: ${error.message}</p>
-                <p>Error loading vocabulary: ${error.message}</p>
-            </div>
-        `;
-        loadingMessage.style.display = 'block';
-        console.error('Error loading vocabulary:', error);
-    }
-    // ... existing code ...
 }
