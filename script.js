@@ -6007,35 +6007,40 @@ async function handleLoadVocabularyClick() {
             // Display the first word
             displayWordCard(currentWordIndex);
 
-            // Set up navigation buttons with direct event listeners
+            // Remove existing event listeners by cloning and replacing buttons
             const prevButton = document.getElementById('prev-word-btn');
             const nextButton = document.getElementById('next-word-btn');
 
             if (prevButton) {
-                prevButton.onclick = () => {
+                const newPrevButton = prevButton.cloneNode(true);
+                prevButton.parentNode.replaceChild(newPrevButton, prevButton);
+                
+                // Add single event listener
+                newPrevButton.onclick = () => {
                     if (currentWordIndex > 0) {
                         currentWordIndex--;
                         displayWordCard(currentWordIndex);
                         updateNavigationControls();
                     }
                 };
-                prevButton.disabled = currentWordIndex <= 0;
             }
 
             if (nextButton) {
-                nextButton.onclick = () => {
+                const newNextButton = nextButton.cloneNode(true);
+                nextButton.parentNode.replaceChild(newNextButton, nextButton);
+                
+                // Add single event listener
+                newNextButton.onclick = () => {
                     if (currentWordIndex < vocabularyWords.length - 1) {
                         currentWordIndex++;
                         displayWordCard(currentWordIndex);
                         updateNavigationControls();
                     }
                 };
-                nextButton.disabled = currentWordIndex >= vocabularyWords.length - 1;
             }
 
-            // Make sure buttons are visible and styled properly
-            if (prevButton) prevButton.style.display = 'block';
-            if (nextButton) nextButton.style.display = 'block';
+            // Initialize navigation controls
+            updateNavigationControls();
         }
     } catch (error) {
         console.error('Error loading vocabulary:', error);
