@@ -3047,7 +3047,7 @@ function initializeEmptyState() {
     // Hide questions display container if it exists
     const questionsDisplayContainer = document.getElementById('questions-display-container');
     if (questionsDisplayContainer) {
-        questionsDisplayContainer.classList.add('hidden');
+        questionsDisplayContainer.style.display = 'none'; // Changed from adding 'hidden' class
     }
 }
 
