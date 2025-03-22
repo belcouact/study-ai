@@ -1803,7 +1803,7 @@ function handleGenerateQuestionsClick() {
 
     示例格式：
     题目：[题目内容]
-    A. [选项A内容]
+    A. [选项A内容] 
     B. [选项B内容] 
     C. [选项C内容]
     D. [选项D内容]
