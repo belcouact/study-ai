@@ -6787,7 +6787,7 @@ async function fetchInspirationalQuotes() {
         const chineseElement = document.getElementById('quote-chinese');
         
         if (chineseElement) {
-            chineseElement.textContent = "加载今日名言中...";
+            chineseElement.textContent = "今日名言加载中...";
             chineseElement.style.opacity = '0.7';
         }
 
@@ -6850,7 +6850,7 @@ async function fetchInspirationalQuotes() {
         // Ensure each quote has required properties
         quotes = parsedContent
             .filter(quote => quote && quote.english && quote.chinese)
-            .slice(0, 10); // Take only first 10 valid quotes
+            .slice(0, 40); // Take only first 10 valid quotes
 
         if (quotes.length === 0) {
             throw new Error('No valid quotes found after filtering');
