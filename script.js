@@ -377,20 +377,21 @@ function showResultsPopup() {
 function displayCurrentQuestion() {
     console.log('displayCurrentQuestion called', currentQuestionIndex);
     
-    // Create questions container if it doesn't exist
-    let questionsContainer = document.querySelector('.questions-container');
+    // First, find or create the create container
+    let createContainer = document.getElementById('create-container');
+    if (!createContainer) {
+        createContainer = document.createElement('div');
+        createContainer.id = 'create-container';
+        document.querySelector('.content-area').appendChild(createContainer);
+    }
+
+    // Find or create the questions display container
+    let questionsContainer = document.querySelector('.questions-display-container');
     if (!questionsContainer) {
-        console.log('Creating questions container');
+        console.log('Creating questions display container');
         questionsContainer = document.createElement('div');
-        questionsContainer.className = 'questions-container';
-        
-        const contentArea = document.querySelector('.content-area') || document.querySelector('.main-content');
-        if (contentArea) {
-            contentArea.appendChild(questionsContainer);
-        } else {
-            document.body.appendChild(questionsContainer);
-            console.log('Appended questions container to body');
-        }
+        questionsContainer.className = 'questions-display-container';
+        createContainer.appendChild(questionsContainer);
     }
 
     // Show empty state if no questions available
@@ -402,7 +403,7 @@ function displayCurrentQuestion() {
                     <i class="fas fa-book-open" style="font-size: 48px; color: #4299e1; margin-bottom: 20px;"></i>
                     <p style="font-size: 18px; color: #2d3748; margin-bottom: 10px;">准备生成练习题</p>
                     <p style="color: #718096; margin-bottom: 20px;">请在左侧设置参数后点击"出题"按钮</p>
-                    <div class="empty-state-steps" style="text-align: left; max-width: 300px; margin: 0 auto;">
+                    <div class="empty-state-steps">
                         <div style="margin-bottom: 10px; color: #4a5568;">
                             <span style="color: #4299e1; margin-right: 8px;">1.</span> 选择学校和年级
                         </div>
