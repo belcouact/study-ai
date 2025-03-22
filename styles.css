@@ -64,7 +64,7 @@ body {
 /* Left panel / Sidebar */
 .left-panel {
     width: var(--sidebar-width);
-    background: linear-gradient(180deg, #2f3b52 0%, #2a3447 100%);
+    background: linear-gradient(180deg, #3d4d6a 0%, #364561 100%);
     color: #e2e8f0;
     height: 100%;
     position: fixed;
@@ -172,7 +172,7 @@ body {
 
 /* External services section */
 .external-services {
-    margin: 0;
+    margin: 0.4rem 0;
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
@@ -210,13 +210,13 @@ body {
     margin: 0.5rem 0 1rem 0;
 }
 
-.sidebar-frame {
+.sidebar-frame, .quote-frame {
     background-color: rgba(255, 255, 255, 0.03);
     border-radius: 8px;
     padding: 0.8rem;
-    margin: 0.6rem 0.8rem;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    width: calc(100% - 1.6rem);
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .frame-title {
@@ -2307,11 +2307,7 @@ button:active {
 
 .quote-frame {
     border: 2px dashed rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    padding: 0.8rem;
-    margin: 0.6rem 0.8rem;
-    width: calc(100% - 1.6rem);
-    transition: all 0.3s ease;
+    margin: 0;
 }
 
 .quote-frame:hover {
@@ -2373,4 +2369,13 @@ button:active {
 
 #refresh-quote i {
     font-size: 0.75rem;
+}
+
+/* Add styles for loading state */
+.quote-loading {
+    color: white;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1rem 0;
+    opacity: 0.8;
 } 
