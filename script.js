@@ -4968,6 +4968,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
+        /*
         // Add the panel to the document
         const mainContent = document.querySelector('.main-content');
         if (mainContent) {
@@ -4976,6 +4977,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             console.error('Main content element not found');
         }
+        */
     }
     
     // Add direct event listener to poetry button
@@ -4990,6 +4992,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (qaPanel) qaPanel.classList.add('hidden');
             if (createPanel) createPanel.classList.add('hidden');
             
+            /*
             // Show poetry panel
             if (poetryPanel) {
                 poetryPanel.classList.remove('hidden');
@@ -4997,6 +5000,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 console.error('Poetry panel not found');
             }
+            */
             
             // Update active states
             if (qaButton) qaButton.classList.remove('active');
