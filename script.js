@@ -1,6 +1,6 @@
 // API configuration variables
 let currentApiFunction = 'chat';
-let currentModel = 'deepseek-r1';
+let currentModel = 'deepseek-chat';
 // Add global variable for current question index
 let currentQuestionIndex = 0;
 
