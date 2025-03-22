@@ -5988,8 +5988,8 @@ async function handleLoadVocabularyClick() {
     vocabularyContainer.innerHTML = `
         <div class="initial-message loading-message">
             <div class="loading-spinner vocabulary-spinner"></div>
-            <p>词汇加载中，请耐心等待...</p>
-            <p>Loading five vocabularies, please be patient...</p>
+            <p>正在加载${vocabularyCount}个词汇，请耐心等待...</p>
+            <p>Loading ${vocabularyCount} vocabularies, please be patient...</p>
         </div>
     `;
     
@@ -6072,8 +6072,11 @@ async function handleLoadVocabularyClick() {
 // Fetch vocabulary words from API
 async function fetchVocabularyWords(school, grade) {
     try {
+        // Get the selected vocabulary count
+        const vocabularyCount = document.getElementById('vocabulary-cnt').value || 5;
+        
         // Create a more structured prompt for consistent API responses
-        const prompt = `Generate 10 English vocabulary words appropriate for ${school} school students in grade ${grade}.
+        const prompt = `Generate ${vocabularyCount} English vocabulary words appropriate for ${school} school students in grade ${grade}.
 
 Please format your response as a valid JSON array with objects having the EXACT following structure for each word:
 \`\`\`json
@@ -6125,11 +6128,12 @@ Please format your response as a valid JSON array with objects having the EXACT 
 \`\`\`
 
 IMPORTANT:
-1. Ensure the JSON is valid and properly formatted with all fields.
-2. Do NOT include any explanatory text outside the JSON.
-3. Make sure all example sentences include both English and Chinese translations.
-4. Choose vocabulary appropriate for ${grade} grade ${school} school students.
-5. Strictly follow the format above for all keys and values.`;
+1. Generate exactly ${vocabularyCount} words.
+2. Ensure the JSON is valid and properly formatted with all fields.
+3. Do NOT include any explanatory text outside the JSON.
+4. Make sure all example sentences include both English and Chinese translations.
+5. Choose vocabulary appropriate for ${grade} grade ${school} school students.
+6. Strictly follow the format above for all keys and values.`;
 
         console.log('Fetching vocabulary with prompt:', prompt);
         
