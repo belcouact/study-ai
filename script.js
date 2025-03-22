@@ -382,33 +382,48 @@ function displayCurrentQuestion() {
         return;
     }
     
-    const question = questions[currentQuestionIndex];
-    console.log('Current question:', question);
-    
-    // Get the create container once at the start
+    // Get the create container
     const createContainer = document.getElementById('create-container');
     if (!createContainer || createContainer.style.display === 'none') {
         console.log('Not on create tab, skipping question display');
         return;
     }
-    
-    // Get or create questions container
+
+    // First ensure we have a questions container
     let questionsContainer = document.querySelector('.questions-container');
     if (!questionsContainer) {
+        console.log('Creating new questions container');
         questionsContainer = document.createElement('div');
         questionsContainer.className = 'questions-container';
         createContainer.appendChild(questionsContainer);
     }
-    
-    // Always ensure empty state is hidden regardless of questions
-    const emptyState = document.querySelector('.empty-state');
-    if (emptyState) {
-        emptyState.style.display = 'none';
-        console.log('Empty state hidden');
+
+    // Create questions display container if it doesn't exist
+    let questionsDisplayContainer = document.getElementById('questions-display-container');
+    if (!questionsDisplayContainer) {
+        console.log('Creating new questions display container');
+        questionsDisplayContainer = document.createElement('div');
+        questionsDisplayContainer.id = 'questions-display-container';
+        questionsDisplayContainer.className = 'questions-display-container';
+        questionsContainer.appendChild(questionsDisplayContainer);
     }
-    
-    // Clear previous question
-    questionsContainer.innerHTML = '';
+
+    // Ensure required child elements exist
+    const requiredElements = [
+        { id: 'question-counter', className: 'question-counter' },
+        { id: 'question-text', className: 'question-text' },
+        { id: 'choices-container', className: 'choices-container' },
+        { id: 'answer-container', className: 'answer-container hidden' }
+    ];
+
+    requiredElements.forEach(element => {
+        if (!document.getElementById(element.id)) {
+            const newElement = document.createElement('div');
+            newElement.id = element.id;
+            newElement.className = element.className;
+            questionsDisplayContainer.appendChild(newElement);
+        }
+    });
     
     // Check if all questions are answered
     const allQuestionsAnswered = window.userAnswers && 
