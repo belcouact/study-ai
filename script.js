@@ -376,7 +376,6 @@ function showResultsPopup() {
 // Function to display the current question
 function displayCurrentQuestion() {
     console.log('displayCurrentQuestion called', currentQuestionIndex);
-    console.log('Questions array:', questions);
     
     if (!questions || questions.length === 0) {
         console.log('No questions available to display');
@@ -386,21 +385,19 @@ function displayCurrentQuestion() {
     const question = questions[currentQuestionIndex];
     console.log('Current question:', question);
     
-    // Create questions container if it doesn't exist
+    // Only create or show questions container if we're on the create tab
+    const createContainer = document.getElementById('create-container');
+    if (!createContainer || createContainer.style.display === 'none') {
+        console.log('Not on create tab, skipping question display');
+        return;
+    }
+    
+    // Get or create questions container
     let questionsContainer = document.querySelector('.questions-container');
     if (!questionsContainer) {
-        console.log('Creating questions container');
         questionsContainer = document.createElement('div');
         questionsContainer.className = 'questions-container';
-        
-        const contentArea = document.querySelector('.content-area') || document.querySelector('.main-content');
-        if (contentArea) {
-            contentArea.appendChild(questionsContainer);
-        } else {
-            // If no content area found, append to body
-            document.body.appendChild(questionsContainer);
-            console.log('Appended questions container to body');
-        }
+        createContainer.appendChild(questionsContainer);
     }
     
     // Always ensure empty state is hidden regardless of questions
@@ -6657,5 +6654,67 @@ function updateNavigationControls() {
 
     if (wordCounter && vocabularyWords.length > 0) {
         wordCounter.textContent = `${currentWordIndex + 1} / ${vocabularyWords.length}`;
+    }
+}
+
+// Update the handleTabSwitch function to properly manage container visibility
+function handleTabSwitch(containerType) {
+    console.log('Switching to tab:', containerType);
+    
+    // Get all possible containers
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    const poetryContainer = document.getElementById('poetry-container');
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    const questionsContainer = document.querySelector('.questions-container');
+    
+    // Hide all containers first
+    if (qaContainer) qaContainer.style.display = 'none';
+    if (createContainer) createContainer.style.display = 'none';
+    if (poetryContainer) poetryContainer.style.display = 'none';
+    if (vocabularyContainer) vocabularyContainer.style.display = 'none';
+    if (questionsContainer) questionsContainer.style.display = 'none';
+    
+    // Reset active states for all buttons
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const poetryButton = document.getElementById('poetry-button');
+    const wordButton = document.getElementById('word-button');
+    
+    if (qaButton) qaButton.classList.remove('active');
+    if (createButton) createButton.classList.remove('active');
+    if (poetryButton) poetryButton.classList.remove('active');
+    if (wordButton) wordButton.classList.remove('active');
+    
+    // Show the appropriate container and set active button based on containerType
+    switch (containerType) {
+        case 'qa':
+            if (qaContainer) {
+                qaContainer.style.display = 'block';
+                if (qaButton) qaButton.classList.add('active');
+            }
+            break;
+            
+        case 'create':
+            if (createContainer) {
+                createContainer.style.display = 'block';
+                if (createButton) createButton.classList.add('active');
+                if (questionsContainer) questionsContainer.style.display = 'block';
+            }
+            break;
+            
+        case 'poetry':
+            if (poetryContainer) {
+                poetryContainer.style.display = 'block';
+                if (poetryButton) poetryButton.classList.add('active');
+            }
+            break;
+            
+        case 'vocabulary':
+            if (vocabularyContainer) {
+                vocabularyContainer.style.display = 'block';
+                if (wordButton) wordButton.classList.add('active');
+            }
+            break;
     }
 }
