@@ -5980,10 +5980,16 @@ document.addEventListener('DOMContentLoaded', function() {
 async function handleLoadVocabularyClick() {
     const loadBtn = document.getElementById('load-vocabulary-btn');
     const vocabularyContainer = document.getElementById('vocabulary-container');
-    
+    const vocabularyCount = document.getElementById('vocabulary-cnt').value || 5;
+
+    if (!vocabularyContainer) {
+        console.error('Vocabulary container not found');
+        return;
+    }
+
     loadBtn.disabled = true;
     loadBtn.innerHTML = '<span class="loading-spinner"></span> 加载中...';
-    
+
     // Display loading message in the vocabulary container
     vocabularyContainer.innerHTML = `
         <div class="initial-message loading-message">
@@ -5992,73 +5998,20 @@ async function handleLoadVocabularyClick() {
             <p>Loading ${vocabularyCount} vocabularies, please be patient...</p>
         </div>
     `;
-    
+
     try {
-        // Get education context from sidebar
-        const schoolSelect = document.getElementById('school-select-sidebar');
-        const gradeSelect = document.getElementById('grade-select-sidebar');
+        const school = document.getElementById('school-select-sidebar').value;
+        const grade = document.getElementById('grade-select-sidebar').value;
         
-        // Check if the elements exist before accessing their values
-        if (!schoolSelect || !gradeSelect) {
-            console.error('School or grade select elements not found');
-            throw new Error('未找到学校或年级选择器，请确保已经设置好教育背景');
-        }
-        
-        const school = schoolSelect.value;
-        const grade = gradeSelect.value;
-        
-        // Validate that we have values
-        if (!school || !grade) {
-            throw new Error('请先在侧边栏选择学校和年级');
-        }
-        
-        console.log('Fetching vocabulary for school:', school, 'grade:', grade);
-        
-        // Fetch vocabulary words from API
         const words = await fetchVocabularyWords(school, grade);
         
-        // Display words
         if (words && words.length > 0) {
             vocabularyWords = words;
             currentWordIndex = 0;
-            
-            // Display the first word
             displayWordCard(currentWordIndex);
-
-            // Remove existing event listeners by cloning and replacing buttons
-            const prevButton = document.getElementById('prev-word-btn');
-            const nextButton = document.getElementById('next-word-btn');
-
-            if (prevButton) {
-                const newPrevButton = prevButton.cloneNode(true);
-                prevButton.parentNode.replaceChild(newPrevButton, prevButton);
-                
-                // Add single event listener
-                newPrevButton.onclick = () => {
-                    if (currentWordIndex > 0) {
-                        currentWordIndex--;
-                        displayWordCard(currentWordIndex);
-                        updateNavigationControls();
-                    }
-                };
-            }
-
-            if (nextButton) {
-                const newNextButton = nextButton.cloneNode(true);
-                nextButton.parentNode.replaceChild(newNextButton, nextButton);
-                
-                // Add single event listener
-                newNextButton.onclick = () => {
-                    if (currentWordIndex < vocabularyWords.length - 1) {
-                        currentWordIndex++;
-                        displayWordCard(currentWordIndex);
-                        updateNavigationControls();
-                    }
-                };
-            }
-
-            // Initialize navigation controls
             updateNavigationControls();
+        } else {
+            showVocabularyError('无法获取单词数据');
         }
     } catch (error) {
         console.error('Error loading vocabulary:', error);
