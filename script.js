@@ -6004,7 +6004,6 @@ async function handleLoadVocabularyClick() {
         vocabularyWords = words;
         currentWordIndex = 0;
             displayWordCard(currentWordIndex);
-            updateNavigationButtons();
         } else {
             showVocabularyError('无法获取单词数据');
         }
@@ -6594,4 +6593,39 @@ function renderLearningTips(tips) {
             ${tips.chinese ? `<div class="tip-content-chinese">${tips.chinese}</div>` : ''}
         </div>
     `;
+}
+
+// Add this function to handle word navigation
+function navigateWordCard(direction) {
+    console.log('Navigating word card:', direction);
+    
+    // Calculate new index
+    const newIndex = currentWordIndex + direction;
+    
+    // Check if new index is valid
+    if (newIndex >= 0 && newIndex < vocabularyWords.length) {
+        currentWordIndex = newIndex;
+        displayWordCard(currentWordIndex);
+        updateNavigationControls();
+    }
+}
+
+// Update the navigation controls function
+function updateNavigationControls() {
+    const prevButton = document.getElementById('prev-word-btn');
+    const nextButton = document.getElementById('next-word-btn');
+    
+    if (prevButton) {
+        prevButton.disabled = currentWordIndex <= 0;
+    }
+    
+    if (nextButton) {
+        nextButton.disabled = currentWordIndex >= vocabularyWords.length - 1;
+    }
+    
+    // Update word counter if it exists
+    const wordCounter = document.getElementById('word-counter');
+    if (wordCounter && vocabularyWords.length > 0) {
+        wordCounter.textContent = `${currentWordIndex + 1} / ${vocabularyWords.length}`;
+    }
 }
