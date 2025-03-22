@@ -6696,3 +6696,140 @@ function handleTabSwitch(containerType) {
             break;
     }
 }
+
+// Add debouncing for event handlers
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Cache DOM elements that are frequently accessed
+const domElements = {
+    vocabularyContainer: document.getElementById('vocabulary-container'),
+    loadBtn: document.getElementById('load-vocabulary-btn'),
+    prevWordBtn: document.getElementById('prev-word-btn'),
+    nextWordBtn: document.getElementById('next-word-btn'),
+    wordCounter: document.getElementById('word-counter'),
+    schoolSelect: document.getElementById('school-select-sidebar'),
+    gradeSelect: document.getElementById('grade-select-sidebar'),
+    vocabularyCount: document.getElementById('vocabulary-cnt')
+};
+
+// Optimize handleLoadVocabularyClick function
+async function handleLoadVocabularyClick() {
+    const { loadBtn, vocabularyContainer, vocabularyCount } = domElements;
+    if (!vocabularyContainer) {
+        console.error('Vocabulary container not found');
+        return;
+    }
+
+    // Disable button and show loading state
+    loadBtn.disabled = true;
+    loadBtn.innerHTML = '<span class="loading-spinner"></span> 加载中...';
+
+    const count = vocabularyCount?.value || 5;
+    
+    // Display loading message
+    vocabularyContainer.innerHTML = `
+        <div class="initial-message loading-message">
+            <div class="loading-spinner vocabulary-spinner"></div>
+            <p>正在加载${count}个词汇，请耐心等待...</p>
+            <p>Loading ${count} vocabularies, please be patient...</p>
+        </div>
+    `;
+
+    try {
+        const school = domElements.schoolSelect.value;
+        const grade = domElements.gradeSelect.value;
+        
+        const words = await fetchVocabularyWords(school, grade);
+        
+        if (words && words.length > 0) {
+            vocabularyWords = words;
+            currentWordIndex = 0;
+            await displayWordCard(currentWordIndex);
+            updateNavigationControls();
+        } else {
+            showVocabularyError('无法获取单词数据');
+        }
+    } catch (error) {
+        console.error('Error loading vocabulary:', error);
+        showVocabularyError(error.message);
+    } finally {
+        loadBtn.disabled = false;
+        loadBtn.innerHTML = '加载词汇';
+    }
+}
+
+// Optimize displayWordCard function with memoization
+const wordCardCache = new Map();
+
+async function displayWordCard(index) {
+    const cacheKey = `word-${index}`;
+    if (wordCardCache.has(cacheKey)) {
+        domElements.vocabularyContainer.innerHTML = wordCardCache.get(cacheKey);
+        return;
+    }
+
+    const word = vocabularyWords[index];
+    if (!word) return;
+
+    const cardHTML = generateWordCardHTML(word);
+    wordCardCache.set(cacheKey, cardHTML);
+    domElements.vocabularyContainer.innerHTML = cardHTML;
+}
+
+// Optimize navigation controls update
+function updateNavigationControls() {
+    const { prevWordBtn, nextWordBtn, wordCounter } = domElements;
+    
+    if (prevWordBtn) {
+        prevWordBtn.disabled = currentWordIndex <= 0;
+        prevWordBtn.style.cursor = currentWordIndex <= 0 ? 'not-allowed' : 'pointer';
+    }
+    
+    if (nextWordBtn) {
+        nextWordBtn.disabled = currentWordIndex >= vocabularyWords.length - 1;
+        nextWordBtn.style.cursor = currentWordIndex >= vocabularyWords.length - 1 ? 'not-allowed' : 'pointer';
+    }
+    
+    if (wordCounter && vocabularyWords.length > 0) {
+        wordCounter.textContent = `${currentWordIndex + 1} / ${vocabularyWords.length}`;
+    }
+}
+
+// Add event listeners with debouncing
+document.addEventListener('DOMContentLoaded', () => {
+    const { prevWordBtn, nextWordBtn, loadBtn } = domElements;
+    
+    if (loadBtn) {
+        loadBtn.addEventListener('click', debounce(handleLoadVocabularyClick, 300));
+    }
+
+    if (prevWordBtn) {
+        prevWordBtn.addEventListener('click', debounce(() => {
+            if (currentWordIndex > 0) {
+                currentWordIndex--;
+                displayWordCard(currentWordIndex);
+                updateNavigationControls();
+            }
+        }, 200));
+    }
+
+    if (nextWordBtn) {
+        nextWordBtn.addEventListener('click', debounce(() => {
+            if (currentWordIndex < vocabularyWords.length - 1) {
+                currentWordIndex++;
+                displayWordCard(currentWordIndex);
+                updateNavigationControls();
+            }
+        }, 200));
+    }
+});
