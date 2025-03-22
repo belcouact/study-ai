@@ -381,7 +381,14 @@ function displayCurrentQuestion() {
         console.log('No questions available to display');
         return;
     }
-    
+
+    // Get the current question from the questions array
+    const question = questions[currentQuestionIndex];
+    if (!question) {
+        console.error('Current question not found at index:', currentQuestionIndex);
+        return;
+    }
+
     // Get the create container
     const createContainer = document.getElementById('create-container');
     if (!createContainer || createContainer.style.display === 'none') {
