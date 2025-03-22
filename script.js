@@ -6678,3 +6678,17 @@ function updateNavigationControls() {
         wordCounter.textContent = `${currentWordIndex + 1} / ${vocabularyWords.length}`;
     }
 }
+
+// Function to display vocabulary error message
+function showVocabularyError(errorMessage) {
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    if (vocabularyContainer) {
+        vocabularyContainer.innerHTML = `
+            <div class="initial-message error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>${errorMessage}</p>
+                <p>Error loading vocabulary, please try again later...</p>
+            </div>
+        `;
+    }
+}
