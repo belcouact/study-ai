@@ -6783,22 +6783,21 @@ let currentQuoteIndex = 0;
 
 async function fetchInspirationalQuotes() {
     try {
-        // Show loading message
-        const quoteContent = document.getElementById('quote-content');
-        quoteContent.innerHTML = '<div class="quote-loading">名言加载中...</div>';
+        // Show initial loading message
+        const chineseElement = document.getElementById('quote-chinese');
         
-        // Disable navigation buttons during loading
-        document.getElementById('prev-quote').disabled = true;
-        document.getElementById('next-quote').disabled = true;
-        document.getElementById('refresh-quote').disabled = true;
+        if (chineseElement) {
+            chineseElement.textContent = "加载名言中...";
+            chineseElement.style.opacity = '0.7';
+        }
 
-        const prompt = `Generate 10 inspirational quotes. For each quote, provide English and Chinese translations. Format the response exactly like this example:
-[
-    {
-        "english": "Success is not final, failure is not fatal.",
-        "chinese": "成功不是终点，失败也并非致命。"
-    }
-]`;
+        const prompt = `Please provide 40 random inspirational quotes that are less than 20 words each. For each quote, provide both English and Chinese translations. The response must be a valid JSON array with this exact format:
+        [
+          {
+            "english": "quote in English",
+            "chinese": "quote in Chinese"
+          }
+        ]`;
         
         const apiEndpoint = `/api/${currentApiFunction}`;
         const response = await fetch(apiEndpoint, {
@@ -6822,61 +6821,61 @@ async function fetchInspirationalQuotes() {
         }
 
         const data = await response.json();
+        if (!data || !data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+            throw new Error('Invalid API response format');
+        }
+
         const content = data.choices[0].message.content;
         
-        // Try to extract JSON array from the response
+        // Try to parse the JSON content
         let parsedContent;
         try {
             // First attempt: direct JSON parse
             parsedContent = JSON.parse(content);
         } catch (parseError) {
-            // Second attempt: try to find JSON array in the text
+            // Second attempt: try to extract JSON from the text
             const jsonMatch = content.match(/\[\s*\{[\s\S]*\}\s*\]/);
             if (jsonMatch) {
                 parsedContent = JSON.parse(jsonMatch[0]);
             } else {
-                // Third attempt: try to parse the response as a structured format
-                const quotes = content.split('\n\n').map(quote => {
-                    const [english, chinese] = quote.split('\n').map(line => 
-                        line.replace(/^(English|Chinese): /, '').trim()
-                    );
-                    return { english, chinese };
-                }).filter(quote => quote.english && quote.chinese);
-                
-                if (quotes.length > 0) {
-                    parsedContent = quotes;
-                } else {
-                    throw new Error('Could not parse quotes from response');
-                }
+                throw new Error('Could not parse quotes from response');
             }
         }
 
-        // Validate and clean the quotes
-        quotes = parsedContent
-            .filter(quote => quote && quote.english && quote.chinese)
-            .map(quote => ({
-                english: quote.english.replace(/^["']|["']$/g, ''),  // Remove quotes if present
-                chinese: quote.chinese.replace(/^["']|["']$/g, '')
-            }))
-            .slice(0, 10);  // Ensure we only take 10 quotes
-
-        if (quotes.length === 0) {
+        // Validate the parsed content
+        if (!Array.isArray(parsedContent) || parsedContent.length === 0) {
             throw new Error('No valid quotes found in response');
         }
 
-        currentQuoteIndex = 0;
-        displayQuote(0);
+        // Ensure each quote has required properties
+        quotes = parsedContent
+            .filter(quote => quote && quote.english && quote.chinese)
+            .slice(0, 40); // Take only first 10 valid quotes
 
+        if (quotes.length === 0) {
+            throw new Error('No valid quotes found after filtering');
+        }
+
+        displayQuote(0);
     } catch (error) {
         console.error('Error fetching quotes:', error);
-        const quoteContent = document.getElementById('quote-content');
-        quoteContent.innerHTML = `
-            <p class="quote-text">Failed to load quote</p>
-            <p class="quote-text">无法加载名言</p>
-        `;
-    } finally {
-        // Re-enable refresh button
-        document.getElementById('refresh-quote').disabled = false;
+        
+        // Display error message with retry button
+        const englishElement = document.getElementById('quote-english');
+        const chineseElement = document.getElementById('quote-chinese');
+        
+        if (englishElement && chineseElement) {
+            englishElement.innerHTML = 'Failed to load quote. <button onclick="fetchInspirationalQuotes()" class="retry-button">Retry</button>';
+            chineseElement.innerHTML = '无法加载名言。<button onclick="fetchInspirationalQuotes()" class="retry-button">重试</button>';
+            englishElement.style.opacity = '1';
+            chineseElement.style.opacity = '1';
+        }
+
+        // Disable navigation buttons when there's an error
+        const prevButton = document.getElementById('prev-quote');
+        const nextButton = document.getElementById('next-quote');
+        if (prevButton) prevButton.disabled = true;
+        if (nextButton) nextButton.disabled = true;
     }
 }
 

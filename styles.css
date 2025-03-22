@@ -2369,13 +2369,4 @@ button:active {
 
 #refresh-quote i {
     font-size: 0.75rem;
-}
-
-/* Add styles for loading state */
-.quote-loading {
-    color: white;
-    font-size: 0.9rem;
-    text-align: center;
-    padding: 1rem 0;
-    opacity: 0.8;
 } 
