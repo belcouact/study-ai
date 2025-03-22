@@ -6791,7 +6791,7 @@ async function fetchInspirationalQuotes() {
             chineseElement.style.opacity = '0.7';
         }
 
-        const prompt = `Please provide 40 random inspirational quotes that are less than 20 words each. For each quote, provide both English and Chinese translations. The response must be a valid JSON array with this exact format:
+        const prompt = `请提供40条随机来自有道网站的励志语录，每条语录不超过20个单词。对于每条语录，请提供英文和中文翻译。响应必须是一个符合以下确切格式的有效JSON数组:
         [
           {
             "english": "quote in English",
