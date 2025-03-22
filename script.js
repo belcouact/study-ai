@@ -376,15 +376,6 @@ function showResultsPopup() {
 // Function to display the current question
 function displayCurrentQuestion() {
     console.log('displayCurrentQuestion called', currentQuestionIndex);
-    console.log('Questions array:', questions);
-    
-    if (!questions || questions.length === 0) {
-        console.log('No questions available to display');
-        return;
-    }
-    
-    const question = questions[currentQuestionIndex];
-    console.log('Current question:', question);
     
     // Create questions container if it doesn't exist
     let questionsContainer = document.querySelector('.questions-container');
@@ -397,21 +388,42 @@ function displayCurrentQuestion() {
         if (contentArea) {
             contentArea.appendChild(questionsContainer);
         } else {
-            // If no content area found, append to body
             document.body.appendChild(questionsContainer);
             console.log('Appended questions container to body');
         }
     }
-    
-    // Always ensure empty state is hidden regardless of questions
-    const emptyState = document.querySelector('.empty-state');
-    if (emptyState) {
-        emptyState.style.display = 'none';
-        console.log('Empty state hidden');
+
+    // Show empty state if no questions available
+    if (!questions || questions.length === 0) {
+        console.log('No questions available, showing empty state');
+        questionsContainer.innerHTML = `
+            <div class="initial-message">
+                <div style="text-align: center; padding: 20px;">
+                    <i class="fas fa-book-open" style="font-size: 48px; color: #4299e1; margin-bottom: 20px;"></i>
+                    <p style="font-size: 18px; color: #2d3748; margin-bottom: 10px;">准备生成练习题</p>
+                    <p style="color: #718096; margin-bottom: 20px;">请在左侧设置参数后点击"出题"按钮</p>
+                    <div class="empty-state-steps" style="text-align: left; max-width: 300px; margin: 0 auto;">
+                        <div style="margin-bottom: 10px; color: #4a5568;">
+                            <span style="color: #4299e1; margin-right: 8px;">1.</span> 选择学校和年级
+                        </div>
+                        <div style="margin-bottom: 10px; color: #4a5568;">
+                            <span style="color: #4299e1; margin-right: 8px;">2.</span> 选择科目和学期
+                        </div>
+                        <div style="margin-bottom: 10px; color: #4a5568;">
+                            <span style="color: #4299e1; margin-right: 8px;">3.</span> 设置题目难度和数量
+                        </div>
+                        <div style="color: #4a5568;">
+                            <span style="color: #4299e1; margin-right: 8px;">4.</span> 点击"出题"开始生成
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        return;
     }
     
-    // Clear previous question
-    questionsContainer.innerHTML = '';
+    const question = questions[currentQuestionIndex];
+    console.log('Current question:', question);
     
     // Check if all questions are answered
     const allQuestionsAnswered = window.userAnswers && 
