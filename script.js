@@ -4757,7 +4757,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 poetryPanel.classList.remove('hidden');
                 console.log('Poetry panel is now visible');
             } else {
-                console.error('Poetry panel not found');
+                // console.error('Poetry panel not found');
             }
             
             // Update active states
@@ -4979,7 +4979,7 @@ document.addEventListener('DOMContentLoaded', function() {
             mainContent.appendChild(newPoetryPanel);
             console.log('Poetry panel added to the document');
         } else {
-            console.error('Main content element not found');
+            // console.error('Main content element not found');
         }
     }
     
@@ -5000,7 +5000,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 poetryPanel.classList.remove('hidden');
                 console.log('Poetry panel is now visible');
             } else {
-                console.error('Poetry panel not found');
+                // console.error('Poetry panel not found');
             }
             
             // Update active states

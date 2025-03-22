@@ -119,6 +119,7 @@ body {
     padding: 0.8rem;
     flex-grow: 1;
     gap: 0.4rem;
+    margin-bottom: 1rem;
 }
 
 .panel-button {
@@ -210,13 +211,14 @@ body {
     margin: 0.5rem 0 1rem 0;
 }
 
-.sidebar-frame, .quote-frame {
+.sidebar-frame {
     background-color: rgba(255, 255, 255, 0.03);
     border-radius: 8px;
     padding: 0.8rem;
     margin: 0;
     width: 100%;
     box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .frame-title {
@@ -2252,11 +2254,11 @@ button:active {
 
 .modal-content {
     background-color: #fefefe;
-    margin: 5% auto;
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 80%;
-    max-width: 800px;
+    width: 60%;
+    max-width: 600px;
     border-radius: 8px;
 }
 
