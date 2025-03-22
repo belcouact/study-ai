@@ -1,6 +1,5 @@
 // Add this at the start of script.js
 document.addEventListener('DOMContentLoaded', () => {
-    // Move all initialization code here
     initializeApp();
 });
 
@@ -13,7 +12,8 @@ function initializeApp() {
         nextWordBtn: document.getElementById('next-word-btn'),
         wordCounter: document.getElementById('word-counter'),
         schoolSelect: document.getElementById('school-select-sidebar'),
-        gradeSelect: document.getElementById('grade-select-sidebar')
+        gradeSelect: document.getElementById('grade-select-sidebar'),
+        vocabularyCount: document.getElementById('vocabulary-cnt')
     };
 
     // Initialize event listeners
@@ -31,10 +31,30 @@ function initializeEventListeners(elements) {
     });
 
     // Add debounced event listeners for performance
-    loadBtn?.addEventListener('click', debounce(handleLoadVocabularyClick, 300));
-    
-    // Use passive event listeners for better scroll performance
-    document.addEventListener('scroll', handleScroll, { passive: true });
+    if (loadBtn) {
+        loadBtn.addEventListener('click', debounce(handleLoadVocabularyClick, 300));
+    }
+
+    // Add navigation button listeners
+    if (prevWordBtn) {
+        prevWordBtn.addEventListener('click', () => {
+            if (currentWordIndex > 0) {
+                currentWordIndex--;
+                displayWordCard(currentWordIndex);
+                updateNavigationControls();
+            }
+        });
+    }
+
+    if (nextWordBtn) {
+        nextWordBtn.addEventListener('click', () => {
+            if (currentWordIndex < vocabularyWords.length - 1) {
+                currentWordIndex++;
+                displayWordCard(currentWordIndex);
+                updateNavigationControls();
+            }
+        });
+    }
 }
 
 // Add utility functions
