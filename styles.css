@@ -1852,12 +1852,16 @@ button:active {
 }
 
 .initial-message {
+    text-align: center;
+    color: #64748b;
+    font-size: 18px;
+    padding: 50px 30px;
+    border-radius: 10px;
     background-color: white;
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    margin: 20px auto;
-    max-width: 600px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 800px;
+    margin: 40px auto;
 }
 
 .word-card {
@@ -2222,30 +2226,4 @@ button:active {
 
 .error-message {
     color: #dc3545;
-}
-
-.loading-message {
-    text-align: center;
-}
-
-.loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #e2e8f0;
-    border-top: 4px solid #4299e1;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.empty-state-steps {
-    background-color: #f7fafc;
-    padding: 20px;
-    border-radius: 8px;
-    border-left: 3px solid #4299e1;
 } 

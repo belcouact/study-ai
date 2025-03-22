@@ -376,55 +376,42 @@ function showResultsPopup() {
 // Function to display the current question
 function displayCurrentQuestion() {
     console.log('displayCurrentQuestion called', currentQuestionIndex);
+    console.log('Questions array:', questions);
     
-    // First, find or create the create container
-    let createContainer = document.getElementById('create-container');
-    if (!createContainer) {
-        createContainer = document.createElement('div');
-        createContainer.id = 'create-container';
-        document.querySelector('.content-area').appendChild(createContainer);
-    }
-
-    // Find or create the questions display container
-    let questionsContainer = document.querySelector('.questions-display-container');
-    if (!questionsContainer) {
-        console.log('Creating questions display container');
-        questionsContainer = document.createElement('div');
-        questionsContainer.className = 'questions-display-container';
-        createContainer.appendChild(questionsContainer);
-    }
-
-    // Show empty state if no questions available
     if (!questions || questions.length === 0) {
-        console.log('No questions available, showing empty state');
-        questionsContainer.innerHTML = `
-            <div class="initial-message">
-                <div style="text-align: center; padding: 20px;">
-                    <i class="fas fa-book-open" style="font-size: 48px; color: #4299e1; margin-bottom: 20px;"></i>
-                    <p style="font-size: 18px; color: #2d3748; margin-bottom: 10px;">准备生成练习题</p>
-                    <p style="color: #718096; margin-bottom: 20px;">请在左侧设置参数后点击"出题"按钮</p>
-                    <div class="empty-state-steps">
-                        <div style="margin-bottom: 10px; color: #4a5568;">
-                            <span style="color: #4299e1; margin-right: 8px;">1.</span> 选择学校和年级
-                        </div>
-                        <div style="margin-bottom: 10px; color: #4a5568;">
-                            <span style="color: #4299e1; margin-right: 8px;">2.</span> 选择科目和学期
-                        </div>
-                        <div style="margin-bottom: 10px; color: #4a5568;">
-                            <span style="color: #4299e1; margin-right: 8px;">3.</span> 设置题目难度和数量
-                        </div>
-                        <div style="color: #4a5568;">
-                            <span style="color: #4299e1; margin-right: 8px;">4.</span> 点击"出题"开始生成
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+        console.log('No questions available to display');
         return;
     }
     
     const question = questions[currentQuestionIndex];
     console.log('Current question:', question);
+    
+    // Create questions container if it doesn't exist
+    let questionsContainer = document.querySelector('.questions-container');
+    if (!questionsContainer) {
+        console.log('Creating questions container');
+        questionsContainer = document.createElement('div');
+        questionsContainer.className = 'questions-container';
+        
+        const contentArea = document.querySelector('.content-area') || document.querySelector('.main-content');
+        if (contentArea) {
+            contentArea.appendChild(questionsContainer);
+        } else {
+            // If no content area found, append to body
+            document.body.appendChild(questionsContainer);
+            console.log('Appended questions container to body');
+        }
+    }
+    
+    // Always ensure empty state is hidden regardless of questions
+    const emptyState = document.querySelector('.empty-state');
+    if (emptyState) {
+        emptyState.style.display = 'none';
+        console.log('Empty state hidden');
+    }
+    
+    // Clear previous question
+    questionsContainer.innerHTML = '';
     
     // Check if all questions are answered
     const allQuestionsAnswered = window.userAnswers && 
@@ -1803,7 +1790,7 @@ function handleGenerateQuestionsClick() {
 
     示例格式：
     题目：[题目内容]
-    A. [选项A内容] 
+    A. [选项A内容]
     B. [选项B内容] 
     C. [选项C内容]
     D. [选项D内容]
@@ -4748,7 +4735,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (qaPanel) qaPanel.classList.add('hidden');
             if (createPanel) createPanel.classList.add('hidden');
             
-            /*
             // Show poetry panel
             if (poetryPanel) {
                 poetryPanel.classList.remove('hidden');
@@ -4756,7 +4742,6 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 console.error('Poetry panel not found');
             }
-            */
             
             // Update active states
             if (qaButton) qaButton.classList.remove('active');
@@ -4971,7 +4956,6 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
-        /*
         // Add the panel to the document
         const mainContent = document.querySelector('.main-content');
         if (mainContent) {
@@ -4980,7 +4964,6 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             console.error('Main content element not found');
         }
-        */
     }
     
     // Add direct event listener to poetry button
@@ -4995,7 +4978,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (qaPanel) qaPanel.classList.add('hidden');
             if (createPanel) createPanel.classList.add('hidden');
             
-            /*
             // Show poetry panel
             if (poetryPanel) {
                 poetryPanel.classList.remove('hidden');
@@ -5003,7 +4985,6 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 console.error('Poetry panel not found');
             }
-            */
             
             // Update active states
             if (qaButton) qaButton.classList.remove('active');
@@ -6676,19 +6657,5 @@ function updateNavigationControls() {
 
     if (wordCounter && vocabularyWords.length > 0) {
         wordCounter.textContent = `${currentWordIndex + 1} / ${vocabularyWords.length}`;
-    }
-}
-
-// Function to display vocabulary error message
-function showVocabularyError(errorMessage) {
-    const vocabularyContainer = document.getElementById('vocabulary-container');
-    if (vocabularyContainer) {
-        vocabularyContainer.innerHTML = `
-            <div class="initial-message error-message">
-                <i class="fas fa-exclamation-circle"></i>
-                <p>${errorMessage}</p>
-                <p>Error loading vocabulary, please try again later...</p>
-            </div>
-        `;
     }
 }
