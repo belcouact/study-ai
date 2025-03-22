@@ -3002,12 +3002,22 @@ function moveContentCreationToTop() {
 function initializeEmptyState() {
     console.log('Initializing empty state');
     
-    const createContainer = document.getElementById('create-container');
-    const questionsDisplayContainer = document.getElementById('questions-display-container');
-    
+    // First ensure create container exists
+    let createContainer = document.getElementById('create-container');
     if (!createContainer) {
-        console.error('Create container not found');
-        return;
+        console.log('Create container not found, creating it');
+        createContainer = document.createElement('div');
+        createContainer.id = 'create-container';
+        createContainer.className = 'create-container';
+        
+        // Find the main content area to append to
+        const mainContent = document.querySelector('.main-content') || document.querySelector('.content-area');
+        if (mainContent) {
+            mainContent.appendChild(createContainer);
+        } else {
+            console.error('No suitable parent container found');
+            return;
+        }
     }
 
     // Create empty state if it doesn't exist
@@ -3042,9 +3052,11 @@ function initializeEmptyState() {
         createContainer.insertBefore(emptyState, createContainer.firstChild);
     }
 
-    // Make sure empty state is visible and questions container is hidden
+    // Make sure empty state is visible
     emptyState.style.display = 'block';
     
+    // Hide questions display container if it exists
+    const questionsDisplayContainer = document.getElementById('questions-display-container');
     if (questionsDisplayContainer) {
         questionsDisplayContainer.style.display = 'none';
     }
