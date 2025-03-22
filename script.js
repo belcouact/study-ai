@@ -5986,23 +5986,10 @@ async function handleLoadVocabularyClick() {
     
     // Display loading message in the vocabulary container
     vocabularyContainer.innerHTML = `
-        <div class="vocabulary-header">
-            <div class="vocabulary-controls">
-                <select id="vocabulary-cnt" class="vocabulary-select">
-                    <option value="5">5个词汇</option>
-                    <option value="10">10个词汇</option>
-                    <option value="15">15个词汇</option>
-                    <option value="20">20个词汇</option>
-                </select>
-                <button id="load-vocabulary-btn" class="vocabulary-button">
-                    加载词汇
-                </button>
-            </div>
-        </div>
         <div class="initial-message loading-message">
             <div class="loading-spinner vocabulary-spinner"></div>
             <p>词汇加载中，请耐心等待...</p>
-            <p>Loading vocabularies, please be patient...</p>
+            <p>Loading five vocabularies, please be patient...</p>
         </div>
     `;
     
@@ -6085,12 +6072,8 @@ async function handleLoadVocabularyClick() {
 // Fetch vocabulary words from API
 async function fetchVocabularyWords(school, grade) {
     try {
-        // Get the selected vocabulary count
-        const vocabCountSelect = document.getElementById('vocabulary-cnt');
-        const vocabCount = vocabCountSelect ? parseInt(vocabCountSelect.value) : 5;
-
         // Create a more structured prompt for consistent API responses
-        const prompt = `Generate ${vocabCount} English vocabulary words appropriate for ${school} school students in grade ${grade}.
+        const prompt = `Generate 10 English vocabulary words appropriate for ${school} school students in grade ${grade}.
 
 Please format your response as a valid JSON array with objects having the EXACT following structure for each word:
 \`\`\`json
@@ -6142,12 +6125,11 @@ Please format your response as a valid JSON array with objects having the EXACT 
 \`\`\`
 
 IMPORTANT:
-1. Generate exactly ${vocabCount} words.
-2. Ensure the JSON is valid and properly formatted with all fields.
-3. Do NOT include any explanatory text outside the JSON.
-4. Make sure all example sentences include both English and Chinese translations.
-5. Choose vocabulary appropriate for ${grade} grade ${school} school students.
-6. Strictly follow the format above for all keys and values.`;
+1. Ensure the JSON is valid and properly formatted with all fields.
+2. Do NOT include any explanatory text outside the JSON.
+3. Make sure all example sentences include both English and Chinese translations.
+4. Choose vocabulary appropriate for ${grade} grade ${school} school students.
+5. Strictly follow the format above for all keys and values.`;
 
         console.log('Fetching vocabulary with prompt:', prompt);
         

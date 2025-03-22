@@ -2226,30 +2226,4 @@ button:active {
 
 .error-message {
     color: #dc3545;
-}
-
-.vocabulary-controls {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.vocabulary-select {
-    padding: 8px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    font-size: 14px;
-    background-color: white;
-    cursor: pointer;
-}
-
-.vocabulary-select:hover {
-    border-color: #cbd5e0;
-}
-
-.vocabulary-select:focus {
-    outline: none;
-    border-color: #4299e1;
-    box-shadow: 0 0 0 1px #4299e1;
 } 
