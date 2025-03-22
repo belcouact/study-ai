@@ -3263,15 +3263,14 @@ function setupChatButtons() {
             optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
             
             // Prepare the prompt for optimization with educational context
-            const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值：
+            const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值。优化时请考虑学生的认知水平、教育阶段和真正意图，使问题更有针对性：
 
 教育背景：
 ${educationalContext}
 
 原始问题：${questionText}
 
-请返回优化后的问题，使其更适合上述教育背景的学生，保持原始意图但使其更加清晰、准确和有教育意义。
-优化时请考虑学生的认知水平、教育阶段和真正意图，使问题更有针对性。`;
+请只返回优化后的问题，不用保留优化说明和思路。`;
             
             // Call the API
             fetchAIResponse(prompt)
