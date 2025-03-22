@@ -3,6 +3,7 @@ let currentApiFunction = 'chat';
 let currentModel = 'deepseek-chat';
 // Add global variable for current question index
 let currentQuestionIndex = 0;
+let currentWordIndex = 0;
 
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
@@ -6022,7 +6023,7 @@ async function handleLoadVocabularyClick() {
 async function fetchVocabularyWords(school, grade) {
     try {
         // Create a more structured prompt for consistent API responses
-        const prompt = `Generate 10 English vocabulary words appropriate for ${school} school students in grade ${grade}.
+        const prompt = `Generate 5 English vocabulary words appropriate for ${school} school students in grade ${grade}.
 
 Please format your response as a valid JSON array with objects having the EXACT following structure for each word:
 \`\`\`json
@@ -6589,4 +6590,38 @@ function renderLearningTips(tips) {
             ${tips.chinese ? `<div class="tip-content-chinese">${tips.chinese}</div>` : ''}
         </div>
     `;
+}
+
+// Add these new functions before handleLoadVocabularyClick
+function showVocabularyError(message) {
+    const loadingMessage = document.querySelector('.initial-message.loading-message');
+    loadingMessage.innerHTML = `<div class="error-message">Error: ${message}</div>`;
+}
+
+function updateNavigationControls(totalWords) {
+    const prevButton = document.querySelector('.nav-button.prev');
+    const nextButton = document.querySelector('.nav-button.next');
+    const wordCounter = document.getElementById('word-counter');
+    
+    if (prevButton && nextButton && wordCounter) {
+        prevButton.disabled = currentWordIndex === 0;
+        nextButton.disabled = currentWordIndex >= totalWords - 1;
+        wordCounter.textContent = `${currentWordIndex + 1} / ${totalWords}`;
+    }
+}
+
+// Update the handleLoadVocabularyClick function
+async function handleLoadVocabularyClick() {
+    // ... existing code ...
+    try {
+        const loadingMessage = document.querySelector('.initial-message.loading-message');
+        loadingMessage.innerHTML = 'Loading vocabulary... <div class="spinner"></div>';
+        loadingMessage.style.display = 'block';
+        
+        // ... existing API call or loading logic ...
+    } catch (error) {
+        showVocabularyError(error.message);
+        console.error('Error loading vocabulary:', error);
+    }
+    // ... existing code ...
 }
