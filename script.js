@@ -4747,6 +4747,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (qaPanel) qaPanel.classList.add('hidden');
             if (createPanel) createPanel.classList.add('hidden');
             
+            /*
             // Show poetry panel
             if (poetryPanel) {
                 poetryPanel.classList.remove('hidden');
@@ -4754,6 +4755,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 console.error('Poetry panel not found');
             }
+            */
             
             // Update active states
             if (qaButton) qaButton.classList.remove('active');
