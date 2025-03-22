@@ -1841,6 +1841,7 @@ button:active {
     flex-direction: column;
     width: 100%;
     flex: 1;
+    contain: content;
 }
 
 #vocabulary-container {
@@ -1878,6 +1879,7 @@ button:active {
     flex-direction: column;
     animation: cardEntrance 0.6s ease-out;
     gap: 20px;
+    contain: layout style paint;
 }
 
 @keyframes cardEntrance {
@@ -1903,6 +1905,8 @@ button:active {
     margin-bottom: 20px;
     padding-bottom: 15px;
     border-bottom: 2px solid #e2e8f0;
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .word-english {
@@ -2124,6 +2128,8 @@ button:active {
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 18px;
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .nav-button:hover:not(:disabled) {
@@ -2259,4 +2265,12 @@ button:active {
     display: flex;
     gap: 15px;
     align-items: center;
+}
+
+/* Optimize animations */
+@media (prefers-reduced-motion: reduce) {
+    .word-card, .nav-button, .vocabulary-header {
+        transition: none;
+        animation: none;
+    }
 } 
