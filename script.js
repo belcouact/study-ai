@@ -6939,5 +6939,5 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup navigation buttons
     document.getElementById('prev-quote').addEventListener('click', () => navigateQuote(-1));
     document.getElementById('next-quote').addEventListener('click', () => navigateQuote(1));
-    document.getElementById('refresh-quote').addEventListener('click', fetchInspirationalQuotes);
+    //document.getElementById('refresh-quote').addEventListener('click', fetchInspirationalQuotes);
 });
