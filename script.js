@@ -6920,3 +6920,43 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('next-quote').addEventListener('click', () => navigateQuote(1));
     //document.getElementById('refresh-quote').addEventListener('click', fetchInspirationalQuotes);
 });
+
+// Update the language toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const langToggle = document.getElementById('langToggle');
+    const chineseContent = document.getElementById('chineseContent');
+    const englishContent = document.getElementById('englishContent');
+    const closeBtn = document.getElementsByClassName('close')[0];
+    const modal = document.getElementById('aboutModal');
+
+    // Language toggle
+    if (langToggle) {
+        langToggle.onclick = function() {
+            if (chineseContent.style.display === 'none') {
+                // Switch to Chinese
+                chineseContent.style.display = 'block';
+                englishContent.style.display = 'none';
+                langToggle.textContent = 'English';
+            } else {
+                // Switch to English
+                chineseContent.style.display = 'none';
+                englishContent.style.display = 'block';
+                langToggle.textContent = '中文';
+            }
+        };
+    }
+
+    // Close modal
+    if (closeBtn) {
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        };
+    }
+
+    // Close when clicking outside
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    };
+});
