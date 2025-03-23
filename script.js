@@ -6766,16 +6766,15 @@ async function fetchInspirationalQuotes() {
         const csvText = await response.text();
         
         // Split CSV into lines and parse, handling the ",\" separator
-        const allQuotes = csvText.split('\n')
+        allLoadedQuotes = csvText.split('\n')
             .map(line => {
-                const [english, chinese] = line.split(',\\,');
+                const [english, chinese] = line.split(',\\');
                 return { english: english?.trim(), chinese: chinese?.trim() };
             })
             .filter(quote => quote.english && quote.chinese); // Remove any invalid entries
 
-        // Get 10 random quotes
-        quotes = getRandomQuotes(allQuotes, 10);
-        displayQuote(currentQuoteIndex);
+        // Get initial 10 random quotes
+        loadRandomQuotes();
     } catch (error) {
         console.error('Error fetching quotes:', error);
         document.getElementById('english-quote').textContent = 'Failed to load quotes';
@@ -6783,39 +6782,25 @@ async function fetchInspirationalQuotes() {
     }
 }
 
-function getRandomQuotes(quotes, count) {
-    const shuffled = [...quotes].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, count);
+function loadRandomQuotes() {
+    currentQuotes = getRandomQuotes(allLoadedQuotes, 10);
+    currentIndex = 0;
+    displayQuote(currentIndex);
 }
 
-function displayQuote(index) {
-    if (index < 0 || index >= quotes.length) return;
-    
-    const quote = quotes[index];
-    document.getElementById('english-quote').textContent = quote.english;
-    document.getElementById('chinese-quote').textContent = quote.chinese;
-    
-    // Update button states
-    document.getElementById('prev-quote').disabled = index === 0;
-    document.getElementById('next-quote').disabled = index === quotes.length - 1;
-}
-
-// Update the navigation event listeners
+// Update event listeners
 document.getElementById('prev-quote').addEventListener('click', () => {
-    if (currentQuoteIndex > 0) {
-        currentQuoteIndex--;
-        displayQuote(currentQuoteIndex);
+    if (currentIndex > 0) {
+        currentIndex--;
+        displayQuote(currentIndex);
     }
 });
 
 document.getElementById('next-quote').addEventListener('click', () => {
-    if (currentQuoteIndex < quotes.length - 1) {
-        currentQuoteIndex++;
-        displayQuote(currentQuoteIndex);
+    if (currentIndex < currentQuotes.length - 1) {
+        currentIndex++;
+        displayQuote(currentIndex);
     }
 });
 
-document.getElementById('refresh-quotes').addEventListener('click', fetchInspirationalQuotes);
-
-// Initial load
-fetchInspirationalQuotes();
+document.getElementById('refresh-quotes').addEventListener('click', loadRandomQuotes);
