@@ -6772,14 +6772,14 @@ async function fetchInspirationalQuotes() {
         const csvText = await response.text();
         console.log('CSV content:', csvText.substring(0, 200) + '...');
         
-        // Parse CSV content
+        // Parse CSV content with new separator
         quotes = csvText.split('\n')
             .filter(line => line.trim()) // Remove empty lines
             .slice(1) // Skip header row
             .map(line => {
-                // Remove any surrounding quotes and split by comma
+                // Split by ,\, and remove any surrounding quotes
                 const [english, chinese] = line
-                    .split(',')
+                    .split(',\\,')
                     .map(text => text.trim().replace(/^["']|["']$/g, ''));
                 return { english, chinese };
             });
