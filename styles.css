@@ -214,11 +214,12 @@ body {
 .sidebar-frame, .quote-frame {
     background-color: rgba(255, 255, 255, 0.03);
     border-radius: 8px;
-    padding: 1rem;
-    margin: 0.5rem 0;
+    padding: 0.8rem;
+    margin: 0;
     width: 100%;
     box-sizing: border-box;
     border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 1rem;
 }
 
 .frame-title {
@@ -2329,13 +2330,8 @@ button:active {
 }
 
 .quote-frame {
-    background-color: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 0.5rem 0;
-    width: 100%;
-    box-sizing: border-box;
     border: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 0;
 }
 
 .quote-frame:hover {
@@ -2347,8 +2343,8 @@ button:active {
     min-height: 100px;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
 .quote-text {
@@ -2356,68 +2352,90 @@ button:active {
     font-size: 0.9rem;
     line-height: 1.4;
     margin: 0;
-    padding: 0.5rem;
-    opacity: 0.9;
-}
-
-#quote-english {
-    font-style: italic;
+    opacity: 1;
 }
 
 #quote-chinese {
     font-size: 0.85rem;
-    opacity: 0.8;
+    color: white;
+    opacity: 0.85;
 }
 
 .quote-controls {
     display: flex;
     justify-content: center;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    gap: 30px;
+    margin-top: 10px;
 }
 
 .quote-nav-btn {
-    background: none;
-    border: none;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
-    cursor: pointer;
-    padding: 8px;
-    margin: 0 4px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
 }
 
 .quote-nav-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
-    transform: scale(1.1);
+    border-color: rgba(255, 255, 255, 0.4);
 }
 
 .quote-nav-btn i {
-    font-size: 1rem;
-}
-
-.quote-nav-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
+    font-size: 0.8rem;
 }
 
 #refresh-quote i {
-    transition: transform 1s ease;
+    font-size: 0.75rem;
 }
 
-#refresh-quote.rotating i {
-    transform: rotate(360deg);
+.quote-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    text-align: center;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.quote-content {
+    margin-bottom: 1rem;
 }
 
-.quote-text {
-    animation: fadeIn 0.3s ease;
+.quote-content .english {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.quote-content .chinese {
+    font-size: 1.3rem;
+    color: #666;
+}
+
+.quote-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.nav-btn, .refresh-btn {
+    padding: 0.5rem 1rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border: none;
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.refresh-btn {
+    padding: 0.5rem;
+}
+
+.nav-btn:hover, .refresh-btn:hover {
+    background: #e0e0e0;
 } 
