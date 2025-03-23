@@ -6790,9 +6790,11 @@ async function fetchInspirationalQuotes() {
             throw new Error('No quotes found in CSV file');
         }
         
-        // Randomly select 5 quotes
+        // Randomly select 10 quotes
         quotes = shuffleArray(quotes).slice(0, 10);
         currentQuoteIndex = 0;
+        
+        console.log('Selected quotes:', quotes);
         
         // Display the first quote
         displayQuote(0);
@@ -6825,7 +6827,7 @@ function shuffleArray(array) {
 }
 
 function displayQuote(index) {
-    console.log('Displaying quote at index:', index);
+    console.log('Displaying quote at index:', index, 'Total quotes:', quotes.length);
     if (quotes.length === 0) {
         console.warn('No quotes available to display');
         return;
@@ -6838,8 +6840,18 @@ function displayQuote(index) {
     const chineseElement = document.getElementById('quote-chinese');
     
     if (englishElement && chineseElement) {
-        englishElement.textContent = quote.english;
-        chineseElement.textContent = quote.chinese;
+        // Clear previous content
+        englishElement.textContent = '';
+        chineseElement.textContent = '';
+        
+        // Add new content with fade effect
+        setTimeout(() => {
+            englishElement.textContent = quote.english;
+            chineseElement.textContent = quote.chinese;
+            englishElement.style.opacity = '1';
+            chineseElement.style.opacity = '1';
+        }, 50);
+        
         console.log('Quote displayed successfully');
         updateQuoteNavigation();
     } else {
@@ -6851,6 +6863,8 @@ function navigateQuote(direction) {
     if (quotes.length === 0) return;
     
     const newIndex = currentQuoteIndex + direction;
+    console.log('Navigating to index:', newIndex, 'Max index:', quotes.length - 1);
+    
     // Only navigate if within bounds
     if (newIndex >= 0 && newIndex < quotes.length) {
         currentQuoteIndex = newIndex;
@@ -6865,10 +6879,14 @@ function updateQuoteNavigation() {
     
     if (prevButton) {
         prevButton.disabled = currentQuoteIndex === 0;
+        prevButton.style.opacity = currentQuoteIndex === 0 ? '0.5' : '1';
     }
     if (nextButton) {
         nextButton.disabled = currentQuoteIndex === quotes.length - 1;
+        nextButton.style.opacity = currentQuoteIndex === quotes.length - 1 ? '0.5' : '1';
     }
+    
+    console.log('Navigation updated - Current index:', currentQuoteIndex, 'Total quotes:', quotes.length);
 }
 
 function setupQuoteControls() {
@@ -6877,11 +6895,19 @@ function setupQuoteControls() {
     const refreshButton = document.getElementById('refresh-quote');
     
     if (prevButton) {
-        prevButton.addEventListener('click', () => navigateQuote(-1));
+        prevButton.addEventListener('click', () => {
+            if (!prevButton.disabled) {
+                navigateQuote(-1);
+            }
+        });
     }
     
     if (nextButton) {
-        nextButton.addEventListener('click', () => navigateQuote(1));
+        nextButton.addEventListener('click', () => {
+            if (!nextButton.disabled) {
+                navigateQuote(1);
+            }
+        });
     }
     
     if (refreshButton) {

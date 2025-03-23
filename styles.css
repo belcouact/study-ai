@@ -214,12 +214,11 @@ body {
 .sidebar-frame, .quote-frame {
     background-color: rgba(255, 255, 255, 0.03);
     border-radius: 8px;
-    padding: 0.8rem;
-    margin: 0;
+    padding: 1rem;
+    margin: 0.5rem 0;
     width: 100%;
     box-sizing: border-box;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    margin-bottom: 1rem;
 }
 
 .frame-title {
@@ -2330,8 +2329,13 @@ button:active {
 }
 
 .quote-frame {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    width: 100%;
+    box-sizing: border-box;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    margin: 0;
 }
 
 .quote-frame:hover {
@@ -2343,8 +2347,9 @@ button:active {
     min-height: 100px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
 }
 
 .quote-text {
@@ -2352,20 +2357,26 @@ button:active {
     font-size: 0.9rem;
     line-height: 1.4;
     margin: 0;
-    opacity: 1;
+    opacity: 0.9;
+    text-align: left;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+#quote-english {
+    font-style: italic;
 }
 
 #quote-chinese {
     font-size: 0.85rem;
-    color: white;
-    opacity: 0.85;
+    opacity: 0.8;
 }
 
 .quote-controls {
     display: flex;
     justify-content: center;
-    gap: 30px;
-    margin-top: 10px;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 .quote-nav-btn {
@@ -2391,10 +2402,25 @@ button:active {
     font-size: 1rem;
 }
 
+.quote-nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
 #refresh-quote i {
     transition: transform 1s ease;
 }
 
 #refresh-quote.rotating i {
     transform: rotate(360deg);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.quote-text {
+    animation: fadeIn 0.3s ease;
 } 
