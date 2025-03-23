@@ -6823,39 +6823,3 @@ document.getElementById('refresh-quotes').addEventListener('click', loadRandomQu
 
 // Initial load
 fetchInspirationalQuotes();
-
-// Add this after your existing event listeners
-document.getElementById('toggle-lang').addEventListener('click', () => {
-    const englishQuote = document.getElementById('english-quote');
-    const chineseQuote = document.getElementById('chinese-quote');
-    
-    // If English is visible, hide it and show Chinese
-    if (!englishQuote.classList.contains('lang-hidden')) {
-        englishQuote.classList.add('lang-hidden');
-        chineseQuote.classList.remove('lang-hidden');
-        chineseQuote.style.opacity = '1';
-    } else {
-        // If Chinese is visible, hide it and show English
-        englishQuote.classList.remove('lang-hidden');
-        chineseQuote.classList.add('lang-hidden');
-    }
-});
-
-// Modify displayQuote function to ensure proper display state is maintained
-function displayQuote(index) {
-    const quote = currentQuotes[index];
-    const englishQuote = document.getElementById('english-quote');
-    const chineseQuote = document.getElementById('chinese-quote');
-    
-    englishQuote.textContent = quote.english;
-    chineseQuote.textContent = quote.chinese;
-    
-    // Maintain current visibility state
-    if (englishQuote.classList.contains('lang-hidden')) {
-        chineseQuote.style.opacity = '1';
-    }
-    
-    // Update button states
-    document.getElementById('prev-quote').disabled = index === 0;
-    document.getElementById('next-quote').disabled = index === currentQuotes.length - 1;
-}
