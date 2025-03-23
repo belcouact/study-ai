@@ -2394,48 +2394,4 @@ button:active {
 
 #refresh-quote i {
     font-size: 0.75rem;
-}
-
-.quote-container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 1rem;
-    text-align: center;
-}
-
-.quote-content {
-    margin-bottom: 1rem;
-}
-
-.quote-content .english {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.quote-content .chinese {
-    font-size: 1.3rem;
-    color: #666;
-}
-
-.quote-controls {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-}
-
-.nav-btn, .refresh-btn {
-    padding: 0.5rem 1rem;
-    font-size: 1.2rem;
-    cursor: pointer;
-    border: none;
-    background: #f0f0f0;
-    border-radius: 4px;
-}
-
-.refresh-btn {
-    padding: 0.5rem;
-}
-
-.nav-btn:hover, .refresh-btn:hover {
-    background: #e0e0e0;
 } 
