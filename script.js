@@ -6762,19 +6762,33 @@ let currentQuoteIndex = 0;
 
 async function fetchInspirationalQuotes() {
     try {
+        console.log('Fetching quotes from CSV file...');
         const response = await fetch('/files/Quotes.csv');
+        
         if (!response.ok) {
-            throw new Error('Failed to fetch quotes');
+            throw new Error(`Failed to fetch quotes: ${response.status} ${response.statusText}`);
         }
+        
         const csvText = await response.text();
+        console.log('CSV content:', csvText.substring(0, 200) + '...');
         
         // Parse CSV content
         quotes = csvText.split('\n')
             .filter(line => line.trim()) // Remove empty lines
+            .slice(1) // Skip header row
             .map(line => {
-                const [english, chinese] = line.split(',').map(text => text.trim());
+                // Remove any surrounding quotes and split by comma
+                const [english, chinese] = line
+                    .split(',')
+                    .map(text => text.trim().replace(/^["']|["']$/g, ''));
                 return { english, chinese };
             });
+        
+        console.log(`Parsed ${quotes.length} quotes`);
+        
+        if (quotes.length === 0) {
+            throw new Error('No quotes found in CSV file');
+        }
         
         // Randomly select 10 quotes
         quotes = shuffleArray(quotes).slice(0, 10);
@@ -6787,7 +6801,18 @@ async function fetchInspirationalQuotes() {
         setupQuoteControls();
     } catch (error) {
         console.error('Error fetching quotes:', error);
-        showSystemMessage('获取名言失败，请稍后重试', 'error');
+        const quoteContent = document.getElementById('quote-content');
+        if (quoteContent) {
+            const englishElement = document.getElementById('quote-english');
+            const chineseElement = document.getElementById('quote-chinese');
+            
+            if (englishElement) {
+                englishElement.textContent = 'Failed to load quotes';
+            }
+            if (chineseElement) {
+                chineseElement.textContent = '无法加载名言';
+            }
+        }
     }
 }
 
@@ -6800,15 +6825,24 @@ function shuffleArray(array) {
 }
 
 function displayQuote(index) {
-    if (quotes.length === 0) return;
+    console.log('Displaying quote at index:', index);
+    if (quotes.length === 0) {
+        console.warn('No quotes available to display');
+        return;
+    }
     
     const quote = quotes[index];
+    console.log('Current quote:', quote);
+    
     const englishElement = document.getElementById('quote-english');
     const chineseElement = document.getElementById('quote-chinese');
     
     if (englishElement && chineseElement) {
         englishElement.textContent = quote.english;
         chineseElement.textContent = quote.chinese;
+        console.log('Quote displayed successfully');
+    } else {
+        console.error('Quote elements not found in DOM');
     }
 }
 
@@ -6842,3 +6876,13 @@ function setupQuoteControls() {
 }
 
 // ... existing code ...
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize quotes
+    fetchInspirationalQuotes();
+    
+    // Setup navigation buttons
+    setupQuoteControls();
+    
+    // ... existing code ...
+});
