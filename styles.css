@@ -2369,29 +2369,32 @@ button:active {
 }
 
 .quote-nav-btn {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: none;
+    border: none;
     color: white;
-    width: 30px;
-    height: 30px;
+    cursor: pointer;
+    padding: 8px;
+    margin: 0 4px;
     border-radius: 50%;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    padding: 0;
 }
 
 .quote-nav-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.1);
 }
 
 .quote-nav-btn i {
-    font-size: 0.8rem;
+    font-size: 1rem;
 }
 
 #refresh-quote i {
-    font-size: 0.75rem;
+    transition: transform 1s ease;
+}
+
+#refresh-quote.rotating i {
+    transform: rotate(360deg);
 } 
