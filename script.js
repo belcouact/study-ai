@@ -6769,7 +6769,7 @@ async function fetchInspirationalQuotes() {
         // Split CSV into lines and parse, handling the ",\" separator
         allLoadedQuotes = csvText.split('\n')
             .map(line => {
-                const [english, chinese] = line.split(',\\');
+                const [english, chinese] = line.split(',\\,');
                 return { english: english?.trim(), chinese: chinese?.trim() };
             })
             .filter(quote => quote.english && quote.chinese); // Remove any invalid entries
