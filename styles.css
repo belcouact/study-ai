@@ -2335,8 +2335,6 @@ button:active {
     border-radius: 8px;
     padding: 12px;
     background-color: rgba(255, 255, 255, 0.05);
-    outline: none;
-    outline-offset: 0;
 }
 
 .quote-frame:hover {
