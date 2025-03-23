@@ -6789,20 +6789,30 @@ function getRandomQuotes(quotes, count) {
 }
 
 function displayQuote(index) {
+    if (index < 0 || index >= quotes.length) return;
+    
     const quote = quotes[index];
     document.getElementById('english-quote').textContent = quote.english;
     document.getElementById('chinese-quote').textContent = quote.chinese;
+    
+    // Update button states
+    document.getElementById('prev-quote').disabled = index === 0;
+    document.getElementById('next-quote').disabled = index === quotes.length - 1;
 }
 
-// Add event listeners for navigation and refresh
+// Update the navigation event listeners
 document.getElementById('prev-quote').addEventListener('click', () => {
-    currentQuoteIndex = (currentQuoteIndex - 1 + quotes.length) % quotes.length;
-    displayQuote(currentQuoteIndex);
+    if (currentQuoteIndex > 0) {
+        currentQuoteIndex--;
+        displayQuote(currentQuoteIndex);
+    }
 });
 
 document.getElementById('next-quote').addEventListener('click', () => {
-    currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
-    displayQuote(currentQuoteIndex);
+    if (currentQuoteIndex < quotes.length - 1) {
+        currentQuoteIndex++;
+        displayQuote(currentQuoteIndex);
+    }
 });
 
 document.getElementById('refresh-quotes').addEventListener('click', fetchInspirationalQuotes);
