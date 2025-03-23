@@ -6757,8 +6757,9 @@ document.getElementsByClassName('close')[0].onclick = function() {
     document.getElementById('aboutModal').style.display = 'none';
 }
 
-let quotes = [];
-let currentQuoteIndex = 0;
+let allLoadedQuotes = []; // Store all quotes
+let currentQuotes = []; // Store current 10 quotes
+let currentIndex = 0;
 
 async function fetchInspirationalQuotes() {
     try {
@@ -6782,13 +6783,28 @@ async function fetchInspirationalQuotes() {
     }
 }
 
+function getRandomQuotes(quotes, count) {
+    const shuffled = [...quotes].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
+}
+
+function displayQuote(index) {
+    const quote = currentQuotes[index];
+    document.getElementById('english-quote').textContent = quote.english;
+    document.getElementById('chinese-quote').textContent = quote.chinese;
+    
+    // Update button states
+    document.getElementById('prev-quote').disabled = index === 0;
+    document.getElementById('next-quote').disabled = index === currentQuotes.length - 1;
+}
+
 function loadRandomQuotes() {
     currentQuotes = getRandomQuotes(allLoadedQuotes, 10);
     currentIndex = 0;
     displayQuote(currentIndex);
 }
 
-// Update event listeners
+// Add event listeners for navigation and refresh
 document.getElementById('prev-quote').addEventListener('click', () => {
     if (currentIndex > 0) {
         currentIndex--;
@@ -6804,3 +6820,6 @@ document.getElementById('next-quote').addEventListener('click', () => {
 });
 
 document.getElementById('refresh-quotes').addEventListener('click', loadRandomQuotes);
+
+// Initial load
+fetchInspirationalQuotes();
