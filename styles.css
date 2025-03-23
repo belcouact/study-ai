@@ -2332,14 +2332,16 @@ button:active {
 .quote-frame {
     border: 1px solid rgba(255, 255, 255, 0.2);
     margin: 0;
-    outline: none;
     border-radius: 8px;
     padding: 12px;
     background-color: rgba(255, 255, 255, 0.05);
+    outline: 1px solid rgba(255, 255, 255, 0.2);
+    outline-offset: 4px;
 }
 
 .quote-frame:hover {
     border-color: rgba(255, 255, 255, 0.4);
+    outline-color: rgba(255, 255, 255, 0.4);
     background-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -2347,16 +2349,17 @@ button:active {
     min-height: 60px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 12px;
     margin-bottom: 8px;
 }
 
 #english-quote, #chinese-quote {
     color: white;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     line-height: 1.4;
     margin: 0;
     opacity: 0.9;
+    padding: 4px 0;
 }
 
 #chinese-quote {
