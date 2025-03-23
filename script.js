@@ -6790,8 +6790,8 @@ async function fetchInspirationalQuotes() {
             throw new Error('No quotes found in CSV file');
         }
         
-        // Randomly select 10 quotes
-        quotes = shuffleArray(quotes).slice(0, 10);
+        // Randomly select 5 quotes
+        quotes = shuffleArray(quotes).slice(0, 5);
         currentQuoteIndex = 0;
         
         console.log('Selected quotes:', quotes);
@@ -6799,21 +6799,18 @@ async function fetchInspirationalQuotes() {
         // Display the first quote
         displayQuote(0);
         
-        // Setup event listeners
+        // Setup event listeners only once
         setupQuoteControls();
     } catch (error) {
         console.error('Error fetching quotes:', error);
-        const quoteContent = document.getElementById('quote-content');
-        if (quoteContent) {
-            const englishElement = document.getElementById('quote-english');
-            const chineseElement = document.getElementById('quote-chinese');
-            
-            if (englishElement) {
-                englishElement.textContent = 'Failed to load quotes';
-            }
-            if (chineseElement) {
-                chineseElement.textContent = '无法加载名言';
-            }
+        const englishElement = document.getElementById('quote-english');
+        const chineseElement = document.getElementById('quote-chinese');
+        
+        if (englishElement) {
+            englishElement.textContent = 'Failed to load quotes';
+        }
+        if (chineseElement) {
+            chineseElement.textContent = '无法加载名言';
         }
     }
 }
@@ -6827,7 +6824,7 @@ function shuffleArray(array) {
 }
 
 function displayQuote(index) {
-    console.log('Displaying quote at index:', index, 'Total quotes:', quotes.length);
+    console.log('Displaying quote at index:', index);
     if (quotes.length === 0) {
         console.warn('No quotes available to display');
         return;
@@ -6840,18 +6837,8 @@ function displayQuote(index) {
     const chineseElement = document.getElementById('quote-chinese');
     
     if (englishElement && chineseElement) {
-        // Clear previous content
-        englishElement.textContent = '';
-        chineseElement.textContent = '';
-        
-        // Add new content with fade effect
-        setTimeout(() => {
-            englishElement.textContent = quote.english;
-            chineseElement.textContent = quote.chinese;
-            englishElement.style.opacity = '1';
-            chineseElement.style.opacity = '1';
-        }, 50);
-        
+        englishElement.textContent = quote.english;
+        chineseElement.textContent = quote.chinese;
         console.log('Quote displayed successfully');
         updateQuoteNavigation();
     } else {
@@ -6863,13 +6850,10 @@ function navigateQuote(direction) {
     if (quotes.length === 0) return;
     
     const newIndex = currentQuoteIndex + direction;
-    console.log('Navigating to index:', newIndex, 'Max index:', quotes.length - 1);
-    
     // Only navigate if within bounds
     if (newIndex >= 0 && newIndex < quotes.length) {
         currentQuoteIndex = newIndex;
         displayQuote(currentQuoteIndex);
-        updateQuoteNavigation();
     }
 }
 
@@ -6879,17 +6863,18 @@ function updateQuoteNavigation() {
     
     if (prevButton) {
         prevButton.disabled = currentQuoteIndex === 0;
-        prevButton.style.opacity = currentQuoteIndex === 0 ? '0.5' : '1';
     }
     if (nextButton) {
         nextButton.disabled = currentQuoteIndex === quotes.length - 1;
-        nextButton.style.opacity = currentQuoteIndex === quotes.length - 1 ? '0.5' : '1';
     }
-    
-    console.log('Navigation updated - Current index:', currentQuoteIndex, 'Total quotes:', quotes.length);
 }
 
+let quoteControlsInitialized = false;
+
 function setupQuoteControls() {
+    // Only set up controls once
+    if (quoteControlsInitialized) return;
+    
     const prevButton = document.getElementById('prev-quote');
     const nextButton = document.getElementById('next-quote');
     const refreshButton = document.getElementById('refresh-quote');
@@ -6918,18 +6903,9 @@ function setupQuoteControls() {
         });
     }
     
+    // Mark controls as initialized
+    quoteControlsInitialized = true;
+    
     // Initialize navigation state
     updateQuoteNavigation();
 }
-
-// ... existing code ...
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize quotes
-    fetchInspirationalQuotes();
-    
-    // Setup navigation buttons
-    setupQuoteControls();
-    
-    // ... existing code ...
-});
