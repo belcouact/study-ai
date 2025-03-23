@@ -6772,7 +6772,7 @@ async function fetchInspirationalQuotes() {
         const csvText = await response.text();
         console.log('CSV content:', csvText.substring(0, 200) + '...');
         
-        // Parse CSV content with new separator
+        // Parse CSV content
         quotes = csvText.split('\n')
             .filter(line => line.trim()) // Remove empty lines
             .slice(1) // Skip header row
@@ -6790,7 +6790,7 @@ async function fetchInspirationalQuotes() {
             throw new Error('No quotes found in CSV file');
         }
         
-        // Randomly select 10 quotes
+        // Randomly select 5 quotes
         quotes = shuffleArray(quotes).slice(0, 10);
         currentQuoteIndex = 0;
         
@@ -6841,6 +6841,7 @@ function displayQuote(index) {
         englishElement.textContent = quote.english;
         chineseElement.textContent = quote.chinese;
         console.log('Quote displayed successfully');
+        updateQuoteNavigation();
     } else {
         console.error('Quote elements not found in DOM');
     }
@@ -6849,8 +6850,25 @@ function displayQuote(index) {
 function navigateQuote(direction) {
     if (quotes.length === 0) return;
     
-    currentQuoteIndex = (currentQuoteIndex + direction + quotes.length) % quotes.length;
-    displayQuote(currentQuoteIndex);
+    const newIndex = currentQuoteIndex + direction;
+    // Only navigate if within bounds
+    if (newIndex >= 0 && newIndex < quotes.length) {
+        currentQuoteIndex = newIndex;
+        displayQuote(currentQuoteIndex);
+        updateQuoteNavigation();
+    }
+}
+
+function updateQuoteNavigation() {
+    const prevButton = document.getElementById('prev-quote');
+    const nextButton = document.getElementById('next-quote');
+    
+    if (prevButton) {
+        prevButton.disabled = currentQuoteIndex === 0;
+    }
+    if (nextButton) {
+        nextButton.disabled = currentQuoteIndex === quotes.length - 1;
+    }
 }
 
 function setupQuoteControls() {
@@ -6873,6 +6891,9 @@ function setupQuoteControls() {
             setTimeout(() => refreshButton.classList.remove('rotating'), 1000);
         });
     }
+    
+    // Initialize navigation state
+    updateQuoteNavigation();
 }
 
 // ... existing code ...
