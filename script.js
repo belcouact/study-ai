@@ -6762,201 +6762,50 @@ let currentQuoteIndex = 0;
 
 async function fetchInspirationalQuotes() {
     try {
-        // Show initial loading message
-        const chineseElement = document.getElementById('quote-chinese');
+        const response = await fetch('/files/Quotes.csv');
+        const csvText = await response.text();
         
-        if (chineseElement) {
-            chineseElement.textContent = "加载名言中...";
-            chineseElement.style.opacity = '0.7';
-        }
-
-        const prompt = `请提供40条随机来自有道网站的励志语录，每条语录不超过20个单词。对于每条语录，请提供英文和中文翻译。响应必须是一个符合以下确切格式的有效JSON数组:
-        [
-          {
-            "english": "quote in English",
-            "chinese": "quote in Chinese"
-          }
-        ]`;
-        
-        const apiEndpoint = `/api/${currentApiFunction}`;
-        const response = await fetch(apiEndpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                messages: [
-                    {
-                        role: "user",
-                        content: prompt
-                    }
-                ],
-                model: currentModel
+        // Split CSV into lines and parse, handling the ",\" separator
+        const allQuotes = csvText.split('\n')
+            .map(line => {
+                const [english, chinese] = line.split(',\\,');
+                return { english: english?.trim(), chinese: chinese?.trim() };
             })
-        });
+            .filter(quote => quote.english && quote.chinese); // Remove any invalid entries
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-        if (!data || !data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
-            throw new Error('Invalid API response format');
-        }
-
-        const content = data.choices[0].message.content;
-        
-        // Try to parse the JSON content
-        let parsedContent;
-        try {
-            // First attempt: direct JSON parse
-            parsedContent = JSON.parse(content);
-        } catch (parseError) {
-            // Second attempt: try to extract JSON from the text
-            const jsonMatch = content.match(/\[\s*\{[\s\S]*\}\s*\]/);
-            if (jsonMatch) {
-                parsedContent = JSON.parse(jsonMatch[0]);
-            } else {
-                throw new Error('Could not parse quotes from response');
-            }
-        }
-
-        // Validate the parsed content
-        if (!Array.isArray(parsedContent) || parsedContent.length === 0) {
-            throw new Error('No valid quotes found in response');
-        }
-
-        // Ensure each quote has required properties
-        quotes = parsedContent
-            .filter(quote => quote && quote.english && quote.chinese)
-            .slice(0, 40); // Take only first 10 valid quotes
-
-        if (quotes.length === 0) {
-            throw new Error('No valid quotes found after filtering');
-        }
-
-        displayQuote(0);
+        // Get 10 random quotes
+        quotes = getRandomQuotes(allQuotes, 10);
+        displayQuote(currentQuoteIndex);
     } catch (error) {
         console.error('Error fetching quotes:', error);
-        
-        // Display error message with retry button
-        const englishElement = document.getElementById('quote-english');
-        const chineseElement = document.getElementById('quote-chinese');
-        
-        if (englishElement && chineseElement) {
-            englishElement.innerHTML = 'Failed to load quote. <button onclick="fetchInspirationalQuotes()" class="retry-button">Retry</button>';
-            chineseElement.innerHTML = '无法加载名言。<button onclick="fetchInspirationalQuotes()" class="retry-button">重试</button>';
-            englishElement.style.opacity = '1';
-            chineseElement.style.opacity = '1';
-        }
-
-        // Disable navigation buttons when there's an error
-        const prevButton = document.getElementById('prev-quote');
-        const nextButton = document.getElementById('next-quote');
-        if (prevButton) prevButton.disabled = true;
-        if (nextButton) nextButton.disabled = true;
+        document.getElementById('english-quote').textContent = 'Failed to load quotes';
+        document.getElementById('chinese-quote').textContent = '无法加载引用';
     }
 }
 
-// Add CSS for the retry button
-const style = document.createElement('style');
-style.textContent = `
-    .retry-button {
-        margin-left: 10px;
-        padding: 4px 8px;
-        background-color: #4299e1;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 0.9em;
-        transition: background-color 0.2s;
-    }
-    .retry-button:hover {
-        background-color: #3182ce;
-    }
-`;
-document.head.appendChild(style);
+function getRandomQuotes(quotes, count) {
+    const shuffled = [...quotes].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
+}
 
 function displayQuote(index) {
-    if (quotes.length === 0) return;
-    
-    currentQuoteIndex = index;
     const quote = quotes[index];
-    
-    // Animate the transition
-    const englishElement = document.getElementById('quote-english');
-    const chineseElement = document.getElementById('quote-chinese');
-    
-    englishElement.style.opacity = '0';
-    chineseElement.style.opacity = '0';
-    
-    setTimeout(() => {
-        englishElement.textContent = quote.english;
-        chineseElement.textContent = quote.chinese;
-        englishElement.style.opacity = '1';
-        chineseElement.style.opacity = '1';
-    }, 200);
-    
-    // Update navigation buttons
-    document.getElementById('prev-quote').disabled = index === 0;
-    document.getElementById('next-quote').disabled = index === quotes.length - 1;
+    document.getElementById('english-quote').textContent = quote.english;
+    document.getElementById('chinese-quote').textContent = quote.chinese;
 }
 
-function navigateQuote(direction) {
-    const newIndex = currentQuoteIndex + direction;
-    if (newIndex >= 0 && newIndex < quotes.length) {
-        displayQuote(newIndex);
-    }
-}
-
-// Add event listeners when the document loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Initial fetch of quotes
-    fetchInspirationalQuotes();
-    
-    // Setup navigation buttons
-    document.getElementById('prev-quote').addEventListener('click', () => navigateQuote(-1));
-    document.getElementById('next-quote').addEventListener('click', () => navigateQuote(1));
-    //document.getElementById('refresh-quote').addEventListener('click', fetchInspirationalQuotes);
+// Add event listeners for navigation and refresh
+document.getElementById('prev-quote').addEventListener('click', () => {
+    currentQuoteIndex = (currentQuoteIndex - 1 + quotes.length) % quotes.length;
+    displayQuote(currentQuoteIndex);
 });
 
-// Update the language toggle functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const langToggle = document.getElementById('langToggle');
-    const chineseContent = document.getElementById('chineseContent');
-    const englishContent = document.getElementById('englishContent');
-    const closeBtn = document.getElementsByClassName('close')[0];
-    const modal = document.getElementById('aboutModal');
-
-    // Language toggle
-    if (langToggle) {
-        langToggle.onclick = function() {
-            if (chineseContent.style.display === 'none') {
-                // Switch to Chinese
-                chineseContent.style.display = 'block';
-                englishContent.style.display = 'none';
-                langToggle.textContent = 'English';
-            } else {
-                // Switch to English
-                chineseContent.style.display = 'none';
-                englishContent.style.display = 'block';
-                langToggle.textContent = '中文';
-            }
-        };
-    }
-
-    // Close modal
-    if (closeBtn) {
-        closeBtn.onclick = function() {
-            modal.style.display = 'none';
-        };
-    }
-
-    // Close when clicking outside
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = 'none';
-        }
-    };
+document.getElementById('next-quote').addEventListener('click', () => {
+    currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+    displayQuote(currentQuoteIndex);
 });
+
+document.getElementById('refresh-quotes').addEventListener('click', fetchInspirationalQuotes);
+
+// Initial load
+fetchInspirationalQuotes();
