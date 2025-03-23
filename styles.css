@@ -2332,16 +2332,15 @@ button:active {
 .quote-frame {
     border: 1px solid rgba(255, 255, 255, 0.2);
     margin: 0;
-    outline: 1px solid rgba(255, 255, 255, 0.1);
-    outline-offset: 4px;
+    outline: none;
     border-radius: 8px;
     padding: 12px;
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .quote-frame:hover {
     border-color: rgba(255, 255, 255, 0.4);
-    outline-color: rgba(255, 255, 255, 0.2);
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 #quote-content {
