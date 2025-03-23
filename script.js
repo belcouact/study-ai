@@ -6837,8 +6837,18 @@ function displayQuote(index) {
     const chineseElement = document.getElementById('quote-chinese');
     
     if (englishElement && chineseElement) {
-        englishElement.textContent = quote.english;
-        chineseElement.textContent = quote.chinese;
+        // Clear previous content
+        englishElement.textContent = '';
+        chineseElement.textContent = '';
+        
+        // Add new content with a small delay for transition
+        setTimeout(() => {
+            englishElement.textContent = quote.english;
+            chineseElement.textContent = quote.chinese;
+            englishElement.style.opacity = '1';
+            chineseElement.style.opacity = '1';
+        }, 50);
+        
         console.log('Quote displayed successfully');
         updateQuoteNavigation();
     } else {
@@ -6909,3 +6919,9 @@ function setupQuoteControls() {
     // Initialize navigation state
     updateQuoteNavigation();
 }
+
+// Add this to ensure quotes are loaded when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize quotes
+    fetchInspirationalQuotes();
+});

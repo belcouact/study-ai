@@ -2349,7 +2349,6 @@ button:active {
     flex-direction: column;
     gap: 0.5rem;
     margin-bottom: 1rem;
-    padding: 0.5rem;
 }
 
 .quote-text {
@@ -2357,10 +2356,8 @@ button:active {
     font-size: 0.9rem;
     line-height: 1.4;
     margin: 0;
+    padding: 0.5rem;
     opacity: 0.9;
-    text-align: left;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
 }
 
 #quote-english {
