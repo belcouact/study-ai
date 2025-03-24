@@ -879,16 +879,23 @@ button:active {
 }
 
 .poetry-header {
-    background-color: var(--light-bg);
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+    margin-bottom: 25px;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
+    width: 100%;
 }
 
 .poetry-header:hover {
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
 }
 
 .poetry-controls {
@@ -900,67 +907,100 @@ button:active {
 .poetry-selectors {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    align-items: flex-end;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 0;
+    padding: 0;
+    transition: background-color 0.3s ease;
 }
 
 .selector-group {
+    position: relative;
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    min-width: 150px;
+    flex-direction: row;
+    align-items: center;
+    height: 38px;
+    min-width: 220px;
+    gap: 10px;
 }
 
 .selector-group label {
+    font-weight: 600;
+    color: white;
     font-size: 0.9rem;
-    color: var(--text-color);
-    font-weight: 500;
-    transition: color 0.2s ease;
+    transition: color 0.2s;
+    margin-bottom: 0;
+    white-space: nowrap;
+    min-width: 50px;
 }
 
 .selector-group:hover label {
-    color: var(--poetry-accent);
+    color: var(--poetry-accent, #8e44ad);
 }
 
 .poetry-select {
-    padding: 0.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-size: 0.9rem;
-    color: var(--text-color);
+    flex: 1;
+    height: 38px;
+    padding: 10px 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
     background-color: white;
-    transition: all 0.2s ease;
+    color: #333;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    padding-right: 35px;
 }
 
 .poetry-select:hover {
-    border-color: var(--poetry-accent);
+    border-color: #bdbdbd;
 }
 
 .poetry-select:focus {
     outline: none;
-    border-color: var(--poetry-accent);
-    box-shadow: 0 0 0 2px rgba(142, 68, 173, 0.1);
+    border-color: var(--poetry-accent, #8e44ad);
+    box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.2);
 }
 
 .poetry-button {
-    background-color: var(--poetry-accent);
+    margin-top: 0;
+    height: 38px;
+    padding: 0 20px;
+    background-color: var(--poetry-accent, #8e44ad);
     color: white;
     border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    align-self: flex-end;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.3s;
+    box-shadow: 0 2px 6px rgba(142, 68, 173, 0.4);
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .poetry-button:hover {
     background-color: #7d3c98;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(142, 68, 173, 0.5);
 }
 
 .poetry-button:active {
     transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(142, 68, 173, 0.4);
+}
+
+.poetry-content {
+    padding: 0 1rem 1rem;
+    overflow-y: auto;
+    flex: 1;
 }
 
 /* Poetry Navigation */
@@ -1070,11 +1110,15 @@ button:active {
 }
 
 .poem-content {
-    padding: 1.5rem;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+    font-size: 1.4rem;
+    line-height: 2.2;
+    text-align: center;
+    margin-bottom: 2.5rem;
+    color: #34495e;
+    transition: color 0.3s;
+    white-space: pre-wrap;
+    position: relative;
+    z-index: 1;
 }
 
 .poem-section {
