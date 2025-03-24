@@ -83,6 +83,35 @@
         
         <!-- Right Content Area -->
         <div class="content-area">
+            <!-- Control Panel for Create Questions -->
+            <div class="control-panel">
+                <label for="subject-selectr">科目</label>
+                <select id="subject-select" name="subject">
+                    <!-- Options will be populated dynamically -->
+                </select>
+
+                <label for="semester-select">学期</label>
+                <select id="semester-select">
+                    <option value="上学期">上学期</option>
+                    <option value="下学期">下学期</option>
+                </select>
+
+                <label for="difficulty-select">难度</label>
+                <select id="difficulty-select">
+                    <option value="容易">容易</option>
+                    <option value="中等">中等</option>
+                    <option value="偏难">偏难</option>
+                </select>
+
+                <label for="question-count-select">题数</label>
+                <select id="question-count-select">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                </select>
+                <button id="generate-btn" onclick="handleGenerateQuestionsClick()">出题</button>
+            </div>
+
             <!-- Q&A Chat Container -->
             <div id="qa-container" class="container">
                 <div class="chat-container">
@@ -111,35 +140,6 @@
             
             <!-- Create Questions Container (initially hidden) -->
             <div id="create-container" class="container hidden">
-                <!-- Add control panel at the top -->
-                <div class="control-panel">
-                    <label for="subject-selectr">科目</label>
-                    <select id="subject-select" name="subject">
-                        <!-- Options will be populated dynamically -->
-                    </select>
-
-                    <label for="semester-select">学期</label>
-                    <select id="semester-select">
-                        <option value="上学期">上学期</option>
-                        <option value="下学期">下学期</option>
-                    </select>
-
-                    <label for="difficulty-select">难度</label>
-                        <select id="difficulty-select">
-                            <option value="容易">容易</option>
-                            <option value="中等">中等</option>
-                            <option value="偏难">偏难</option>
-                        </select>
-
-                        <label for="question-count-select">题数</label>
-                        <select id="question-count-select">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="15">15</option>
-                        </select>
-                    <button id="generate-btn" onclick="handleGenerateQuestionsClick()">出题</button>
-                </div>
-
                 <!-- Questions display container -->
                 <div id="questions-display-container" class="questions-display-container hidden">
                     <!-- Empty state message -->
