@@ -2332,66 +2332,66 @@ button:active {
 .quote-frame {
     border: 1px solid rgba(255, 255, 255, 0.2);
     margin: 0;
-    outline: 1px solid rgba(255, 255, 255, 0.1);
-    outline-offset: 4px;
-    border-radius: 8px;
-    padding: 12px;
 }
 
 .quote-frame:hover {
     border-color: rgba(255, 255, 255, 0.4);
-    outline-color: rgba(255, 255, 255, 0.2);
     background-color: rgba(255, 255, 255, 0.05);
 }
 
 #quote-content {
-    min-height: 60px;
+    min-height: 100px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-bottom: 8px;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
-#english-quote, #chinese-quote {
+.quote-text {
     color: white;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     line-height: 1.4;
     margin: 0;
-    opacity: 0.9;
+    opacity: 1;
 }
 
-#chinese-quote {
-    opacity: 0.75;
+#quote-chinese {
+    font-size: 0.85rem;
+    color: white;
+    opacity: 0.85;
 }
 
 .quote-controls {
     display: flex;
-    gap: 0.5rem;
     justify-content: center;
-    margin-top: 0.5rem;
+    gap: 30px;
+    margin-top: 10px;
 }
 
-.quote-controls button {
-    background: none;
+.quote-nav-btn {
+    background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    cursor: pointer;
-    font-size: 0.9rem;
     color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
     padding: 0;
 }
 
-.quote-controls button:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
+.quote-nav-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
 }
 
-.quote-controls button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+.quote-nav-btn i {
+    font-size: 0.8rem;
+}
+
+#refresh-quote i {
+    font-size: 0.75rem;
 } 
