@@ -1791,28 +1791,36 @@ button:active {
     border-radius: 8px;
     box-shadow: var(--shadow);
     padding: 2rem;
+    position: relative;
 }
 
-.initial-message {
-    text-align: center;
-    color: #64748b;
-    font-size: 18px;
-    padding: 50px 30px;
-    border-radius: 10px;
-    background-color: #f8fafc;
+.word-card {
     width: 100%;
-    max-width: 800px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
 }
 
 .navigation-controls {
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    padding: 1rem;
-    background-color: white;
+    padding: 0.5rem 1rem;
+    background-color: rgba(255, 255, 255, 0.9);
     border-radius: 8px;
     box-shadow: var(--shadow);
+    z-index: 10;
+    backdrop-filter: blur(4px);
 }
 
 .navigation-controls.hidden {
@@ -1823,15 +1831,15 @@ button:active {
     background-color: var(--secondary-color);
     color: white;
     border: none;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .nav-button:hover:not(:disabled) {
@@ -1849,10 +1857,10 @@ button:active {
 }
 
 #word-counter {
-    font-size: 16px;
+    font-size: 14px;
     color: #64748b;
     font-weight: 500;
-    margin: 0 15px;
+    margin: 0 12px;
 }
 
 /* Add loading spinner for the load button */
