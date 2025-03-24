@@ -1818,12 +1818,13 @@ button:active {
     gap: 1.5rem;
     padding: 2rem;
     background-color: white;
-    border-radius: 8px;
-    box-shadow: var(--shadow);
-    transition: all 0.3s ease;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
     animation: cardEntrance 0.6s ease-out;
+    border: 1px solid rgba(52, 152, 219, 0.1);
 }
 
 .word-card::before {
@@ -1833,15 +1834,17 @@ button:active {
     left: 0;
     width: 100%;
     height: 4px;
-    background: linear-gradient(90deg, var(--secondary-color), #2980b9);
+    background: linear-gradient(90deg, var(--secondary-color), #2980b9, #3498db);
+    background-size: 200% 100%;
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 0.3s ease;
+    transition: transform 0.4s ease, background-position 0.4s ease;
+    animation: gradientMove 3s linear infinite;
 }
 
 .word-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
 }
 
 .word-card:hover::before {
@@ -1855,22 +1858,55 @@ button:active {
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 2px solid #e2e8f0;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
+    position: relative;
 }
 
-.word-card:hover .word-header {
-    border-bottom-color: var(--secondary-color);
+.word-card .word-header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background-color: var(--secondary-color);
+    transition: width 0.3s ease;
+}
+
+.word-card:hover .word-header::after {
+    width: 100%;
 }
 
 .word-card .word-english {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: 3rem;
+    font-weight: 800;
     color: var(--primary-color);
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: inline-block;
+}
+
+.word-card .word-english::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--secondary-color), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
 }
 
 .word-card:hover .word-english {
     color: var(--secondary-color);
+    transform: translateX(5px);
+}
+
+.word-card:hover .word-english::after {
+    transform: scaleX(1);
 }
 
 .word-card .word-details {
@@ -1878,73 +1914,167 @@ button:active {
     gap: 1rem;
     align-items: center;
     margin-bottom: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .word-card .word-form,
 .word-card .word-pronunciation {
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1.2rem;
     border-radius: 20px;
     background-color: #f1f5f9;
     color: #64748b;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     transition: all 0.3s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 
-.word-card:hover .word-form,
-.word-card:hover .word-pronunciation {
+.word-card .word-form:hover,
+.word-card .word-pronunciation:hover {
     background-color: #e2e8f0;
     color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.word-card .word-form::before,
+.word-card .word-pronunciation::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.word-card .word-form:hover::before,
+.word-card .word-pronunciation:hover::before {
+    transform: translateX(100%);
 }
 
 .word-card .meaning-row {
     display: flex;
     margin-bottom: 1rem;
-    padding: 0.8rem;
+    padding: 1rem;
     border-radius: 8px;
     transition: all 0.3s ease;
+    background-color: #f8fafc;
+    border: 1px solid transparent;
+    cursor: pointer;
 }
 
 .word-card .meaning-row:hover {
-    background-color: #f8fafc;
+    background-color: #f1f5f9;
     transform: translateX(5px);
+    border-color: var(--secondary-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
 .word-card .meaning-label {
     width: 100px;
     font-weight: 600;
     color: #334155;
+    position: relative;
+    padding-left: 1rem;
+}
+
+.word-card .meaning-label::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.word-card .meaning-row:hover .meaning-label::before {
+    opacity: 1;
 }
 
 .word-card .meaning-content {
     flex: 1;
     color: #475569;
     line-height: 1.6;
+    transition: color 0.3s ease;
+}
+
+.word-card .meaning-row:hover .meaning-content {
+    color: var(--primary-color);
 }
 
 .word-card .example-item {
     background-color: #f8fafc;
     border-radius: 8px;
-    padding: 1rem;
+    padding: 1.2rem;
     margin-bottom: 1rem;
     border-left: 3px solid transparent;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.word-card .example-item::before {
+    content: '"';
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    font-size: 2rem;
+    color: var(--secondary-color);
+    opacity: 0.2;
+    transition: opacity 0.3s ease;
 }
 
 .word-card .example-item:hover {
     background-color: #f1f5f9;
     border-left-color: var(--secondary-color);
     transform: translateX(5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.word-card .example-item:hover::before {
+    opacity: 0.4;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
 }
 
 @keyframes cardEntrance {
     0% {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(20px) scale(0.95);
     }
     100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
+}
+
+/* Add a fun hover effect for the entire card */
+.word-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                rgba(52, 152, 219, 0.1) 0%,
+                transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.word-card:hover::after {
+    opacity: 1;
 }
 
 /* Remove the hidden class from navigation controls */
