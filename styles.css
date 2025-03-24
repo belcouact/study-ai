@@ -1741,82 +1741,17 @@ button:active {
     overflow: auto;
     width: 100%;
     padding: 20px;
-    justify-content: center;
-}
-
-.vocabulary-card-container {
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 2rem;
-    margin: 0 auto;
-    min-height: 400px;
-    display: flex;
-    flex-direction: column;
     gap: 1.5rem;
-    max-width: 1200px;
-    width: 100%;
-}
-
-.vocabulary-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 15px 20px;
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
-    margin-bottom: 25px;
-    transition: all 0.3s ease;
-}
-
-.vocabulary-header:hover {
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-}
-
-.vocabulary-load-btn {
-    background-color: var(--secondary-color, #3498db);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 20px;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 6px rgba(52, 152, 219, 0.4);
-}
-
-.vocabulary-load-btn:hover {
-    background-color: #2980b9;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.5);
-}
-
-.vocabulary-load-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.4);
-}
-
-.vocabulary-load-btn:disabled {
-    background-color: #a0c8e6;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
 }
 
 .vocabulary-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
 }
 
 .vocabulary-header h2 {
@@ -1847,11 +1782,15 @@ button:active {
 }
 
 #vocabulary-container {
-    width: 100%;
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    flex: 1;
+    min-height: 400px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 2rem;
 }
 
 .initial-message {
@@ -1860,263 +1799,29 @@ button:active {
     font-size: 18px;
     padding: 50px 30px;
     border-radius: 10px;
-    background-color: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    background-color: #f8fafc;
     width: 100%;
     max-width: 800px;
-    margin: 40px auto;
 }
 
-.word-card {
+.navigation-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
     background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-    padding: 35px 40px;
-    width: 100%;
-    max-width: 900px;
-    margin: 0 auto;
-    min-height: 500px;
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
-    display: flex;
-    flex-direction: column;
-    animation: cardEntrance 0.6s ease-out;
-    gap: 20px;
-}
-
-@keyframes cardEntrance {
-    0% {
-        transform: translateY(20px);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.word-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-}
-
-.word-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e2e8f0;
-}
-
-.word-english {
-    font-size: 38px;
-    font-weight: 700;
-    color: var(--primary-color, #2c3e50);
-    animation: fadeIn 0.8s ease-out;
-}
-
-.word-details {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-}
-
-.word-form {
-    font-size: 16px;
-    color: #64748b;
-    background-color: #f1f5f9;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-weight: 500;
-    animation: slideIn 0.8s ease-out;
-}
-
-.word-pronunciation {
-    font-family: monospace;
-    color: #64748b;
-    font-size: 16px;
-    background-color: #f1f5f9;
-    padding: 6px 14px;
-    border-radius: 20px;
-}
-
-.word-meanings {
-    margin-bottom: 25px;
-    animation: fadeInUp 1s ease-out;
-}
-
-.meaning-row {
-    display: flex;
-    margin-bottom: 15px;
-}
-
-.meaning-label {
-    width: 100px;
-    font-weight: 600;
-    color: #334155;
-}
-
-.meaning-content {
-    flex: 1;
-    color: #475569;
-    line-height: 1.6;
-    font-size: 16px;
-}
-
-.section-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--primary-color, #2c3e50);
-    margin-bottom: 12px;
-    position: relative;
-    padding-left: 15px;
-}
-
-.section-title::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 18px;
-    width: 4px;
-    background-color: var(--secondary-color, #3498db);
-    border-radius: 2px;
-}
-
-.word-examples, .word-family, .collocations, .word-relationships, .learning-tips {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #f1f5f9;
-    animation: fadeInUp 1.3s ease-out;
-}
-
-.example-item {
-    background-color: #f8fafc;
-    border-radius: 10px;
-    padding: 15px 20px;
-    margin-bottom: 15px;
-    border-left: 4px solid var(--secondary-color, #3498db);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.example-item:hover {
-    transform: translateX(5px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-}
-
-.example-english {
-    color: #334155;
-    margin-bottom: 8px;
-    font-weight: 500;
-    font-size: 16px;
-}
-
-.example-chinese {
-    color: #64748b;
-    font-size: 15px;
-}
-
-.word-family-items, .collocation-items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 12px;
-}
-
-.word-family-item, .collocation-item {
-    background-color: #eef2ff;
-    color: #4338ca;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-size: 15px;
-    transition: transform 0.2s, background-color 0.2s;
-}
-
-.word-family-item:hover, .collocation-item:hover {
-    background-color: #4338ca;
-    color: white;
-    transform: translateY(-2px);
-}
-
-.word-relationships {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-@media (min-width: 968px) {
-    .word-relationships {
-        flex-direction: row;
-    }
-    
-    .synonyms, .antonyms {
-        width: 50%;
-    }
-}
-
-.synonym-items, .antonym-items {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 12px;
-}
-
-.synonym-container, .antonym-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 15px;
-    background-color: #f8fafc;
     border-radius: 8px;
-    transition: transform 0.2s ease;
+    box-shadow: var(--shadow);
 }
 
-.synonym-container:hover, .antonym-container:hover {
-    transform: translateX(5px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+.navigation-controls.hidden {
+    display: none;
 }
 
-.synonym-word, .antonym-word {
-    font-weight: 600;
-    color: #334155;
-}
-
-.synonym-def, .antonym-def {
-    color: #64748b;
-    font-size: 14px;
-}
-
-.learning-tips {
-    background-color: #ecfdf5;
-    border-left: 4px solid #10b981;
-    padding: 18px 20px;
-    border-radius: 8px;
-    margin-top: 20px;
-}
-
-.tip-content {
-    color: #065f46;
-    line-height: 1.6;
-    font-size: 15px;
-}
-
-.error-message {
-    background-color: #fee2e2;
-    border-left: 4px solid #ef4444;
-    padding: 20px;
-    border-radius: 10px;
-    color: #b91c1c;
-    text-align: center;
-    width: 100%;
-    max-width: 800px;
-    margin: 40px auto;
-}
-
-/* Navigation buttons styling to match the site theme */
 .nav-button {
-    background-color: #f1f5f9;
-    color: #64748b;
+    background-color: var(--secondary-color);
+    color: white;
     border: none;
     width: 40px;
     height: 40px;
@@ -2130,8 +1835,7 @@ button:active {
 }
 
 .nav-button:hover:not(:disabled) {
-    background-color: var(--secondary-color, #3498db);
-    color: white;
+    background-color: #2980b9;
     transform: scale(1.1);
 }
 
