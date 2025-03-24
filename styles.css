@@ -737,6 +737,11 @@ button:active {
 
 /* Navigation controls */
 .navigation-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 90;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -746,9 +751,7 @@ button:active {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
-    margin: 1rem auto;
-    position: relative;
-    overflow: hidden;
+    margin: 0;
     border: 1px solid rgba(52, 152, 219, 0.1);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1839,6 +1842,7 @@ button:active {
     padding: 2rem;
     position: relative;
     gap: 1rem;
+    padding-bottom: 80px;
 }
 
 .navigation-controls {
@@ -2365,7 +2369,7 @@ button:active {
 }
 
 /* Collocation Section */
-.collocation {
+.collocations {
     background-color: #f8fafc;
     border-radius: 12px;
     padding: 1.5rem;
@@ -2374,9 +2378,11 @@ button:active {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    animation: sectionEntrance 0.6s ease-out forwards;
+    opacity: 0;
 }
 
-.collocation::before {
+.collocations::before {
     content: '';
     position: absolute;
     top: 0;
@@ -2388,16 +2394,16 @@ button:active {
     transition: opacity 0.3s ease;
 }
 
-.collocation:hover {
+.collocations:hover {
     transform: translateX(5px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.collocation:hover::before {
+.collocations:hover::before {
     opacity: 1;
 }
 
-.collocation h3 {
+.collocations h3 {
     color: var(--primary-color);
     font-size: 1.2rem;
     margin-bottom: 1rem;
@@ -2406,9 +2412,32 @@ button:active {
     gap: 0.5rem;
 }
 
-.collocation h3::before {
+.collocations h3::before {
     content: '🔗';
     font-size: 1.4rem;
+}
+
+.collocations ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.collocations li {
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.5rem;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid rgba(52, 152, 219, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.collocations li:hover {
+    transform: translateX(5px);
+    background-color: #f1f5f9;
+    border-color: var(--secondary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* Word Relationships Section */
@@ -2507,7 +2536,7 @@ button:active {
 
 /* Common styles for all sections */
 .word-family ul,
-.collocation ul,
+.collocations ul,
 .word-relationships ul,
 .learning-tips ul {
     list-style: none;
@@ -2516,7 +2545,7 @@ button:active {
 }
 
 .word-family li,
-.collocation li,
+.collocations li,
 .word-relationships li,
 .learning-tips li {
     padding: 0.8rem 1rem;
@@ -2529,7 +2558,7 @@ button:active {
 }
 
 .word-family li:hover,
-.collocation li:hover,
+.collocations li:hover,
 .word-relationships li:hover,
 .learning-tips li:hover {
     transform: translateX(5px);
@@ -2540,7 +2569,7 @@ button:active {
 
 /* Add entrance animation for sections */
 .word-family,
-.collocation,
+.collocations,
 .word-relationships,
 .learning-tips {
     animation: sectionEntrance 0.6s ease-out forwards;
@@ -2548,7 +2577,7 @@ button:active {
 }
 
 .word-family { animation-delay: 0.2s; }
-.collocation { animation-delay: 0.4s; }
+.collocations { animation-delay: 0.4s; }
 .word-relationships { animation-delay: 0.6s; }
 .learning-tips { animation-delay: 0.8s; }
 
