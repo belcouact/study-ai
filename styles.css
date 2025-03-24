@@ -737,44 +737,89 @@ button:active {
 
 /* Navigation controls */
 .navigation-controls {
-    position: sticky;
-    bottom: 20px;
-    z-index: 90;
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
-    padding: 15px;
-    background: white;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: white;
     border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
-    order: 3;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: 1rem auto;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(52, 152, 219, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navigation-controls::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--secondary-color), #2980b9, #3498db);
+    background-size: 200% 100%;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease, background-position 0.4s ease;
+    animation: gradientMove 3s linear infinite;
 }
 
 .navigation-controls:hover {
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.navigation-controls:hover::before {
+    transform: scaleX(1);
 }
 
 .nav-button {
-    padding: 10px 20px;
-    background-color: #4299e1;
-    color: white;
-    border: none;
-    border-radius: 6px;
+    padding: 0.8rem 1.5rem;
+    background-color: #f1f5f9;
+    color: var(--primary-color);
+    border: 1px solid transparent;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 16px;
+    font-size: 0.95rem;
     font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-button:hover {
+    background-color: var(--secondary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .nav-button:disabled {
-    background-color: #cbd5e0;
+    background-color: #e2e8f0;
+    color: #94a3b8;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
-.nav-button:not(:disabled):hover {
-    background-color: #3182ce;
-    transform: translateY(-1px);
+.nav-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.nav-button:hover::before {
+    transform: translateX(100%);
 }
 
 /* Empty state styling */
@@ -2270,4 +2315,250 @@ button:active {
 
 #refresh-quote i {
     font-size: 0.75rem;
+}
+
+/* Word Family Section */
+.word-family {
+    background-color: #f8fafc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    border: 1px solid rgba(52, 152, 219, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.word-family::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--secondary-color), #2980b9);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.word-family:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.word-family:hover::before {
+    opacity: 1;
+}
+
+.word-family h3 {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.word-family h3::before {
+    content: '👨‍👩‍👧‍👦';
+    font-size: 1.4rem;
+}
+
+/* Collocation Section */
+.collocation {
+    background-color: #f8fafc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    border: 1px solid rgba(52, 152, 219, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.collocation::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, #2ecc71, #27ae60);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.collocation:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.collocation:hover::before {
+    opacity: 1;
+}
+
+.collocation h3 {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.collocation h3::before {
+    content: '🔗';
+    font-size: 1.4rem;
+}
+
+/* Word Relationships Section */
+.word-relationships {
+    background-color: #f8fafc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    border: 1px solid rgba(52, 152, 219, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.word-relationships::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, #e74c3c, #c0392b);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.word-relationships:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.word-relationships:hover::before {
+    opacity: 1;
+}
+
+.word-relationships h3 {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.word-relationships h3::before {
+    content: '🔄';
+    font-size: 1.4rem;
+}
+
+/* Learning Tips Section */
+.learning-tips {
+    background-color: #f8fafc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    border: 1px solid rgba(52, 152, 219, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.learning-tips::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, #f1c40f, #f39c12);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.learning-tips:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.learning-tips:hover::before {
+    opacity: 1;
+}
+
+.learning-tips h3 {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.learning-tips h3::before {
+    content: '💡';
+    font-size: 1.4rem;
+}
+
+/* Common styles for all sections */
+.word-family ul,
+.collocation ul,
+.word-relationships ul,
+.learning-tips ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.word-family li,
+.collocation li,
+.word-relationships li,
+.learning-tips li {
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.5rem;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid rgba(52, 152, 219, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.word-family li:hover,
+.collocation li:hover,
+.word-relationships li:hover,
+.learning-tips li:hover {
+    transform: translateX(5px);
+    background-color: #f1f5f9;
+    border-color: var(--secondary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Add entrance animation for sections */
+.word-family,
+.collocation,
+.word-relationships,
+.learning-tips {
+    animation: sectionEntrance 0.6s ease-out forwards;
+    opacity: 0;
+}
+
+.word-family { animation-delay: 0.2s; }
+.collocation { animation-delay: 0.4s; }
+.word-relationships { animation-delay: 0.6s; }
+.learning-tips { animation-delay: 0.8s; }
+
+@keyframes sectionEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 } 
