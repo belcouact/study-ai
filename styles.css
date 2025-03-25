@@ -924,6 +924,8 @@ button:active {
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     width: 100%;
+    position: relative;
+    z-index: 1;
 }
 
 .poetry-header:hover {
@@ -2262,10 +2264,10 @@ button:active {
 }
 
 .navigation-controls {
-    position: sticky;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     background: var(--card-bg);
     padding: 15px 20px;
     display: flex;
@@ -2274,7 +2276,11 @@ button:active {
     gap: 20px;
     border-top: 1px solid var(--border-color);
     margin-top: 20px;
-    z-index: 10;
+    z-index: 100;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    width: auto;
+    min-width: 200px;
 }
 
 #vocabulary-container {
