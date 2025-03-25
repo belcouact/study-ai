@@ -1094,6 +1094,13 @@ function handleEvaluateClick() {
     
     const scorePercentage = (correctCount / window.questions.length) * 100;
     
+    // Store score data in window object so it can be accessed by showEvaluationModal
+    window.testScore = {
+        totalQuestions: window.questions.length,
+        correctCount: correctCount,
+        scorePercentage: scorePercentage
+    };
+    
     // Create prompt for API
     const prompt = `
 我刚完成了一个测试，请根据我的表现给出评估和建议。
@@ -1131,6 +1138,24 @@ ${questionResults.map(result =>
             console.error('Error fetching evaluation:', error);
             showEvaluationModal('获取评估时出错，请重试。');
         });
+}
+
+// Helper function to get score grade based on percentage
+function getScoreGrade(percentage) {
+    if (percentage >= 90) return 'A (优秀)';
+    if (percentage >= 80) return 'B (良好)';
+    if (percentage >= 70) return 'C (中等)';
+    if (percentage >= 60) return 'D (及格)';
+    return 'E (不及格)';
+}
+
+// Helper function to get color for score grade
+function getScoreGradeColor(percentage) {
+    if (percentage >= 90) return '#38a169'; // Green for A
+    if (percentage >= 80) return '#4299e1'; // Blue for B
+    if (percentage >= 70) return '#805ad5'; // Purple for C
+    if (percentage >= 60) return '#ed8936'; // Orange for D
+    return '#e53e3e'; // Red for E
 }
 
 // Make handleEvaluateClick globally available for the onclick attribute
@@ -1209,6 +1234,9 @@ function showEvaluationModal(content) {
         // Process the content to identify different sections
         const sections = processEvaluationContent(content);
         
+        // Get score data from window object
+        const scoreData = window.testScore || { totalQuestions: 0, correctCount: 0, scorePercentage: 0 };
+        
         modalContent = `
             <div class="modal-content" style="
                 background: white;
@@ -1249,6 +1277,60 @@ function showEvaluationModal(content) {
                         font-size: 14px;
                         color: #718096;
                     ">基于您的测试表现提供的个性化评估和建议</div>
+                </div>
+                
+                <!-- Score Summary Card -->
+                <div class="score-card" style="
+                    background: #ebf8ff;
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+                    border-left: 5px solid #3182ce;
+                    display: flex;
+                    justify-content: space-around;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                ">
+                    <div class="score-item" style="
+                        text-align: center;
+                        padding: 10px;
+                        min-width: 120px;
+                    ">
+                        <div style="font-size: 14px; color: #4a5568; margin-bottom: 5px;">总题数</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #2c5282;">${scoreData.totalQuestions}</div>
+                    </div>
+                    
+                    <div class="score-item" style="
+                        text-align: center;
+                        padding: 10px;
+                        min-width: 120px;
+                    ">
+                        <div style="font-size: 14px; color: #4a5568; margin-bottom: 5px;">答对题数</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #2c5282;">${scoreData.correctCount}</div>
+                    </div>
+                    
+                    <div class="score-item" style="
+                        text-align: center;
+                        padding: 10px;
+                        min-width: 120px;
+                    ">
+                        <div style="font-size: 14px; color: #4a5568; margin-bottom: 5px;">正确率</div>
+                        <div style="font-size: 24px; font-weight: bold; color: ${scoreData.scorePercentage >= 60 ? '#38a169' : '#e53e3e'};">
+                            ${scoreData.scorePercentage.toFixed(1)}%
+                        </div>
+                    </div>
+                    
+                    <div class="score-item" style="
+                        text-align: center;
+                        padding: 10px;
+                        min-width: 120px;
+                    ">
+                        <div style="font-size: 14px; color: #4a5568; margin-bottom: 5px;">等级评定</div>
+                        <div style="font-size: 24px; font-weight: bold; color: ${getScoreGradeColor(scoreData.scorePercentage)};">
+                            ${getScoreGrade(scoreData.scorePercentage)}
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="evaluation-cards" style="
@@ -3408,7 +3490,6 @@ function inspectDropdowns() {
 // Call the inspection function when setting up chat buttons
 function setupChatButtons() {
     console.log('Setting up chat buttons');
-    console.log('loading setupChatButtons function from line 3419');
     // Inspect dropdowns to debug the issue
     // inspectDropdowns();
     
@@ -3622,8 +3703,6 @@ function createChatInterface() {
 // Now let's fix the grade and subject dropdowns by ensuring they're populated
 function initializeFormLayout() {
     // ... existing code ...
-    
-    console.log('loading initializeFormLayout function from line 3629');
     // Ensure dropdowns are populated in the sidebar
     const sidebarSchoolSelect = document.getElementById('sidebar-school-select');
     if (sidebarSchoolSelect) {
@@ -4079,7 +4158,6 @@ function getSimplifiedContextSummary() {
     // Set up all event listeners
     function setupEventListeners() {
         // Sidebar toggle
-        console.log('loading setupEventListeners function from line 4090');
         elements.sidebarToggle.addEventListener('click', toggleSidebar);
         
         // Panel buttons
@@ -4973,7 +5051,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Function to update style options based on selected type
         function updatePoetryStyleOptions() {
             const poetryType = poetryTypeSelect.value;
-            console.log('loading updatePoetryStyleOptions function from line 4972');
             console.log('Updating poetry style options for type:', poetryType);
             
             // Clear existing options
