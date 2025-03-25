@@ -6002,12 +6002,11 @@ Please format your response as a valid JSON array with objects having the follow
     "part_of_speech": "noun",
     "pronunciation": "/ɪɡˈzæm.pəl/",
     "definition": "A clear English definition",
-    "chinese_translation": "中文翻译",
+    "chinese_translation": "中文翻译","中文翻译","中文翻译"
     "related_phrases": [
       {
         "english": "example phrase",
         "chinese": "相关词组",
-        "usage": "Brief explanation of when to use this phrase"
       }
     ],
     "example_sentences": [
