@@ -1587,27 +1587,44 @@ button:active {
 
 /* Enhance the generate button */
 .control-panel button {
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
+    padding: 8px 16px;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
+    background-color: var(--secondary-color);
+    color: white;
     cursor: pointer;
-    font-size: 15px;
-    font-weight: 500;
-    transition: all 0.2s;
-    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+    transition: background-color 0.2s;
+    margin-left: 10px;
 }
 
 .control-panel button:hover {
-    background-color: #3e9f41;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4);
+    background-color: #2980b9;
 }
 
 .control-panel button:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(76, 175, 80, 0.3);
+    background-color: #2472a4;
+}
+
+.control-panel button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+#evaluate-btn {
+    background-color: #27ae60;
+}
+
+#evaluate-btn:hover {
+    background-color: #219a52;
+}
+
+#evaluate-btn:active {
+    background-color: #1e8449;
+}
+
+#evaluate-btn:disabled {
+    background-color: #bdc3c7;
 }
 
 /* Enhance loading indicator */

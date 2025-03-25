@@ -826,92 +826,42 @@ function displayCurrentQuestion() {
     
     // Function to display answer and explanation
     function displayAnswer(selectedValue) {
-        // Create or get the answer container
-        let answerContainer = document.getElementById('answer-container');
-        if (!answerContainer) {
-            answerContainer = document.createElement('div');
-            answerContainer.id = 'answer-container';
-            answerContainer.className = 'answer-container';
-            answerContainer.style.cssText = `
-                margin-top: clamp(20px, 5vw, 30px);
-                padding: clamp(15px, 4vw, 25px);
-                border-radius: 12px;
-                background-color: white;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-                width: 100%;
-                box-sizing: border-box;
-                animation: fadeIn 0.3s ease;
-            `;
-            questionsContainer.appendChild(answerContainer);
-        }
+        const currentQuestion = questions[currentQuestionIndex];
+        const answerContainer = document.getElementById('answer-container');
+        const answerResult = document.getElementById('answer-result');
+        const answerExplanation = document.getElementById('answer-explanation');
         
-        answerContainer.classList.remove('hidden');
-        
-        // Check if answer is correct
-        const correctAnswer = question.answer;
-        const isCorrect = selectedValue === correctAnswer;
-        
-        // Create or update the answer result
-        let answerResult = document.getElementById('answer-result');
-        if (!answerResult) {
-            answerResult = document.createElement('div');
-            answerResult.id = 'answer-result';
-            answerResult.className = 'answer-result';
-            answerContainer.appendChild(answerResult);
-        }
-        
-        answerResult.style.cssText = `
-            font-size: 18px;
-            font-weight: 500;
-            color: ${isCorrect ? '#48bb78' : '#e53e3e'};
-            margin-bottom: 20px;
-            padding: 15px;
-            background: ${isCorrect ? '#f0fff4' : '#fff5f5'};
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        `;
-        
-        const resultText = isCorrect 
-            ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 正确！答案是：${correctAnswer}`
-            : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> 错误。正确答案是：${correctAnswer}`;
-        
-        answerResult.innerHTML = formatMathExpressions(resultText);
-        
-        // Create or update the explanation
-        let answerExplanation = document.getElementById('answer-explanation');
-        if (!answerExplanation) {
-            answerExplanation = document.createElement('div');
-            answerExplanation.id = 'answer-explanation';
-            answerExplanation.className = 'answer-explanation';
-            answerContainer.appendChild(answerExplanation);
-        }
-        
-        answerExplanation.style.cssText = `
-            font-size: 16px;
-            color: #4a5568;
-            line-height: 1.8;
-            margin-top: 20px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            white-space: pre-wrap;
-        `;
-        answerExplanation.innerHTML = formatMathExpressions(question.explanation);
-        
-        // Disable the submit button after submission
-        const submitButton = document.getElementById('submit-answer-button');
-        if (submitButton) {
-            submitButton.disabled = true;
-            submitButton.style.opacity = '0.5';
-            submitButton.style.pointerEvents = 'none';
-            submitButton.textContent = '已提交';
-        }
-        
-        // Render math expressions
-        if (window.MathJax) {
-            window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+        if (!currentQuestion.userAnswer) {
+            currentQuestion.userAnswer = selectedValue;
+            
+            // Check if all questions have been answered
+            const allQuestionsAnswered = questions.every(q => q.userAnswer);
+            
+            // Enable the evaluate button if all questions are answered
+            const evaluateButton = document.getElementById('evaluate-btn');
+            if (evaluateButton) {
+                evaluateButton.disabled = !allQuestionsAnswered;
+            }
+            
+            // Show the answer container
+            answerContainer.classList.remove('hidden');
+            
+            // Display whether the answer was correct or not
+            const isCorrect = selectedValue === currentQuestion.answer;
+            answerResult.textContent = isCorrect ? '✓ 回答正确！' : '✗ 回答错误！';
+            answerResult.style.color = isCorrect ? '#27ae60' : '#e74c3c';
+            
+            // Display the explanation
+            answerExplanation.innerHTML = formatMathExpressions(currentQuestion.explanation);
+            
+            // Disable all radio buttons for this question
+            const radioButtons = document.querySelectorAll('input[type="radio"]');
+            radioButtons.forEach(radio => {
+                radio.disabled = true;
+            });
+            
+            // Update navigation controls
+            updateNavigationButtons();
         }
     }
     
@@ -1112,131 +1062,8 @@ function updateNavigationButtons() {
 
 // Function to display completion status and score in navigation section
 function displayCompletionStatus() {
-    // Calculate score
-    let correctCount = 0;
-    window.userAnswers.forEach((answer, index) => {
-        if (answer === window.questions[index].answer) {
-            correctCount++;
-        }
-    });
-    const scorePercentage = (correctCount / window.questions.length) * 100;
-    
-    // Get or create navigation controls
-    let navigationControls = document.querySelector('.navigation-controls');
-    if (!navigationControls) {
-        navigationControls = document.createElement('div');
-        navigationControls.className = 'navigation-controls';
-        navigationControls.style.cssText = `
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 20px 0;
-            width: 100%;
-            flex-wrap: wrap;
-        `;
-        
-        const questionsContainer = document.querySelector('.questions-container');
-        if (questionsContainer) {
-            questionsContainer.appendChild(navigationControls);
-        }
-    }
-    
-    // Check if completion status already exists
-    let completionStatus = document.getElementById('completion-status');
-    if (!completionStatus) {
-        // Create completion status element
-        completionStatus = document.createElement('div');
-        completionStatus.id = 'completion-status';
-        completionStatus.style.cssText = `
-            background-color: #ebf8ff;
-            border: 1px solid #4299e1;
-            border-radius: 8px;
-            padding: 12px 20px;
-            margin: 0 15px 15px 15px;
-            text-align: center;
-            color: #2b6cb0;
-            font-weight: 500;
-            font-size: 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
-            animation: fadeIn 0.5s ease;
-        `;
-        
-        // Add completion message
-        const completionMessage = document.createElement('div');
-        completionMessage.style.cssText = `
-            font-size: 18px;
-            font-weight: 600;
-            color: #2c5282;
-            margin-bottom: 5px;
-        `;
-        completionMessage.textContent = '测试完成！';
-        completionStatus.appendChild(completionMessage);
-        
-        // Add score information
-        const scoreInfo = document.createElement('div');
-        scoreInfo.style.cssText = `
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        `;
-        
-        const totalQuestions = document.createElement('span');
-        totalQuestions.textContent = `总题数: ${window.questions.length}`;
-        
-        const correctAnswers = document.createElement('span');
-        correctAnswers.textContent = `正确: ${correctCount}`;
-        
-        const scorePercent = document.createElement('span');
-        scorePercent.textContent = `正确率: ${scorePercentage.toFixed(1)}%`;
-        
-        scoreInfo.appendChild(totalQuestions);
-        scoreInfo.appendChild(correctAnswers);
-        scoreInfo.appendChild(scorePercent);
-        completionStatus.appendChild(scoreInfo);
-        
-        // Add evaluation button
-        const evaluateButton = document.createElement('button');
-        evaluateButton.textContent = '成绩评估';
-        evaluateButton.style.cssText = `
-            margin-top: 10px;
-            padding: 8px 16px;
-            background-color: #4299e1;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        `;
-        evaluateButton.addEventListener('click', handleEvaluateClick);
-        completionStatus.appendChild(evaluateButton);
-        
-        // Insert completion status between navigation buttons
-        const prevButton = document.getElementById('prev-question-button');
-        if (prevButton && prevButton.parentNode === navigationControls) {
-            navigationControls.insertBefore(completionStatus, prevButton.nextSibling);
-        } else {
-            navigationControls.appendChild(completionStatus);
-        }
-        
-        // Add fadeIn animation
-        const styleElement = document.createElement('style');
-        styleElement.textContent = `
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(-10px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-        `;
-        document.head.appendChild(styleElement);
-    }
+    // This function is now empty as we don't want to show completion status in navigation controls
+    return;
 }
 
 // Function to handle evaluation button click
