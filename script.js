@@ -389,12 +389,16 @@ function displayCurrentQuestion() {
         return;
     }
 
-    // Get the create container
+    // Get the create container - it exists in HTML regardless of which tab is active
     const createContainer = document.getElementById('create-container');
-    if (!createContainer || createContainer.style.display === 'none') {
-        console.log('Not on create tab, skipping question display');
+    if (!createContainer) {
+        console.error('Create container not found');
         return;
     }
+
+    // Ensure the create container is accessible for content updates
+    // This doesn't change which tab is visible, just ensures we can update the content
+    createContainer.style.display = ''; // Clear any inline display:none
 
     // First ensure we have a questions container
     let questionsContainer = document.querySelector('.questions-container');
@@ -405,15 +409,25 @@ function displayCurrentQuestion() {
         createContainer.appendChild(questionsContainer);
     }
 
-    // Create questions display container if it doesn't exist
+    // Get or create questions display container
     let questionsDisplayContainer = document.getElementById('questions-display-container');
     if (!questionsDisplayContainer) {
         console.log('Creating new questions display container');
         questionsDisplayContainer = document.createElement('div');
         questionsDisplayContainer.id = 'questions-display-container';
         questionsDisplayContainer.className = 'questions-display-container';
-        questionsContainer.appendChild(questionsDisplayContainer);
+        
+        // Add to the appropriate container
+        if (questionsContainer) {
+            questionsContainer.appendChild(questionsDisplayContainer);
+        } else {
+            // If questionsContainer doesn't exist for some reason, add directly to create container
+            createContainer.appendChild(questionsDisplayContainer);
+        }
     }
+
+    // Make sure the questions display container is visible
+    questionsDisplayContainer.classList.remove('hidden');
 
     // Ensure required child elements exist
     const requiredElements = [
@@ -437,9 +451,10 @@ function displayCurrentQuestion() {
                                window.userAnswers.length === window.questions.length && 
                                window.userAnswers.every(answer => answer !== null);
 
-    // Show completion status if all questions are answered
-    if (allQuestionsAnswered) {
-        displayCompletionStatus();
+    // Enable the evaluate button if all questions are answered
+    const evaluateButton = document.getElementById('evaluate-btn');
+    if (evaluateButton) {
+        evaluateButton.disabled = !allQuestionsAnswered;
     }
     
     // Update question counter with responsive styling
@@ -476,7 +491,7 @@ function displayCurrentQuestion() {
             width: fit-content;
         `;
         newCounter.textContent = `题目 ${currentQuestionIndex + 1} / ${window.questions.length}`;
-        questionsContainer.appendChild(newCounter);
+        questionsDisplayContainer.appendChild(newCounter);
     }
     
     // Format and display question text with responsive styling
@@ -524,7 +539,7 @@ function displayCurrentQuestion() {
             displayText = displayText.substring(3);
         }
         newText.innerHTML = formatMathExpressions(displayText);
-        questionsContainer.appendChild(newText);
+        questionsDisplayContainer.appendChild(newText);
     }
     
     // Create responsive grid for choices with 2x2 layout
@@ -1638,7 +1653,7 @@ function handleGenerateQuestionsClick() {
 
     示例格式：
     题目：[题目内容]
-    A. [选项A内容]
+    A. [选项A内容] 
     B. [选项B内容] 
     C. [选项C内容]
     D. [选项D内容]
