@@ -2643,7 +2643,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (createButton.classList.contains('active')) {
             initializeEmptyState();
         }
-                } else {
+    } else {
         // If tab buttons don't exist, initialize empty state anyway
         initializeEmptyState();
     }
@@ -3062,6 +3062,9 @@ function setupChatButtons() {
     // First, ensure the chat interface exists
     createChatInterface();
     
+    // Debug: Inspect dropdowns
+    inspectDropdowns();
+    
     // Now get the chat input and response area
     const chatInput = document.getElementById('chat-input');
     const chatResponse = document.getElementById('chat-response');
@@ -3074,30 +3077,37 @@ function setupChatButtons() {
     // Set up optimize button
     const optimizeButton = document.getElementById('optimize-button');
     if (optimizeButton) {
+        // Remove any existing event listeners
+        const newOptimizeButton = optimizeButton.cloneNode(true);
+        optimizeButton.parentNode.replaceChild(newOptimizeButton, optimizeButton);
+        optimizeButton = newOptimizeButton;
+        
         optimizeButton.addEventListener('click', function() {
             const questionText = chatInput.value.trim();
             
             if (!questionText) {
                 showSystemMessage('请先输入问题内容', 'warning');
-            return;
-        }
-        
-            // Get educational context from sidebar
-            const educationalContext = getEducationalContext();
+                return;
+            }
+            
+            // Get simplified educational context
+            const { school, grade } = getSimplifiedEducationalContext();
             
             // Show loading state
             optimizeButton.disabled = true;
             optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
             
-            // Prepare the prompt for optimization with educational context
-            const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值。优化时请考虑学生的认知水平、教育阶段和真正意图，使问题更有针对性：
+            // Prepare the prompt with simplified context
+            const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值：
 
 教育背景：
-${educationalContext}
+学校类型：${school}
+年级：${grade}
 
 原始问题：${questionText}
 
-请只返回优化后的问题，不用保留优化说明和思路。`;
+请返回优化后的问题，使其更适合上述教育背景的学生，保持原始意图但使其更加清晰、准确和有教育意义。
+优化时请考虑学生的认知水平和教育阶段，使问题更有针对性。`;
             
             // Call the API
             fetchAIResponse(prompt)
@@ -3111,12 +3121,12 @@ ${educationalContext}
                     // Focus the input and move cursor to end
                     chatInput.focus();
                     chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
-            
-            // Show success message
+                    
+                    // Show success message
                     showSystemMessage('问题已根据教育背景成功优化！', 'success');
                 })
                 .catch(error => {
-            console.error('Error optimizing question:', error);
+                    console.error('Error optimizing question:', error);
                     showSystemMessage('优化问题时出错，请重试。', 'error');
                 })
                 .finally(() => {
@@ -3130,32 +3140,38 @@ ${educationalContext}
     // Set up submit button
     const submitButton = document.getElementById('submit-button');
     if (submitButton) {
+        // Remove any existing event listeners
+        const newSubmitButton = submitButton.cloneNode(true);
+        submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
+        submitButton = newSubmitButton;
+        
         submitButton.addEventListener('click', function() {
             const questionText = chatInput.value.trim();
             
             if (!questionText) {
                 showSystemMessage('请先输入问题内容', 'warning');
-            return;
-        }
-        
-            // Get educational context from sidebar
-            const educationalContext = getEducationalContext();
+                return;
+            }
+            
+            // Get simplified educational context
+            const { school, grade } = getSimplifiedEducationalContext();
             
             // Show loading state
             submitButton.disabled = true;
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
             chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
             
-            // Prepare the prompt for the AI with educational context
+            // Prepare the prompt with simplified context
             const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
 
 教育背景：
-${educationalContext}
+学校类型：${school}
+年级：${grade}
 
 问题：${questionText}
 
 请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
-如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平和课程要求。
+如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平。
 如果可能，请提供一些例子或应用场景来帮助理解。`;
             
             // Call the API
@@ -3167,8 +3183,8 @@ ${educationalContext}
                     // Format the response with MathJax
                     const formattedResponse = formatMathExpressions(aiResponse);
                     
-                    // Get context summary for display
-                    const contextSummary = getContextSummary();
+                    // Get simplified context summary
+                    const contextSummary = getSimplifiedContextSummary();
                     
                     // Display the response with educational context
                     chatResponse.innerHTML = `
@@ -3187,14 +3203,8 @@ ${educationalContext}
                     }
                 })
                 .catch(error => {
-                    console.error('Error submitting question:', error);
-                    chatResponse.innerHTML = `
-                        <div class="error-message">
-                            <i class="fas fa-exclamation-circle"></i>
-                            抱歉，处理您的问题时出现了错误。请重试。
-            </div>
-        `;
-                    showSystemMessage('提交问题时出错，请重试。', 'error');
+                    console.error('Error getting AI response:', error);
+                    chatResponse.innerHTML = '<div class="error-message">抱歉，获取回答时出错。请重试。</div>';
                 })
                 .finally(() => {
                     // Reset button state
@@ -3411,773 +3421,45 @@ function inspectDropdowns() {
     });
 }
 
-// Call the inspection function when setting up chat buttons
-function setupChatButtons() {
-    console.log('Setting up chat buttons');
-    
-    // Inspect dropdowns to debug the issue
-    // inspectDropdowns();
-    
-    // First, ensure the chat interface exists and get references to its elements
-    const chatElements = createChatInterface();
-    
-    // If createChatInterface didn't return elements, try to get them directly
-    let chatInput = chatElements?.chatInput || document.getElementById('chat-input');
-    let chatResponse = chatElements?.chatResponse || document.getElementById('chat-response');
-    let optimizeButton = chatElements?.optimizeButton || document.getElementById('optimize-button');
-    let submitButton = chatElements?.submitButton || document.getElementById('submit-button');
-    
-    // If we still don't have the elements, try one more time with a delay
-    if (!chatInput || !chatResponse || !optimizeButton || !submitButton) {
-        console.log('Elements not found, trying again with delay');
-        setTimeout(() => {
-            // Create the interface again
-            createChatInterface();
-            
-            // Get references to the elements
-            chatInput = document.getElementById('chat-input');
-            chatResponse = document.getElementById('chat-response');
-            optimizeButton = document.getElementById('optimize-button');
-            submitButton = document.getElementById('submit-button');
-            
-            if (!chatInput || !chatResponse) {
-                console.error('Chat input or response area not found even after retry');
-                return;
-            }
-            
-            // Set up the event listeners
-            setupButtonEventListeners(chatInput, chatResponse, optimizeButton, submitButton);
-        }, 500);
-        return;
-    }
-    
-    // Set up the event listeners
-    setupButtonEventListeners(chatInput, chatResponse, optimizeButton, submitButton);
-}
-
-// First, let's fix the createChatInterface function definition issue by ensuring it's defined only once
-// and placed before setupChatButtons
-
-// Function to create the chat interface
-function createChatInterface() {
-    console.log('Creating chat interface');
-    
-    // Get or create the QA container
-    let qaContainer = document.getElementById('qa-container');
-    if (!qaContainer) {
-        console.log('QA container not found, creating it');
-        // Create the QA container if it doesn't exist
-        qaContainer = document.createElement('div');
-        qaContainer.id = 'qa-container';
-        qaContainer.className = 'qa-container';
-        qaContainer.style.cssText = 'display: block; height: 100%; padding: 20px;';
-        
-        // Find a suitable parent to append it to
-        const contentArea = document.querySelector('.content-area');
-        if (contentArea) {
-            contentArea.appendChild(qaContainer);
-        } else {
-            // If content area not found, append to body
-            document.body.appendChild(qaContainer);
-        }
-    }
-    
-    // Check if the chat interface already exists
-    if (document.getElementById('chat-interface')) {
-        console.log('Chat interface already exists');
-        return; // Already exists, no need to create it
-    }
-    
-    console.log('Creating new chat interface elements');
-    
-    // Create the chat interface
-    const chatInterface = document.createElement('div');
-    chatInterface.id = 'chat-interface';
-    chatInterface.className = 'chat-interface';
-    chatInterface.style.cssText = 'display: flex; flex-direction: column; height: 100%; padding: 20px; gap: 20px;';
-    
-    // Create the chat input area
-    const chatInputArea = document.createElement('div');
-    chatInputArea.className = 'chat-input-area';
-    chatInputArea.style.cssText = 'display: flex; flex-direction: column; gap: 10px;';
-    
-    // Create the textarea
-    const chatInput = document.createElement('textarea');
-    chatInput.id = 'chat-input';
-    chatInput.className = 'chat-input';
-    chatInput.placeholder = '输入您的问题...';
-    chatInput.style.cssText = 'width: 100%; min-height: 100px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 16px; resize: vertical;';
-    
-    // Create the buttons container
-    const buttonsContainer = document.createElement('div');
-    buttonsContainer.className = 'chat-buttons';
-    buttonsContainer.style.cssText = 'display: flex; gap: 10px; justify-content: flex-end;';
-    
-    // Create the optimize button
-    const optimizeButton = document.createElement('button');
-    optimizeButton.id = 'optimize-button';
-    optimizeButton.className = 'chat-button optimize-button';
-    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
-    optimizeButton.style.cssText = 'padding: 8px 16px; background-color: #4299e1; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
-    
-    // Create the submit button
-    const submitButton = document.createElement('button');
-    submitButton.id = 'submit-button';
-    submitButton.className = 'chat-button submit-button';
-    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
-    submitButton.style.cssText = 'padding: 8px 16px; background-color: #48bb78; color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 5px;';
-    
-    // Add buttons to container
-    buttonsContainer.appendChild(optimizeButton);
-    buttonsContainer.appendChild(submitButton);
-    
-    // Add textarea and buttons to input area
-    chatInputArea.appendChild(chatInput);
-    chatInputArea.appendChild(buttonsContainer);
-    
-    // Create the response area
-    const chatResponse = document.createElement('div');
-    chatResponse.id = 'chat-response';
-    chatResponse.className = 'chat-response';
-    chatResponse.style.cssText = 'background-color: #f8fafc; border-radius: 8px; padding: 20px; min-height: 100px; max-height: 500px; overflow-y: auto;';
-    
-    // Add a welcome message
-    chatResponse.innerHTML = `
-        <div class="welcome-message" style="text-align: center; color: #718096;">
-            <i class="fas fa-comment-dots" style="font-size: 24px; margin-bottom: 10px;"></i>
-            <h3 style="margin: 0 0 10px 0; font-size: 18px;">欢迎使用AI学习助手</h3>
-            <p style="margin: 0; font-size: 14px;">在上方输入您的问题，点击"提交问题"获取回答</p>
-        </div>
-    `;
-    
-    // Add input area and response area to chat interface
-    chatInterface.appendChild(chatInputArea);
-    chatInterface.appendChild(chatResponse);
-    
-    // Add the chat interface to the QA container
-    qaContainer.innerHTML = ''; // Clear any existing content
-    qaContainer.appendChild(chatInterface);
-    
-    // Add CSS for the chat interface
-    const style = document.createElement('style');
-    style.textContent = `
-        .chat-button:hover {
-            opacity: 0.9;
-        }
-        .chat-button:active {
-            transform: translateY(1px);
-        }
-        .chat-button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        .loading-indicator {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            color: #718096;
-            font-size: 16px;
-                                padding: 20px;
-        }
-        .response-header {
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 8px;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-        .context-badge {
-            font-size: 12px;
-            background-color: #ebf8ff;
-            color: #3182ce;
-            padding: 2px 8px;
-            border-radius: 12px;
-            margin-left: 8px;
-            font-weight: normal;
-        }
-        .response-content {
-            line-height: 1.6;
-                                    color: #4a5568;
-            white-space: pre-wrap;
-        }
-        .error-message {
-            color: #e53e3e;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 16px;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // Add event listener for Ctrl+Enter to submit
-    chatInput.addEventListener('keydown', function(event) {
-        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
-            event.preventDefault();
-            submitButton.click();
-        }
-    });
-    
-    console.log('Chat interface created successfully');
-    return { chatInput, chatResponse, optimizeButton, submitButton };
-}
-
-// Now let's fix the grade and subject dropdowns by ensuring they're populated
-function initializeFormLayout() {
-    // ... existing code ...
-    
-    // Ensure dropdowns are populated in the sidebar
-    const sidebarSchoolSelect = document.getElementById('sidebar-school-select');
-    if (sidebarSchoolSelect) {
-        // Add event listener to populate grade options when school changes
-        sidebarSchoolSelect.addEventListener('change', function() {
-            const selectedSchool = this.value;
-            populateSidebarGradeOptions(selectedSchool);
-            populateSidebarSubjectOptions(selectedSchool);
-        });
-        
-        // Populate grade and subject options initially
-        const selectedSchool = sidebarSchoolSelect.value;
-        if (selectedSchool && selectedSchool !== 'none') {
-            populateSidebarGradeOptions(selectedSchool);
-            populateSidebarSubjectOptions(selectedSchool);
-        }
-    }
-    
-    // ... rest of existing code ...
-}
-
-// Function to populate sidebar grade options
-function populateSidebarGradeOptions(school) {
-    const gradeSelect = document.getElementById('sidebar-grade-select');
-    if (!gradeSelect) return;
-    
-    // Clear existing options
-    gradeSelect.innerHTML = '<option value="none">选择年级</option>';
-    
-    // Add appropriate grade options based on school
-    if (school === 'primary') {
-        const grades = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
-        grades.forEach((grade, index) => {
-            const option = document.createElement('option');
-            option.value = `grade${index + 1}`;
-            option.textContent = grade;
-            gradeSelect.appendChild(option);
-        });
-    } else if (school === 'middle') {
-        const grades = ['初一', '初二', '初三'];
-        grades.forEach((grade, index) => {
-            const option = document.createElement('option');
-            option.value = `middle${index + 1}`;
-            option.textContent = grade;
-            gradeSelect.appendChild(option);
-        });
-    } else if (school === 'high') {
-        const grades = ['高一', '高二', '高三'];
-        grades.forEach((grade, index) => {
-            const option = document.createElement('option');
-            option.value = `high${index + 1}`;
-            option.textContent = grade;
-            gradeSelect.appendChild(option);
-        });
-    }
-    
-    console.log('Populated sidebar grade options for school:', school);
-}
-
-// Function to populate sidebar subject options
-function populateSidebarSubjectOptions(school) {
-    const subjectSelect = document.getElementById('sidebar-subject-select');
-    if (!subjectSelect) return;
-    
-    // Clear existing options
-    subjectSelect.innerHTML = '<option value="none">选择科目</option>';
-    
-    // Add appropriate subject options based on school
-    if (school === 'primary') {
-        const subjects = ['语文', '数学', '英语', '科学'];
-        subjects.forEach((subject, index) => {
-            const option = document.createElement('option');
-            option.value = `subject${index + 1}`;
-            option.textContent = subject;
-            subjectSelect.appendChild(option);
-        });
-    } else if (school === 'middle') {
-        const subjects = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '道德与法治'];
-        subjects.forEach((subject, index) => {
-            const option = document.createElement('option');
-            option.value = `subject${index + 1}`;
-            option.textContent = subject;
-            subjectSelect.appendChild(option);
-        });
-    } else if (school === 'high') {
-        const subjects = ['语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '政治'];
-        subjects.forEach((subject, index) => {
-            const option = document.createElement('option');
-            option.value = `subject${index + 1}`;
-            option.textContent = subject;
-            subjectSelect.appendChild(option);
-        });
-    }
-    
-    console.log('Populated sidebar subject options for school:', school);
-}
-
-// Add this at the end of the file to ensure dropdowns are populated when the page loads
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded');
-    
-    // Populate sidebar dropdowns if school is selected
-    const sidebarSchoolSelect = document.getElementById('sidebar-school-select');
-    if (sidebarSchoolSelect && sidebarSchoolSelect.value && sidebarSchoolSelect.value !== 'none') {
-        populateSidebarGradeOptions(sidebarSchoolSelect.value);
-        populateSidebarSubjectOptions(sidebarSchoolSelect.value);
-    }
-    
-    // Set up chat buttons when the page loads with multiple retries
-    setTimeout(() => {
-        setupChatButtons();
-        
-        // Try again after a longer delay to ensure everything is loaded
-        setTimeout(setupChatButtons, 1000);
-    }, 300);
-});
-
-// Add the missing setupButtonEventListeners function
-function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, submitButton) {
-    console.log('Setting up button event listeners');
-    
-    // Set up optimize button
-    if (optimizeButton) {
-        // Remove any existing event listeners
-        const newOptimizeButton = optimizeButton.cloneNode(true);
-        optimizeButton.parentNode.replaceChild(newOptimizeButton, optimizeButton);
-        optimizeButton = newOptimizeButton;
-        
-        optimizeButton.addEventListener('click', function() {
-            const questionText = chatInput.value.trim();
-            
-            if (!questionText) {
-                showSystemMessage('请先输入问题内容', 'warning');
-                return;
-            }
-            
-            // Get simplified educational context (school and grade only)
-            const { school, grade } = getSimplifiedEducationalContext();
-            
-            // Show loading state
-            optimizeButton.disabled = true;
-            optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
-            
-            // Prepare the prompt for optimization with simplified educational context
-            const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值：
-
-教育背景：
-学校类型：${school}
-年级：${grade}
-
-原始问题：${questionText}
-
-请返回优化后的问题，使其更适合上述教育背景的学生，保持原始意图但使其更加清晰、准确和有教育意义。
-优化时请考虑学生的认知水平和教育阶段，使问题更有针对性。`;
-            
-            // Call the API
-            fetchAIResponse(prompt)
-                .then(response => {
-                    // Extract the optimized question
-                    const optimizedContent = extractContentFromResponse(response);
-                    
-                    // Update the chat input with the optimized question
-                    chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
-                    
-                    // Focus the input and move cursor to end
-                    chatInput.focus();
-                    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
-                    
-                    // Show success message
-                    showSystemMessage('问题已根据教育背景成功优化！', 'success');
-                })
-                .catch(error => {
-                    console.error('Error optimizing question:', error);
-                    showSystemMessage('优化问题时出错，请重试。', 'error');
-                })
-                .finally(() => {
-                    // Reset button state
-                    optimizeButton.disabled = false;
-                    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
-                });
-        });
-    }
-    
-    // Set up submit button
-    if (submitButton) {
-        // Remove any existing event listeners
-        const newSubmitButton = submitButton.cloneNode(true);
-        submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
-        submitButton = newSubmitButton;
-        
-        submitButton.addEventListener('click', function() {
-            const questionText = chatInput.value.trim();
-            
-            if (!questionText) {
-                showSystemMessage('请先输入问题内容', 'warning');
-                return;
-            }
-            
-            // Get simplified educational context (school and grade only)
-            const { school, grade } = getSimplifiedEducationalContext();
-            
-            // Show loading state
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
-            chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
-            
-            // Prepare the prompt for the AI with simplified educational context
-            const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
-
-教育背景：
-学校类型：${school}
-年级：${grade}
-
-问题：${questionText}
-
-请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
-如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平。
-如果可能，请提供一些例子或应用场景来帮助理解。`;
-            
-            // Call the API
-            fetchAIResponse(prompt)
-                .then(response => {
-                    // Extract the AI response
-                    const aiResponse = extractContentFromResponse(response);
-                    
-                    // Format the response with MathJax
-                    const formattedResponse = formatMathExpressions(aiResponse);
-                    
-                    // Get simplified context summary for display
-                    const contextSummary = getSimplifiedContextSummary();
-                    
-                    // Display the response with educational context
-                    chatResponse.innerHTML = `
-                        <div class="response-header">
-                            <i class="fas fa-robot"></i> AI 助手回答
-                            ${contextSummary ? `<span class="context-badge">${contextSummary}</span>` : ''}
-                        </div>
-                        <div class="response-content">
-                            ${formattedResponse}
-                </div>
-            `;
-                    
-                    // Render MathJax in the response
-                    if (window.MathJax) {
-                        MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error submitting question:', error);
-                    chatResponse.innerHTML = `
-                        <div class="error-message">
-                            <i class="fas fa-exclamation-circle"></i>
-                            抱歉，处理您的问题时出现了错误。请重试。
-            </div>
-        `;
-                    showSystemMessage('提交问题时出错，请重试。', 'error');
-                })
-                .finally(() => {
-                    // Reset button state
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
-                });
-        });
-    }
-}
-
-// Function to get curriculum information based on school, grade and subject
-function getCurriculumInfo(school, grade, subject) {
-    // Default curriculum info
-    let curriculumInfo = '根据中国教育大纲标准提供适合的回答。';
-    
-    // Primary school curriculum info
-    if (school.includes('小学')) {
-        curriculumInfo = '根据小学教育大纲，注重基础知识的讲解，使用简单易懂的语言，多用具体例子，避免抽象概念。';
-        
-        if (subject.includes('数学')) {
-            if (grade.includes('一年级') || grade.includes('二年级')) {
-                curriculumInfo += '一二年级数学主要包括20以内的加减法、100以内的加减法、认识图形、认识时间等基础内容。';
-            } else if (grade.includes('三年级') || grade.includes('四年级')) {
-                curriculumInfo += '三四年级数学主要包括乘除法、分数初步、小数初步、面积、周长等内容。';
-            } else if (grade.includes('五年级') || grade.includes('六年级')) {
-                curriculumInfo += '五六年级数学主要包括分数四则运算、小数四则运算、比例、百分数、统计等内容。';
-            }
-        } else if (subject.includes('语文')) {
-            curriculumInfo += '小学语文注重汉字识记、阅读理解、写作基础等能力培养。';
-        } else if (subject.includes('英语')) {
-            curriculumInfo += '小学英语注重基础词汇、简单句型和日常交流用语的学习。';
-        } else if (subject.includes('科学')) {
-            curriculumInfo += '小学科学注重培养观察能力和好奇心，了解自然现象和简单科学原理。';
-        }
-    }
-    // Middle school curriculum info
-    else if (school.includes('初中')) {
-        curriculumInfo = '根据初中教育大纲，注重系统性知识的讲解，可以引入一定的抽象概念，但需要配合例子说明。';
-        
-        if (subject.includes('数学')) {
-            if (grade.includes('初一')) {
-                curriculumInfo += '初一数学主要包括有理数、整式、一元一次方程、几何初步等内容。';
-            } else if (grade.includes('初二')) {
-                curriculumInfo += '初二数学主要包括二元一次方程组、不等式、相似三角形、勾股定理等内容。';
-            } else if (grade.includes('初三')) {
-                curriculumInfo += '初三数学主要包括一元二次方程、二次函数、圆、概率初步等内容。';
-            }
-        } else if (subject.includes('物理')) {
-            curriculumInfo += '初中物理注重基本概念、基本规律的理解和简单应用，包括力学、热学、光学、电学等基础内容。';
-        } else if (subject.includes('化学')) {
-            curriculumInfo += '初中化学注重基本概念、元素性质、化学反应等基础内容的学习。';
-        } else if (subject.includes('生物')) {
-            curriculumInfo += '初中生物注重生物的基本结构、功能和分类，以及生态系统的基本概念。';
-        }
-    }
-    // High school curriculum info
-    else if (school.includes('高中')) {
-        curriculumInfo = '根据高中教育大纲，可以使用较为抽象的概念和复杂的理论，注重知识的系统性和应用能力的培养。';
-        
-        if (subject.includes('数学')) {
-            if (grade.includes('高一')) {
-                curriculumInfo += '高一数学主要包括集合、函数、三角函数、平面向量等内容。';
-            } else if (grade.includes('高二')) {
-                curriculumInfo += '高二数学主要包括立体几何、概率统计、数列、导数等内容。';
-            } else if (grade.includes('高三')) {
-                curriculumInfo += '高三数学主要是对高中数学知识的综合复习和应用，注重解题技巧和方法。';
-            }
-        } else if (subject.includes('物理')) {
-            curriculumInfo += '高中物理包括力学、热学、电磁学、原子物理等内容，注重理论与实验的结合。';
-        } else if (subject.includes('化学')) {
-            curriculumInfo += '高中化学包括化学反应原理、元素化学、有机化学等内容，注重微观结构与宏观性质的联系。';
-        } else if (subject.includes('生物')) {
-            curriculumInfo += '高中生物包括分子与细胞、遗传与进化、稳态与环境等内容，注重生命活动的分子基础。';
-        }
-    }
-    
-    return curriculumInfo;
-}
-
-// Add a new function to get simplified educational context (school and grade only)
-function getSimplifiedEducationalContext() {
-    console.log('Getting simplified educational context');
-    
-    // Initialize with default values
-    let school = '未指定学校类型';
-    let grade = '未指定年级';
-    
-    // Get all select elements in the document
-    const allSelects = document.querySelectorAll('select');
-    
-    // Scan through all selects to find our dropdowns
-    allSelects.forEach(select => {
-        const id = select.id || '';
-        const name = select.name || '';
-        const value = select.value;
-        
-        // Check if this is a school dropdown
-        if (id.includes('school') || name.includes('school')) {
-            if (value && value !== 'none') {
-                try {
-                    school = select.options[select.selectedIndex].text;
-                } catch (e) {
-                    // Map values to text
-                    const schoolMap = {
-                        'primary': '小学',
-                        'middle': '初中',
-                        'high': '高中'
-                    };
-                    school = schoolMap[value] || value;
-                }
-            }
-        }
-        
-        // Check if this is a grade dropdown
-        if (id.includes('grade') || name.includes('grade')) {
-            if (value && value !== 'none') {
-                try {
-                    grade = select.options[select.selectedIndex].text;
-                } catch (e) {
-                    grade = value;
-                }
-            }
-        }
-    });
-    
-    console.log('Simplified educational context:', { school, grade });
-    return { school, grade };
-}
-
-// Add a new function to get simplified context summary (school and grade only)
-function getSimplifiedContextSummary() {
-    // Initialize with default values
-    let school = '';
-    let grade = '';
-    let hasValues = false;
-    
-    // Get all select elements in the document
-    const allSelects = document.querySelectorAll('select');
-    
-    // Scan through all selects to find our dropdowns
-    allSelects.forEach(select => {
-        const id = select.id || '';
-        const name = select.name || '';
-        const value = select.value;
-        
-        // Check if this is a school dropdown
-        if (id.includes('school') || name.includes('school')) {
-            if (value && value !== 'none') {
-                try {
-                    school = select.options[select.selectedIndex].text;
-                } catch (e) {
-                    // Map values to text
-                    const schoolMap = {
-                        'primary': '小学',
-                        'middle': '初中',
-                        'high': '高中'
-                    };
-                    school = schoolMap[value] || value;
-                }
-                hasValues = true;
-            }
-        }
-        
-        // Check if this is a grade dropdown
-        if (id.includes('grade') || name.includes('grade')) {
-            if (value && value !== 'none') {
-                try {
-                    grade = select.options[select.selectedIndex].text;
-                } catch (e) {
-                    grade = value;
-                }
-                hasValues = true;
-            }
-        }
-    });
-    
-    if (!hasValues) {
-        return '';
-    }
-    
-    let summary = '';
-    
-    if (school) {
-        summary += school;
-    }
-    
-    if (grade) {
-        if (summary) summary += ' · ';
-        summary += grade;
-    }
-    
-    return summary;
-}
-
 // ... existing code ...
-
-    // Set up all event listeners
-    function setupEventListeners() {
-        // Sidebar toggle
-        elements.sidebarToggle.addEventListener('click', toggleSidebar);
-        
-        // Panel buttons
-        elements.qaButton.addEventListener('click', () => switchPanel('qa'));
-        elements.createButton.addEventListener('click', () => switchPanel('create'));
-        
-        // Make sure the poetry button has an event listener
-        if (elements.poetryButton) {
-            elements.poetryButton.addEventListener('click', () => switchPanel('poetry'));
-            console.log('Poetry button event listener added');
-        } else {
-            console.error('Poetry button element not found');
-        }
-        
-        // School select change
-        elements.schoolSelectSidebar.addEventListener('change', (e) => {
-            populateSidebarGradeOptions(e.target.value);
-            populateSidebarSubjectOptions(e.target.value);
-        });
-        
-        // Poetry type change
-        if (elements.poetryTypeSelect) {
-            elements.poetryTypeSelect.addEventListener('change', (e) => {
-                updatePoetryStyleOptions(e.target.value);
-            });
-            
-            // Initialize poetry style options based on default poetry type
-            updatePoetryStyleOptions(elements.poetryTypeSelect.value);
-        }
-        
-        // Chat buttons
-        setupChatButtons();
-        
-        // Navigation buttons
-        setupNavigationButtons();
-        
-        // Poetry buttons
-        setupPoetryButtons();
-        
-        // Button click handlers for sidebar navigation
-        if (qaButton) {
-            qaButton.addEventListener('click', () => handleTabSwitch('qa'));
-        }
-        
-        if (createButton) {
-            createButton.addEventListener('click', () => handleTabSwitch('create'));
-        }
-        
-        if (poetryButton) {
-            poetryButton.addEventListener('click', () => handleTabSwitch('poetry'));
-        }
-        
-        const wordButton = document.getElementById('word-button');
-        if (wordButton) {
-            wordButton.addEventListener('click', () => handleTabSwitch('vocabulary'));
-        }
-        
-        // Tab switching for any additional tabs using data-tab attributes
-        const tabs = document.querySelectorAll('.tab');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => handleTabSwitch(tab.dataset.tab));
-        });
-    }
 
 // ... existing code ...
 
     // Update poetry style options based on selected poetry type
     function updatePoetryStyleOptions(poetryType) {
-        const styleSelect = elements.poetryStyleSelect;
-        if (!styleSelect) return;
+        console.log('Updating poetry style options for type:', poetryType);
         
-        // Clear existing options
-        styleSelect.innerHTML = '';
-        
-        // Define style options based on poetry type
-        let options = [];
-        
-        if (poetryType === '唐诗') {
-            options = ['山水', '边塞', '浪漫', '现实'];
-        } else if (poetryType === '宋词') {
-            options = ['婉约', '豪放'];
-        } else if (poetryType === '元曲') {
-            options = ['杂居', '散曲'];
+        const poetryStyleSelect = document.getElementById('poetry-style');
+        if (!poetryStyleSelect) {
+            console.error('Poetry style select element not found');
+            return;
         }
         
-        // Add options to select element
-        options.forEach(style => {
+        // Clear existing options
+        while (poetryStyleSelect.options.length > 0) {
+            poetryStyleSelect.remove(0);
+        }
+        
+        // Add new options based on selected type
+        let styles = [];
+        
+        if (poetryType === '唐诗') {
+            styles = ['山水', '边塞', '浪漫', '现实'];
+        } else if (poetryType === '宋词') {
+            styles = ['婉约', '豪放'];
+        } else if (poetryType === '元曲') {
+            styles = ['杂居', '散曲'];
+        }
+        
+        // Add options to select
+        styles.forEach(style => {
             const option = document.createElement('option');
             option.value = style;
             option.textContent = style;
-            styleSelect.appendChild(option);
+            poetryStyleSelect.appendChild(option);
         });
         
-        console.log(`Updated poetry style options for ${poetryType}: ${options.join(', ')}`);
+        console.log('Updated poetry style options:', styles);
     }
 
 // ... existing code ...
@@ -4525,15 +3807,33 @@ function switchPanel(panelId) {
 function setupEventListeners() {
     console.log('Setting up event listeners...');
     
-    // Sidebar toggle
+    // 1. Sidebar toggle
     const sidebarToggle = document.getElementById('sidebar-toggle');
     if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', toggleSidebar);
+        sidebarToggle.addEventListener('click', function() {
+            const leftPanel = document.querySelector('.left-panel');
+            const contentArea = document.querySelector('.content-area');
+            
+            leftPanel.classList.toggle('hidden');
+            contentArea.classList.toggle('full-width');
+            sidebarToggle.classList.toggle('collapsed');
+            
+            // Change the icon direction
+            const icon = sidebarToggle.querySelector('i');
+            if (icon) {
+                if (leftPanel.classList.contains('hidden')) {
+                    icon.className = 'fas fa-chevron-right';
+                } else {
+                    icon.className = 'fas fa-chevron-left';
+                }
+            }
+        });
     }
     
-    // Panel buttons
+    // 2. Panel buttons
     const qaButton = document.getElementById('qa-button');
     const createButton = document.getElementById('create-button');
+    const poetryButton = document.getElementById('poetry-button');
     
     if (qaButton) {
         qaButton.addEventListener('click', function() {
@@ -4546,9 +3846,63 @@ function setupEventListeners() {
             switchPanel('create-panel');
         });
     }
+    
+    if (poetryButton) {
+        poetryButton.addEventListener('click', function(event) {
+            console.log('Poetry button clicked');
+            switchPanel('poetry-panel');
+            event.preventDefault();
+        });
+    }
+    
+    // 3. Poetry-related listeners
+    const poetryTypeSelect = document.getElementById('poetry-type');
+    if (poetryTypeSelect) {
+        poetryTypeSelect.addEventListener('change', function() {
+            updatePoetryStyleOptions(this.value);
+        });
+    }
+    
+    const learnPoetryButton = document.getElementById('learn-poetry-button');
+    if (learnPoetryButton) {
+        learnPoetryButton.addEventListener('click', handleLearnPoetryClick);
+    }
+    
+    // 4. Navigation buttons
+    const prevPoemButton = document.getElementById('prev-poem-button');
+    const nextPoemButton = document.getElementById('next-poem-button');
+    
+    if (prevPoemButton) {
+        prevPoemButton.addEventListener('click', function() {
+            console.log('Previous poem button clicked');
+            // Add your previous poem logic here
+        });
+    }
+    
+    if (nextPoemButton) {
+        nextPoemButton.addEventListener('click', function() {
+            console.log('Next poem button clicked');
+            // Add your next poem logic here
+        });
+    }
+    
+    // 5. School and grade dropdowns
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    const gradeSelect = document.getElementById('grade-select-sidebar');
+    
+    if (schoolSelect) {
+        schoolSelect.addEventListener('change', function() {
+            const selectedSchool = this.value;
+            if (gradeSelect) {
+                populateGradeOptions(selectedSchool);
+            }
+        });
+    }
+    
+    console.log('Event listeners setup complete');
 }
 
-// Add this code at the end of the file to ensure it runs after everything else
+// ... existing code ...
 
 // Poetry Tab Functionality - Self-contained implementation
 document.addEventListener('DOMContentLoaded', function() {
@@ -5815,7 +5169,7 @@ async function handleLoadVocabularyClick() {
         <div class="initial-message loading-message">
             <div class="loading-spinner vocabulary-spinner"></div>
             <p>词汇加载中，请耐心等待...</p>
-            <p>Loading five vocabularies, please be patient...</p>
+            <p>Loading vocabularies, please be patient...</p>
         </div>
     `;
     
