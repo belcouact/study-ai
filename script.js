@@ -1133,6 +1133,9 @@ ${questionResults.map(result =>
         });
 }
 
+// Make handleEvaluateClick globally available for the onclick attribute
+window.handleEvaluateClick = handleEvaluateClick;
+
 // Function to show evaluation modal
 function showEvaluationModal(content) {
     // Create or get modal container
@@ -1676,6 +1679,19 @@ function handleGenerateQuestionsClick() {
                 // Ensure the questions display container exists and is visible
                 if (!questionsDisplayContainer) {
                     console.error('Questions display container not found, creating one');
+                    const createContainer = document.getElementById('create-container');
+                    if (!createContainer) {
+                        console.error('Create container not found');
+                        throw new Error('Create container not found');
+                    }
+
+                    // Check if there's an empty state and hide it
+                    const emptyState = document.getElementById('empty-state');
+                    if (emptyState) {
+                        emptyState.style.display = 'none';
+                    }
+
+                    // Create the new container
                     const newContainer = document.createElement('div');
                     newContainer.id = 'questions-display-container';
                     newContainer.className = 'questions-display-container';
@@ -1691,64 +1707,33 @@ function handleGenerateQuestionsClick() {
                         </div>
                     `;
                     
-                    // Add to the create container
-                    const createContainer = document.getElementById('create-container');
-                    if (createContainer) {
-                        createContainer.insertBefore(newContainer, createContainer.firstChild);
-                    }
-                }
-                
-                // Get a fresh reference to the questions display container
-                const questionsContainer = document.getElementById('questions-display-container');
-                
-                // Always ensure empty state is hidden regardless of questions
-                const emptyState = document.querySelector('.empty-state');
-                if (emptyState) {
-                    emptyState.style.display = 'none';
-                    console.log('Empty state hidden');
-                }
-                
-                // Make sure the questions display container is visible
-                if (questionsContainer) {
-                    questionsContainer.classList.remove('hidden');
-                    console.log('Questions display container shown');
-                    
-                    // Ensure the container has the necessary child elements
-                    if (!document.getElementById('question-counter')) {
-                        const counterDiv = document.createElement('div');
-                        counterDiv.id = 'question-counter';
-                        counterDiv.className = 'question-counter';
-                        questionsContainer.appendChild(counterDiv);
+                    // Find the navigation controls to insert before
+                    const navigationControls = createContainer.querySelector('.navigation-controls');
+                    if (navigationControls) {
+                        createContainer.insertBefore(newContainer, navigationControls);
+                    } else {
+                        // If no navigation controls, append to the end
+                        createContainer.appendChild(newContainer);
                     }
                     
-                    if (!document.getElementById('question-text')) {
-                        const textDiv = document.createElement('div');
-                        textDiv.id = 'question-text';
-                        textDiv.className = 'question-text';
-                        questionsContainer.appendChild(textDiv);
-                    }
-                    
-                    if (!document.getElementById('choices-container')) {
-                        const choicesDiv = document.createElement('div');
-                        choicesDiv.id = 'choices-container';
-                        choicesDiv.className = 'choices-container';
-                        questionsContainer.appendChild(choicesDiv);
-                    }
-                    
-                    if (!document.getElementById('answer-container')) {
-                        const answerDiv = document.createElement('div');
-                        answerDiv.id = 'answer-container';
-                        answerDiv.className = 'answer-container hidden';
-                        answerDiv.innerHTML = `
-                            <div id="answer-result" class="answer-result"></div>
-                            <div id="answer-explanation" class="answer-explanation"></div>
-                        `;
-                        questionsContainer.appendChild(answerDiv);
+                    // Get a fresh reference to the newly created container
+                    questionsDisplayContainer = document.getElementById('questions-display-container');
+                    if (!questionsDisplayContainer) {
+                        console.error('Failed to create questions display container');
+                        throw new Error('Failed to create questions display container');
                     }
                 } else {
-                    console.error('Questions display container still not found after creation attempt');
+                    // If it exists, make sure it's visible
+                    questionsDisplayContainer.classList.remove('hidden');
+                    
+                    // Hide the empty state if it exists
+                    const emptyState = document.getElementById('empty-state');
+                    if (emptyState) {
+                        emptyState.style.display = 'none';
+                    }
                 }
                 
+                // Now we can safely use questionsDisplayContainer
                 // Display the first question
                 displayCurrentQuestion();
                 updateNavigationButtons();
