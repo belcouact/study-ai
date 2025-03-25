@@ -375,104 +375,619 @@ function showResultsPopup() {
 
 // Function to display the current question
 function displayCurrentQuestion() {
-    // Get the create container and questions display container
-    const createContainer = document.getElementById('create-container');
-    let questionsDisplayContainer = document.getElementById('questions-display-container');
-
-    // Check if the containers exist
-    if (!createContainer) {
-        console.error('Create container not found');
+    console.log('displayCurrentQuestion called', currentQuestionIndex);
+    
+    if (!questions || questions.length === 0) {
+        console.log('No questions available to display');
         return;
     }
 
-    if (!questionsDisplayContainer) {
-        console.error('Questions display container not found');
-        return;
-    }
-    // Ensure the questions display container is visible
-    questionsDisplayContainer.classList.remove('hidden');
-
-    // Check if there are any questions
-    if (!window.questions || window.questions.length === 0) {
-        console.warn('No questions to display');
-        return;
-    }
-
-    // Get the current question
-    const question = window.questions[window.currentQuestionIndex];
+    // Get the current question from the questions array
+    const question = questions[currentQuestionIndex];
     if (!question) {
-        console.error('Question not found at index:', window.currentQuestionIndex);
+        console.error('Current question not found at index:', currentQuestionIndex);
         return;
     }
 
-    // Update question counter
+    // Get the create container
+    const createContainer = document.getElementById('create-container');
+    if (!createContainer || createContainer.style.display === 'none') {
+        console.log('Not on create tab, skipping question display');
+        return;
+    }
+
+    // First ensure we have a questions container
+    let questionsContainer = document.querySelector('.questions-container');
+    if (!questionsContainer) {
+        console.log('Creating new questions container');
+        questionsContainer = document.createElement('div');
+        questionsContainer.className = 'questions-container';
+        createContainer.appendChild(questionsContainer);
+    }
+
+    // Create questions display container if it doesn't exist
+    let questionsDisplayContainer = document.getElementById('questions-display-container');
+    if (!questionsDisplayContainer) {
+        console.log('Creating new questions display container');
+        questionsDisplayContainer = document.createElement('div');
+        questionsDisplayContainer.id = 'questions-display-container';
+        questionsDisplayContainer.className = 'questions-display-container';
+        questionsContainer.appendChild(questionsDisplayContainer);
+    }
+
+    // Ensure required child elements exist
+    const requiredElements = [
+        { id: 'question-counter', className: 'question-counter' },
+        { id: 'question-text', className: 'question-text' },
+        { id: 'choices-container', className: 'choices-container' },
+        { id: 'answer-container', className: 'answer-container hidden' }
+    ];
+
+    requiredElements.forEach(element => {
+        if (!document.getElementById(element.id)) {
+            const newElement = document.createElement('div');
+            newElement.id = element.id;
+            newElement.className = element.className;
+            questionsDisplayContainer.appendChild(newElement);
+        }
+    });
+    
+    // Check if all questions are answered
+    const allQuestionsAnswered = window.userAnswers && 
+                               window.userAnswers.length === window.questions.length && 
+                               window.userAnswers.every(answer => answer !== null);
+
+    // Show completion status if all questions are answered
+    if (allQuestionsAnswered) {
+        displayCompletionStatus();
+    }
+    
+    // Update question counter with responsive styling
     const questionCounter = document.getElementById('question-counter');
     if (questionCounter) {
-        questionCounter.textContent = `题目 ${window.currentQuestionIndex + 1} / ${window.questions.length}`;
+        questionCounter.style.cssText = `
+            font-size: clamp(14px, 2.5vw, 16px);
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: #edf2f7;
+            border-radius: 20px;
+            display: inline-block;
+            width: fit-content;
+        `;
+        questionCounter.textContent = `题目 ${currentQuestionIndex + 1} / ${window.questions.length}`;
+        console.log('Updated question counter:', questionCounter.textContent);
     } else {
-        console.error("question-counter not found");
+        console.error('Question counter element not found');
+        // Create it if it doesn't exist
+        const newCounter = document.createElement('div');
+        newCounter.id = 'question-counter';
+        newCounter.className = 'question-counter';
+        newCounter.style.cssText = `
+            font-size: clamp(14px, 2.5vw, 16px);
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: #edf2f7;
+            border-radius: 20px;
+            display: inline-block;
+            width: fit-content;
+        `;
+        newCounter.textContent = `题目 ${currentQuestionIndex + 1} / ${window.questions.length}`;
+        questionsContainer.appendChild(newCounter);
     }
-
-    // Update question text
+    
+    // Format and display question text with responsive styling
     const questionText = document.getElementById('question-text');
     if (questionText) {
-        questionText.innerHTML = formatMathExpressions(question.questionText); // Use innerHTML to render formatted text
+        questionText.style.cssText = `
+            font-size: clamp(16px, 4vw, 18px);
+            color: #2d3748;
+            line-height: 1.6;
+            margin-bottom: clamp(15px, 4vw, 25px);
+            padding: clamp(15px, 4vw, 20px);
+            background: #f8f9fa;
+            border-radius: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        `;
+        // Remove "题目：" prefix if it exists
+        let displayText = question.questionText;
+        if (displayText.startsWith('题目：')) {
+            displayText = displayText.substring(3);
+        }
+        
+        // Apply enhanced math formatting
+        questionText.innerHTML = formatMathExpressions(displayText);
+        console.log('Updated question text:', displayText);
     } else {
-        console.error("question-text not found");
+        console.error('Question text element not found');
+        // Create it if it doesn't exist
+        const newText = document.createElement('div');
+        newText.id = 'question-text';
+        newText.className = 'question-text';
+        newText.style.cssText = `
+            font-size: clamp(16px, 4vw, 18px);
+            color: #2d3748;
+            line-height: 1.6;
+            margin-bottom: clamp(15px, 4vw, 25px);
+            padding: clamp(15px, 4vw, 20px);
+            background: #f8f9fa;
+            border-radius: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        `;
+        let displayText = question.questionText;
+        if (displayText.startsWith('题目：')) {
+            displayText = displayText.substring(3);
+        }
+        newText.innerHTML = formatMathExpressions(displayText);
+        questionsContainer.appendChild(newText);
     }
-
-    // Clear previous choices
+    
+    // Create responsive grid for choices with 2x2 layout
     const choicesContainer = document.getElementById('choices-container');
     if (choicesContainer) {
-        choicesContainer.innerHTML = '';
+        console.log('Choices container found, updating with choices:', question.choices);
+        
+        choicesContainer.innerHTML = `
+            <div class="choices-grid" style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: clamp(8px, 2vw, 20px);
+                margin: 25px 0;
+                width: 100%;
+            ">
+                ${['A', 'B', 'C', 'D'].map(letter => `
+                    <div class="choice-cell" data-value="${letter}" style="
+                        padding: clamp(10px, 2vw, 15px);
+                        border: 2px solid #e2e8f0;
+                        border-radius: 12px;
+                        background-color: white;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        user-select: none;
+                        -webkit-tap-highlight-color: transparent;
+                    ">
+                        <div class="choice-indicator" style="
+                            width: 28px;
+                            height: 28px;
+                            border-radius: 50%;
+                            background: #edf2f7;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: 500;
+                            color: #4a5568;
+                            flex-shrink: 0;
+                        ">${letter}</div>
+                        <div class="choice-text" style="
+                            flex: 1;
+                            font-size: clamp(14px, 2.5vw, 16px);
+                            color: #2d3748;
+                            line-height: 1.5;
+                        ">${formatMathExpressions(question.choices[letter])}</div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="submit-button-container" style="
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+                width: 100%;
+            ">
+                <button id="submit-answer-button" style="
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    font-weight: 500;
+                    background-color: #4299e1;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+                    opacity: 0.7;
+                    pointer-events: none;
+                ">提交答案</button>
+            </div>
+        `;
 
-        // Create and append choices
-        for (const [key, value] of Object.entries(question.choices)) {
-            const choiceDiv = document.createElement('div');
-            choiceDiv.className = 'choice-item';
+        // Add enhanced interaction effects for choice cells
+        const choiceCells = choicesContainer.querySelectorAll('.choice-cell');
+        const submitButton = document.getElementById('submit-answer-button');
+        let selectedCell = null;
+        let selectedValue = null;
 
-            const radioInput = document.createElement('input');
-            radioInput.type = 'radio';
-            radioInput.name = 'question-choice';
-            radioInput.value = key;
-            radioInput.id = `choice-${key}`;
+        choiceCells.forEach(cell => {
+            const indicator = cell.querySelector('.choice-indicator');
+            
+            // Function to update cell styles
+            const updateCellStyles = (cell, isSelected) => {
+                cell.style.borderColor = isSelected ? '#4299e1' : '#e2e8f0';
+                cell.style.backgroundColor = isSelected ? '#ebf8ff' : 'white';
+                cell.querySelector('.choice-indicator').style.backgroundColor = isSelected ? '#4299e1' : '#edf2f7';
+                cell.querySelector('.choice-indicator').style.color = isSelected ? 'white' : '#4a5568';
+            };
+            
+            // Click handling with single choice enforcement
+            cell.addEventListener('click', () => {
+                if (selectedCell) {
+                    updateCellStyles(selectedCell, false);
+                }
+                selectedCell = cell;
+                selectedValue = cell.dataset.value;
+                updateCellStyles(cell, true);
+                
+                // Enable submit button
+                if (submitButton) {
+                    submitButton.style.opacity = '1';
+                    submitButton.style.pointerEvents = 'auto';
+                }
+            });
+            
+            // Touch and hover effects
+            cell.addEventListener('touchstart', () => {
+                if (cell !== selectedCell) {
+                    cell.style.backgroundColor = '#f7fafc';
+                }
+            }, { passive: true });
+            
+            cell.addEventListener('touchend', () => {
+                if (cell !== selectedCell) {
+                    cell.style.backgroundColor = 'white';
+                }
+            }, { passive: true });
+            
+            cell.addEventListener('mouseover', () => {
+                if (cell !== selectedCell) {
+                    cell.style.borderColor = '#cbd5e0';
+                    cell.style.backgroundColor = '#f7fafc';
+                    cell.style.transform = 'translateY(-1px)';
+                }
+            });
+            
+            cell.addEventListener('mouseout', () => {
+                if (cell !== selectedCell) {
+                    cell.style.borderColor = '#e2e8f0';
+                    cell.style.backgroundColor = 'white';
+                    cell.style.transform = 'none';
+                }
+            });
 
-            // Check if this question has been answered before, and if so, select the previous answer
-            if (window.userAnswers[window.currentQuestionIndex] === key) {
-                radioInput.checked = true;
+            // Set initial state if answer exists
+            if (window.userAnswers && window.userAnswers[currentQuestionIndex] === cell.dataset.value) {
+                selectedCell = cell;
+                selectedValue = cell.dataset.value;
+                updateCellStyles(cell, true);
+                
+                // Enable submit button if answer already selected
+                if (submitButton) {
+                    submitButton.style.opacity = '1';
+                    submitButton.style.pointerEvents = 'auto';
+                }
             }
-
-            const label = document.createElement('label');
-            label.htmlFor = `choice-${key}`;
-            label.innerHTML = `${key}. ${formatMathExpressions(value)}`; // Use innerHTML to render formatted text
-
-            choiceDiv.appendChild(radioInput);
-            choiceDiv.appendChild(label);
-            choicesContainer.appendChild(choiceDiv);
-
-            // Add event listener to radio input
-            radioInput.addEventListener('change', () => {
-                // window.userAnswers[window.currentQuestionIndex] = key; // Moved to displayAnswer
-                displayAnswer(key);
-                // updateNavigationButtons(); // Moved to displayAnswer
+        });
+        
+        // Add submit button functionality
+        if (submitButton) {
+            submitButton.addEventListener('click', () => {
+                if (selectedValue) {
+                    // Save the answer
+                    window.userAnswers[currentQuestionIndex] = selectedValue;
+                    
+                    // Show the answer container
+                    displayAnswer(selectedValue);
+                    
+                    // Check if all questions are answered
+                    const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
+                                               window.userAnswers.every(answer => answer !== null);
+                    
+                    // Show completion status if all questions are answered
+                    if (allQuestionsAnswered) {
+                        displayCompletionStatus();
+                    }
+                }
             });
         }
+        
+        console.log('Choice cells set up:', choiceCells.length);
     } else {
-        console.error("choices-container not found");
+        console.error('Choices container element not found');
+        // Create it if it doesn't exist
+        const newChoices = document.createElement('div');
+        newChoices.id = 'choices-container';
+        newChoices.className = 'choices-container';
+        newChoices.innerHTML = `
+            <div class="choices-grid" style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: clamp(8px, 2vw, 20px);
+                margin: 25px 0;
+                width: 100%;
+            ">
+                ${['A', 'B', 'C', 'D'].map(letter => `
+                    <div class="choice-cell" data-value="${letter}" style="
+                        padding: clamp(10px, 2vw, 15px);
+                        border: 2px solid #e2e8f0;
+                        border-radius: 12px;
+                        background-color: white;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        user-select: none;
+                        -webkit-tap-highlight-color: transparent;
+                    ">
+                        <div class="choice-indicator" style="
+                            width: 28px;
+                            height: 28px;
+                            border-radius: 50%;
+                            background: #edf2f7;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: 500;
+                            color: #4a5568;
+                            flex-shrink: 0;
+                        ">${letter}</div>
+                        <div class="choice-text" style="
+                            flex: 1;
+                            font-size: clamp(14px, 2.5vw, 16px);
+                            color: #2d3748;
+                            line-height: 1.5;
+                        ">${formatMathExpressions(question.choices[letter])}</div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="submit-button-container" style="
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+                width: 100%;
+            ">
+                <button id="submit-answer-button" style="
+                    padding: 12px 30px;
+                    font-size: 16px;
+                    font-weight: 500;
+                    background-color: #4299e1;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+                    opacity: 0.7;
+                    pointer-events: none;
+                ">提交答案</button>
+            </div>
+        `;
+        questionsContainer.appendChild(newChoices);
+        
+        // Add event listeners to the newly created choice cells
+        const choiceCells = newChoices.querySelectorAll('.choice-cell');
+        const submitButton = document.getElementById('submit-answer-button');
+        let selectedValue = null;
+        
+        choiceCells.forEach(cell => {
+            cell.addEventListener('click', function() {
+                // Update UI to show this cell as selected
+                choiceCells.forEach(c => {
+                    c.style.borderColor = '#e2e8f0';
+                    c.style.backgroundColor = 'white';
+                    c.querySelector('.choice-indicator').style.backgroundColor = '#edf2f7';
+                    c.querySelector('.choice-indicator').style.color = '#4a5568';
+                });
+                
+                this.style.borderColor = '#4299e1';
+                this.style.backgroundColor = '#ebf8ff';
+                this.querySelector('.choice-indicator').style.backgroundColor = '#4299e1';
+                this.querySelector('.choice-indicator').style.color = 'white';
+                
+                // Store selected value
+                selectedValue = this.dataset.value;
+                
+                // Enable submit button
+                if (submitButton) {
+                    submitButton.style.opacity = '1';
+                    submitButton.style.pointerEvents = 'auto';
+                }
+            });
+        });
+        
+        // Add submit button functionality
+        if (submitButton) {
+            submitButton.addEventListener('click', function() {
+                if (selectedValue) {
+                    // Save the answer
+                    window.userAnswers[currentQuestionIndex] = selectedValue;
+                    
+                    // Show answer and explanation
+                    displayAnswer(selectedValue);
+                    
+                    // Check if all questions are answered
+                    const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
+                                               window.userAnswers.every(answer => answer !== null);
+                    
+                    // Show completion status if all questions are answered
+                    if (allQuestionsAnswered) {
+                        displayCompletionStatus();
+                    }
+                }
+            });
+        }
     }
-
-    // Hide answer container initially
-    const answerContainer = document.getElementById('answer-container');
-    if (answerContainer) {
-        answerContainer.classList.add('hidden');
+    
+    // Function to display answer and explanation
+    function displayAnswer(selectedValue) {
+        const currentQuestion = questions[currentQuestionIndex];
+        const answerContainer = document.getElementById('answer-container');
+        const answerResult = document.getElementById('answer-result');
+        const answerExplanation = document.getElementById('answer-explanation');
+        
+        if (!currentQuestion.userAnswer) {
+            currentQuestion.userAnswer = selectedValue;
+            
+            // Check if all questions have been answered
+            const allQuestionsAnswered = questions.every(q => q.userAnswer);
+            
+            // Enable the evaluate button if all questions are answered
+            const evaluateButton = document.getElementById('evaluate-btn');
+            if (evaluateButton) {
+                evaluateButton.disabled = !allQuestionsAnswered;
+            }
+            
+            // Show the answer container
+            answerContainer.classList.remove('hidden');
+            
+            // Display whether the answer was correct or not
+            const isCorrect = selectedValue === currentQuestion.answer;
+            answerResult.textContent = isCorrect ? '✓ 回答正确！' : '✗ 回答错误！';
+            answerResult.style.color = isCorrect ? '#27ae60' : '#e74c3c';
+            
+            // Display the explanation
+            answerExplanation.innerHTML = formatMathExpressions(currentQuestion.explanation);
+            
+            // Disable all radio buttons for this question
+            const radioButtons = document.querySelectorAll('input[type="radio"]');
+            radioButtons.forEach(radio => {
+                radio.disabled = true;
+            });
+            
+            // Update navigation controls
+            updateNavigationButtons();
+        }
+    }
+    
+    // Style the answer container when showing results
+    if (window.userAnswers && window.userAnswers[currentQuestionIndex]) {
+        const answerContainer = document.getElementById('answer-container');
+        if (answerContainer) {
+            answerContainer.classList.remove('hidden');
+            answerContainer.style.cssText = `
+                margin-top: clamp(20px, 5vw, 30px);
+                padding: clamp(15px, 4vw, 25px);
+                border-radius: 12px;
+                background-color: white;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                width: 100%;
+                box-sizing: border-box;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            const selectedAnswer = window.userAnswers[currentQuestionIndex];
+            const correctAnswer = question.answer;
+            const isCorrect = selectedAnswer === correctAnswer;
+            
+            // Style the result section
+            const answerResult = document.getElementById('answer-result');
+            if (answerResult) {
+                answerResult.style.cssText = `
+                    font-size: 18px;
+                    font-weight: 500;
+                    color: ${isCorrect ? '#48bb78' : '#e53e3e'};
+                    margin-bottom: 20px;
+                    padding: 15px;
+                    background: ${isCorrect ? '#f0fff4' : '#fff5f5'};
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                `;
+                
+                const resultText = isCorrect 
+                    ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 正确！答案是：${correctAnswer}`
+                    : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> 错误。正确答案是：${correctAnswer}`;
+                
+                answerResult.innerHTML = formatMathExpressions(resultText);
+            }
+            
+            // Style the explanation section
+            const answerExplanation = document.getElementById('answer-explanation');
+            if (answerExplanation) {
+                answerExplanation.style.cssText = `
+                    font-size: 16px;
+                    color: #4a5568;
+                    line-height: 1.8;
+                    margin-top: 20px;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                    white-space: pre-wrap;
+                `;
+                answerExplanation.innerHTML = formatMathExpressions(question.explanation);
+            }
+            
+            // Disable the submit button if already submitted
+            const submitButton = document.getElementById('submit-answer-button');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.style.opacity = '0.5';
+                submitButton.style.pointerEvents = 'none';
+                submitButton.textContent = '已提交';
+            }
+        }
     } else {
-        console.error("answer-container not found");
+        const answerContainer = document.getElementById('answer-container');
+        if (answerContainer) {
+            answerContainer.classList.add('hidden');
+        }
     }
-
-    // Render MathJax
+    
+    // Use the existing createContainer reference
+    if (createContainer) {
+        createContainer.style.cssText = `
+            min-height: 100vh;
+            height: auto;
+            padding: clamp(15px, 4vw, 30px);
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            background: transparent;
+            border-radius: 16px;
+            box-shadow: none;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            margin: 0 auto;
+        `;
+    }
+    
+    // Render math expressions
     if (window.MathJax) {
         window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+    } else {
+        // If MathJax is not loaded, try to load it
+        if (!document.getElementById('mathjax-script')) {
+            const script = document.createElement('script');
+            script.id = 'mathjax-script';
+            script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+            script.async = true;
+            document.head.appendChild(script);
+            
+            script.onload = function() {
+                window.MathJax = {
+                    tex: {
+                        inlineMath: [['\\(', '\\)']],
+                        displayMath: [['\\[', '\\]']]
+                    },
+                    svg: {
+                        fontCache: 'global'
+                    }
+                };
+                
+                // Typeset the math after MathJax is loaded
+                window.MathJax.typesetPromise && window.MathJax.typesetPromise();
+            };
+        }
     }
+    
+    console.log('displayCurrentQuestion completed');
 }
 
 // Function to format math expressions
@@ -4289,6 +4804,7 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         
         // Add the panel to the document
+        /*
         const mainContent = document.querySelector('.main-content');
         if (mainContent) {
             mainContent.appendChild(newPoetryPanel);
@@ -4296,6 +4812,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             console.error('Main content element not found');
         }
+        */
     }
     
     // Add direct event listener to poetry button
