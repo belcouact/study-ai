@@ -4804,6 +4804,7 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         
         // Add the panel to the document
+        /*
         const mainContent = document.querySelector('.main-content');
         if (mainContent) {
             mainContent.appendChild(newPoetryPanel);
@@ -4811,6 +4812,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             console.error('Main content element not found');
         }
+        */
     }
     
     // Add direct event listener to poetry button
@@ -4834,7 +4836,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Poetry panel not found');
             }
             */
-           
+
             // Update active states
             if (qaButton) qaButton.classList.remove('active');
             if (createButton) createButton.classList.remove('active');
