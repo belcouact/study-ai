@@ -5910,7 +5910,7 @@ async function handleLoadVocabularyClick() {
         <div class="initial-message loading-message">
             <div class="loading-spinner vocabulary-spinner"></div>
             <p>词汇加载中，请耐心等待...</p>
-            <p>Loading five vocabularies, please be patient...</p>
+            <p>Loading vocabularies, please be patient...</p>
         </div>
     `;
     

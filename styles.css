@@ -154,13 +154,16 @@ body {
 }
 
 .sidebar-slogan {
-    margin: 15px 10px 20px 10px;
+    margin: auto 10px 20px 10px;
     padding: 15px 8px;
     border-radius: 6px;
     background-color: var(--primary-color);
     text-align: center;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .sidebar-slogan p {
