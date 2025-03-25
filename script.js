@@ -5993,67 +5993,31 @@ async function handleLoadVocabularyClick() {
 // Fetch vocabulary words from API
 async function fetchVocabularyWords(school, grade) {
     try {
-        // Create a more structured prompt for consistent API responses
+        // Create a simpler prompt for more reliable API responses
         const prompt = `Generate 10 English vocabulary words appropriate for ${school} school students in grade ${grade}.
 
-Please format your response as a valid JSON array with objects having the EXACT following structure for each word:
-\`\`\`json
-[
-  {
-    "word": "example",
-    "part_of_speech": "noun",
-    "pronunciation": "/ɪɡˈzæm.pəl/",
-    "definition": "A clear English definition",
-    "chinese_translation": "中文翻译",
-    "example_sentences": [
-      {
-        "english": "This is an example sentence.",
-        "chinese": "这是一个例句。"
-      },
-      {
-        "english": "Here is another example.",
-        "chinese": "这是另一个例句。"
-      }
-    ],
-    "word_family": {
-      "noun": "example (例子)",
-      "verb": "exemplify (例示)"
-    },
-    "common_collocations": [
-      "common example (常见例子)",
-      "good example (好例子)"
-    ],
-    "synonyms": [
-      {
-        "word": "instance",
-        "definition": "a particular case",
-        "chinese": "实例"
-      }
-    ],
-    "antonyms": [
-      {
-        "word": "opposite word",
-        "definition": "opposite definition",
-        "chinese": "反义词"
-      }
-    ],
-    "learning_tips": {
-      "tip": "A useful memory trick or learning strategy",
-      "chinese": "记忆技巧的中文翻译"
+Please format your response as a valid JSON array with objects having the following structure for each word:
+{
+  "word": "example",
+  "part_of_speech": "noun",
+  "pronunciation": "/ɪɡˈzæm.pəl/",
+  "definition": "A clear English definition",
+  "chinese_translation": "中文翻译",
+  "example_sentences": [
+    {
+      "english": "This is an example sentence.",
+      "chinese": "这是一个例句。"
     }
-  }
-]
-\`\`\`
+  ]
+}
 
-IMPORTANT:
-1. Ensure the JSON is valid and properly formatted with all fields.
-2. Do NOT include any explanatory text outside the JSON.
-3. Make sure all example sentences include both English and Chinese translations.
-4. Choose vocabulary appropriate for ${grade} grade ${school} school students.
-5. Strictly follow the format above for all keys and values.`;
+Requirements:
+1. Choose vocabulary appropriate for ${grade} grade ${school} school students
+2. Include one example sentence for each word
+3. Provide both English and Chinese translations
+4. Keep the JSON structure simple and valid
+5. Do not include any text outside the JSON array`;
 
-        //console.log('Fetching vocabulary with prompt:', prompt);
-        
         // Use the existing fetchAIResponse function
         const response = await fetchAIResponse(prompt);
         console.log('Raw API response type:', typeof response);
