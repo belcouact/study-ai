@@ -6696,7 +6696,97 @@ function showAboutSiteModal() {
         z-index: 1000;
     `;
     
-    // Create modal content
+    // Chinese content
+    const chineseContent = `
+        <div style="
+            font-size: 16px;
+            color: #4a5568;
+            line-height: 1.7;
+        ">
+            <p>这是一个由好奇心、探索欲与热忱促成的小小实验项目，它始于几个萦绕心头的问题：</p>
+            
+            <ul style="
+                padding-left: 20px;
+                margin: 15px 0;
+            ">
+                <li>生成式AI如此强大，如何让它适配个性化需求？</li>
+                <li>在AI时代，编程与创造是否真的人人可为？</li>
+                <li>如何利用AI帮助孩子学习？</li>
+            </ul>
+            
+            <p>以下是实践过程中的一些感悟：</p>
+            
+            <ul style="
+                padding-left: 20px;
+                margin: 15px 0;
+            ">
+                <li>拒绝躺平，开启思考</li>
+                <li>不要拖延，立即行动</li>
+                <li>无惧试错，在实践中成长</li>
+                <li>永不言弃，探索不止</li>
+                <li>坚信自己，终有所成</li>
+            </ul>
+            
+            <p>项目所用到的工具（这些都是实践过程中现学现用的）：</p>
+            
+            <ul style="
+                padding-left: 20px;
+                margin: 15px 0;
+            ">
+                <li>内容提供：DeepSeek API</li>
+                <li>代码：Claude-3.7-sonnet</li>
+                <li>编译器：Cursor / VS Code</li>
+                <li>网页部署：Github / Cloudflare</li>
+            </ul>
+        </div>
+    `;
+    
+    // English content
+    const englishContent = `
+        <div style="
+            font-size: 16px;
+            color: #4a5568;
+            line-height: 1.7;
+        ">
+            <p>This is a small experimental project fueled by curiosity, exploration, and passion. It began with several lingering questions:</p>
+            
+            <ul style="
+                padding-left: 20px;
+                margin: 15px 0;
+            ">
+                <li>With generative AI being so powerful, how can we adapt it to personalized needs?</li>
+                <li>In the AI era, can programming and creation truly become accessible to everyone?</li>
+                <li>How can we leverage AI to assist children's learning?</li>
+            </ul>
+            
+            <p>Here are some insights gained during implementation:</p>
+            
+            <ul style="
+                padding-left: 20px;
+                margin: 15px 0;
+            ">
+                <li>Reject complacency, start thinking</li>
+                <li>Resist procrastination, take immediate action</li>
+                <li>Embrace trial and error, grow through practice</li>
+                <li>Never give up, keep exploring</li>
+                <li>Believe in yourself, success will follow</li>
+            </ul>
+            
+            <p>Tools used in the project (all learned during implementation):</p>
+            
+            <ul style="
+                padding-left: 20px;
+                margin: 15px 0;
+            ">
+                <li>Content provider: DeepSeek</li>
+                <li>Coding: Claude-3.7-sonnet</li>
+                <li>Code Editor: Cursor / VS Code</li>
+                <li>Web deployment: Github / Cloudflare</li>
+            </ul>
+        </div>
+    `;
+    
+    // Create modal content (initially with Chinese content)
     const modalContent = `
         <div class="modal-content" style="
             background: white;
@@ -6723,58 +6813,38 @@ function showAboutSiteModal() {
             ">×</button>
             
             <div style="
-                text-align: center;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
                 margin-bottom: 20px;
                 padding-bottom: 15px;
                 border-bottom: 1px solid #e2e8f0;
             ">
-                <h2 style="
+                <h2 id="about-title" style="
                     font-size: 24px;
                     color: #2d3748;
                     margin-bottom: 5px;
                 ">关于本站</h2>
+                
+                <button id="lang-toggle" style="
+                    background-color: #edf2f7;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 4px;
+                    padding: 5px 10px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    color: #4a5568;
+                ">
+                    <span id="lang-indicator">EN</span>
+                    <span style="margin: 0 4px;">|</span>
+                    <span>中</span>
+                </button>
             </div>
             
-            <div style="
-                font-size: 16px;
-                color: #4a5568;
-                line-height: 1.7;
-            ">
-                <p>这是一个由好奇心、探索欲与热忱促成的小小实验项目，它始于几个萦绕心头的问题：</p>
-                
-                <ul style="
-                    padding-left: 20px;
-                    margin: 15px 0;
-                ">
-                    <li>生成式AI如此强大，如何让它适配个性化需求？</li>
-                    <li>在AI时代，编程与创造是否真的人人可为？</li>
-                    <li>如何利用AI帮助孩子学习？</li>
-                </ul>
-                
-                <p>以下是实践过程中的一些感悟：</p>
-                
-                <ul style="
-                    padding-left: 20px;
-                    margin: 15px 0;
-                ">
-                    <li>拒绝躺平，开启思考</li>
-                    <li>不要拖延，立即行动</li>
-                    <li>无惧试错，在实践中成长</li>
-                    <li>永不言弃，探索不止</li>
-                    <li>坚信自己，终有所成</li>
-                </ul>
-                
-                <p>项目所用到的工具（这些都是实践过程中现学现用的）：</p>
-                
-                <ul style="
-                    padding-left: 20px;
-                    margin: 15px 0;
-                ">
-                    <li>内容提供：DeepSeek API</li>
-                    <li>代码：Claude-3.7-sonnet</li>
-                    <li>编译器：Cursor / VS Code</li>
-                    <li>网页部署：Github / Cloudflare</li>
-                </ul>
+            <div id="about-content">
+                ${chineseContent}
             </div>
             
             <div style="
@@ -6802,6 +6872,33 @@ function showAboutSiteModal() {
     // Add event listeners
     const closeButton = document.getElementById('close-about-modal');
     const closeAboutButton = document.getElementById('close-about-button');
+    const langToggle = document.getElementById('lang-toggle');
+    const langIndicator = document.getElementById('lang-indicator');
+    const aboutContent = document.getElementById('about-content');
+    const aboutTitle = document.getElementById('about-title');
+    
+    // Track current language (start with Chinese)
+    let isEnglish = false;
+    
+    if (langToggle) {
+        langToggle.addEventListener('click', function() {
+            isEnglish = !isEnglish;
+            
+            if (isEnglish) {
+                // Switch to English
+                aboutContent.innerHTML = englishContent;
+                aboutTitle.textContent = 'About this website';
+                closeAboutButton.textContent = 'Close';
+                langIndicator.textContent = '中';
+            } else {
+                // Switch to Chinese
+                aboutContent.innerHTML = chineseContent;
+                aboutTitle.textContent = '关于本站';
+                closeAboutButton.textContent = '关闭';
+                langIndicator.textContent = 'EN';
+            }
+        });
+    }
     
     if (closeButton) {
         closeButton.addEventListener('click', function() {
