@@ -475,58 +475,58 @@ function displayCurrentQuestion() {
         const wasHidden = createContainer.style.display === 'none';
         if (wasHidden) {
             createContainer.style.display = '';
-        }
+    }
 
-        // First ensure we have a questions container
-        let questionsContainer = document.querySelector('.questions-container');
-        if (!questionsContainer) {
-            console.log('Creating new questions container');
-            questionsContainer = document.createElement('div');
-            questionsContainer.className = 'questions-container';
-            createContainer.appendChild(questionsContainer);
-        }
+    // First ensure we have a questions container
+    let questionsContainer = document.querySelector('.questions-container');
+    if (!questionsContainer) {
+        console.log('Creating new questions container');
+        questionsContainer = document.createElement('div');
+        questionsContainer.className = 'questions-container';
+        createContainer.appendChild(questionsContainer);
+    }
 
         // Get or create questions display container
-        let questionsDisplayContainer = document.getElementById('questions-display-container');
-        if (!questionsDisplayContainer) {
-            console.log('Creating new questions display container');
-            questionsDisplayContainer = document.createElement('div');
-            questionsDisplayContainer.id = 'questions-display-container';
-            questionsDisplayContainer.className = 'questions-display-container';
+    let questionsDisplayContainer = document.getElementById('questions-display-container');
+    if (!questionsDisplayContainer) {
+        console.log('Creating new questions display container');
+        questionsDisplayContainer = document.createElement('div');
+        questionsDisplayContainer.id = 'questions-display-container';
+        questionsDisplayContainer.className = 'questions-display-container';
             
             // Add to the appropriate container
             if (questionsContainer) {
-                questionsContainer.appendChild(questionsDisplayContainer);
+        questionsContainer.appendChild(questionsDisplayContainer);
             } else {
                 // If questionsContainer doesn't exist for some reason, add directly to create container
                 createContainer.appendChild(questionsDisplayContainer);
             }
-        }
+    }
 
         // Make sure the questions display container is visible
         questionsDisplayContainer.classList.remove('hidden');
 
-        // Ensure required child elements exist
-        const requiredElements = [
-            { id: 'question-counter', className: 'question-counter' },
-            { id: 'question-text', className: 'question-text' },
-            { id: 'choices-container', className: 'choices-container' },
-            { id: 'answer-container', className: 'answer-container hidden' }
-        ];
+    // Ensure required child elements exist
+    const requiredElements = [
+        { id: 'question-counter', className: 'question-counter' },
+        { id: 'question-text', className: 'question-text' },
+        { id: 'choices-container', className: 'choices-container' },
+        { id: 'answer-container', className: 'answer-container hidden' }
+    ];
 
-        requiredElements.forEach(element => {
-            if (!document.getElementById(element.id)) {
-                const newElement = document.createElement('div');
-                newElement.id = element.id;
-                newElement.className = element.className;
-                questionsDisplayContainer.appendChild(newElement);
-            }
-        });
-        
-        // Check if all questions are answered
-        const allQuestionsAnswered = window.userAnswers && 
-                                   window.userAnswers.length === window.questions.length && 
-                                   window.userAnswers.every(answer => answer !== null);
+    requiredElements.forEach(element => {
+        if (!document.getElementById(element.id)) {
+            const newElement = document.createElement('div');
+            newElement.id = element.id;
+            newElement.className = element.className;
+            questionsDisplayContainer.appendChild(newElement);
+        }
+    });
+    
+    // Check if all questions are answered
+    const allQuestionsAnswered = window.userAnswers && 
+                               window.userAnswers.length === window.questions.length && 
+                               window.userAnswers.every(answer => answer !== null);
 
         // Enable the evaluate button if all questions are answered
         const evaluateButton = document.getElementById('evaluate-btn');
@@ -666,11 +666,11 @@ function updateQuestionContent(question) {
                 this.style.borderColor = '#48bb78';
                 this.style.backgroundColor = '#f0fff4';
                 
-                // Save the answer
-                window.userAnswers[currentQuestionIndex] = selectedValue;
-                
+                    // Save the answer
+                    window.userAnswers[currentQuestionIndex] = selectedValue;
+                    
                 // Display the answer and explanation
-                displayAnswer(selectedValue);
+                    displayAnswer(selectedValue);
             });
         });
     }
@@ -1324,7 +1324,7 @@ function handleGenerateQuestionsClick() {
 
     示例格式：
     题目：[题目内容]
-    A. [选项A内容] 
+    A. [选项A内容]
     B. [选项B内容] 
     C. [选项C内容]
     D. [选项D内容]
@@ -4522,7 +4522,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Poetry panel not found');
             }
             */
-
+            
             // Update active states
             if (qaButton) qaButton.classList.remove('active');
             if (createButton) createButton.classList.remove('active');
