@@ -377,55 +377,118 @@ function showResultsPopup() {
 function displayCurrentQuestion() {
     console.log('displayCurrentQuestion called', currentQuestionIndex);
     
-    if (!questions || questions.length === 0) {
+    if (!window.questions || window.questions.length === 0) {
         console.log('No questions available to display');
         return;
     }
 
     // Get the current question from the questions array
-    const question = questions[currentQuestionIndex];
+    const question = window.questions[currentQuestionIndex];
     if (!question) {
         console.error('Current question not found at index:', currentQuestionIndex);
         return;
     }
 
-    // Get the create container
-    const createContainer = document.getElementById('create-container');
+    // Get the create container - make sure it's visible
+    let createContainer = document.getElementById('create-container');
+    
+    // If create container doesn't exist, try to find the container through other means
     if (!createContainer) {
-        console.error('Create container not found');
-        return;
+        console.warn('Create container not found directly, trying alternative methods');
+        
+        // Try to find it by class
+        const containers = document.querySelectorAll('.container');
+        for (const container of containers) {
+            if (container.id === 'create-container') {
+                createContainer = container;
+                break;
+            }
+        }
+        
+        // If still not found, find the parent container and create it
+        if (!createContainer) {
+            console.warn('Create container not found by class search, creating it');
+            const contentArea = document.querySelector('.content-area');
+            
+            if (!contentArea) {
+                console.error('Content area not found, cannot create container');
+                return;
+            }
+            
+            // Create the container
+            createContainer = document.createElement('div');
+            createContainer.id = 'create-container';
+            createContainer.className = 'container';
+            contentArea.appendChild(createContainer);
+            
+            // Add the basic structure
+            createContainer.innerHTML = `
+                <div class="control-panel">
+                    <label for="subject-select">科目</label>
+                    <select id="subject-select" name="subject"></select>
+                    <label for="semester-select">学期</label>
+                    <select id="semester-select">
+                        <option value="上学期">上学期</option>
+                        <option value="下学期">下学期</option>
+                    </select>
+                    <label for="difficulty-select">难度</label>
+                    <select id="difficulty-select">
+                        <option value="容易">容易</option>
+                        <option value="中等">中等</option>
+                        <option value="偏难">偏难</option>
+                    </select>
+                    <label for="question-count-select">题数</label>
+                    <select id="question-count-select">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                    </select>
+                    <button id="generate-btn" onclick="handleGenerateQuestionsClick()">出题</button>
+                    <button id="evaluate-btn" onclick="handleEvaluateClick()" disabled>结果评估</button>
+                </div>
+                <div class="navigation-controls">
+                    <button id="prev-question-button" class="nav-button" disabled> < </button>
+                    <button id="next-question-button" class="nav-button" disabled> > </button>
+                </div>
+            `;
+        }
     }
     
-    // Make sure create container is visible
+    // Make sure create container is visible and active
     createContainer.classList.remove('hidden');
-    
-    // If we're not on the create tab, switch to it
     if (createContainer.style.display === 'none') {
-        console.log('Not on create tab, switching to it');
-        switchPanel('create-container');
+        console.log('Setting create container to display block');
+        createContainer.style.display = 'block';
+        
+        // Try to activate the create tab
+        try {
+            switchPanel('create-container');
+        } catch (e) {
+            console.warn('Error switching to create panel:', e);
+        }
     }
 
-    // First ensure we have a questions container
-    let questionsContainer = document.querySelector('.questions-container');
-    if (!questionsContainer) {
-        console.log('Creating new questions container');
-        questionsContainer = document.createElement('div');
-        questionsContainer.className = 'questions-container';
-        createContainer.appendChild(questionsContainer);
-    }
-
-    // Create questions display container if it doesn't exist
+    // Now ensure we have a questions display container
     let questionsDisplayContainer = document.getElementById('questions-display-container');
     if (!questionsDisplayContainer) {
-        console.log('Creating new questions display container');
+        console.log('Creating questions display container');
+        
+        // Create the container
         questionsDisplayContainer = document.createElement('div');
         questionsDisplayContainer.id = 'questions-display-container';
         questionsDisplayContainer.className = 'questions-display-container';
-        questionsContainer.appendChild(questionsDisplayContainer);
-    } else {
-        // Make sure it's visible
-        questionsDisplayContainer.classList.remove('hidden');
+        
+        // Add it to the create container before the navigation controls
+        const navigationControls = createContainer.querySelector('.navigation-controls');
+        if (navigationControls) {
+            createContainer.insertBefore(questionsDisplayContainer, navigationControls);
+        } else {
+            createContainer.appendChild(questionsDisplayContainer);
+        }
     }
+    
+    // Make sure it's visible
+    questionsDisplayContainer.classList.remove('hidden');
 
     // Ensure required child elements exist
     const requiredElements = [
@@ -494,7 +557,7 @@ function displayCurrentQuestion() {
             width: fit-content;
         `;
         newCounter.textContent = `题目 ${currentQuestionIndex + 1} / ${window.questions.length}`;
-        questionsContainer.appendChild(newCounter);
+        questionsDisplayContainer.appendChild(newCounter);
     }
     
     // Format and display question text with responsive styling
@@ -542,7 +605,7 @@ function displayCurrentQuestion() {
             displayText = displayText.substring(3);
         }
         newText.innerHTML = formatMathExpressions(displayText);
-        questionsContainer.appendChild(newText);
+        questionsDisplayContainer.appendChild(newText);
     }
     
     // Create responsive grid for choices with 2x2 layout
@@ -786,7 +849,7 @@ function displayCurrentQuestion() {
                 ">提交答案</button>
             </div>
         `;
-        questionsContainer.appendChild(newChoices);
+        questionsDisplayContainer.appendChild(newChoices);
         
         // Add event listeners to the newly created choice cells
         const choiceCells = newChoices.querySelectorAll('.choice-cell');
