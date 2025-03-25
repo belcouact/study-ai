@@ -2291,4 +2291,45 @@ button:active {
     flex: 1;
     min-height: 200px;
     padding-bottom: 20px;
+}
+
+.related-phrases {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 12px;
+}
+
+.phrase-item {
+    background-color: #f8fafc;
+    border-radius: 10px;
+    padding: 15px 20px;
+    border-left: 4px solid var(--secondary-color, #3498db);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.phrase-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.phrase-english {
+    color: #334155;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.phrase-chinese {
+    color: #64748b;
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.phrase-usage {
+    color: #475569;
+    font-size: 14px;
+    font-style: italic;
+    padding-top: 8px;
+    border-top: 1px solid #e2e8f0;
 } 

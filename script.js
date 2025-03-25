@@ -4926,7 +4926,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Poetry panel not found');
             }
             */
-           
+            
             // Update active states
             if (qaButton) qaButton.classList.remove('active');
             if (createButton) createButton.classList.remove('active');
@@ -5993,57 +5993,39 @@ async function handleLoadVocabularyClick() {
 // Fetch vocabulary words from API
 async function fetchVocabularyWords(school, grade) {
     try {
-        // Create a focused prompt for vocabulary learning
+        // Create a simpler prompt for more reliable API responses
         const prompt = `Generate 10 English vocabulary words appropriate for ${school} school students in grade ${grade}.
 
 Please format your response as a valid JSON array with objects having the following structure for each word:
-{
-  "word": "example",
-  "part_of_speech": "noun",
-  "pronunciation": "/ɪɡˈzæm.pəl/",
-  "definition": "A clear English definition",
-  "chinese_translation": "中文翻译",
-  "example_sentences": [
-    {
-      "english": "This is an example sentence.",
-      "chinese": "这是一个例句。"
-    }
-  ],
-  "word_family": {
-    "related_words": ["example1", "example2"],
-    "word_forms": {
-      "noun": "example",
-      "verb": "exemplify",
-      "adjective": "exemplary"
-    }
-  },
-  "collocations": ["common", "typical", "perfect"],
-  "synonyms": [
-    {
-      "word": "instance",
-      "definition": "A particular case or example"
-    }
-  ],
-  "antonyms": [
-    {
-      "word": "exception",
-      "definition": "Something that is not included in a rule"
-    }
-  ],
-  "learning_tips": "Remember this word by thinking about its root 'ex-' meaning 'out' and 'ample' meaning 'to take'"
-}
+  {
+    "word": "example",
+    "part_of_speech": "noun",
+    "pronunciation": "/ɪɡˈzæm.pəl/",
+    "definition": "A clear English definition",
+    "chinese_translation": "中文翻译",
+    "related_phrases": [
+      {
+        "english": "example phrase",
+        "chinese": "相关词组",
+        "usage": "Brief explanation of when to use this phrase"
+      }
+    ],
+    "example_sentences": [
+      {
+        "english": "This is an example sentence.",
+        "chinese": "这是一个例句。"
+      }
+    ]
+  }
 
 Requirements:
 1. Choose vocabulary appropriate for ${grade} grade ${school} school students
-2. Include one clear example sentence for each word
-3. Provide both English and Chinese translations
-4. Include word family information (related words and forms)
-5. Add 2-3 common collocations
-6. Include 1-2 synonyms and antonyms with brief definitions
-7. Provide a practical learning tip or memory aid
-8. Keep the JSON structure valid and focused
-9. Do not include any text outside the JSON array`;
-
+2. Include 2-3 related phrases (词组) for each word
+3. Include one example sentence for each word
+4. Provide both English and Chinese translations for all content
+5. Keep the JSON structure simple and valid
+6. Do not include any text outside the JSON array`;
+        
         // Use the existing fetchAIResponse function
         const response = await fetchAIResponse(prompt);
         console.log('Raw API response type:', typeof response);
@@ -6066,11 +6048,11 @@ Requirements:
             return wordData;
         } else {
             console.warn('Could not extract valid vocabulary data from response');
-            return getMockVocabularyWords();
+            //return getMockVocabularyWords();
         }
     } catch (error) {
         console.error('Error in fetchVocabularyWords:', error);
-        return getMockVocabularyWords();
+        //return getMockVocabularyWords();
     }
 }
 
@@ -6139,6 +6121,7 @@ function displayWordCard(index) {
         
         // Process complex structures
         examples: processExamples(word),
+        relatedPhrases: processRelatedPhrases(word),
         wordFamily: processWordFamily(word),
         collocations: processCollocations(word),
         synonyms: processSynonyms(word),
@@ -6168,6 +6151,7 @@ function displayWordCard(index) {
                 </div>
             </div>
             
+            ${renderRelatedPhrases(wordData.relatedPhrases)}
             ${renderExamples(wordData.examples)}
             ${renderWordFamily(wordData.wordFamily)}
             ${renderCollocations(wordData.collocations)}
@@ -6954,3 +6938,46 @@ window.showAboutModal = function() {
     showAboutSiteModal();
     return false;
 };
+
+// Process related phrases
+function processRelatedPhrases(word) {
+    const phrases = [];
+    
+    try {
+        if (word.related_phrases && Array.isArray(word.related_phrases)) {
+            word.related_phrases.forEach(phrase => {
+                if (typeof phrase === 'object') {
+                    phrases.push({
+                        english: safeGet(phrase, 'english', ''),
+                        chinese: safeGet(phrase, 'chinese', ''),
+                        usage: safeGet(phrase, 'usage', '')
+                    });
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error processing related phrases:', error);
+    }
+    
+    return phrases;
+}
+
+// Render related phrases section
+function renderRelatedPhrases(phrases) {
+    if (!phrases || phrases.length === 0) return '';
+    
+    return `
+        <div class="word-section">
+            <h3>相关词组</h3>
+            <div class="related-phrases">
+                ${phrases.map(phrase => `
+                    <div class="phrase-item">
+                        <div class="phrase-english">${phrase.english}</div>
+                        <div class="phrase-chinese">${phrase.chinese}</div>
+                        ${phrase.usage ? `<div class="phrase-usage">${phrase.usage}</div>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
