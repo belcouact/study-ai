@@ -5945,7 +5945,7 @@ async function handleLoadVocabularyClick() {
 async function fetchVocabularyWords(school, grade) {
     try {
         // Create a more structured prompt for consistent API responses
-        const prompt = `Generate 10 English vocabulary words appropriate for ${school} school students in grade ${grade}.
+        const prompt = `Generate 5 English vocabulary words appropriate for ${school} school students in grade ${grade}.
 
 Please format your response as a valid JSON array with objects having the EXACT following structure for each word:
 \`\`\`json
