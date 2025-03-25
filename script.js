@@ -6013,8 +6013,6 @@ Please format your response as a valid JSON array with objects having the follow
       {
         "english": "This is an example sentence.",
         "chinese": "这是一个例句。"
-        "english": "This is an example sentence.",
-        "chinese": "这是一个例句。"
       }
     ]
   }
@@ -6022,7 +6020,7 @@ Please format your response as a valid JSON array with objects having the follow
 Requirements:
 1. Choose vocabulary appropriate for ${grade} grade ${school} school students
 2. Include 2-3 related phrases (词组) for each word
-3. Include one example sentence for each word
+3. Include two example sentences for each word
 4. Provide both English and Chinese translations for all content
 5. Keep the JSON structure simple and valid
 6. Do not include any text outside the JSON array`;
