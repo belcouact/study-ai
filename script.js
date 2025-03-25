@@ -6778,7 +6778,7 @@ function showAboutSiteModal() {
                 padding-left: 20px;
                 margin: 15px 0;
             ">
-                <li>Content provider: DeepSeek</li>
+                <li>Content provider: DeepSeek API</li>
                 <li>Coding: Claude-3.7-sonnet</li>
                 <li>Code Editor: Cursor / VS Code</li>
                 <li>Web deployment: Github / Cloudflare</li>
@@ -6820,12 +6820,6 @@ function showAboutSiteModal() {
                 padding-bottom: 15px;
                 border-bottom: 1px solid #e2e8f0;
             ">
-                <h2 id="about-title" style="
-                    font-size: 24px;
-                    color: #2d3748;
-                    margin-bottom: 5px;
-                ">关于本站</h2>
-                
                 <button id="lang-toggle" style="
                     background-color: #edf2f7;
                     border: 1px solid #e2e8f0;
@@ -6841,6 +6835,15 @@ function showAboutSiteModal() {
                     <span style="margin: 0 4px;">|</span>
                     <span>中</span>
                 </button>
+                
+                <h2 id="about-title" style="
+                    font-size: 24px;
+                    color: #2d3748;
+                    margin: 0 auto;
+                    text-align: center;
+                ">关于本站</h2>
+                
+                <div style="width: 70px;"></div> <!-- Spacer to balance the layout -->
             </div>
             
             <div id="about-content">
