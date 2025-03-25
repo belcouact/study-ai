@@ -6014,6 +6014,8 @@ Please format your response as a valid JSON array with objects having the follow
       {
         "english": "This is an example sentence.",
         "chinese": "这是一个例句。"
+        "english": "This is an example sentence.",
+        "chinese": "这是一个例句。"
       }
     ]
   }
