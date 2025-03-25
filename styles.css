@@ -1854,6 +1854,8 @@ button:active {
     background: var(--card-bg);
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    padding-bottom: 80px; /* Add padding to prevent content from being hidden behind navigation */
 }
 
 .vocabulary-header {
@@ -2260,4 +2262,30 @@ button:active {
 
 .error-message {
     color: #dc3545;
+}
+
+.navigation-controls {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card-bg);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    border-top: 1px solid var(--border-color);
+    margin-top: 20px;
+    z-index: 10;
+}
+
+#vocabulary-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex: 1;
+    min-height: 200px;
+    padding-bottom: 20px;
 } 
