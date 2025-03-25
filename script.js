@@ -2094,6 +2094,7 @@ function showSystemMessage(message, type = 'info') {
 }
 
 // Initialize the page with form layout
+/*
 function initializeFormLayout() {
 
     console.log('loading initializeFormLayout function from line 2097');
@@ -2336,7 +2337,6 @@ function initializeFormLayout() {
         });
     }
     
-    /*
     // Set up event listeners for the sidebar generate button
     const sidebarGenerateButton = document.getElementById('sidebar-generate-button');
     if (sidebarGenerateButton) {
@@ -2350,11 +2350,11 @@ function initializeFormLayout() {
             handleGenerateQuestionsClick();
         });
     }
-    */
 
     // Add event listeners for the optimize and submit buttons
     setupOptimizeAndSubmitButtons();
 }
+*/
 
 // Function to set up optimize and submit buttons
 function setupOptimizeAndSubmitButtons() {
@@ -3001,6 +3001,7 @@ ${questionText}
 }
 
 // Modify initializeFormLayout to call setupChatButtons
+/*
 function initializeFormLayout() {
     // ... existing code ...
     console.log('loading initializeFormLayout function from line 3004');
@@ -3051,6 +3052,7 @@ function initializeFormLayout() {
     
     // ... existing code ...
 }
+*/
 
 // Add this at the end of the file to ensure buttons are set up when the page loads
 document.addEventListener('DOMContentLoaded', function() {
@@ -3059,6 +3061,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Modify the setupChatButtons function to include school and grade information
+
+/*
 function setupChatButtons() {
     console.log('Setting up chat buttons');
     console.log('loading setupChatButtons function from line 3062');
@@ -3208,6 +3212,7 @@ ${educationalContext}
         });
     }
 }
+*/
 
 // Function to get educational context from any available dropdowns in the document
 function getEducationalContext() {
@@ -4155,7 +4160,7 @@ function getSimplifiedContextSummary() {
     }
 
 // ... existing code ...
-
+/*
     // Update poetry style options based on selected poetry type
     function updatePoetryStyleOptions(poetryType) {
         console.log('loading updatePoetryStyleOptions function from line 4159');
@@ -4187,6 +4192,7 @@ function getSimplifiedContextSummary() {
         
         console.log(`Updated poetry style options for ${poetryType}: ${options.join(', ')}`);
     }
+    */
 
 // ... existing code ...
     /*
@@ -4530,6 +4536,7 @@ function switchPanel(panelId) {
 }
 
 // Setup event listeners
+/*
 function setupEventListeners() {
     console.log('Setting up event listeners...');
     console.log('loading setupEventListeners function from line 4533');
@@ -4556,10 +4563,12 @@ function setupEventListeners() {
         });
     }
 }
+*/
 
 // Add this code at the end of the file to ensure it runs after everything else
 
 // Poetry Tab Functionality - Self-contained implementation
+/*
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Poetry tab functionality initializing...');
     
@@ -4723,7 +4732,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Poetry tab functionality initialized');
 });
-
+*/
 // Add this code at the end of the file
 
 // Poetry Tab Functionality - Complete implementation
@@ -4868,6 +4877,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+/*
     // Update poetry style options based on selected type
     function updatePoetryStyleOptions(poetryType) {
         console.log('Updating poetry style options for type:', poetryType);
@@ -4905,7 +4915,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log('Updated poetry style options:', styles);
     }
-    
+*/
+
     // Add event listener to Learn Poetry button
     document.addEventListener('click', function(event) {
         if (event.target && event.target.id === 'learn-poetry-button') {
