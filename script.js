@@ -6654,17 +6654,32 @@ function handleTabSwitch(containerType) {
 
 // Function to handle the about site popup
 function setupAboutSiteLink() {
+    console.log('Setting up about site link...');
     const aboutSiteLink = document.getElementById('about-site-link');
+    console.log('About site link found:', !!aboutSiteLink);
+    
     if (aboutSiteLink) {
+        // Remove any existing event listeners to avoid duplicates
+        aboutSiteLink.removeEventListener('click', showAboutSiteModal);
+        
+        // Add click event listener
         aboutSiteLink.addEventListener('click', function(e) {
+            console.log('About site link clicked');
             e.preventDefault();
             showAboutSiteModal();
         });
+        console.log('About site link event listener added');
+    } else {
+        console.error('About site link element not found');
+        // Try again in 500ms in case the DOM isn't fully loaded yet
+        setTimeout(setupAboutSiteLink, 500);
     }
 }
 
 // Function to show the about site modal
 function showAboutSiteModal() {
+    console.log('Showing about site modal...');
+    
     // Create modal container
     const modalContainer = document.createElement('div');
     modalContainer.id = 'about-site-modal';
@@ -6782,6 +6797,7 @@ function showAboutSiteModal() {
     
     modalContainer.innerHTML = modalContent;
     document.body.appendChild(modalContainer);
+    console.log('Modal added to DOM');
     
     // Add event listeners
     const closeButton = document.getElementById('close-about-modal');
@@ -6789,12 +6805,14 @@ function showAboutSiteModal() {
     
     if (closeButton) {
         closeButton.addEventListener('click', function() {
+            console.log('Close button clicked');
             modalContainer.remove();
         });
     }
     
     if (closeAboutButton) {
         closeAboutButton.addEventListener('click', function() {
+            console.log('Close button clicked');
             modalContainer.remove();
         });
     }
@@ -6802,6 +6820,7 @@ function showAboutSiteModal() {
     // Close modal when clicking outside content
     modalContainer.addEventListener('click', function(e) {
         if (e.target === modalContainer) {
+            console.log('Clicked outside modal content');
             modalContainer.remove();
         }
     });
@@ -6812,3 +6831,27 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Document ready, initializing application...');
     init();
 });
+
+// Add direct event listener for the about-site-link
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Setting up direct about site link listener...');
+    const aboutSiteLink = document.getElementById('about-site-link');
+    if (aboutSiteLink) {
+        aboutSiteLink.onclick = function(e) {
+            console.log('About site link clicked (direct handler)');
+            e.preventDefault();
+            showAboutSiteModal();
+            return false;
+        };
+        console.log('Direct about site link event handler attached');
+    } else {
+        console.error('About site link not found for direct handler');
+    }
+});
+
+// Make the showAboutSiteModal function globally available
+window.showAboutModal = function() {
+    console.log('Show about modal called from global function');
+    showAboutSiteModal();
+    return false;
+};
