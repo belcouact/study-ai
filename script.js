@@ -2095,6 +2095,9 @@ function showSystemMessage(message, type = 'info') {
 
 // Initialize the page with form layout
 function initializeFormLayout() {
+
+    console.log('loading initializeFormLayout function from line 2097');
+
     const formContainer = document.getElementById('question-form-container');
     if (!formContainer) return;
     
@@ -3000,7 +3003,7 @@ ${questionText}
 // Modify initializeFormLayout to call setupChatButtons
 function initializeFormLayout() {
     // ... existing code ...
-    
+    console.log('loading initializeFormLayout function from line 3004');
     // Setup tab switching functionality
     const qaButton = document.getElementById('qa-button');
     const createButton = document.getElementById('create-button');
@@ -3058,7 +3061,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // Modify the setupChatButtons function to include school and grade information
 function setupChatButtons() {
     console.log('Setting up chat buttons');
-    
+    console.log('loading setupChatButtons function from line 3062');
+
     // First, ensure the chat interface exists
     createChatInterface();
     
@@ -3414,7 +3418,7 @@ function inspectDropdowns() {
 // Call the inspection function when setting up chat buttons
 function setupChatButtons() {
     console.log('Setting up chat buttons');
-    
+    console.log('loading setupChatButtons function from line 3419');
     // Inspect dropdowns to debug the issue
     // inspectDropdowns();
     
@@ -3629,6 +3633,7 @@ function createChatInterface() {
 function initializeFormLayout() {
     // ... existing code ...
     
+    console.log('loading initializeFormLayout function from line 3629');
     // Ensure dropdowns are populated in the sidebar
     const sidebarSchoolSelect = document.getElementById('sidebar-school-select');
     if (sidebarSchoolSelect) {
@@ -4084,6 +4089,7 @@ function getSimplifiedContextSummary() {
     // Set up all event listeners
     function setupEventListeners() {
         // Sidebar toggle
+        console.log('loading setupEventListeners function from line 4090');
         elements.sidebarToggle.addEventListener('click', toggleSidebar);
         
         // Panel buttons
@@ -4152,6 +4158,8 @@ function getSimplifiedContextSummary() {
 
     // Update poetry style options based on selected poetry type
     function updatePoetryStyleOptions(poetryType) {
+        console.log('loading updatePoetryStyleOptions function from line 4159');
+
         const styleSelect = elements.poetryStyleSelect;
         if (!styleSelect) return;
         
@@ -4524,6 +4532,7 @@ function switchPanel(panelId) {
 // Setup event listeners
 function setupEventListeners() {
     console.log('Setting up event listeners...');
+    console.log('loading setupEventListeners function from line 4533');
     
     // Sidebar toggle
     const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -4862,7 +4871,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update poetry style options based on selected type
     function updatePoetryStyleOptions(poetryType) {
         console.log('Updating poetry style options for type:', poetryType);
-        
+        console.log('loading updatePoetryStyleOptions function from line 4870');
+
         const poetryStyleSelect = document.getElementById('poetry-style');
         if (!poetryStyleSelect) {
             console.error('Poetry style select element not found');
@@ -4963,6 +4973,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Function to update style options based on selected type
         function updatePoetryStyleOptions() {
             const poetryType = poetryTypeSelect.value;
+            console.log('loading updatePoetryStyleOptions function from line 4972');
             console.log('Updating poetry style options for type:', poetryType);
             
             // Clear existing options
