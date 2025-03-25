@@ -377,118 +377,43 @@ function showResultsPopup() {
 function displayCurrentQuestion() {
     console.log('displayCurrentQuestion called', currentQuestionIndex);
     
-    if (!window.questions || window.questions.length === 0) {
+    if (!questions || questions.length === 0) {
         console.log('No questions available to display');
         return;
     }
 
     // Get the current question from the questions array
-    const question = window.questions[currentQuestionIndex];
+    const question = questions[currentQuestionIndex];
     if (!question) {
         console.error('Current question not found at index:', currentQuestionIndex);
         return;
     }
 
-    // Get the create container - make sure it's visible
-    let createContainer = document.getElementById('create-container');
-    
-    // If create container doesn't exist, try to find the container through other means
-    if (!createContainer) {
-        console.warn('Create container not found directly, trying alternative methods');
-        
-        // Try to find it by class
-        const containers = document.querySelectorAll('.container');
-        for (const container of containers) {
-            if (container.id === 'create-container') {
-                createContainer = container;
-                break;
-            }
-        }
-        
-        // If still not found, find the parent container and create it
-        if (!createContainer) {
-            console.warn('Create container not found by class search, creating it');
-            const contentArea = document.querySelector('.content-area');
-            
-            if (!contentArea) {
-                console.error('Content area not found, cannot create container');
-                return;
-            }
-            
-            // Create the container
-            createContainer = document.createElement('div');
-            createContainer.id = 'create-container';
-            createContainer.className = 'container';
-            contentArea.appendChild(createContainer);
-            
-            // Add the basic structure
-            createContainer.innerHTML = `
-                <div class="control-panel">
-                    <label for="subject-select">科目</label>
-                    <select id="subject-select" name="subject"></select>
-                    <label for="semester-select">学期</label>
-                    <select id="semester-select">
-                        <option value="上学期">上学期</option>
-                        <option value="下学期">下学期</option>
-                    </select>
-                    <label for="difficulty-select">难度</label>
-                    <select id="difficulty-select">
-                        <option value="容易">容易</option>
-                        <option value="中等">中等</option>
-                        <option value="偏难">偏难</option>
-                    </select>
-                    <label for="question-count-select">题数</label>
-                    <select id="question-count-select">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                    </select>
-                    <button id="generate-btn" onclick="handleGenerateQuestionsClick()">出题</button>
-                    <button id="evaluate-btn" onclick="handleEvaluateClick()" disabled>结果评估</button>
-                </div>
-                <div class="navigation-controls">
-                    <button id="prev-question-button" class="nav-button" disabled> < </button>
-                    <button id="next-question-button" class="nav-button" disabled> > </button>
-                </div>
-            `;
-        }
-    }
-    
-    // Make sure create container is visible and active
-    createContainer.classList.remove('hidden');
-    if (createContainer.style.display === 'none') {
-        console.log('Setting create container to display block');
-        createContainer.style.display = 'block';
-        
-        // Try to activate the create tab
-        try {
-            switchPanel('create-container');
-        } catch (e) {
-            console.warn('Error switching to create panel:', e);
-        }
+    // Get the create container
+    const createContainer = document.getElementById('create-container');
+    if (!createContainer || createContainer.style.display === 'none') {
+        console.log('Not on create tab, skipping question display');
+        return;
     }
 
-    // Now ensure we have a questions display container
+    // First ensure we have a questions container
+    let questionsContainer = document.querySelector('.questions-container');
+    if (!questionsContainer) {
+        console.log('Creating new questions container');
+        questionsContainer = document.createElement('div');
+        questionsContainer.className = 'questions-container';
+        createContainer.appendChild(questionsContainer);
+    }
+
+    // Create questions display container if it doesn't exist
     let questionsDisplayContainer = document.getElementById('questions-display-container');
     if (!questionsDisplayContainer) {
-        console.log('Creating questions display container');
-        
-        // Create the container
+        console.log('Creating new questions display container');
         questionsDisplayContainer = document.createElement('div');
         questionsDisplayContainer.id = 'questions-display-container';
         questionsDisplayContainer.className = 'questions-display-container';
-        
-        // Add it to the create container before the navigation controls
-        const navigationControls = createContainer.querySelector('.navigation-controls');
-        if (navigationControls) {
-            createContainer.insertBefore(questionsDisplayContainer, navigationControls);
-        } else {
-            createContainer.appendChild(questionsDisplayContainer);
-        }
+        questionsContainer.appendChild(questionsDisplayContainer);
     }
-    
-    // Make sure it's visible
-    questionsDisplayContainer.classList.remove('hidden');
 
     // Ensure required child elements exist
     const requiredElements = [
@@ -511,12 +436,6 @@ function displayCurrentQuestion() {
     const allQuestionsAnswered = window.userAnswers && 
                                window.userAnswers.length === window.questions.length && 
                                window.userAnswers.every(answer => answer !== null);
-
-    // Update evaluate button state
-    const evaluateButton = document.getElementById('evaluate-btn');
-    if (evaluateButton) {
-        evaluateButton.disabled = !allQuestionsAnswered;
-    }
 
     // Show completion status if all questions are answered
     if (allQuestionsAnswered) {
@@ -557,7 +476,7 @@ function displayCurrentQuestion() {
             width: fit-content;
         `;
         newCounter.textContent = `题目 ${currentQuestionIndex + 1} / ${window.questions.length}`;
-        questionsDisplayContainer.appendChild(newCounter);
+        questionsContainer.appendChild(newCounter);
     }
     
     // Format and display question text with responsive styling
@@ -605,7 +524,7 @@ function displayCurrentQuestion() {
             displayText = displayText.substring(3);
         }
         newText.innerHTML = formatMathExpressions(displayText);
-        questionsDisplayContainer.appendChild(newText);
+        questionsContainer.appendChild(newText);
     }
     
     // Create responsive grid for choices with 2x2 layout
@@ -849,7 +768,7 @@ function displayCurrentQuestion() {
                 ">提交答案</button>
             </div>
         `;
-        questionsDisplayContainer.appendChild(newChoices);
+        questionsContainer.appendChild(newChoices);
         
         // Add event listeners to the newly created choice cells
         const choiceCells = newChoices.querySelectorAll('.choice-cell');
@@ -1809,8 +1728,8 @@ function handleGenerateQuestionsClick() {
                     
                     // Hide the empty state if it exists
                     const emptyState = document.getElementById('empty-state');
-                    if (emptyState) {
-                        emptyState.style.display = 'none';
+                if (emptyState) {
+                    emptyState.style.display = 'none';
                     }
                 }
                 
@@ -3132,7 +3051,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupChatButtons() {
     console.log('Setting up chat buttons');
     console.log('loading setupChatButtons function from line 3062');
-
+    
     // First, ensure the chat interface exists
     createChatInterface();
     
@@ -4569,56 +4488,35 @@ function init() {
 function switchPanel(panelId) {
     console.log('Switching to panel:', panelId);
     
-    // Get all containers
-    const qaContainer = document.getElementById('qa-container');
-    const createContainer = document.getElementById('create-container');
-    const poetryContainer = document.getElementById('poetry-container');
-    const vocabularyContent = document.getElementById('vocabulary-content');
+    // Hide all panels
+    const qaPanel = document.getElementById('qa-panel');
+    const createPanel = document.getElementById('create-panel');
+    const poetryPanel = document.getElementById('poetry-panel');
     
-    // Hide all containers
-    if (qaContainer) qaContainer.classList.add('hidden');
-    if (createContainer) createContainer.classList.add('hidden');
-    if (poetryContainer) poetryContainer.classList.add('hidden');
-    if (vocabularyContent) vocabularyContent.classList.add('hidden');
+    if (qaPanel) qaPanel.classList.add('hidden');
+    if (createPanel) createPanel.classList.add('hidden');
+    if (poetryPanel) poetryPanel.classList.add('hidden');
     
-    // Reset active states on buttons
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    const poetryButton = document.getElementById('poetry-button');
-    const wordButton = document.getElementById('word-button');
-    
-    if (qaButton) qaButton.classList.remove('active');
-    if (createButton) createButton.classList.remove('active');
-    if (poetryButton) poetryButton.classList.remove('active');
-    if (wordButton) wordButton.classList.remove('active');
-    
-    // Show the selected container and activate the corresponding button
-    if (panelId === 'qa-container' && qaContainer) {
-        qaContainer.classList.remove('hidden');
-        if (qaButton) qaButton.classList.add('active');
-    } else if (panelId === 'create-container' && createContainer) {
-        createContainer.classList.remove('hidden');
-        if (createButton) createButton.classList.add('active');
-        
-        // If there are questions, make sure they're displayed
-        if (window.questions && window.questions.length > 0) {
-            const questionsDisplayContainer = document.getElementById('questions-display-container');
-            if (questionsDisplayContainer) {
-                questionsDisplayContainer.classList.remove('hidden');
-                
-                // Hide empty state if it exists
-                const emptyState = document.getElementById('empty-state');
-                if (emptyState) {
-                    emptyState.style.display = 'none';
-                }
-            }
-        }
-    } else if (panelId === 'poetry-container' && poetryContainer) {
-        poetryContainer.classList.remove('hidden');
+    // Show the selected panel
+    if (panelId === 'qa-panel' && qaPanel) {
+        qaPanel.classList.remove('hidden');
+        document.getElementById('qa-button').classList.add('active');
+        document.getElementById('create-button').classList.remove('active');
+        const poetryButton = document.getElementById('poetry-button');
+        if (poetryButton) poetryButton.classList.remove('active');
+    } else if (panelId === 'create-panel' && createPanel) {
+        createPanel.classList.remove('hidden');
+        document.getElementById('create-button').classList.add('active');
+        document.getElementById('qa-button').classList.remove('active');
+        const poetryButton = document.getElementById('poetry-button');
+        if (poetryButton) poetryButton.classList.remove('active');
+    } else if (panelId === 'poetry-panel' && poetryPanel) {
+        poetryPanel.classList.remove('hidden');
+        const poetryButton = document.getElementById('poetry-button');
         if (poetryButton) poetryButton.classList.add('active');
-    } else if (panelId === 'vocabulary-content' && vocabularyContent) {
-        vocabularyContent.classList.remove('hidden');
-        if (wordButton) wordButton.classList.add('active');
+        document.getElementById('qa-button').classList.remove('active');
+        document.getElementById('create-button').classList.remove('active');
+        console.log('Poetry panel is now visible via switchPanel');
     }
 }
 
@@ -4969,7 +4867,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updatePoetryStyleOptions(poetryType) {
         console.log('Updating poetry style options for type:', poetryType);
         console.log('loading updatePoetryStyleOptions function from line 4870');
-
+        
         const poetryStyleSelect = document.getElementById('poetry-style');
         if (!poetryStyleSelect) {
             console.error('Poetry style select element not found');
@@ -5003,7 +4901,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Updated poetry style options:', styles);
     }
 */
-
+    
     // Add event listener to Learn Poetry button
     document.addEventListener('click', function(event) {
         if (event.target && event.target.id === 'learn-poetry-button') {
@@ -5505,12 +5403,6 @@ document.addEventListener('DOMContentLoaded', function() {
             3. 内容要求：主题积极向上，意境清晰，适合${school}${grade}学生理解和背诵
             4. 教育价值：具有明确的情感表达和思想内涵，能够引发学生共鸣
             
-            针对不同学龄段的具体要求：
-            - 小学低年级(1-3年级)：选择字数少、节奏感强、内容生动形象的诗词，如《静夜思》《春晓》
-            - 小学高年级(4-6年级)：选择意境优美、主题明确的诗词，如《望庐山瀑布》《黄鹤楼送孟浩然之广陵》
-            - 初中：选择思想内涵较丰富、艺术手法有特色的诗词，如《望岳》《茅屋为秋风所破歌》
-            - 高中：选择思想深度和艺术价值较高的诗词，如《蜀相》《琵琶行》《念奴娇·赤壁怀古》
-            
             解释和赏析要求：
             - 解释要${explanationDetail}，使用适合${school}${grade}学生理解的语言
             - 背景介绍要有趣且与学生的知识水平相符
@@ -6008,7 +5900,7 @@ async function handleLoadVocabularyClick() {
 async function fetchVocabularyWords(school, grade) {
     try {
         // Create a more structured prompt for consistent API responses
-        const prompt = `Generate 5 English vocabulary words appropriate for ${school} school students in grade ${grade}.
+        const prompt = `Generate 10 English vocabulary words appropriate for ${school} school students in grade ${grade}.
 
 Please format your response as a valid JSON array with objects having the EXACT following structure for each word:
 \`\`\`json
