@@ -3060,14 +3060,17 @@ function setupChatButtons() {
     console.log('Setting up chat buttons');
     
     // First, ensure the chat interface exists
-    createChatInterface();
+    const chatInterface = createChatInterface();
+    if (!chatInterface) {
+        console.error('Failed to create or get chat interface');
+        return;
+    }
     
     // Debug: Inspect dropdowns
     inspectDropdowns();
     
-    // Now get the chat input and response area
-    const chatInput = document.getElementById('chat-input');
-    const chatResponse = document.getElementById('chat-response');
+    // Get chat elements from the interface
+    const { chatInput, chatResponse, optimizeButton, submitButton } = chatInterface;
     
     if (!chatInput || !chatResponse) {
         console.error('Chat input or response area not found even after creation');
@@ -3075,14 +3078,13 @@ function setupChatButtons() {
     }
     
     // Set up optimize button
-    const optimizeButton = document.getElementById('optimize-button');
     if (optimizeButton) {
         // Remove any existing event listeners
         const newOptimizeButton = optimizeButton.cloneNode(true);
         optimizeButton.parentNode.replaceChild(newOptimizeButton, optimizeButton);
-        optimizeButton = newOptimizeButton;
+        const optimizeBtn = newOptimizeButton;
         
-        optimizeButton.addEventListener('click', function() {
+        optimizeBtn.addEventListener('click', function() {
             const questionText = chatInput.value.trim();
             
             if (!questionText) {
@@ -3094,8 +3096,8 @@ function setupChatButtons() {
             const { school, grade } = getSimplifiedEducationalContext();
             
             // Show loading state
-            optimizeButton.disabled = true;
-            optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
+            optimizeBtn.disabled = true;
+            optimizeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
             
             // Prepare the prompt with simplified context
             const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值：
@@ -3131,21 +3133,20 @@ function setupChatButtons() {
                 })
                 .finally(() => {
                     // Reset button state
-                    optimizeButton.disabled = false;
-                    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+                    optimizeBtn.disabled = false;
+                    optimizeBtn.innerHTML = '优化问题';
                 });
         });
     }
     
     // Set up submit button
-    const submitButton = document.getElementById('submit-button');
     if (submitButton) {
         // Remove any existing event listeners
         const newSubmitButton = submitButton.cloneNode(true);
         submitButton.parentNode.replaceChild(newSubmitButton, submitButton);
-        submitButton = newSubmitButton;
+        const submitBtn = newSubmitButton;
         
-        submitButton.addEventListener('click', function() {
+        submitBtn.addEventListener('click', function() {
             const questionText = chatInput.value.trim();
             
             if (!questionText) {
@@ -3157,8 +3158,8 @@ function setupChatButtons() {
             const { school, grade } = getSimplifiedEducationalContext();
             
             // Show loading state
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
             chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
             
             // Prepare the prompt with simplified context
@@ -3208,8 +3209,8 @@ function setupChatButtons() {
                 })
                 .finally(() => {
                     // Reset button state
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '提交问题';
                 });
         });
     }
@@ -5918,4 +5919,275 @@ function handleTabSwitch(containerType) {
             }
             break;
     }
+}
+
+// First, let's fix the createChatInterface function definition issue by ensuring it's defined only once
+// Function to create the chat interface
+function createChatInterface() {
+    console.log('Creating chat interface');
+    
+    // Get the chat container
+    const qaContainer = document.getElementById('qa-container');
+    if (!qaContainer) {
+        console.error('QA container not found');
+        return null;
+    }
+    
+    // Check if chat interface already exists
+    let chatInput = document.getElementById('user-input');
+    let chatResponse = document.getElementById('output');
+    const optimizeButton = document.getElementById('optimize-button');
+    const submitButton = document.getElementById('submit-button');
+    
+    // If all elements exist, just return them
+    if (chatInput && chatResponse && optimizeButton && submitButton) {
+        console.log('Chat interface already exists');
+        return { chatInput, chatResponse, optimizeButton, submitButton };
+    }
+    
+    // If we need to create the chat interface
+    console.log('Building chat interface');
+    
+    // If container is empty or doesn't have needed elements, create them
+    const chatContainer = document.querySelector('.chat-container') || document.createElement('div');
+    chatContainer.className = 'chat-container';
+    chatContainer.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+    `;
+    qaContainer.appendChild(chatContainer);
+    
+    // Create input container if needed
+    let inputContainer = chatContainer.querySelector('.input-container');
+    if (!inputContainer) {
+        inputContainer = document.createElement('div');
+        inputContainer.className = 'input-container';
+        inputContainer.style.cssText = `
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        `;
+        chatContainer.appendChild(inputContainer);
+    }
+    
+    // Create welcome message if needed
+    let welcomeMessage = inputContainer.querySelector('.welcome-message');
+    if (!welcomeMessage) {
+        welcomeMessage = document.createElement('div');
+        welcomeMessage.className = 'welcome-message';
+        welcomeMessage.textContent = '你好，我是你的AI老师，有什么我可以帮你的吗？';
+        welcomeMessage.style.cssText = `
+            margin-bottom: 15px;
+            color: #4a5568;
+            font-size: 16px;
+        `;
+        inputContainer.appendChild(welcomeMessage);
+    }
+    
+    // Create or get textarea
+    chatInput = inputContainer.querySelector('#user-input') || document.createElement('textarea');
+    chatInput.id = 'user-input';
+    chatInput.placeholder = '请输入你的问题...';
+    chatInput.style.cssText = `
+        width: 100%;
+        min-height: 100px;
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 16px;
+        resize: vertical;
+        margin-bottom: 10px;
+    `;
+    inputContainer.appendChild(chatInput);
+    
+    // Create button container if needed
+    let buttonContainer = inputContainer.querySelector('.button-container');
+    if (!buttonContainer) {
+        buttonContainer = document.createElement('div');
+        buttonContainer.className = 'button-container';
+        buttonContainer.style.cssText = `
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        `;
+        inputContainer.appendChild(buttonContainer);
+    }
+    
+    // Create right controls if needed
+    let rightControls = buttonContainer.querySelector('.right-controls');
+    if (!rightControls) {
+        rightControls = document.createElement('div');
+        rightControls.className = 'right-controls';
+        rightControls.style.cssText = `
+            display: flex;
+            gap: 10px;
+        `;
+        buttonContainer.appendChild(rightControls);
+    }
+    
+    // Create optimize button if needed
+    if (!optimizeButton) {
+        const optimizeBtn = document.createElement('button');
+        optimizeBtn.id = 'optimize-button';
+        optimizeBtn.title = '优化您的问题以获得更好的回答';
+        optimizeBtn.textContent = '优化问题';
+        optimizeBtn.style.cssText = `
+            padding: 8px 16px;
+            background-color: #4a5568;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        `;
+        rightControls.appendChild(optimizeBtn);
+    }
+    
+    // Create submit button if needed
+    if (!submitButton) {
+        const submitBtn = document.createElement('button');
+        submitBtn.id = 'submit-button';
+        submitBtn.textContent = '提交问题';
+        submitBtn.style.cssText = `
+            padding: 8px 16px;
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        `;
+        rightControls.appendChild(submitBtn);
+    }
+    
+    // Create output container if needed
+    let outputContainer = chatContainer.querySelector('.output-container');
+    if (!outputContainer) {
+        outputContainer = document.createElement('div');
+        outputContainer.className = 'output-container';
+        outputContainer.style.cssText = `
+            flex-grow: 1;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow-y: auto;
+        `;
+        chatContainer.appendChild(outputContainer);
+    }
+    
+    // Create loading indicator if needed
+    let loading = outputContainer.querySelector('#loading');
+    if (!loading) {
+        loading = document.createElement('div');
+        loading.id = 'loading';
+        loading.className = 'hidden';
+        loading.innerHTML = `
+            <div class="spinner"></div>
+            <p>思考中...</p>
+        `;
+        loading.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+        `;
+        outputContainer.appendChild(loading);
+    }
+    
+    // Create output div if needed
+    chatResponse = outputContainer.querySelector('#output');
+    if (!chatResponse) {
+        chatResponse = document.createElement('div');
+        chatResponse.id = 'output';
+        outputContainer.appendChild(chatResponse);
+    }
+    
+    // Add event listener for Enter key on textarea
+    chatInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            document.getElementById('submit-button').click();
+        }
+    });
+    
+    console.log('Chat interface created successfully');
+    return { chatInput, chatResponse, optimizeButton: document.getElementById('optimize-button'), submitButton: document.getElementById('submit-button') };
+}
+
+// Modify the setupChatButtons function to include school and grade information
+function setupChatButtons() {
+    // ... existing code ...
+}
+
+// Add a new function to get simplified educational context (school and grade only)
+function getSimplifiedEducationalContext() {
+    console.log('Getting simplified educational context');
+    
+    // Get school and grade from sidebar
+    const schoolSelect = document.getElementById('school-select-sidebar');
+    const gradeSelect = document.getElementById('grade-select-sidebar');
+    
+    let school = '未知学校类型';
+    let grade = '未知年级';
+    
+    // Get school value
+    if (schoolSelect && schoolSelect.value) {
+        // Convert value to display name
+        switch (schoolSelect.value) {
+            case '小学':
+                school = '小学';
+                break;
+            case '初中':
+                school = '初中';
+                break;
+            case '高中':
+                school = '高中';
+                break;
+            default:
+                // Try to use the text of the selected option
+                try {
+                    if (schoolSelect.selectedIndex >= 0) {
+                        school = schoolSelect.options[schoolSelect.selectedIndex].text;
+                    }
+                } catch (e) {
+                    console.error('Error getting school text:', e);
+                }
+        }
+    }
+    
+    // Get grade value
+    if (gradeSelect && gradeSelect.value) {
+        // Try to use the text of the selected option
+        try {
+            if (gradeSelect.selectedIndex >= 0) {
+                grade = gradeSelect.options[gradeSelect.selectedIndex].text;
+            } else {
+                grade = gradeSelect.value;
+            }
+        } catch (e) {
+            console.error('Error getting grade text:', e);
+            grade = gradeSelect.value;
+        }
+    }
+    
+    console.log('Simplified educational context:', { school, grade });
+    return { school, grade };
+}
+
+// Add a new function to get simplified context summary (school and grade only)
+function getSimplifiedContextSummary() {
+    const { school, grade } = getSimplifiedEducationalContext();
+    
+    if (school === '未知学校类型' || grade === '未知年级') {
+        return '';
+    }
+    
+    return `${school} ${grade}`;
 }
