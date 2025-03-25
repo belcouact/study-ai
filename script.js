@@ -4153,10 +4153,19 @@ function getSimplifiedContextSummary() {
     return summary;
 }
 
-// ... existing code ...
-
     // Set up all event listeners
     function setupEventListeners() {
+        // Define elements object
+        const elements = {
+            sidebarToggle: document.getElementById('sidebar-toggle'),
+            qaButton: document.getElementById('qa-button'),
+            createButton: document.getElementById('create-button'),
+            poetryButton: document.getElementById('poetry-button'),
+            schoolSelectSidebar: document.getElementById('school-select-sidebar'),
+            poetryTypeSelect: document.getElementById('poetry-type-select'),
+            poetryStyleSelect: document.getElementById('poetry-style-select')
+        };
+
         // Sidebar toggle
         elements.sidebarToggle.addEventListener('click', toggleSidebar);
         
@@ -6043,7 +6052,7 @@ IMPORTANT:
 4. Choose vocabulary appropriate for ${grade} grade ${school} school students.
 5. Strictly follow the format above for all keys and values.`;
 
-        console.log('Fetching vocabulary with prompt:', prompt);
+        //console.log('Fetching vocabulary with prompt:', prompt);
         
         // Use the existing fetchAIResponse function
         const response = await fetchAIResponse(prompt);
