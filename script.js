@@ -391,9 +391,18 @@ function displayCurrentQuestion() {
 
     // Get the create container
     const createContainer = document.getElementById('create-container');
-    if (!createContainer || createContainer.style.display === 'none') {
-        console.log('Not on create tab, skipping question display');
+    if (!createContainer) {
+        console.error('Create container not found');
         return;
+    }
+    
+    // Make sure create container is visible
+    createContainer.classList.remove('hidden');
+    
+    // If we're not on the create tab, switch to it
+    if (createContainer.style.display === 'none') {
+        console.log('Not on create tab, switching to it');
+        switchPanel('create-container');
     }
 
     // First ensure we have a questions container
@@ -413,6 +422,9 @@ function displayCurrentQuestion() {
         questionsDisplayContainer.id = 'questions-display-container';
         questionsDisplayContainer.className = 'questions-display-container';
         questionsContainer.appendChild(questionsDisplayContainer);
+    } else {
+        // Make sure it's visible
+        questionsDisplayContainer.classList.remove('hidden');
     }
 
     // Ensure required child elements exist
@@ -436,6 +448,12 @@ function displayCurrentQuestion() {
     const allQuestionsAnswered = window.userAnswers && 
                                window.userAnswers.length === window.questions.length && 
                                window.userAnswers.every(answer => answer !== null);
+
+    // Update evaluate button state
+    const evaluateButton = document.getElementById('evaluate-btn');
+    if (evaluateButton) {
+        evaluateButton.disabled = !allQuestionsAnswered;
+    }
 
     // Show completion status if all questions are answered
     if (allQuestionsAnswered) {
@@ -4488,35 +4506,56 @@ function init() {
 function switchPanel(panelId) {
     console.log('Switching to panel:', panelId);
     
-    // Hide all panels
-    const qaPanel = document.getElementById('qa-panel');
-    const createPanel = document.getElementById('create-panel');
-    const poetryPanel = document.getElementById('poetry-panel');
+    // Get all containers
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    const poetryContainer = document.getElementById('poetry-container');
+    const vocabularyContent = document.getElementById('vocabulary-content');
     
-    if (qaPanel) qaPanel.classList.add('hidden');
-    if (createPanel) createPanel.classList.add('hidden');
-    if (poetryPanel) poetryPanel.classList.add('hidden');
+    // Hide all containers
+    if (qaContainer) qaContainer.classList.add('hidden');
+    if (createContainer) createContainer.classList.add('hidden');
+    if (poetryContainer) poetryContainer.classList.add('hidden');
+    if (vocabularyContent) vocabularyContent.classList.add('hidden');
     
-    // Show the selected panel
-    if (panelId === 'qa-panel' && qaPanel) {
-        qaPanel.classList.remove('hidden');
-        document.getElementById('qa-button').classList.add('active');
-        document.getElementById('create-button').classList.remove('active');
-        const poetryButton = document.getElementById('poetry-button');
-        if (poetryButton) poetryButton.classList.remove('active');
-    } else if (panelId === 'create-panel' && createPanel) {
-        createPanel.classList.remove('hidden');
-        document.getElementById('create-button').classList.add('active');
-        document.getElementById('qa-button').classList.remove('active');
-        const poetryButton = document.getElementById('poetry-button');
-        if (poetryButton) poetryButton.classList.remove('active');
-    } else if (panelId === 'poetry-panel' && poetryPanel) {
-        poetryPanel.classList.remove('hidden');
-        const poetryButton = document.getElementById('poetry-button');
+    // Reset active states on buttons
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const poetryButton = document.getElementById('poetry-button');
+    const wordButton = document.getElementById('word-button');
+    
+    if (qaButton) qaButton.classList.remove('active');
+    if (createButton) createButton.classList.remove('active');
+    if (poetryButton) poetryButton.classList.remove('active');
+    if (wordButton) wordButton.classList.remove('active');
+    
+    // Show the selected container and activate the corresponding button
+    if (panelId === 'qa-container' && qaContainer) {
+        qaContainer.classList.remove('hidden');
+        if (qaButton) qaButton.classList.add('active');
+    } else if (panelId === 'create-container' && createContainer) {
+        createContainer.classList.remove('hidden');
+        if (createButton) createButton.classList.add('active');
+        
+        // If there are questions, make sure they're displayed
+        if (window.questions && window.questions.length > 0) {
+            const questionsDisplayContainer = document.getElementById('questions-display-container');
+            if (questionsDisplayContainer) {
+                questionsDisplayContainer.classList.remove('hidden');
+                
+                // Hide empty state if it exists
+                const emptyState = document.getElementById('empty-state');
+                if (emptyState) {
+                    emptyState.style.display = 'none';
+                }
+            }
+        }
+    } else if (panelId === 'poetry-container' && poetryContainer) {
+        poetryContainer.classList.remove('hidden');
         if (poetryButton) poetryButton.classList.add('active');
-        document.getElementById('qa-button').classList.remove('active');
-        document.getElementById('create-button').classList.remove('active');
-        console.log('Poetry panel is now visible via switchPanel');
+    } else if (panelId === 'vocabulary-content' && vocabularyContent) {
+        vocabularyContent.classList.remove('hidden');
+        if (wordButton) wordButton.classList.add('active');
     }
 }
 
