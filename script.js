@@ -5993,7 +5993,7 @@ async function handleLoadVocabularyClick() {
 // Fetch vocabulary words from API
 async function fetchVocabularyWords(school, grade) {
     try {
-        // Create a simpler prompt for more reliable API responses
+        // Create a focused prompt for vocabulary learning
         const prompt = `Generate 10 English vocabulary words appropriate for ${school} school students in grade ${grade}.
 
 Please format your response as a valid JSON array with objects having the following structure for each word:
@@ -6008,15 +6008,41 @@ Please format your response as a valid JSON array with objects having the follow
       "english": "This is an example sentence.",
       "chinese": "这是一个例句。"
     }
-  ]
+  ],
+  "word_family": {
+    "related_words": ["example1", "example2"],
+    "word_forms": {
+      "noun": "example",
+      "verb": "exemplify",
+      "adjective": "exemplary"
+    }
+  },
+  "collocations": ["common", "typical", "perfect"],
+  "synonyms": [
+    {
+      "word": "instance",
+      "definition": "A particular case or example"
+    }
+  ],
+  "antonyms": [
+    {
+      "word": "exception",
+      "definition": "Something that is not included in a rule"
+    }
+  ],
+  "learning_tips": "Remember this word by thinking about its root 'ex-' meaning 'out' and 'ample' meaning 'to take'"
 }
 
 Requirements:
 1. Choose vocabulary appropriate for ${grade} grade ${school} school students
-2. Include one example sentence for each word
+2. Include one clear example sentence for each word
 3. Provide both English and Chinese translations
-4. Keep the JSON structure simple and valid
-5. Do not include any text outside the JSON array`;
+4. Include word family information (related words and forms)
+5. Add 2-3 common collocations
+6. Include 1-2 synonyms and antonyms with brief definitions
+7. Provide a practical learning tip or memory aid
+8. Keep the JSON structure valid and focused
+9. Do not include any text outside the JSON array`;
 
         // Use the existing fetchAIResponse function
         const response = await fetchAIResponse(prompt);
@@ -6040,11 +6066,11 @@ Requirements:
             return wordData;
         } else {
             console.warn('Could not extract valid vocabulary data from response');
-            //return getMockVocabularyWords();
+            return getMockVocabularyWords();
         }
     } catch (error) {
         console.error('Error in fetchVocabularyWords:', error);
-        //return getMockVocabularyWords();
+        return getMockVocabularyWords();
     }
 }
 
