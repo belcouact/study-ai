@@ -4558,6 +4558,9 @@ function init() {
     }
     
     console.log('Application initialized');
+    
+    // Setup about site link
+    setupAboutSiteLink();
 }
 
 // ... existing code ...
@@ -6648,3 +6651,164 @@ function handleTabSwitch(containerType) {
             break;
     }
 }
+
+// Function to handle the about site popup
+function setupAboutSiteLink() {
+    const aboutSiteLink = document.getElementById('about-site-link');
+    if (aboutSiteLink) {
+        aboutSiteLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showAboutSiteModal();
+        });
+    }
+}
+
+// Function to show the about site modal
+function showAboutSiteModal() {
+    // Create modal container
+    const modalContainer = document.createElement('div');
+    modalContainer.id = 'about-site-modal';
+    modalContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    `;
+    
+    // Create modal content
+    const modalContent = `
+        <div class="modal-content" style="
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        ">
+            <button id="close-about-modal" style="
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #4a5568;
+                padding: 5px;
+                z-index: 1;
+            ">×</button>
+            
+            <div style="
+                text-align: center;
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid #e2e8f0;
+            ">
+                <h2 style="
+                    font-size: 24px;
+                    color: #2d3748;
+                    margin-bottom: 5px;
+                ">关于本站</h2>
+            </div>
+            
+            <div style="
+                font-size: 16px;
+                color: #4a5568;
+                line-height: 1.7;
+            ">
+                <p>这是一个由好奇心、探索欲与热忱促成的小小实验项目，它始于几个萦绕心头的问题：</p>
+                
+                <ul style="
+                    padding-left: 20px;
+                    margin: 15px 0;
+                ">
+                    <li>生成式AI如此强大，如何让它适配个性化需求？</li>
+                    <li>在AI时代，编程与创造是否真的人人可为？</li>
+                    <li>如何利用AI帮助孩子学习？</li>
+                </ul>
+                
+                <p>以下是实践过程中的一些感悟：</p>
+                
+                <ul style="
+                    padding-left: 20px;
+                    margin: 15px 0;
+                ">
+                    <li>拒绝躺平，开启思考</li>
+                    <li>不要拖延，立即行动</li>
+                    <li>无惧试错，在实践中成长</li>
+                    <li>永不言弃，探索不止</li>
+                    <li>坚信自己，终有所成</li>
+                </ul>
+                
+                <p>项目所用到的工具（这些都是实践过程中现学现用的）：</p>
+                
+                <ul style="
+                    padding-left: 20px;
+                    margin: 15px 0;
+                ">
+                    <li>内容提供：DeepSeek API</li>
+                    <li>代码：Claude-3.7-sonnet</li>
+                    <li>编译器：Cursor / VS Code</li>
+                    <li>网页部署：Github / Cloudflare</li>
+                </ul>
+            </div>
+            
+            <div style="
+                text-align: center;
+                margin-top: 25px;
+            ">
+                <button id="close-about-button" style="
+                    padding: 10px 20px;
+                    background-color: #4299e1;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    cursor: pointer;
+                ">关闭</button>
+            </div>
+        </div>
+    `;
+    
+    modalContainer.innerHTML = modalContent;
+    document.body.appendChild(modalContainer);
+    
+    // Add event listeners
+    const closeButton = document.getElementById('close-about-modal');
+    const closeAboutButton = document.getElementById('close-about-button');
+    
+    if (closeButton) {
+        closeButton.addEventListener('click', function() {
+            modalContainer.remove();
+        });
+    }
+    
+    if (closeAboutButton) {
+        closeAboutButton.addEventListener('click', function() {
+            modalContainer.remove();
+        });
+    }
+    
+    // Close modal when clicking outside content
+    modalContainer.addEventListener('click', function(e) {
+        if (e.target === modalContainer) {
+            modalContainer.remove();
+        }
+    });
+}
+
+// Add event listener to call init function when the document is ready
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Document ready, initializing application...');
+    init();
+});

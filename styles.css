@@ -157,6 +157,29 @@ body {
     margin: 0 0 3px 0;
 }
 
+.footer-links {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: color 0.2s ease;
+    padding: 2px 5px;
+}
+
+.footer-links a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
 /* External services section */
 .external-services {
     margin-top: 1rem;
