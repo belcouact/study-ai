@@ -1085,55 +1085,52 @@ function handleEvaluateClick() {
         
         questionResults.push({
             questionNumber: index + 1,
-            isCorrect,
+            questionText: questionText.substring(0, 50) + (questionText.length > 50 ? '...' : ''),
             userAnswer: answer,
             correctAnswer: question.answer,
-            explanation: question.explanation
+            isCorrect: isCorrect
         });
     });
-
-    // Calculate score and percentage
-    const totalQuestions = window.questions.length;
-    const scorePercentage = (correctCount / totalQuestions) * 100;
     
-    // Create the evaluation content with score summary at the top
-    let evaluationContent = `
-        <div style="text-align: center; margin-bottom: 20px; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
-            <h2 style="color: #2c3e50; margin-bottom: 15px;">测试成绩</h2>
-            <div style="font-size: 24px; color: #2c3e50; margin-bottom: 10px;">
-                得分：${correctCount}/${totalQuestions}
-            </div>
-            <div style="font-size: 20px; color: ${scorePercentage >= 60 ? '#27ae60' : '#e74c3c'};">
-                正确率：${scorePercentage.toFixed(1)}%
-            </div>
-        </div>
-        <div style="margin-top: 20px;">
-            <h3 style="color: #2c3e50; margin-bottom: 15px;">详细分析</h3>
-    `;
+    const scorePercentage = (correctCount / window.questions.length) * 100;
+    
+    // Create prompt for API
+    const prompt = `
+我刚完成了一个测试，请根据我的表现给出评估和建议。
 
-    // Add individual question results
-    questionResults.forEach(result => {
-        evaluationContent += `
-            <div style="margin-bottom: 20px; padding: 15px; border-left: 4px solid ${result.isCorrect ? '#27ae60' : '#e74c3c'}; background-color: #f8f9fa;">
-                <div style="margin-bottom: 10px;">
-                    <strong>问题 ${result.questionNumber}:</strong> 
-                    ${result.isCorrect ? 
-                        '<span style="color: #27ae60;">✓ 回答正确</span>' : 
-                        '<span style="color: #e74c3c;">✗ 回答错误</span>'}
-                </div>
-                <div style="margin-bottom: 5px;">你的答案：${result.userAnswer}</div>
-                ${!result.isCorrect ? `<div style="margin-bottom: 5px;">正确答案：${result.correctAnswer}</div>` : ''}
-                <div style="margin-top: 10px; color: #666;">
-                    <strong>解析：</strong>${result.explanation}
-                </div>
-            </div>
-        `;
-    });
+测试信息：
+- 总题数: ${window.questions.length}
+- 正确数: ${correctCount}
+- 正确率: ${scorePercentage.toFixed(1)}%
 
-    evaluationContent += '</div>';
+题目详情：
+${questionResults.map(result => 
+    `${result.questionNumber}. ${result.questionText} - ${result.isCorrect ? '正确' : '错误'} (我的答案: ${result.userAnswer}, 正确答案: ${result.correctAnswer})`
+).join('\n')}
 
-    // Show the evaluation modal with the content
-    showEvaluationModal(evaluationContent);
+请提供以下内容：
+1. 对我的表现的总体评价
+2. 我的优势和不足
+3. 针对性的学习建议
+4. 如何提高我的弱项
+5. 下一步学习计划建议
+
+请用鼓励的语气，并给出具体、实用的建议。
+`;
+
+    // Show loading state in the modal
+    showEvaluationModal('加载中...');
+    
+    // Call API to get evaluation
+    fetchAIResponse(prompt)
+        .then(response => {
+            const content = extractContentFromResponse(response);
+            showEvaluationModal(content);
+        })
+        .catch(error => {
+            console.error('Error fetching evaluation:', error);
+            showEvaluationModal('获取评估时出错，请重试。');
+        });
 }
 
 // Function to show evaluation modal
