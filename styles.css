@@ -1850,6 +1850,9 @@ button:active {
     height: 100%;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .vocabulary-card-container {
@@ -1860,7 +1863,8 @@ button:active {
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: relative;
-    padding-bottom: 80px; /* Add padding to prevent content from being hidden behind navigation */
+    padding-bottom: 80px;
+    width: 100%;
 }
 
 .vocabulary-header {
@@ -1911,7 +1915,7 @@ button:active {
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
     padding: 35px 40px;
     width: 100%;
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
     min-height: 500px;
     transition: transform 0.4s ease, box-shadow 0.4s ease;
@@ -2348,5 +2352,58 @@ button:active {
         padding: 15px 20px;
         gap: 20px;
         min-width: 250px;
+    }
+}
+
+/* Improve layout for wider screens */
+@media (min-width: 1200px) {
+    .word-meanings {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        margin-bottom: 25px;
+    }
+
+    .word-relationships {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+
+    .synonyms, .antonyms {
+        width: 100%;
+    }
+
+    .related-phrases {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+/* Adjust for medium screens */
+@media (min-width: 768px) and (max-width: 1199px) {
+    .vocabulary-container {
+        max-width: 1000px;
+    }
+
+    .word-card {
+        max-width: 900px;
+    }
+}
+
+/* Adjust for mobile screens */
+@media (max-width: 767px) {
+    .vocabulary-container {
+        padding: 10px;
+    }
+
+    .word-card {
+        padding: 20px;
+    }
+
+    .word-meanings, .word-relationships, .related-phrases {
+        display: flex;
+        flex-direction: column;
     }
 } 
