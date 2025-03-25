@@ -154,9 +154,13 @@ body {
 }
 
 .sidebar-slogan {
-    margin-bottom: 15px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 15px 10px 20px 10px;
+    padding: 15px 8px;
+    border-radius: 6px;
+    background-color: var(--primary-color);
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .sidebar-slogan p {
@@ -169,7 +173,7 @@ body {
     color: rgba(255, 255, 255, 0.9);
     font-weight: 500;
     font-style: italic;
-    margin-bottom: 3px;
+    margin-bottom: 5px;
 }
 
 .sidebar-slogan p:last-child {
