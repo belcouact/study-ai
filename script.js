@@ -1021,34 +1021,39 @@ function formatMathExpressions(text) {
 
 // Global function to update navigation buttons
 function updateNavigationButtons() {
+    console.log('updateNavigationButtons called', currentQuestionIndex, window.questions ? window.questions.length : 0);
+    
     const prevButton = document.getElementById('prev-question-button');
     const nextButton = document.getElementById('next-question-button');
-    const questionCounter = document.getElementById('question-counter');
     
+    if (prevButton) {
+        prevButton.disabled = !window.questions || currentQuestionIndex <= 0;
+    }
+    
+    if (nextButton) {
+        nextButton.disabled = !window.questions || currentQuestionIndex >= window.questions.length - 1;
+    }
+
+    // Update navigation buttons for mobile
     if (prevButton && nextButton) {
-        // Add icons to navigation buttons
-        prevButton.innerHTML = `
-            <i class="fas fa-chevron-left"></i>
-            <span>上一题</span>
+        const buttonStyle = `
+            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            border-radius: 8px;
+            margin: clamp(5px, 2vw, 10px);
         `;
-        nextButton.innerHTML = `
-            <span>下一题</span>
-            <i class="fas fa-chevron-right"></i>
-        `;
+        prevButton.style.cssText += buttonStyle;
+        nextButton.style.cssText += buttonStyle;
+    }
+    
+    // Check if all questions are answered and display completion status
+    if (window.userAnswers && window.questions) {
+        const allQuestionsAnswered = window.userAnswers.length === window.questions.length && 
+                                   window.userAnswers.every(answer => answer !== null);
         
-        prevButton.addEventListener('click', () => {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                displayCurrentQuestion();
-            }
-        });
-        
-        nextButton.addEventListener('click', () => {
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
-                displayCurrentQuestion();
-            }
-        });
+        if (allQuestionsAnswered) {
+            displayCompletionStatus();
+        }
     }
 }
 
@@ -1950,63 +1955,118 @@ function hideLoadingIndicator() {
 
 // Function to set up navigation button event listeners
 function setupNavigationButtons() {
+    console.log('Setting up navigation buttons');
+    
     const prevButton = document.getElementById('prev-question-button');
     const nextButton = document.getElementById('next-question-button');
     
-    if (prevButton && nextButton) {
-        // Add icons to navigation buttons
-        prevButton.innerHTML = `
-            <i class="fas fa-chevron-left"></i>
-            <span>上一题</span>
-        `;
-        nextButton.innerHTML = `
-            <span>下一题</span>
-            <i class="fas fa-chevron-right"></i>
+    // Create navigation controls if they don't exist
+    let navigationControls = document.querySelector('.navigation-controls');
+    if (!navigationControls) {
+        navigationControls = document.createElement('div');
+        navigationControls.className = 'navigation-controls';
+        navigationControls.style.cssText = `
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 10px;
         `;
         
-        prevButton.addEventListener('click', () => {
+        const questionsContainer = document.querySelector('.questions-container');
+        if (questionsContainer) {
+            questionsContainer.appendChild(navigationControls);
+        }
+    }
+    
+    // Create prev button if it doesn't exist
+    if (!prevButton) {
+        const newPrevButton = document.createElement('button');
+        newPrevButton.id = 'prev-question-button';
+        newPrevButton.className = 'nav-button';
+        newPrevButton.innerHTML = '&larr; 上一题';
+        newPrevButton.style.cssText = `
+            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            border-radius: 8px;
+            margin: clamp(5px, 2vw, 10px);
+            background-color: #edf2f7;
+            color: #4a5568;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        `;
+        
+        newPrevButton.addEventListener('click', function() {
             if (currentQuestionIndex > 0) {
                 currentQuestionIndex--;
                 displayCurrentQuestion();
+                updateNavigationButtons();
             }
         });
         
-        nextButton.addEventListener('click', () => {
-            if (currentQuestionIndex < questions.length - 1) {
+        navigationControls.appendChild(newPrevButton);
+    } else {
+        // Remove any existing event listeners
+        const newPrevButton = prevButton.cloneNode(true);
+        prevButton.parentNode.replaceChild(newPrevButton, prevButton);
+        
+        // Add new event listener
+        newPrevButton.addEventListener('click', function() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+    }
+    
+    // Create next button if it doesn't exist
+    if (!nextButton) {
+        const newNextButton = document.createElement('button');
+        newNextButton.id = 'next-question-button';
+        newNextButton.className = 'nav-button';
+        newNextButton.innerHTML = '下一题 &rarr;';
+        newNextButton.style.cssText = `
+            padding: clamp(8px, 3vw, 12px) clamp(15px, 4vw, 25px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            border-radius: 8px;
+            margin: clamp(5px, 2vw, 10px);
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        `;
+        
+        newNextButton.addEventListener('click', function() {
+            if (window.questions && currentQuestionIndex < window.questions.length - 1) {
                 currentQuestionIndex++;
                 displayCurrentQuestion();
+                updateNavigationButtons();
+            }
+        });
+        
+        navigationControls.appendChild(newNextButton);
+    } else {
+        // Remove any existing event listeners
+        const newNextButton = nextButton.cloneNode(true);
+        nextButton.parentNode.replaceChild(newNextButton, nextButton);
+        
+        // Add new event listener
+        newNextButton.addEventListener('click', function() {
+            if (window.questions && currentQuestionIndex < window.questions.length - 1) {
+                currentQuestionIndex++;
+                displayCurrentQuestion();
+                updateNavigationButtons();
             }
         });
     }
-}
-
-function updateNavigationButtons() {
-    const prevButton = document.getElementById('prev-question-button');
-    const nextButton = document.getElementById('next-question-button');
-    const questionCounter = document.getElementById('question-counter');
     
-    if (prevButton && nextButton) {
-        prevButton.disabled = currentQuestionIndex === 0;
-        nextButton.disabled = currentQuestionIndex >= questions.length - 1;
-        
-        // Update question counter with enhanced display
-        if (questionCounter && questions) {
-            const totalQuestions = questions.length;
-            const currentNumber = currentQuestionIndex + 1;
-            questionCounter.innerHTML = `
-                <span class="current">${String(currentNumber).padStart(2, '0')}</span>
-                <span class="separator">/</span>
-                <span class="total">${String(totalQuestions).padStart(2, '0')}</span>
-            `;
-            
-            // Add the counter to the navigation controls
-            const navigationControls = document.querySelector('.navigation-controls');
-            if (navigationControls && !navigationControls.contains(questionCounter)) {
-                // Insert counter between the navigation buttons
-                navigationControls.insertBefore(questionCounter, nextButton);
-            }
-        }
-    }
+    // Update button states
+    updateNavigationButtons();
 }
 
 // Function to set up option selection buttons
