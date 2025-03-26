@@ -5492,7 +5492,6 @@ document.addEventListener('DOMContentLoaded', function() {
             2. 难度要求：选择难度${complexityLevel}、词汇量${vocabularyLevel}的诗词,${examplePoems}
             3. 内容要求：主题积极向上，意境清晰，适合${school}${grade}学生理解和背诵
             4. 教育价值：具有明确的情感表达和思想内涵，能够引发学生共鸣
-            5. 类型匹配：所选诗词曲的类型和风格必须匹配学生的需求
             
             解释和赏析要求：
             - 解释要${explanationDetail}，使用适合${school}${grade}学生理解的语言
