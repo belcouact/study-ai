@@ -2469,4 +2469,37 @@ button:active {
         display: flex;
         flex-direction: column;
     }
+}
+
+.word-forms {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.word-form-item {
+    background-color: #f8fafc;
+    padding: 10px 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-label {
+    color: #64748b;
+    font-size: 14px;
+    min-width: 60px;
+}
+
+.form-value {
+    color: #334155;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .word-forms {
+        grid-template-columns: 1fr;
+    }
 } 
