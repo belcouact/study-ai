@@ -5439,7 +5439,42 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             // Determine appropriate complexity level based on educational background
-            // Get style prompt
+            let complexityLevel = "简单";
+            let vocabularyLevel = "基础";
+            let explanationDetail = "详细";
+            let examplePoems = "";
+            let wordCount = "20-40字";
+            
+            // Adjust complexity based on school level
+            if (school === "小学") {
+                if (parseInt(grade) <= 3) {
+                    complexityLevel = "非常简单";
+                    vocabularyLevel = "最基础";
+                    explanationDetail = "非常详细且通俗易懂";
+                    wordCount = "20-30字";
+                    examplePoems = "如《静夜思》《春晓》《悯农》等简短易懂的诗";
+                } else {
+                    complexityLevel = "简单";
+                    vocabularyLevel = "基础";
+                    explanationDetail = "详细且通俗易懂";
+                    wordCount = "30-40字";
+                    examplePoems = "如《登鹳雀楼》《游子吟》《咏柳》等小学课本中的经典诗";
+                }
+            } else if (school === "初中") {
+                complexityLevel = "中等";
+                vocabularyLevel = "适中";
+                explanationDetail = "较详细";
+                wordCount = "40-60字";
+                examplePoems = "如《望岳》《送元二使安西》《茅屋为秋风所破歌》等初中课本中的经典诗";
+            } else if (school === "高中") {
+                complexityLevel = "适当";
+                vocabularyLevel = "丰富";
+                explanationDetail = "深入";
+                wordCount = "不限";
+                examplePoems = "如《蜀相》《琵琶行》《念奴娇·赤壁怀古》等高中课本中的经典诗";
+            }
+            
+            // Modify the prompt to handle "任意" style
             let stylePrompt = '';
             if (poetryStyle === '任意') {
                 stylePrompt = `风格不限`;
@@ -5447,70 +5482,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 stylePrompt = `风格为${poetryStyle}`;
             }
             
-            // Define difficulty levels and educational guidance based on school level and grade
-            let difficultyLevel, vocabularyLevel, lengthGuidance, contentGuidance;
-            
-            // Determine appropriate difficulty and content parameters based on education background
-            if (school === '小学') {
-                if (grade <= 2) {
-                    difficultyLevel = "非常简单";
-                    vocabularyLevel = "最基础";
-                    lengthGuidance = "短小精悍，以四句或八句为主";
-                    contentGuidance = "以描写自然、家庭、友情、动物等简单题材为主，避免复杂典故和深奥意境";
-                } else if (grade <= 4) {
-                    difficultyLevel = "简单";
-                    vocabularyLevel = "基础";
-                    lengthGuidance = "以短诗为主，不超过十二句";
-                    contentGuidance = "以描写自然、季节、学校生活等熟悉题材为主，可包含简单的人生哲理";
-                } else {
-                    difficultyLevel = "初级";
-                    vocabularyLevel = "基础偏中等";
-                    lengthGuidance = "控制在十六句以内";
-                    contentGuidance = "可包含一些简单的人生哲理和历史背景，避免晦涩难懂的典故";
-                }
-            } else if (school === '初中') {
-                if (grade == 1) {
-                    difficultyLevel = "中等偏简单";
-                    vocabularyLevel = "中等";
-                    lengthGuidance = "长度适中";
-                    contentGuidance = "可包含较为常见的历史背景和文化典故，但需附带解释";
-                } else {
-                    difficultyLevel = "中等";
-                    vocabularyLevel = "适中";
-                    lengthGuidance = "长度不限";
-                    contentGuidance = "可包含一定的历史背景、人文思想和常见的文化典故";
-                }
-            } else if (school === '高中') {
-                if (grade == 1) {
-                    difficultyLevel = "中等偏难";
-                    vocabularyLevel = "适中偏丰富";
-                    lengthGuidance = "长度不限";
-                    contentGuidance = "可包含较深的历史背景、人文思想和文化典故，适当涉及人生哲理和社会思考";
-                } else {
-                    difficultyLevel = "较难";
-                    vocabularyLevel = "丰富";
-                    lengthGuidance = "长度不限";
-                    contentGuidance = "可包含深刻的历史背景、人文思想和丰富的文化典故，涉及复杂的社会现象和人生哲理";
-                }
-            }
-            
             // Prepare the prompt for the API - specifically requesting famous ancient poems
             // with consideration for the student's educational level
-            const prompt = `请为${school}${grade}的学生推荐${poetryQty}首适合其学习阶段的古代${poetryType}，${stylePrompt}。
-
-请根据学生的教育背景，严格遵循以下要求：
-1. 难度要求：选择难度${difficultyLevel}、词汇量${vocabularyLevel}的诗词
-2. 内容指导：${contentGuidance}
-3. 篇幅要求：${lengthGuidance}
-4. 教材匹配：优先选择${school}${grade}教材中出现或与教学大纲匹配的作品
-5. 著名程度：选择具有代表性的知名作品，不要生成虚构的诗词
-
-对于每首诗词，请提供以下内容：
-- 标题和作者
-- 原文（完整）
-- 注释（解释难懂字词和典故，针对${school}${grade}学生的认知水平）
-- 译文（现代汉语，适合${school}${grade}学生理解的难度）
-- 教育价值（简述该诗词为什么适合${school}${grade}学生学习，如何引导学生理解和欣赏）
+            const prompt = `请为${school}${grade}的学生推荐${poetryQty}首著名的古代${poetryType}，${stylePrompt}。
+            请选择中国文学史上最著名、最经典的作品，这些作品应该是真实存在的古代诗词，不要创作新的内容。
+            
+            【重要】这些诗词必须严格符合${school}${grade}学生的认知水平和学习需求：
+            1. 诗词长度：优先选择${wordCount}左右的诗词
+            2. 难度要求：选择难度${complexityLevel}、词汇量${vocabularyLevel}的诗词,${examplePoems}
+            3. 内容要求：主题积极向上，意境清晰，适合${school}${grade}学生理解和背诵
+            4. 教育价值：具有明确的情感表达和思想内涵，能够引发学生共鸣
             
             解释和赏析要求：
             - 解释要${explanationDetail}，使用适合${school}${grade}学生理解的语言
