@@ -827,27 +827,28 @@ button:active {
     }
 }
 
-/* Navigation controls */
+/* Navigation controls - shared style for all pages */
 .navigation-controls {
     position: fixed;
     bottom: 20px;
     left: calc(50% + (var(--sidebar-width) / 2));
     transform: translateX(-50%);
-    background: var(--card-bg);
+    background: linear-gradient(145deg, var(--card-bg), #f8fafc);
     padding: 15px 30px;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 30px;
-    border-top: 1px solid var(--border-color);
     margin-top: 20px;
     z-index: 100;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
     width: 90%;
     max-width: 600px;
     min-width: 300px;
-    transition: left var(--transition-speed) ease;
+    transition: all var(--transition-speed) ease;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
 }
 
 /* When sidebar is hidden, adjust the navigation controls position */
@@ -855,30 +856,80 @@ button:active {
     left: 50%;
 }
 
-.navigation-controls:hover {
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
-
+/* Nav buttons styling */
+.navigation-controls button,
 .nav-button {
-    padding: 10px 20px;
-    background-color: #4299e1;
-    color: white;
+    background: white;
+    color: var(--primary-color);
     border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    padding: 10px 20px;
+    border-radius: 12px;
     font-size: 16px;
     font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
+.navigation-controls button:hover:not(:disabled),
+.nav-button:hover:not(:disabled) {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.navigation-controls button:active:not(:disabled),
+.nav-button:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navigation-controls button:disabled,
 .nav-button:disabled {
-    background-color: #cbd5e0;
+    background: #f1f5f9;
+    color: #cbd5e1;
     cursor: not-allowed;
+    box-shadow: none;
 }
 
-.nav-button:not(:disabled):hover {
-    background-color: #3182ce;
-    transform: translateY(-1px);
+/* Counter styling */
+#question-counter,
+#word-counter {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-color-muted);
+    background: rgba(255, 255, 255, 0.7);
+    padding: 8px 16px;
+    border-radius: 10px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navigation-controls {
+        width: 95%;
+        padding: 12px 20px;
+        gap: 20px;
+        min-width: 250px;
+    }
+    
+    .navigation-controls button,
+    .nav-button {
+        padding: 8px 16px;
+        font-size: 14px;
+        min-width: 40px;
+    }
+    
+    #question-counter,
+    #word-counter {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
 }
 
 /* Empty state styling */
@@ -2333,28 +2384,6 @@ button:active {
 
 .error-message {
     color: #dc3545;
-}
-
-.navigation-controls {
-    position: fixed;
-    bottom: 20px;
-    left: calc(50% + (var(--sidebar-width) / 2));
-    transform: translateX(-50%);
-    background: var(--card-bg);
-    padding: 15px 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
-    border-top: 1px solid var(--border-color);
-    margin-top: 20px;
-    z-index: 100;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    border-radius: 12px;
-    width: 90%;
-    max-width: 600px;
-    min-width: 300px;
-    transition: left var(--transition-speed) ease;
 }
 
 #vocabulary-container {
