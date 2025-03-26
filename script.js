@@ -851,8 +851,15 @@ function displayCurrentQuestion() {
             answerResult.textContent = isCorrect ? '✓ 回答正确！' : '✗ 回答错误！';
             answerResult.style.color = isCorrect ? '#27ae60' : '#e74c3c';
             
-            // Display the explanation
+            // Display the explanation with proper math formatting
             answerExplanation.innerHTML = formatMathExpressions(currentQuestion.explanation);
+            
+            // Render math expressions in the answer explanation
+            if (window.MathJax) {
+                window.MathJax.typesetPromise([answerExplanation]).catch(err => {
+                    console.error('MathJax error:', err);
+                });
+            }
             
             // Disable all radio buttons for this question
             const radioButtons = document.querySelectorAll('input[type="radio"]');
@@ -998,26 +1005,16 @@ function formatMathExpressions(text) {
     if (text.includes('\\(') && text.includes('\\)')) {
         return text;
     }
+
+    // Replace $...$ with \(...\) for inline math
+    text = text.replace(/\$([^$]+)\$/g, '\\($1\\)');
     
-    // Replace LaTeX-style expressions with proper LaTeX delimiters
-    // This handles expressions like \( g' = \frac{GM}{(R+h)^2} \)
-    text = text.replace(/\\\( (.*?) \\\)/g, '\\($1\\)');
+    // Replace $$...$$ with \[...\] for display math
+    text = text.replace(/\$\$([^$]+)\$\$/g, '\\[$1\\]');
     
-    // Replace simple math expressions with LaTeX
-    text = text.replace(/\b(\d+[+\-*/]\d+)\b/g, '\\($1\\)');
-    
-    // Replace fractions written as a/b
-    text = text.replace(/(\d+)\/(\d+)/g, '\\(\\frac{$1}{$2}\\)');
-    
-    // Replace powers written as a^b
-    text = text.replace(/(\d+)\^(\d+)/g, '\\($1^{$2}\\)');
-    
-    // Replace square roots
-    text = text.replace(/sqrt\(([^)]+)\)/g, '\\(\\sqrt{$1}\\)');
-    
-    // Replace existing LaTeX delimiters
-    text = text.replace(/\$\$(.*?)\$\$/g, '\\[$1\\]');
-    text = text.replace(/\$(.*?)\$/g, '\\($1\\)');
+    // Add proper spacing around math expressions
+    text = text.replace(/\\(\(|\[)/g, ' \\$1');
+    text = text.replace(/\\(\)|\])/g, '\\$1 ');
     
     return text;
 }
