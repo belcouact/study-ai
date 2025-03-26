@@ -5490,9 +5490,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             【重要】这些诗词必须严格符合${school}${grade}学生的认知水平和学习需求：
             1. 诗词长度：优先选择${wordCount}左右的诗词
-            2. 难度要求：选择难度${complexityLevel}、词汇量${vocabularyLevel}的诗词,${examplePoems}
+            2. 难度要求：选择难度${complexityLevel}、词汇量${vocabularyLevel}的诗词
             3. 内容要求：主题积极向上，意境清晰，适合${school}${grade}学生理解和背诵
             4. 教育价值：具有明确的情感表达和思想内涵，能够引发学生共鸣
+            5. 类型匹配：所选诗词曲的类型和风格必须匹配学生的需求
             
             解释和赏析要求：
             - 解释要${explanationDetail}，使用适合${school}${grade}学生理解的语言
@@ -5999,7 +6000,8 @@ Please format your response as a valid JSON array with objects having the follow
     "part_of_speech": "noun",
     "pronunciation": "/ɪɡˈzæm.pəl/",
     "definition": "A clear English definition",
-    "chinese_translation": "中文翻译","中文翻译","中文翻译"
+    "chinese_translation": "中文翻译","中文翻译","中文翻译",
+    "词形变化": "examplify"， "v", "举例", "是...的典范",
     "related_phrases": [
       {
         "english": "example phrase",
@@ -6017,10 +6019,11 @@ Please format your response as a valid JSON array with objects having the follow
 Requirements:
 1. Choose vocabulary appropriate for ${grade} grade ${school} school students
 2. Include 2-3 related phrases (词组) for each word
-3. Include two example sentences for each word
-4. Provide both English and Chinese translations for all content
-5. Keep the JSON structure simple and valid
-6. Do not include any text outside the JSON array`;
+3. Include 2-3 related word transformations (词性变化) for each word
+4. Include two example sentences for each word
+5. Provide both English and Chinese translations for all content
+6. Keep the JSON structure simple and valid
+7. Do not include any text outside the JSON array`;
         
         // Use the existing fetchAIResponse function
         const response = await fetchAIResponse(prompt);
