@@ -63,7 +63,8 @@ export async function onRequestPost(context) {
           "Authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: "deepseek-chat",
+          //model: "deepseek-chat",
+          model: env.MODEL,
           messages: body.messages,
           max_tokens: parseInt(env.MAX_TOKENS || "4096"),
           temperature: parseFloat(env.TEMPERATURE || "0.7")
