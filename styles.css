@@ -775,7 +775,7 @@ button:active {
 .navigation-controls {
     position: fixed;
     bottom: 20px;
-    left: 50%;
+    left: calc(50% + (var(--sidebar-width) / 2));
     transform: translateX(-50%);
     background: var(--card-bg);
     padding: 15px 30px;
@@ -791,6 +791,12 @@ button:active {
     width: 90%;
     max-width: 600px;
     min-width: 300px;
+    transition: left var(--transition-speed) ease;
+}
+
+/* When sidebar is hidden, adjust the navigation controls position */
+.left-panel.hidden ~ .content-area .navigation-controls {
+    left: 50%;
 }
 
 .navigation-controls:hover {
@@ -2276,7 +2282,7 @@ button:active {
 .navigation-controls {
     position: fixed;
     bottom: 20px;
-    left: 50%;
+    left: calc(50% + (var(--sidebar-width) / 2));
     transform: translateX(-50%);
     background: var(--card-bg);
     padding: 15px 30px;
@@ -2292,6 +2298,7 @@ button:active {
     width: 90%;
     max-width: 600px;
     min-width: 300px;
+    transition: left var(--transition-speed) ease;
 }
 
 #vocabulary-container {
