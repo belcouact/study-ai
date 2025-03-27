@@ -6468,7 +6468,7 @@ function renderWordFamily(wordFamily) {
             <div class="word-family-items">
                 ${wordFamily.map(item => `
                     <span class="word-family-item" title="${item.translation || ''}">
-                        ${item.type ? `<strong>${item.type}:</strong> ` : ''}${item.word}
+                        ${item.word ? `<strong>${item.word}:</strong> ` : ''}${item.translation}
                     </span>
                 `).join('')}
             </div>
