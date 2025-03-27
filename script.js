@@ -5943,6 +5943,7 @@ async function handleLoadVocabularyClick() {
         // Display words
         if (words && words.length > 0) {
             vocabularyWords = words;
+            console.log('Vocabulary words:', vocabularyWords);
             currentWordIndex = 0;
             
             // Display the first word
