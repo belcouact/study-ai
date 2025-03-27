@@ -1679,7 +1679,7 @@ button:active {
     justify-content: space-between;
     margin-top: 20px;
     padding: 15px;
-    background: white;
+    background: rgb(108, 103, 103);
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease;
