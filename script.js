@@ -6008,8 +6008,8 @@ Please format your response as a valid JSON array with objects having the follow
     "chinese_translation": "中文翻译",
     "word_family": [
       {
-        "examplify": "v, 举例说明",
-        "examplary": "adj, 可作榜样的",
+        "english": "examplary",
+        "chinese": "adj, 可作榜样的",
       }
     ],
     "related_phrases": [
