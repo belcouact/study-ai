@@ -3766,6 +3766,7 @@ function init() {
     setupEventListeners();
     
     // Populate sidebar options based on selected school
+    const schoolSelectSidebar = document.getElementById('school-select-sidebar');
     const selectedSchool = schoolSelectSidebar.value;
     if (selectedSchool) {
         populateSidebarGradeOptions(selectedSchool);
