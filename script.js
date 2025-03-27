@@ -6285,6 +6285,7 @@ function processWordFamily(word) {
     }
     
     return wordFamilyItems;
+    console.log(wordFamilyItems);
 }
 
 // Process collocations from various formats
