@@ -3779,8 +3779,12 @@ function init() {
         poetryButton.addEventListener('click', function() {
             console.log('Poetry button clicked directly');
             // Hide all panels
-            document.getElementById('qa-panel').classList.add('hidden');
-            document.getElementById('create-panel').classList.add('hidden');
+            const qaPanel = document.getElementById('qa-panel');
+            const createPanel = document.getElementById('create-panel');
+            
+            // Add null checks before accessing classList
+            if (qaPanel) qaPanel.classList.add('hidden');
+            if (createPanel) createPanel.classList.add('hidden');
             
             // Show poetry panel
             const poetryPanel = document.getElementById('poetry-panel');
@@ -3791,9 +3795,12 @@ function init() {
                 console.error('Poetry panel element not found');
             }
             
-            // Update active states
-            document.getElementById('qa-button').classList.remove('active');
-            document.getElementById('create-button').classList.remove('active');
+            // Update active states with null checks
+            const qaButton = document.getElementById('qa-button');
+            const createButton = document.getElementById('create-button');
+            
+            if (qaButton) qaButton.classList.remove('active');
+            if (createButton) createButton.classList.remove('active');
             poetryButton.classList.add('active');
         });
     } else {
@@ -3821,25 +3828,27 @@ function switchPanel(panelId) {
     if (createPanel) createPanel.classList.add('hidden');
     if (poetryPanel) poetryPanel.classList.add('hidden');
     
+    // Get all buttons
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const poetryButton = document.getElementById('poetry-button');
+    
     // Show the selected panel
-    if (panelId === 'qa-panel' && qaPanel) {
+    if (panelId === 'qa' && qaPanel) {
         qaPanel.classList.remove('hidden');
-        document.getElementById('qa-button').classList.add('active');
-        document.getElementById('create-button').classList.remove('active');
-        const poetryButton = document.getElementById('poetry-button');
+        if (qaButton) qaButton.classList.add('active');
+        if (createButton) createButton.classList.remove('active');
         if (poetryButton) poetryButton.classList.remove('active');
-    } else if (panelId === 'create-panel' && createPanel) {
+    } else if (panelId === 'create' && createPanel) {
         createPanel.classList.remove('hidden');
-        document.getElementById('create-button').classList.add('active');
-        document.getElementById('qa-button').classList.remove('active');
-        const poetryButton = document.getElementById('poetry-button');
+        if (createButton) createButton.classList.add('active');
+        if (qaButton) qaButton.classList.remove('active');
         if (poetryButton) poetryButton.classList.remove('active');
-    } else if (panelId === 'poetry-panel' && poetryPanel) {
+    } else if (panelId === 'poetry' && poetryPanel) {
         poetryPanel.classList.remove('hidden');
-        const poetryButton = document.getElementById('poetry-button');
         if (poetryButton) poetryButton.classList.add('active');
-        document.getElementById('qa-button').classList.remove('active');
-        document.getElementById('create-button').classList.remove('active');
+        if (qaButton) qaButton.classList.remove('active');
+        if (createButton) createButton.classList.remove('active');
         console.log('Poetry panel is now visible via switchPanel');
     }
 }
@@ -3944,27 +3953,8 @@ document.addEventListener('DOMContentLoaded', function() {
         poetryButton.addEventListener('click', function(event) {
             console.log('Poetry button clicked (direct handler)');
             
-            // Get the poetry panel again in case it was just created
-            const poetryPanel = document.getElementById('poetry-panel');
-            
-            // Hide other panels
-            if (qaPanel) qaPanel.classList.add('hidden');
-            if (createPanel) createPanel.classList.add('hidden');
-            
-            // Show poetry panel
-            /*
-            if (poetryPanel) {
-                poetryPanel.classList.remove('hidden');
-                console.log('Poetry panel is now visible');
-            } else {
-                console.error('Poetry panel not found');
-            }
-            */
-            
-            // Update active states
-            if (qaButton) qaButton.classList.remove('active');
-            if (createButton) createButton.classList.remove('active');
-            poetryButton.classList.add('active');
+            // Use the common switchPanel function for consistency
+            switchPanel('poetry');
             
             // Initialize poetry type and style dropdowns
             initializePoetryDropdowns();
@@ -3987,7 +3977,60 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Initialize style options based on current type
             updatePoetryStyleOptions(poetryTypeSelect.value);
+        } else {
+            console.log('Poetry selects not found');
         }
+    }
+    
+    // Update poetry style options based on selected type
+    function updatePoetryStyleOptions(poetryType) {
+        const poetryStyleSelect = document.getElementById('poetry-style');
+        if (!poetryStyleSelect) return;
+        
+        // Clear existing options
+        poetryStyleSelect.innerHTML = '';
+        
+        // Add options based on type
+        let options = [];
+        
+        switch(poetryType) {
+            case '唐诗':
+                options = [
+                    { value: '山水', text: '山水' },
+                    { value: '边塞', text: '边塞' },
+                    { value: '田园', text: '田园' },
+                    { value: '送别', text: '送别' }
+                ];
+                break;
+            case '宋词':
+                options = [
+                    { value: '婉约', text: '婉约' },
+                    { value: '豪放', text: '豪放' },
+                    { value: '爱情', text: '爱情' },
+                    { value: '怀古', text: '怀古' }
+                ];
+                break;
+            case '元曲':
+                options = [
+                    { value: '浪漫', text: '浪漫' },
+                    { value: '现实', text: '现实' },
+                    { value: '爱情', text: '爱情' }
+                ];
+                break;
+            default:
+                options = [
+                    { value: '山水', text: '山水' },
+                    { value: '浪漫', text: '浪漫' }
+                ];
+        }
+        
+        // Add options to select
+        options.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option.value;
+            optionElement.textContent = option.text;
+            poetryStyleSelect.appendChild(optionElement);
+        });
     }
     
     // Add event listener to Learn Poetry button
@@ -3996,15 +4039,27 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Learn poetry button clicked via delegation');
             
             // Get selected values
-            const poetryTypeSelect = document.getElementById('poetry-type-select');
-            const poetryStyleSelect = document.getElementById('poetry-style-select');
-            const poetryQtySelect = document.getElementById('poetry-qty-select');
+            const poetryTypeSelect = document.getElementById('poetry-type');
+            const poetryStyleSelect = document.getElementById('poetry-style');
+            const poetryQtySelect = document.getElementById('poetry-qty');
+            
             const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
             const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
-            const poetryQty = poetryQtySelect ? poetryQtySelect.value : '10';
+            const poetryQty = poetryQtySelect ? poetryQtySelect.value : '5';
             
-            // Call the API function directly - no mock data
-            handleLearnPoetryClick();
+            // Show loading state
+            const poetryEmptyState = document.getElementById('poetry-empty-state');
+            const poetryDisplay = document.getElementById('poetry-display');
+            
+            if (poetryEmptyState) poetryEmptyState.classList.add('hidden');
+            if (poetryDisplay) {
+                poetryDisplay.classList.remove('hidden');
+                // Add loading indicator if needed
+            }
+            
+            // Here you would call your API to get poetry content
+            console.log('Fetching poetry with:', { poetryType, poetryStyle, poetryQty });
+            // fetchPoetry(poetryType, poetryStyle, poetryQty);
         }
     });
 
