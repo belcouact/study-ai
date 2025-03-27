@@ -6464,19 +6464,6 @@ function renderWordFamily(wordFamily) {
 
     return `
         <div class="word-family">
-            <h3 class="section-title">相关词族</h3>
-            ${wordFamily.map(item => `
-                <div class="item-item">
-                    <div class="item-english">${item.english}</div>
-                    ${item.chinese ? `<div class="item-chinese">${item.chinese}</div>` : ''}
-                </div>
-            `).join('')}
-        </div>
-    `;
-
-    /*
-    return `
-        <div class="word-family">
             <h3 class="section-title">词族</h3>
             <div class="word-family-items">
                 ${wordFamily.map(item => `
@@ -6487,7 +6474,7 @@ function renderWordFamily(wordFamily) {
             </div>
         </div>
     `;
-    */
+
 }
 
 // Render collocations section
