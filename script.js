@@ -6006,7 +6006,7 @@ Please format your response as a valid JSON array with objects having the follow
     "pronunciation": "-ɪɡˈzæm.pəl-",
     "definition": "A clear English definition",
     "chinese_translation": "中文翻译",
-    "word family": [
+    "word_family": [
       {
         "english": "example word, adjective",
         "chinese": "变形词",
