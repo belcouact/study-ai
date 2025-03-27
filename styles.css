@@ -607,26 +607,98 @@ button:active {
 .math-inline {
     display: inline-block;
     margin: 0 0.2em;
+    vertical-align: middle;
+    font-size: 1.1em;
 }
 
 .math-display {
     display: block;
-    margin: 1em 0;
+    margin: 1.2em 0;
     text-align: center;
+    overflow-x: auto;
+    padding: 0.5em 0;
 }
 
+/* Add math styles for question sections */
+.question-text .math-inline,
+.choice-item .math-inline,
+.answer-explanation .math-inline {
+    font-size: 1.1em;
+    color: inherit;
+    padding: 0 0.2em;
+}
+
+.question-text .math-display,
+.choice-item .math-display,
+.answer-explanation .math-display {
+    margin: 1em 0;
+    padding: 0.8em 0;
+    background-color: rgba(248, 250, 252, 0.5);
+    border-radius: 6px;
+}
+
+/* Ensure proper alignment in choices */
+.choice-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding: 1rem 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.choice-item label {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    width: 100%;
+}
+
+/* Improve MathJax container styles */
 .MathJax {
     overflow-x: auto;
     max-width: 100%;
+    padding: 0.1em 0;
+    font-size: 1.1em !important;
 }
 
-.math-code {
-    display: block;
-    margin: 1em 0;
-    padding: 1em;
-    background-color: #f8f9fa;
-    border-radius: 4px;
+.MathJax_Display {
     overflow-x: auto;
+    max-width: 100%;
+    margin: 0.8em 0 !important;
+}
+
+/* Add scrollbar styling for overflow math content */
+.math-display::-webkit-scrollbar {
+    height: 6px;
+}
+
+.math-display::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.math-display::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+.math-display::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* Ensure proper spacing around math in explanations */
+.answer-explanation p {
+    margin: 0.8em 0;
+}
+
+.answer-explanation .math-display {
+    margin: 1.2em 0;
+    background-color: #f8fafc;
+    padding: 1em;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* Question form styles */
