@@ -4283,46 +4283,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-/*
-    // Update poetry style options based on selected type
-    function updatePoetryStyleOptions(poetryType) {
-        console.log('Updating poetry style options for type:', poetryType);
-        console.log('loading updatePoetryStyleOptions function from line 4870');
-        
-        const poetryStyleSelect = document.getElementById('poetry-style');
-        if (!poetryStyleSelect) {
-            console.error('Poetry style select element not found');
-            return;
-        }
-        
-        // Clear existing options
-        while (poetryStyleSelect.options.length > 0) {
-            poetryStyleSelect.remove(0);
-        }
-        
-        // Add new options based on selected type
-        let styles = [];
-        
-        if (poetryType === '唐诗') {
-            styles = ['山水', '边塞', '浪漫', '现实'];
-        } else if (poetryType === '宋词') {
-            styles = ['婉约', '豪放'];
-        } else if (poetryType === '元曲') {
-            styles = ['杂居', '散曲'];
-        }
-        
-        // Add options to select
-        styles.forEach(style => {
-            const option = document.createElement('option');
-            option.value = style;
-            option.textContent = style;
-            poetryStyleSelect.appendChild(option);
-        });
-        
-        console.log('Updated poetry style options:', styles);
-    }
-*/
-    
     // Add event listener to Learn Poetry button
     document.addEventListener('click', function(event) {
         if (event.target && event.target.id === 'learn-poetry-button') {
