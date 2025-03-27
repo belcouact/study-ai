@@ -6458,6 +6458,7 @@ function renderExamples(examples) {
 
 // Render word family section
 function renderWordFamily(wordFamily) {
+    console.log("displaying word family");
     if (!wordFamily || wordFamily.length === 0) return '';
     
     return `
