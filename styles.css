@@ -771,62 +771,6 @@ button:active {
     color: var(--text-color);
 }
 
-/* Math formatting for answer section */
-.answer-explanation .math-inline {
-    display: inline-block;
-    margin: 0 0.2em;
-    vertical-align: middle;
-}
-
-.answer-explanation .math-display {
-    display: block;
-    margin: 1em 0;
-    text-align: center;
-    overflow-x: auto;
-    max-width: 100%;
-}
-
-.answer-explanation .MathJax {
-    overflow-x: auto;
-    max-width: 100%;
-    font-size: 1.1em;
-}
-
-.answer-explanation .math-code {
-    display: block;
-    margin: 1em 0;
-    padding: 1em;
-    background-color: #f8f9fa;
-    border-radius: 4px;
-    overflow-x: auto;
-    font-family: 'Courier New', monospace;
-    font-size: 0.95em;
-    line-height: 1.5;
-}
-
-/* Ensure proper alignment and spacing for math in answers */
-.answer-explanation p {
-    margin: 0.8em 0;
-    line-height: 1.8;
-}
-
-.answer-explanation .MathJax_Display {
-    margin: 1em 0 !important;
-}
-
-/* Add responsive adjustments for math in answers */
-@media (max-width: 768px) {
-    .answer-explanation .math-display {
-        font-size: 0.9em;
-        margin: 0.8em 0;
-    }
-    
-    .answer-explanation .math-code {
-        padding: 0.8em;
-        font-size: 0.9em;
-    }
-}
-
 /* Navigation controls */
 .navigation-controls {
     position: fixed;

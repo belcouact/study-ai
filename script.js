@@ -1,7 +1,6 @@
 // API configuration variables
 let currentApiFunction = 'chat';
-//let currentModel = 'deepseek-chat';
-let currentModel = 'moonshot-v1-8k';
+let currentModel = 'deepseek-chat';
 // Add global variable for current question index
 let currentQuestionIndex = 0;
 let currentWordIndex = 0;
@@ -852,15 +851,8 @@ function displayCurrentQuestion() {
             answerResult.textContent = isCorrect ? '✓ 回答正确！' : '✗ 回答错误！';
             answerResult.style.color = isCorrect ? '#27ae60' : '#e74c3c';
             
-            // Display the explanation with proper math formatting
+            // Display the explanation
             answerExplanation.innerHTML = formatMathExpressions(currentQuestion.explanation);
-            
-            // Render math expressions in the answer explanation
-            if (window.MathJax) {
-                window.MathJax.typesetPromise([answerExplanation]).catch(err => {
-                    console.error('MathJax error:', err);
-                });
-            }
             
             // Disable all radio buttons for this question
             const radioButtons = document.querySelectorAll('input[type="radio"]');
@@ -1007,15 +999,25 @@ function formatMathExpressions(text) {
         return text;
     }
     
-    // Replace $...$ with \(...\) for inline math
-    text = text.replace(/\$([^$]+)\$/g, '\\($1\\)');
+    // Replace LaTeX-style expressions with proper LaTeX delimiters
+    // This handles expressions like \( g' = \frac{GM}{(R+h)^2} \)
+    text = text.replace(/\\\( (.*?) \\\)/g, '\\($1\\)');
     
-    // Replace $$...$$ with \[...\] for display math
-    text = text.replace(/\$\$([^$]+)\$\$/g, '\\[$1\\]');
+    // Replace simple math expressions with LaTeX
+    text = text.replace(/\b(\d+[+\-*/]\d+)\b/g, '\\($1\\)');
     
-    // Add proper spacing around math expressions
-    text = text.replace(/\\(\(|\[)/g, ' \\$1');
-    text = text.replace(/\\(\)|\])/g, '\\$1 ');
+    // Replace fractions written as a/b
+    text = text.replace(/(\d+)\/(\d+)/g, '\\(\\frac{$1}{$2}\\)');
+    
+    // Replace powers written as a^b
+    text = text.replace(/(\d+)\^(\d+)/g, '\\($1^{$2}\\)');
+    
+    // Replace square roots
+    text = text.replace(/sqrt\(([^)]+)\)/g, '\\(\\sqrt{$1}\\)');
+    
+    // Replace existing LaTeX delimiters
+    text = text.replace(/\$\$(.*?)\$\$/g, '\\[$1\\]');
+    text = text.replace(/\$(.*?)\$/g, '\\($1\\)');
     
     return text;
 }
@@ -2158,6 +2160,269 @@ function showSystemMessage(message, type = 'info') {
     }, 5000);
 }
 
+// Initialize the page with form layout
+/*
+function initializeFormLayout() {
+
+    console.log('loading initializeFormLayout function from line 2097');
+
+    const formContainer = document.getElementById('question-form-container');
+    if (!formContainer) return;
+    
+    // Style the form container with a more compact look
+    formContainer.style.cssText = `
+        padding: 15px;
+        margin-bottom: 10px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        min-height: auto;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s ease;
+    `;
+    
+    // Create a flex container for the dropdowns with reduced spacing
+    const dropdownContainer = document.createElement('div');
+    dropdownContainer.className = 'dropdown-container';
+    dropdownContainer.style.cssText = `
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 15px;
+        flex-wrap: nowrap;
+        padding: 8px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    `;
+    
+    // Move all select elements into the dropdown container
+    const selects = formContainer.querySelectorAll('select');
+    selects.forEach(select => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'select-wrapper';
+        wrapper.style.cssText = `
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            position: relative;
+        `;
+        
+        // Get the label for this select
+        const label = formContainer.querySelector(`label[for="${select.id}"]`);
+        if (label) {
+            label.style.cssText = `
+                margin-bottom: 4px;
+                font-size: 13px;
+                font-weight: 500;
+                color: #4a5568;
+                white-space: nowrap;
+            `;
+            wrapper.appendChild(label);
+        }
+        
+        // Style the select element
+        select.style.cssText = `
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #2d3748;
+            background-color: white;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234a5568' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 12px;
+            margin: 0;
+        `;
+        
+        wrapper.appendChild(select);
+        dropdownContainer.appendChild(wrapper);
+    });
+    
+    // Create a more compact button container
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = `
+        display: flex;
+        justify-content: center;
+        padding: 10px 0;
+        margin: 5px 0 10px 0;
+        border-bottom: 1px solid #edf2f7;
+    `;
+    
+    // Style the generate questions button
+    const generateButton = document.getElementById('generate-questions-button');
+    if (generateButton) {
+        generateButton.style.cssText = `
+            padding: 10px 25px;
+            font-size: 15px;
+            font-weight: 500;
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
+        `;
+        
+        buttonContainer.appendChild(generateButton);
+    }
+    
+    // Style the API function container with reduced spacing
+    const apiRadioContainer = document.querySelector('.api-function-container');
+    if (apiRadioContainer) {
+        apiRadioContainer.style.cssText = `
+            padding: 12px;
+            margin-top: 5px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #edf2f7;
+            border-radius: 0 0 12px 12px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        `;
+        
+        // Style radio buttons and labels
+        const radioButtons = apiRadioContainer.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach(radio => {
+            const label = radio.nextElementSibling;
+            if (label) {
+                const wrapper = document.createElement('div');
+                wrapper.style.cssText = `
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 6px 12px;
+                    background: white;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                `;
+                
+                radio.style.cssText = `
+                    width: 14px;
+                    height: 14px;
+                    cursor: pointer;
+                    accent-color: #4299e1;
+                    margin: 0;
+                `;
+                
+                label.style.cssText = `
+                    font-size: 13px;
+                    color: #4a5568;
+                    cursor: pointer;
+                    margin: 0;
+                `;
+                
+                // Move radio and label to the wrapper
+                radio.parentNode.insertBefore(wrapper, radio);
+                wrapper.appendChild(radio);
+                wrapper.appendChild(label);
+            }
+        });
+    }
+    
+    // Insert elements in the correct order with minimal spacing
+    const form = document.getElementById('question-form');
+    if (form) {
+        form.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 0;
+            margin: 0;
+        `;
+        
+        // Remove any existing containers
+        const existingDropdownContainer = form.querySelector('.dropdown-container');
+        if (existingDropdownContainer) {
+            existingDropdownContainer.remove();
+        }
+        
+        // Remove the header if it exists
+        const header = form.querySelector('h3');
+        if (header && header.textContent.includes('设置问题参数')) {
+            header.remove();
+        }
+        
+        // Insert containers in the correct order
+        form.insertBefore(dropdownContainer, form.firstChild);
+        formContainer.parentNode.insertBefore(buttonContainer, formContainer.nextSibling);
+    }
+    
+    // Set up event listeners for the sidebar toggle
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            const leftPanel = document.querySelector('.left-panel');
+    const contentArea = document.querySelector('.content-area');
+    
+        leftPanel.classList.toggle('hidden');
+        contentArea.classList.toggle('full-width');
+        sidebarToggle.classList.toggle('collapsed');
+        
+            // Change the icon direction
+            const icon = sidebarToggle.querySelector('i');
+            if (icon) {
+                if (leftPanel.classList.contains('hidden')) {
+                    icon.className = 'fas fa-chevron-right';
+                } else {
+                    icon.className = 'fas fa-chevron-left';
+                }
+            }
+        });
+    }
+    
+    // Set up event listeners for tab buttons
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    
+    if (qaButton && createButton && qaContainer && createContainer) {
+        qaButton.addEventListener('click', function() {
+        qaButton.classList.add('active');
+        createButton.classList.remove('active');
+            qaContainer.style.display = 'block';
+            createContainer.style.display = 'none';
+        });
+        
+        createButton.addEventListener('click', function() {
+        createButton.classList.add('active');
+        qaButton.classList.remove('active');
+            createContainer.style.display = 'block';
+            qaContainer.style.display = 'none';
+        });
+    }
+    
+    // Set up event listeners for the sidebar generate button
+    const sidebarGenerateButton = document.getElementById('sidebar-generate-button');
+    if (sidebarGenerateButton) {
+        sidebarGenerateButton.addEventListener('click', function() {
+            // If not already on the test tab, switch to it
+            if (createButton && !createButton.classList.contains('active')) {
+                createButton.click();
+            }
+            
+            // Call the generate questions function
+            handleGenerateQuestionsClick();
+        });
+    }
+
+    // Add event listeners for the optimize and submit buttons
+    setupOptimizeAndSubmitButtons();
+}
+*/
+
 // Function to set up optimize and submit buttons
 function setupOptimizeAndSubmitButtons() {
     // Set up event listener for optimize button
@@ -2802,11 +3067,219 @@ ${questionText}
     });
 }
 
+// Modify initializeFormLayout to call setupChatButtons
+/*
+function initializeFormLayout() {
+    // ... existing code ...
+    console.log('loading initializeFormLayout function from line 3004');
+    // Setup tab switching functionality
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    
+    if (qaButton && createButton && qaContainer && createContainer) {
+        qaButton.addEventListener('click', function() {
+            qaButton.classList.add('active');
+            createButton.classList.remove('active');
+            qaContainer.classList.remove('hidden');
+            createContainer.classList.add('hidden');
+            
+            // Set up chat buttons when switching to QA tab
+            setTimeout(setupChatButtons, 100);
+        });
+        
+        createButton.addEventListener('click', function() {
+            createButton.classList.add('active');
+            qaButton.classList.remove('active');
+            createContainer.classList.remove('hidden');
+            qaContainer.classList.add('hidden');
+            
+            // Initialize empty state if no questions are loaded
+            initializeEmptyState();
+        });
+        
+        // Initialize empty state on the test page if it's active
+        if (createButton.classList.contains('active')) {
+            initializeEmptyState();
+        } else if (qaButton.classList.contains('active')) {
+            // Set up chat buttons if QA tab is active
+            setTimeout(setupChatButtons, 100);
+        }
+    } else {
+        // If tab buttons don't exist, initialize empty state anyway
+        initializeEmptyState();
+    }
+    
+    // Set up initial navigation buttons
+    setupNavigationButtons();
+    
+    // Set up chat buttons on page load
+    setupChatButtons();
+    
+    // ... existing code ...
+}
+*/
+
 // Add this at the end of the file to ensure buttons are set up when the page loads
 document.addEventListener('DOMContentLoaded', function() {
     // Set up chat buttons when the page loads
     setTimeout(setupChatButtons, 300);
 });
+
+// Modify the setupChatButtons function to include school and grade information
+
+/*
+function setupChatButtons() {
+    console.log('Setting up chat buttons');
+    console.log('loading setupChatButtons function from line 3062');
+    
+    // First, ensure the chat interface exists
+    createChatInterface();
+    
+    // Now get the chat input and response area
+    const chatInput = document.getElementById('chat-input');
+    const chatResponse = document.getElementById('chat-response');
+    
+    if (!chatInput || !chatResponse) {
+        console.error('Chat input or response area not found even after creation');
+        return;
+    }
+    
+    // Set up optimize button
+    const optimizeButton = document.getElementById('optimize-button');
+    if (optimizeButton) {
+        optimizeButton.addEventListener('click', function() {
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+            return;
+        }
+        
+            // Get educational context from sidebar
+            const educationalContext = getEducationalContext();
+            
+            // Show loading state
+            optimizeButton.disabled = true;
+            optimizeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 优化中...';
+            
+            // Prepare the prompt for optimization with educational context
+            const prompt = `请根据以下教育背景优化这个问题，使其更清晰、更有教育价值。优化时请考虑学生的认知水平、教育阶段和真正意图，使问题更有针对性：
+
+教育背景：
+${educationalContext}
+
+原始问题：${questionText}
+
+请只返回优化后的问题，不用保留优化说明和思路。`;
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the optimized question
+                    const optimizedContent = extractContentFromResponse(response);
+                    
+                    // Update the chat input with the optimized question
+                    chatInput.value = optimizedContent.replace(/^问题：|^优化后的问题：/i, '').trim();
+                    
+                    // Focus the input and move cursor to end
+                    chatInput.focus();
+                    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+            
+            // Show success message
+                    showSystemMessage('问题已根据教育背景成功优化！', 'success');
+                })
+                .catch(error => {
+            console.error('Error optimizing question:', error);
+                    showSystemMessage('优化问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    optimizeButton.disabled = false;
+                    optimizeButton.innerHTML = '<i class="fas fa-magic"></i> 优化问题';
+                });
+        });
+    }
+    
+    // Set up submit button
+    const submitButton = document.getElementById('submit-button');
+    if (submitButton) {
+        submitButton.addEventListener('click', function() {
+            const questionText = chatInput.value.trim();
+            
+            if (!questionText) {
+                showSystemMessage('请先输入问题内容', 'warning');
+            return;
+        }
+        
+            // Get educational context from sidebar
+            const educationalContext = getEducationalContext();
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+            chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
+            
+            // Prepare the prompt for the AI with educational context
+            const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
+
+教育背景：
+${educationalContext}
+
+问题：${questionText}
+
+请提供适合上述教育背景学生的清晰、准确、有教育意义的回答。
+如果涉及数学或科学概念，请确保解释清楚，并考虑学生的认知水平和课程要求。
+如果可能，请提供一些例子或应用场景来帮助理解。`;
+            
+            // Call the API
+            fetchAIResponse(prompt)
+                .then(response => {
+                    // Extract the AI response
+                    const aiResponse = extractContentFromResponse(response);
+                    
+                    // Format the response with MathJax
+                    const formattedResponse = formatMathExpressions(aiResponse);
+                    
+                    // Get context summary for display
+                    const contextSummary = getContextSummary();
+                    
+                    // Display the response with educational context
+                    chatResponse.innerHTML = `
+                        <div class="response-header">
+                            <i class="fas fa-robot"></i> AI 助手回答
+                            ${contextSummary ? `<span class="context-badge">${contextSummary}</span>` : ''}
+                        </div>
+                        <div class="response-content">
+                            ${formattedResponse}
+                        </div>
+                    `;
+                    
+                    // Render MathJax in the response
+                    if (window.MathJax) {
+                        MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting question:', error);
+                    chatResponse.innerHTML = `
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            抱歉，处理您的问题时出现了错误。请重试。
+            </div>
+        `;
+                    showSystemMessage('提交问题时出错，请重试。', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问题';
+                });
+        });
+    }
+}
+*/
 
 // Function to get educational context from any available dropdowns in the document
 function getEducationalContext() {
@@ -3694,7 +4167,7 @@ function getSimplifiedContextSummary() {
         };
 
         // Sidebar toggle
-        // elements.sidebarToggle.addEventListener('click', sidebar-toggle);
+        elements.sidebarToggle.addEventListener('click', toggleSidebar);
         
         // Panel buttons
         elements.qaButton.addEventListener('click', () => switchPanel('qa'));
@@ -3731,24 +4204,24 @@ function getSimplifiedContextSummary() {
         setupNavigationButtons();
         
         // Poetry buttons
-        // setupPoetryButtons();
+        setupPoetryButtons();
         
         // Button click handlers for sidebar navigation
-        if (elements.qaButton) {
-            elements.qaButton.addEventListener('click', () => handleTabSwitch('qa'));
+        if (qaButton) {
+            qaButton.addEventListener('click', () => handleTabSwitch('qa'));
         }
         
-        if (elements.createButton) {
-            elements.createButton.addEventListener('click', () => handleTabSwitch('create'));
+        if (createButton) {
+            createButton.addEventListener('click', () => handleTabSwitch('create'));
         }
         
-        if (elements.poetryButton) {
-            elements.poetryButton.addEventListener('click', () => handleTabSwitch('poetry'));
+        if (poetryButton) {
+            poetryButton.addEventListener('click', () => handleTabSwitch('poetry'));
         }
         
         const wordButton = document.getElementById('word-button');
-        if (elements.wordButton) {
-            elements.wordButton.addEventListener('click', () => handleTabSwitch('vocabulary'));
+        if (wordButton) {
+            wordButton.addEventListener('click', () => handleTabSwitch('vocabulary'));
         }
         
         // Tab switching for any additional tabs using data-tab attributes
@@ -3758,6 +4231,300 @@ function getSimplifiedContextSummary() {
         });
     }
 
+// ... existing code ...
+/*
+    // Update poetry style options based on selected poetry type
+    function updatePoetryStyleOptions(poetryType) {
+        console.log('loading updatePoetryStyleOptions function from line 4159');
+
+        const styleSelect = elements.poetryStyleSelect;
+        if (!styleSelect) return;
+        
+        // Clear existing options
+        styleSelect.innerHTML = '';
+        
+        // Define style options based on poetry type
+        let options = [];
+        
+        if (poetryType === '唐诗') {
+            options = ['山水', '边塞', '浪漫', '现实'];
+        } else if (poetryType === '宋词') {
+            options = ['婉约', '豪放'];
+        } else if (poetryType === '元曲') {
+            options = ['杂居', '散曲'];
+        }
+        
+        // Add options to select element
+        options.forEach(style => {
+            const option = document.createElement('option');
+            option.value = style;
+            option.textContent = style;
+            styleSelect.appendChild(option);
+        });
+        
+        console.log(`Updated poetry style options for ${poetryType}: ${options.join(', ')}`);
+    }
+    */
+
+// ... existing code ...
+    /*
+    // Function to handle learn poetry button click
+    async function handleLearnPoetryClick() {
+        console.log('Learn poetry button clicked');
+        
+        // Get user's educational context
+        const schoolSelect = document.getElementById('school-select-sidebar');
+        const gradeSelect = document.getElementById('grade-select-sidebar');
+        
+        if (!schoolSelect || !gradeSelect) {
+            showSystemMessage('无法获取学校和年级信息', 'error');
+            return;
+        }
+        
+        const school = schoolSelect.value;
+        const grade = gradeSelect.options[gradeSelect.selectedIndex].text;
+        
+        if (!school || !grade) {
+            showSystemMessage('请先选择学校和年级', 'warning');
+            return;
+        }
+        
+        // Get poetry type and style
+        // const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
+        // const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
+        poetryType = document.getElementById('poetry-type-select').value;
+        poetryStyle = document.getElementById('poetry-style-select').value;
+        
+        console.log(`Generating poems for: ${school} ${grade}, Type: ${poetryType}, Style: ${poetryStyle}`);
+        
+        // Show loading state
+        const poetryEmptyState = document.getElementById('poetry-empty-state');
+        const poetryDisplay = document.getElementById('poetry-display');
+        
+        if (poetryEmptyState) poetryEmptyState.classList.add('hidden');
+        if (poetryDisplay) poetryDisplay.classList.add('hidden');
+        
+        // Create and show loading indicator
+        let loadingIndicator = document.getElementById('poetry-loading');
+        if (!loadingIndicator) {
+            loadingIndicator = document.createElement('div');
+            loadingIndicator.id = 'poetry-loading';
+            loadingIndicator.innerHTML = `
+                <div class="spinner"></div>
+                <p>十里走马正疾驰，五里扬鞭未敢停...</p>
+            `;
+            loadingIndicator.style.display = 'flex';
+            loadingIndicator.style.flexDirection = 'column';
+            loadingIndicator.style.alignItems = 'center';
+            loadingIndicator.style.justifyContent = 'center';
+            loadingIndicator.style.padding = '3rem';
+            
+            const poetryContent = document.querySelector('.poetry-content');
+            if (poetryContent) {
+                poetryContent.appendChild(loadingIndicator);
+            }
+        } else {
+            loadingIndicator.style.display = 'flex';
+        }
+        
+        try {
+            // Prepare the prompt for the API - specifically requesting famous ancient poems
+            const prompt = `请为${school}${grade}的学生推荐5首著名的古代${poetryType}，风格为${poetryStyle}。
+            请选择中国文学史上最著名、最经典的作品，这些作品应该是真实存在的古代诗词，不要创作新的内容。
+            
+            每首诗都应包含以下内容：
+            1. 题目
+            2. 作者（必须是真实的历史人物）
+            3. 原文（必须是原始的古代诗词文本）
+            4. 创作背景（包括历史背景和创作缘由）
+            5. 赏析（包括艺术特色和文学价值）
+            
+            请以JSON格式返回，格式如下：
+            [
+              {
+                "title": "诗词标题",
+                "author": "作者",
+                "content": "诗词原文",
+                "background": "创作背景",
+                "explanation": "赏析"
+              },
+              ...
+            ]`;
+            
+            // Call the API
+            const apiResponse = await fetchAIResponse(prompt);
+            console.log('API response received');
+            
+            // Extract text content from the response
+            let responseText = '';
+            if (typeof apiResponse === 'string') {
+                responseText = apiResponse;
+            } else if (apiResponse && typeof apiResponse === 'object') {
+                // Try to extract content from response object
+                if (apiResponse.choices && apiResponse.choices.length > 0 && apiResponse.choices[0].message) {
+                    responseText = apiResponse.choices[0].message.content || '';
+                } else if (apiResponse.content) {
+                    responseText = apiResponse.content;
+                } else if (apiResponse.text) {
+                    responseText = apiResponse.text;
+                } else if (apiResponse.message) {
+                    responseText = apiResponse.message;
+                } else if (apiResponse.data) {
+                    responseText = typeof apiResponse.data === 'string' ? apiResponse.data : JSON.stringify(apiResponse.data);
+                } else {
+                    // Last resort: stringify the entire response
+                    responseText = JSON.stringify(apiResponse);
+                }
+            } else {
+                throw new Error('Unexpected response format');
+            }
+            
+            console.log('Extracted response text:', responseText.substring(0, 100) + '...');
+            
+            // Parse the response to extract the poems
+            let poems = [];
+            try {
+                // First try: direct JSON parse if the response is already JSON
+                try {
+                    if (responseText.trim().startsWith('[') && responseText.trim().endsWith(']')) {
+                        poems = JSON.parse(responseText);
+                        console.log('Parsed JSON directly');
+                    } else {
+                        throw new Error('Response is not direct JSON');
+                    }
+                } catch (directParseError) {
+                    console.log('Direct JSON parse failed, trying to extract JSON from text');
+                    
+                    // Second try: find JSON in the response text
+                    const jsonMatch = responseText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                    if (jsonMatch) {
+                        poems = JSON.parse(jsonMatch[0]);
+                        console.log('Extracted and parsed JSON from text');
+                    } else {
+                        throw new Error('No JSON found in response');
+                    }
+                }
+            } catch (parseError) {
+                console.error('Error parsing poems from response:', parseError);
+                
+                // Fallback: Try to extract structured content
+                console.log('Trying to extract structured content');
+                const sections = responseText.split(/(?=\d+\.\s*题目[:：])/);
+                console.log('Found', sections.length - 1, 'potential poem sections');
+                
+                for (let i = 1; i < sections.length; i++) {
+                    const section = sections[i];
+                    
+                    const titleMatch = section.match(/题目[:：]\s*(.+?)(?=\n|$)/);
+                    const authorMatch = section.match(/作者[:：]\s*(.+?)(?=\n|$)/);
+                    const contentMatch = section.match(/原文[:：]\s*([\s\S]+?)(?=\n\d+\.\s*创作背景[:：]|$)/);
+                    const backgroundMatch = section.match(/创作背景[:：]\s*([\s\S]+?)(?=\n\d+\.\s*赏析[:：]|$)/);
+                    const explanationMatch = section.match(/赏析[:：]\s*([\s\S]+?)(?=\n\d+\.\s*题目[:：]|$)/);
+                    
+                    if (titleMatch && authorMatch && contentMatch) {
+                        poems.push({
+                            title: titleMatch[1].trim(),
+                            author: authorMatch[1].trim(),
+                            content: contentMatch[1].trim(),
+                            background: backgroundMatch ? backgroundMatch[1].trim() : "暂无背景信息",
+                            explanation: explanationMatch ? explanationMatch[1].trim() : "暂无赏析"
+                        });
+                    }
+                }
+                
+                // If still no poems, try one more approach with a different pattern
+                if (poems.length === 0) {
+                    console.log('Trying alternative parsing approach');
+                    
+                    // Look for numbered poems (1. 2. 3. etc.)
+                    const poemSections = responseText.split(/(?=\d+\.)/);
+                    
+                    for (let i = 1; i < poemSections.length; i++) {
+                        const section = poemSections[i];
+                        
+                        // Extract what we can
+                        const titleMatch = section.match(/(?:题目[:：]|《(.+?)》)/);
+                        const authorMatch = section.match(/(?:作者[:：]|[\(（](.+?)[\)）])/);
+                        
+                        // If we found at least a title, create a basic poem entry
+                        if (titleMatch) {
+                            const title = titleMatch[1] || titleMatch[0].replace(/题目[:：]/, '').trim();
+                            const author = authorMatch ? (authorMatch[1] || authorMatch[0].replace(/作者[:：]/, '').trim()) : "未知";
+                            
+                            // Get the rest of the content
+                            const contentStart = section.indexOf(titleMatch[0]) + titleMatch[0].length;
+                            let content = section.substring(contentStart).trim();
+                            
+                            // Basic poem with what we could extract
+                            poems.push({
+                                title: title,
+                                author: author,
+                                content: content,
+                                background: "暂无背景信息",
+                                explanation: "暂无赏析"
+                            });
+                        }
+                    }
+                }
+                
+                // Last resort: if we still have no poems, create a single poem from the entire response
+                if (poems.length === 0 && responseText.length > 0) {
+                    console.log('Creating fallback poem from entire response');
+                    poems.push({
+                        title: `${poetryType}·${poetryStyle}`,
+                        author: "古代诗人",
+                        content: responseText.substring(0, 200), // Take first 200 chars as content
+                        background: "这是根据您的要求查找的内容，但解析遇到了困难。",
+                        explanation: "由于解析困难，无法提供完整赏析。请尝试重新生成。"
+                    });
+                }
+            }
+            
+            // Validate poem objects
+            poems = poems.map(poem => {
+                return {
+                    title: poem.title || '无标题',
+                    author: poem.author || '佚名',
+                    content: poem.content || '无内容',
+                    background: poem.background || '无背景信息',
+                    explanation: poem.explanation || '无赏析'
+                };
+            });
+            
+            // Remove loading indicator
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
+            
+            if (poems.length > 0) {
+                console.log('Successfully parsed', poems.length, 'poems');
+                // Store poems in state
+                poemState.poems = poems;
+                poemState.currentIndex = 0;
+                
+                // Display poems
+                if (poetryDisplay) poetryDisplay.classList.remove('hidden');
+                displayCurrentPoem();
+            } else {
+                // Show error message
+                if (poetryEmptyState) poetryEmptyState.classList.remove('hidden');
+                showSystemMessage(`无法生成${poetryType}的${poetryStyle}风格诗词，请稍后再试`, 'error');
+            }
+        } catch (error) {
+            console.error('Error generating poems:', error);
+            
+            // Remove loading indicator
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
+            
+            // Show error message
+            if (poetryEmptyState) poetryEmptyState.classList.remove('hidden');
+            showSystemMessage('生成诗词时出错，请稍后再试', 'error');
+        }
+    }
+    */
+
 // Initialize the application
 function init() {
     console.log('Initializing application...');
@@ -3766,8 +4533,7 @@ function init() {
     setupEventListeners();
     
     // Populate sidebar options based on selected school
-    const schoolSelectSidebar = document.getElementById('school-select-sidebar');
-    const selectedSchool = schoolSelectSidebar.value;
+    const selectedSchool = elements.schoolSelectSidebar.value;
     if (selectedSchool) {
         populateSidebarGradeOptions(selectedSchool);
     }
@@ -3779,12 +4545,8 @@ function init() {
         poetryButton.addEventListener('click', function() {
             console.log('Poetry button clicked directly');
             // Hide all panels
-            const qaPanel = document.getElementById('qa-panel');
-            const createPanel = document.getElementById('create-panel');
-            
-            // Add null checks before accessing classList
-            if (qaPanel) qaPanel.classList.add('hidden');
-            if (createPanel) createPanel.classList.add('hidden');
+            document.getElementById('qa-panel').classList.add('hidden');
+            document.getElementById('create-panel').classList.add('hidden');
             
             // Show poetry panel
             const poetryPanel = document.getElementById('poetry-panel');
@@ -3795,12 +4557,9 @@ function init() {
                 console.error('Poetry panel element not found');
             }
             
-            // Update active states with null checks
-            const qaButton = document.getElementById('qa-button');
-            const createButton = document.getElementById('create-button');
-            
-            if (qaButton) qaButton.classList.remove('active');
-            if (createButton) createButton.classList.remove('active');
+            // Update active states
+            document.getElementById('qa-button').classList.remove('active');
+            document.getElementById('create-button').classList.remove('active');
             poetryButton.classList.add('active');
         });
     } else {
@@ -3828,30 +4587,228 @@ function switchPanel(panelId) {
     if (createPanel) createPanel.classList.add('hidden');
     if (poetryPanel) poetryPanel.classList.add('hidden');
     
-    // Get all buttons
-    const qaButton = document.getElementById('qa-button');
-    const createButton = document.getElementById('create-button');
-    const poetryButton = document.getElementById('poetry-button');
-    
     // Show the selected panel
-    if (panelId === 'qa' && qaPanel) {
+    if (panelId === 'qa-panel' && qaPanel) {
         qaPanel.classList.remove('hidden');
-        if (qaButton) qaButton.classList.add('active');
-        if (createButton) createButton.classList.remove('active');
+        document.getElementById('qa-button').classList.add('active');
+        document.getElementById('create-button').classList.remove('active');
+        const poetryButton = document.getElementById('poetry-button');
         if (poetryButton) poetryButton.classList.remove('active');
-    } else if (panelId === 'create' && createPanel) {
+    } else if (panelId === 'create-panel' && createPanel) {
         createPanel.classList.remove('hidden');
-        if (createButton) createButton.classList.add('active');
-        if (qaButton) qaButton.classList.remove('active');
+        document.getElementById('create-button').classList.add('active');
+        document.getElementById('qa-button').classList.remove('active');
+        const poetryButton = document.getElementById('poetry-button');
         if (poetryButton) poetryButton.classList.remove('active');
-    } else if (panelId === 'poetry' && poetryPanel) {
+    } else if (panelId === 'poetry-panel' && poetryPanel) {
         poetryPanel.classList.remove('hidden');
+        const poetryButton = document.getElementById('poetry-button');
         if (poetryButton) poetryButton.classList.add('active');
-        if (qaButton) qaButton.classList.remove('active');
-        if (createButton) createButton.classList.remove('active');
+        document.getElementById('qa-button').classList.remove('active');
+        document.getElementById('create-button').classList.remove('active');
         console.log('Poetry panel is now visible via switchPanel');
     }
 }
+
+// Setup event listeners
+/*
+function setupEventListeners() {
+    console.log('Setting up event listeners...');
+    console.log('loading setupEventListeners function from line 4533');
+    
+    // Sidebar toggle
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', toggleSidebar);
+    }
+    
+    // Panel buttons
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    
+    if (qaButton) {
+        qaButton.addEventListener('click', function() {
+            switchPanel('qa-panel');
+        });
+    }
+    
+    if (createButton) {
+        createButton.addEventListener('click', function() {
+            switchPanel('create-panel');
+        });
+    }
+}
+*/
+
+// Add this code at the end of the file to ensure it runs after everything else
+
+// Poetry Tab Functionality - Self-contained implementation
+/*
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Poetry tab functionality initializing...');
+    
+    // Get the poetry button and panel
+    const poetryButton = document.getElementById('poetry-button');
+    const poetryPanel = document.getElementById('poetry-panel');
+    const qaPanel = document.getElementById('qa-panel');
+    const createPanel = document.getElementById('create-panel');
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    
+    // Log what we found
+    console.log('Poetry elements found:', {
+        poetryButton: !!poetryButton,
+        poetryPanel: !!poetryPanel,
+        qaPanel: !!qaPanel,
+        createPanel: !!createPanel
+    });
+    
+    // Add direct event listener to poetry button
+    if (poetryButton) {
+        poetryButton.addEventListener('click', function(event) {
+            console.log('Poetry button clicked (direct handler)');
+            
+            // Hide other panels
+            if (qaPanel) qaPanel.classList.add('hidden');
+            if (createPanel) createPanel.classList.add('hidden');
+            
+            // Show poetry panel
+            if (poetryPanel) {
+                poetryPanel.classList.remove('hidden');
+                console.log('Poetry panel is now visible');
+            } else {
+                console.error('Poetry panel not found');
+            }
+            
+            // Update active states
+            if (qaButton) qaButton.classList.remove('active');
+            if (createButton) createButton.classList.remove('active');
+            poetryButton.classList.add('active');
+            
+            // Prevent default behavior
+            event.preventDefault();
+        });
+        console.log('Direct event listener added to poetry button');
+    } else {
+        console.error('Poetry button not found');
+    }
+    
+    // Add event listener to Learn Poetry button
+    const learnPoetryButton = document.getElementById('learn-poetry-button');
+    if (learnPoetryButton) {
+        learnPoetryButton.addEventListener('click', function() {
+            console.log('Learn poetry button clicked (direct handler)');
+            
+            // Mock data for testing
+            const mockPoems = [
+                {
+                    title: "望庐山瀑布",
+                    author: "李白",
+                    content: "日照香炉生紫烟，\n遥看瀑布挂前川。\n飞流直下三千尺，\n疑是银河落九天。",
+                    background: "这首诗是唐代诗人李白游览庐山时所作，描写了庐山瀑布的壮观景象。",
+                    explanation: "这首诗生动地描绘了庐山瀑布的壮丽景象，表现了诗人对自然的热爱和赞美。"
+                },
+                {
+                    title: "静夜思",
+                    author: "李白",
+                    content: "床前明月光，\n疑是地上霜。\n举头望明月，\n低头思故乡。",
+                    background: "这首诗是唐代诗人李白所作，表达了诗人思乡之情。",
+                    explanation: "这首诗通过月光和霜的联想，表达了诗人对故乡的思念之情。"
+                }
+            ];
+            
+            // Get poetry display elements
+            const poetryEmptyState = document.getElementById('poetry-empty-state');
+            const poetryDisplay = document.getElementById('poetry-display');
+            const poemTitle = document.getElementById('poem-title');
+            const poemAuthor = document.getElementById('poem-author');
+            const poemContent = document.getElementById('poem-content');
+            const poemBackground = document.getElementById('poem-background');
+            const poemExplanation = document.getElementById('poem-explanation');
+            const poemCounter = document.getElementById('poem-counter');
+            
+            // Hide empty state and show display
+            if (poetryEmptyState) poetryEmptyState.classList.add('hidden');
+            if (poetryDisplay) poetryDisplay.classList.remove('hidden');
+            
+            // Display the first poem
+            if (poemTitle) poemTitle.textContent = mockPoems[0].title;
+            if (poemAuthor) poemAuthor.textContent = mockPoems[0].author;
+            if (poemContent) poemContent.innerHTML = mockPoems[0].content.replace(/\n/g, '<br>');
+            if (poemBackground) poemBackground.innerHTML = mockPoems[0].background;
+            if (poemExplanation) poemExplanation.innerHTML = mockPoems[0].explanation;
+            if (poemCounter) poemCounter.textContent = `1 / ${mockPoems.length}`;
+            
+            console.log('Mock poem displayed');
+        });
+        console.log('Direct event listener added to learn poetry button');
+    }
+    
+    // Add event listeners for navigation buttons
+    const prevPoemButton = document.getElementById('prev-poem-button');
+    const nextPoemButton = document.getElementById('next-poem-button');
+    
+    if (prevPoemButton) {
+        prevPoemButton.addEventListener('click', function() {
+            console.log('Previous poem button clicked');
+        });
+    }
+    
+    if (nextPoemButton) {
+        nextPoemButton.addEventListener('click', function() {
+            console.log('Next poem button clicked');
+        });
+    }
+    
+    // Add event listener for poetry type dropdown
+    const poetryTypeSelect = document.getElementById('poetry-type');
+    const poetryStyleSelect = document.getElementById('poetry-style');
+    
+    if (poetryTypeSelect && poetryStyleSelect) {
+        poetryTypeSelect.addEventListener('change', function() {
+            const poetryType = poetryTypeSelect.value;
+            console.log('Poetry type changed to:', poetryType);
+            
+            // Clear existing options
+            while (poetryStyleSelect.options.length > 0) {
+                poetryStyleSelect.remove(0);
+            }
+            
+            // Add new options based on selected type
+            if (poetryType === '唐诗') {
+                const styles = ['山水', '边塞', '浪漫', '现实'];
+                styles.forEach(style => {
+                    const option = document.createElement('option');
+                    option.value = style;
+                    option.textContent = style;
+                    poetryStyleSelect.appendChild(option);
+                });
+            } else if (poetryType === '宋词') {
+                const styles = ['婉约', '豪放'];
+                styles.forEach(style => {
+                    const option = document.createElement('option');
+                    option.value = style;
+                    option.textContent = style;
+                    poetryStyleSelect.appendChild(option);
+                });
+            } else if (poetryType === '元曲') {
+                const styles = ['杂居', '散曲'];
+                styles.forEach(style => {
+                    const option = document.createElement('option');
+                    option.value = style;
+                    option.textContent = style;
+                    poetryStyleSelect.appendChild(option);
+                });
+            }
+            
+            console.log('Updated poetry style options');
+        });
+    }
+    
+    console.log('Poetry tab functionality initialized');
+});
+*/
+// Add this code at the end of the file
 
 // Poetry Tab Functionality - Complete implementation
 document.addEventListener('DOMContentLoaded', function() {
@@ -3953,8 +4910,27 @@ document.addEventListener('DOMContentLoaded', function() {
         poetryButton.addEventListener('click', function(event) {
             console.log('Poetry button clicked (direct handler)');
             
-            // Use the common switchPanel function for consistency
-            switchPanel('poetry');
+            // Get the poetry panel again in case it was just created
+            const poetryPanel = document.getElementById('poetry-panel');
+            
+            // Hide other panels
+            if (qaPanel) qaPanel.classList.add('hidden');
+            if (createPanel) createPanel.classList.add('hidden');
+            
+            // Show poetry panel
+            /*
+            if (poetryPanel) {
+                poetryPanel.classList.remove('hidden');
+                console.log('Poetry panel is now visible');
+            } else {
+                console.error('Poetry panel not found');
+            }
+            */
+            
+            // Update active states
+            if (qaButton) qaButton.classList.remove('active');
+            if (createButton) createButton.classList.remove('active');
+            poetryButton.classList.add('active');
             
             // Initialize poetry type and style dropdowns
             initializePoetryDropdowns();
@@ -3977,61 +4953,48 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Initialize style options based on current type
             updatePoetryStyleOptions(poetryTypeSelect.value);
-        } else {
-            console.log('Poetry selects not found');
         }
     }
     
+/*
     // Update poetry style options based on selected type
     function updatePoetryStyleOptions(poetryType) {
+        console.log('Updating poetry style options for type:', poetryType);
+        console.log('loading updatePoetryStyleOptions function from line 4870');
+        
         const poetryStyleSelect = document.getElementById('poetry-style');
-        if (!poetryStyleSelect) return;
+        if (!poetryStyleSelect) {
+            console.error('Poetry style select element not found');
+            return;
+        }
         
         // Clear existing options
-        poetryStyleSelect.innerHTML = '';
+        while (poetryStyleSelect.options.length > 0) {
+            poetryStyleSelect.remove(0);
+        }
         
-        // Add options based on type
-        let options = [];
+        // Add new options based on selected type
+        let styles = [];
         
-        switch(poetryType) {
-            case '唐诗':
-                options = [
-                    { value: '山水', text: '山水' },
-                    { value: '边塞', text: '边塞' },
-                    { value: '田园', text: '田园' },
-                    { value: '送别', text: '送别' }
-                ];
-                break;
-            case '宋词':
-                options = [
-                    { value: '婉约', text: '婉约' },
-                    { value: '豪放', text: '豪放' },
-                    { value: '爱情', text: '爱情' },
-                    { value: '怀古', text: '怀古' }
-                ];
-                break;
-            case '元曲':
-                options = [
-                    { value: '浪漫', text: '浪漫' },
-                    { value: '现实', text: '现实' },
-                    { value: '爱情', text: '爱情' }
-                ];
-                break;
-            default:
-                options = [
-                    { value: '山水', text: '山水' },
-                    { value: '浪漫', text: '浪漫' }
-                ];
+        if (poetryType === '唐诗') {
+            styles = ['山水', '边塞', '浪漫', '现实'];
+        } else if (poetryType === '宋词') {
+            styles = ['婉约', '豪放'];
+        } else if (poetryType === '元曲') {
+            styles = ['杂居', '散曲'];
         }
         
         // Add options to select
-        options.forEach(option => {
-            const optionElement = document.createElement('option');
-            optionElement.value = option.value;
-            optionElement.textContent = option.text;
-            poetryStyleSelect.appendChild(optionElement);
+        styles.forEach(style => {
+            const option = document.createElement('option');
+            option.value = style;
+            option.textContent = style;
+            poetryStyleSelect.appendChild(option);
         });
+        
+        console.log('Updated poetry style options:', styles);
     }
+*/
     
     // Add event listener to Learn Poetry button
     document.addEventListener('click', function(event) {
@@ -4039,27 +5002,15 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Learn poetry button clicked via delegation');
             
             // Get selected values
-            const poetryTypeSelect = document.getElementById('poetry-type');
-            const poetryStyleSelect = document.getElementById('poetry-style');
-            const poetryQtySelect = document.getElementById('poetry-qty');
-            
+            const poetryTypeSelect = document.getElementById('poetry-type-select');
+            const poetryStyleSelect = document.getElementById('poetry-style-select');
+            const poetryQtySelect = document.getElementById('poetry-qty-select');
             const poetryType = poetryTypeSelect ? poetryTypeSelect.value : '唐诗';
             const poetryStyle = poetryStyleSelect ? poetryStyleSelect.value : '山水';
-            const poetryQty = poetryQtySelect ? poetryQtySelect.value : '5';
+            const poetryQty = poetryQtySelect ? poetryQtySelect.value : '10';
             
-            // Show loading state
-            const poetryEmptyState = document.getElementById('poetry-empty-state');
-            const poetryDisplay = document.getElementById('poetry-display');
-            
-            if (poetryEmptyState) poetryEmptyState.classList.add('hidden');
-            if (poetryDisplay) {
-                poetryDisplay.classList.remove('hidden');
-                // Add loading indicator if needed
-            }
-            
-            // Here you would call your API to get poetry content
-            console.log('Fetching poetry with:', { poetryType, poetryStyle, poetryQty });
-            // fetchPoetry(poetryType, poetryStyle, poetryQty);
+            // Call the API function directly - no mock data
+            handleLearnPoetryClick();
         }
     });
 
@@ -5051,8 +6002,7 @@ Please format your response as a valid JSON array with objects having the follow
     "part_of_speech": "noun",
     "pronunciation": "/ɪɡˈzæm.pəl/",
     "definition": "A clear English definition",
-    "chinese_translation": "中文翻译","中文翻译","中文翻译",
-    "词形变化": "examplify"， "v", "举例", "是...的典范",
+    "chinese_translation": "中文翻译","中文翻译","中文翻译"
     "related_phrases": [
       {
         "english": "example phrase",
@@ -5070,11 +6020,10 @@ Please format your response as a valid JSON array with objects having the follow
 Requirements:
 1. Choose vocabulary appropriate for ${grade} grade ${school} school students
 2. Include 2-3 related phrases (词组) for each word
-3. Include 2-3 related word transformations (词性变化) for each word
-4. Include two example sentences for each word
-5. Provide both English and Chinese translations for all content
-6. Keep the JSON structure simple and valid
-7. Do not include any text outside the JSON array`;
+3. Include two example sentences for each word
+4. Provide both English and Chinese translations for all content
+5. Keep the JSON structure simple and valid
+6. Do not include any text outside the JSON array`;
         
         // Use the existing fetchAIResponse function
         const response = await fetchAIResponse(prompt);
