@@ -6285,7 +6285,7 @@ function processWordFamily(word) {
     }
     
     return wordFamilyItems;
-    console.log(wordFamilyItems);
+    //console.log(wordFamilyItems);
 }
 
 // Process collocations from various formats
@@ -6460,7 +6460,7 @@ function renderExamples(examples) {
 
 // Render word family section
 function renderWordFamily(wordFamily) {
-    console.log("displaying word family");
+    console.log(wordFamily);
     if (!wordFamily || wordFamily.length === 0) return '';
 
     return `
@@ -6468,8 +6468,8 @@ function renderWordFamily(wordFamily) {
             <h3 class="section-title">词族</h3>
             <div class="word-family-items">
                 ${wordFamily.map(item => `
-                    <span class="word-family-item" title="${item.translation || ''}">
-                        ${item.word ? `<strong>${item.word}:</strong> ` : ''}${item.translation}
+                    <span class="word-family-item" title="${item.english || ''}">
+                        ${item.english ? `${item.english}: ` : ''}${item.chinese}
                     </span>
                 `).join('')}
             </div>
