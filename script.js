@@ -6161,8 +6161,8 @@ function displayWordCard(index) {
             </div>
             
             ${renderRelatedPhrases(wordData.relatedPhrases)}
-            ${renderExamples(wordData.examples)}
             ${renderWordFamily(wordData.wordFamily)}
+            ${renderExamples(wordData.examples)}
             ${renderCollocations(wordData.collocations)}
             
             <div class="word-relationships">
