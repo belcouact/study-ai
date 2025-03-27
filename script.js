@@ -3682,19 +3682,14 @@ function getSimplifiedContextSummary() {
 
     // Set up all event listeners
     function setupEventListeners() {
-        // Define elements object
-        const elements = {
-            sidebarToggle: document.getElementById('sidebar-toggle'),
-            qaButton: document.getElementById('qa-button'),
-            createButton: document.getElementById('create-button'),
-            poetryButton: document.getElementById('poetry-button'),
-            schoolSelectSidebar: document.getElementById('school-select-sidebar'),
-            poetryTypeSelect: document.getElementById('poetry-type-select'),
-            poetryStyleSelect: document.getElementById('poetry-style-select')
-        };
 
-        // Sidebar toggle
-        // elements.sidebarToggle.addEventListener('click', sidebar-toggle);
+        sidebarToggle= document.getElementById('sidebar-toggle'),
+        qaButton= document.getElementById('qa-button'),
+        createButton= document.getElementById('create-button'),
+        poetryButton= document.getElementById('poetry-button'),
+        schoolSelectSidebar= document.getElementById('school-select-sidebar'),
+        poetryTypeSelect= document.getElementById('poetry-type-select'),
+        poetryStyleSelect= document.getElementById('poetry-style-select')
         
         // Panel buttons
         elements.qaButton.addEventListener('click', () => switchPanel('qa'));
