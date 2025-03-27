@@ -6461,7 +6461,20 @@ function renderExamples(examples) {
 function renderWordFamily(wordFamily) {
     console.log("displaying word family");
     if (!wordFamily || wordFamily.length === 0) return '';
-    
+
+    return `
+        <div class="word-family">
+            <h3 class="section-title">相关词族</h3>
+            ${wordFamily.map(item => `
+                <div class="item-item">
+                    <div class="item-english">${item.english}</div>
+                    ${item.chinese ? `<div class="item-chinese">${item.chinese}</div>` : ''}
+                </div>
+            `).join('')}
+        </div>
+    `;
+
+    /*
     return `
         <div class="word-family">
             <h3 class="section-title">词族</h3>
@@ -6474,6 +6487,7 @@ function renderWordFamily(wordFamily) {
             </div>
         </div>
     `;
+    */
 }
 
 // Render collocations section
