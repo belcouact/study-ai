@@ -6002,7 +6002,7 @@ Please format your response as a valid JSON array with objects having the follow
   {
     "word": "example",
     "part_of_speech": "noun",
-    "pronunciation": "/ɪɡˈzæm.pəl/",
+    "pronunciation": "-ɪɡˈzæm.pəl-",
     "definition": "A clear English definition",
     "chinese_translation": "中文翻译",
     "word family": [
