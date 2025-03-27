@@ -4165,7 +4165,7 @@ function getSimplifiedContextSummary() {
         };
 
         // Sidebar toggle
-        elements.sidebarToggle.addEventListener('click', toggleSidebar);
+        elements.sidebarToggle.addEventListener('click', sidebar-toggle);
         
         // Panel buttons
         elements.qaButton.addEventListener('click', () => switchPanel('qa'));
