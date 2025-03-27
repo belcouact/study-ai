@@ -1659,7 +1659,9 @@ function formatParagraph(paragraph) {
 function handleGenerateQuestionsClick() {
     console.log('handleGenerateQuestionsClick started');
     
-    // Get values from the dropdowns using the new IDs (without -sidebar suffix)
+    currentQuestionIndex = 0;
+    
+    // Get valu es from the dropdowns using the new IDs (without -sidebar suffix)
     const schoolSelect = document.getElementById('school-select-sidebar');
     const gradeSelect = document.getElementById('grade-select-sidebar');
     const subjectSelect = document.getElementById('subject-select');
