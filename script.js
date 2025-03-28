@@ -4149,7 +4149,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Create button clicked');
             handleTabSwitch('create');
             // populate subject dropdown based on selected school
-            const selectedSchool = document.getElementById('sidebar-school-select').value;
+            const School = document.getElementById('sidebar-school-select');
+            const selectedSchool = School.value
             populateSidebarSubjectOptions(selectedSchool);
         });
     }
