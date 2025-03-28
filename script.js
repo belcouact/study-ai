@@ -5043,8 +5043,8 @@ Please format your response as a valid JSON array with objects having the follow
     "chinese_translation": "中文翻译",
     "word_family": [
       {
-        "english": "examplary",
-        "chinese": "adj, -ɪɡˈzæm.pələri-, 可作榜样的",
+        "english": "examplary (-ɪɡˈzæm.pələri-)",
+        "chinese": "adj, 可作榜样的",
       }
     ],
     "related_phrases": [
