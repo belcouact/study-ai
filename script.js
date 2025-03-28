@@ -6505,6 +6505,7 @@ function renderExamples(examples) {
     `;
 }
 
+/*
 // Render word family section
 function renderWordFamily(wordFamily) {
     console.log("testing wordfamily")
@@ -6524,6 +6525,28 @@ function renderWordFamily(wordFamily) {
         </div>
     `;
 
+}
+*/
+
+// Enhanced render function
+function renderWordFamily(wordFamily) {
+    if (!wordFamily || wordFamily.length === 0) return '';
+    
+    return `
+        <div class="word-family">
+            <h3 class="section-title">词族</h3>
+            <div class="word-family-items">
+                ${wordFamily.map(item => `
+                    <span class="word-family-item" 
+                          title="${item.chinese || item.word || ''}">
+                        ${item.word || ''}
+                        ${item.type ? `<small>(${item.type})</small>` : ''}
+                        ${item.chinese ? `<small>${item.chinese}</small>` : ''}
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+    `;
 }
 
 // Render collocations section
