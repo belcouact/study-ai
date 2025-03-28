@@ -4901,6 +4901,19 @@ async function handleLoadVocabularyClick() {
     }
 }
 
+// Function to show vocabulary error message
+function showVocabularyError(message) {
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    if (vocabularyContainer) {
+        vocabularyContainer.innerHTML = `
+            <div class="error-message">
+                <p>${message}</p>
+                <p>请确保您已选择正确的学校和年级，然后再试一次。</p>
+            </div>
+        `;
+    }
+}
+
 // Fetch vocabulary words from API
 async function fetchVocabularyWords(school, grade) {
     try {
