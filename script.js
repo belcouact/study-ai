@@ -5176,3 +5176,35 @@ function speakText(text) {
         window.speechSynthesis.speak(utterance);
     }
 }
+
+// Add this before displayWordCard function
+// Safe property getter with default value
+function safeGet(obj, path, defaultValue) {
+    if (!obj) return defaultValue;
+    
+    // Handle dot notation for nested paths
+    const keys = path.split('.');
+    let current = obj;
+    
+    for (const key of keys) {
+        if (current === null || current === undefined || typeof current !== 'object') {
+            return defaultValue;
+        }
+        current = current[key];
+    }
+    
+    return current !== undefined && current !== null ? current : defaultValue;
+}
+
+// Function to show vocabulary error message
+function showVocabularyError(message) {
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    if (vocabularyContainer) {
+        vocabularyContainer.innerHTML = `
+            <div class="error-message">
+                <p>${message}</p>
+                <p>请确保您已选择正确的学校和年级，然后再试一次。</p>
+            </div>
+        `;
+    }
+}
