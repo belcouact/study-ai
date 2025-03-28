@@ -3943,7 +3943,7 @@ function getSimplifiedContextSummary() {
         setupNavigationButtons();
         
         // Poetry buttons
-        setupPoetryButtons();
+        //setupPoetryButtons();
         
         // Button click handlers for sidebar navigation
         if (qaButton) {
