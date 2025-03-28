@@ -6468,8 +6468,8 @@ function renderWordFamily(wordFamily) {
             <h3 class="section-title">词族</h3>
             <div class="word-family-items">
                 ${wordFamily.map(item => `
-                    <span class="word-family-item" title="${item.english || ''}">
-                        ${item.english ? `${item.english}: ` : ''}${item.chinese}
+                    <span class="word-family-item" title="${item.type || ''}">
+                        ${item.type ? `${item.type}: ` : ''}${item.word}
                     </span>
                 `).join('')}
             </div>
