@@ -5084,100 +5084,10 @@ function displayWordCard(index) {
     
     vocabularyContainer.innerHTML = cardHTML;
     
-    // Add event listeners for interactive elements
-    setupWordInteractions(wordData);
-    
     // Update counter
     document.getElementById('word-counter').textContent = `${index + 1}/${vocabularyWords.length}`;
 }
 
-// Function to set up interactive elements on the word card
-function setupWordInteractions(wordData) {
-    // Get word elements
-    const wordElement = document.querySelector('.word-english');
-    const wordCard = document.querySelector('.word-card');
-    const exampleItems = document.querySelectorAll('.example-item');
-    
-    // Add pronunciation functionality
-    if (wordElement) {
-        wordElement.addEventListener('click', function() {
-            speakText(wordData.english);
-            
-            // Add a visual feedback effect
-            this.classList.add('speaking');
-            setTimeout(() => {
-                this.classList.remove('speaking');
-            }, 1500);
-        });
-    }
-    
-    // Add example sentence pronunciation
-    exampleItems.forEach(item => {
-        const exampleText = item.querySelector('.example-english')?.textContent;
-        if (exampleText) {
-            item.addEventListener('click', function() {
-                speakText(exampleText);
-                
-                // Add a visual feedback effect
-                this.classList.add('speaking');
-                setTimeout(() => {
-                    this.classList.remove('speaking');
-                }, 2000);
-            });
-        }
-    });
-    
-    // Add card interaction effects
-    if (wordCard) {
-        // Create 3D tilt effect based on mouse position
-        wordCard.addEventListener('mousemove', function(e) {
-            // Only apply if device supports hover
-            if (window.matchMedia("(hover: hover)").matches) {
-                const card = this;
-                const cardRect = card.getBoundingClientRect();
-                const cardCenterX = cardRect.left + cardRect.width / 2;
-                const cardCenterY = cardRect.top + cardRect.height / 2;
-                
-                // Calculate rotation based on mouse position
-                const rotateY = (e.clientX - cardCenterX) / 15;
-                const rotateX = (cardCenterY - e.clientY) / 15;
-                
-                // Apply transform
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-            }
-        });
-        
-        // Reset transform when mouse leaves
-        wordCard.addEventListener('mouseleave', function() {
-            this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-        });
-    }
-}
-
-// Function to speak text using Web Speech API
-function speakText(text) {
-    if (!text || typeof text !== 'string') return;
-    
-    // Check if speech synthesis is available
-    if ('speechSynthesis' in window) {
-        // Cancel any ongoing speech
-        window.speechSynthesis.cancel();
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
-        
-        // Set voice if available
-        const voices = window.speechSynthesis.getVoices();
-        const englishVoice = voices.find(voice => voice.lang.includes('en') && voice.name.includes('Female'));
-        if (englishVoice) {
-            utterance.voice = englishVoice;
-        }
-        
-        window.speechSynthesis.speak(utterance);
-    }
-}
-
-// Add this before displayWordCard function
 // Safe property getter with default value
 function safeGet(obj, path, defaultValue) {
     if (!obj) return defaultValue;
@@ -5196,15 +5106,860 @@ function safeGet(obj, path, defaultValue) {
     return current !== undefined && current !== null ? current : defaultValue;
 }
 
-// Function to show vocabulary error message
-function showVocabularyError(message) {
-    const vocabularyContainer = document.getElementById('vocabulary-container');
-    if (vocabularyContainer) {
-        vocabularyContainer.innerHTML = `
-            <div class="error-message">
-                <p>${message}</p>
-                <p>请确保您已选择正确的学校和年级，然后再试一次。</p>
-            </div>
-        `;
+// Process example sentences from various formats
+function processExamples(word) {
+    const examples = [];
+    
+    try {
+        if (word.example_sentences) {
+            if (Array.isArray(word.example_sentences)) {
+                word.example_sentences.forEach(example => {
+                    if (typeof example === 'string') {
+                        // Handle string format with parentheses for Chinese
+                        const match = example.match(/^(.*?)(?:\s*\((.*?)\))?$/);
+                        if (match) {
+                            examples.push({
+                                english: match[1].trim(),
+                                chinese: match[2] ? match[2].trim() : ''
+                            });
+                        } else {
+                            examples.push({ english: example, chinese: '' });
+                        }
+                    } else if (example && typeof example === 'object') {
+                        // Handle object format
+                        examples.push({
+                            english: example.english || example.sentence || '',
+                            chinese: example.chinese || example.translation || ''
+                        });
+                    }
+                });
+            } else if (typeof word.example_sentences === 'object') {
+                // Handle object with numbered keys
+                Object.values(word.example_sentences).forEach(example => {
+                    if (typeof example === 'string') {
+                        const match = example.match(/^(.*?)(?:\s*\((.*?)\))?$/);
+                        if (match) {
+                            examples.push({
+                                english: match[1].trim(),
+                                chinese: match[2] ? match[2].trim() : ''
+                            });
+                        } else {
+                            examples.push({ english: example, chinese: '' });
+                        }
+                    } else if (example && typeof example === 'object') {
+                        examples.push({
+                            english: example.english || example.sentence || '',
+                            chinese: example.chinese || example.translation || ''
+                        });
+                    }
+                });
+            }
+        }
+    } catch (e) {
+        console.warn('Error processing examples:', e);
     }
+    
+    return examples;
+}
+
+/*
+// Process word family from various formats
+function processWordFamily(word) {
+    const wordFamilyItems = [];
+    
+    try {
+        if (word.word_family) {
+            if (Array.isArray(word.word_family)) {
+                word.word_family.forEach(item => {
+                    if (typeof item === 'string') {
+                        wordFamilyItems.push({ word: item });
+                    } else if (item && typeof item === 'object') {
+                        const keys = Object.keys(item);
+                        if (keys.length > 0) {
+                            wordFamilyItems.push({ 
+                                type: keys[0], 
+                                word: item[keys[0]] 
+                            });
+                        }
+                    }
+                });
+            } else if (typeof word.word_family === 'object') {
+                Object.entries(word.word_family).forEach(([type, value]) => {
+                    wordFamilyItems.push({ type, word: value });
+                });
+            }
+        }
+    } catch (e) {
+        console.warn('Error processing word family:', e);
+    }
+    
+    return wordFamilyItems;
+    //console.log(wordFamilyItems);
+}
+*/
+
+function processWordFamily(word) {
+    const wordFamilyItems = [];
+    
+    try {
+        if (word.word_family) {
+            if (Array.isArray(word.word_family)) {
+                word.word_family.forEach(item => {
+                    if (item && typeof item === 'object') {
+                        // Process objects with chinese and english properties
+                        if (item.chinese && item.english) {
+                            wordFamilyItems.push({
+                                type: item.chinese,  // Keep the full chinese string (e.g., "adv, 突然地")
+                                word: item.english  // The English word
+                            });
+                        }
+                        // Keep the original handling for other object types
+                        else {
+                            const keys = Object.keys(item);
+                            if (keys.length > 0) {
+                                wordFamilyItems.push({ 
+                                    type: keys[0], 
+                                    word: item[keys[0]]     
+                                });
+                            }
+                        }
+                    }
+                    // Keep the original handling for string items
+                    else if (typeof item === 'string') {
+                        wordFamilyItems.push({ word: item });
+                    }
+                });
+            } else if (typeof word.word_family === 'object') {
+                // Keep the original handling for plain objects
+                Object.entries(word.word_family).forEach(([type, value]) => {
+                    wordFamilyItems.push({ type, word: value });
+                });
+            }
+        }
+    } catch (e) {
+        console.warn('Error processing word family:', e);
+    }
+    
+    return wordFamilyItems;
+}
+
+// Process collocations from various formats
+function processCollocations(word) {
+    const collocations = [];
+    
+    try {
+        if (word.common_collocations) {
+            if (Array.isArray(word.common_collocations)) {
+                word.common_collocations.forEach(item => {
+                    if (typeof item === 'string') {
+                        // Handle parentheses format
+                        const match = item.match(/^(.*?)(?:\s*\((.*?)\))?$/);
+                        if (match) {
+                            collocations.push({
+                                phrase: match[1].trim(),
+                                translation: match[2] ? match[2].trim() : ''
+                            });
+                        } else {
+                            collocations.push({ phrase: item });
+                        }
+                    } else if (item && typeof item === 'object') {
+                        const keys = Object.keys(item);
+                        if (keys.length > 0) {
+                            collocations.push({
+                                phrase: keys[0],
+                                translation: item[keys[0]]
+                            });
+                        }
+                    }
+                });
+            } else if (typeof word.common_collocations === 'object') {
+                Object.entries(word.common_collocations).forEach(([phrase, translation]) => {
+                    collocations.push({ phrase, translation });
+                });
+            }
+        }
+    } catch (e) {
+        console.warn('Error processing collocations:', e);
+    }
+    
+    return collocations;
+}
+
+// Process synonyms from various formats
+function processSynonyms(word) {
+    return processWordRelationship(word.synonyms);
+}
+
+// Process antonyms from various formats
+function processAntonyms(word) {
+    return processWordRelationship(word.antonyms);
+}
+
+// Generic processor for word relationships (synonyms/antonyms)
+function processWordRelationship(items) {
+    const processed = [];
+    
+    try {
+        if (items) {
+            if (Array.isArray(items)) {
+                items.forEach(item => {
+                    if (typeof item === 'string') {
+                        processed.push({ word: item });
+                    } else if (item && typeof item === 'object') {
+                        if (item.word) {
+                            processed.push({
+                                word: item.word,
+                                definition: item.definition || '',
+                                chinese: item.chinese || ''
+                            });
+                        } else {
+                            const keys = Object.keys(item);
+                            if (keys.length > 0) {
+                                const key = keys[0];
+                                const value = item[key];
+                                
+                                // Try to extract Chinese in parentheses
+                                let definition = value;
+                                let chinese = '';
+                                
+                                if (typeof value === 'string') {
+                                    const match = value.match(/^(.*?)(?:\s*\((.*?)\))?$/);
+                                    if (match) {
+                                        definition = match[1].trim();
+                                        chinese = match[2] ? match[2].trim() : '';
+                                    }
+                                }
+                                
+                                processed.push({
+                                    word: key,
+                                    definition,
+                                    chinese
+                                });
+                            }
+                        }
+                    }
+                });
+            } else if (typeof items === 'object') {
+                Object.entries(items).forEach(([word, value]) => {
+                    // Try to extract Chinese in parentheses
+                    let definition = value;
+                    let chinese = '';
+                    
+                    if (typeof value === 'string') {
+                        const match = value.match(/^(.*?)(?:\s*\((.*?)\))?$/);
+                        if (match) {
+                            definition = match[1].trim();
+                            chinese = match[2] ? match[2].trim() : '';
+                        }
+                    }
+                    
+                    processed.push({
+                        word,
+                        definition,
+                        chinese
+                    });
+                });
+            }
+        }
+    } catch (e) {
+        console.warn('Error processing word relationship:', e);
+    }
+    
+    return processed;
+}
+
+// Process learning tips from various formats
+function processLearningTips(word) {
+    try {
+        if (word.learning_tips) {
+            if (typeof word.learning_tips === 'string') {
+                // Handle parentheses format
+                const match = word.learning_tips.match(/^(.*?)(?:\s*\((.*?)\))?$/);
+                if (match) {
+                    return {
+                        tip: match[1].trim(),
+                        chinese: match[2] ? match[2].trim() : ''
+                    };
+                }
+                return { tip: word.learning_tips };
+            } else if (typeof word.learning_tips === 'object') {
+                return {
+                    tip: word.learning_tips.tip || word.learning_tips.english || '',
+                    chinese: word.learning_tips.chinese || ''
+                };
+            }
+        }
+    } catch (e) {
+        console.warn('Error processing learning tips:', e);
+    }
+    
+    return { tip: '', chinese: '' };
+}
+
+// Render example sentences section
+function renderExamples(examples) {
+    if (!examples || examples.length === 0) return '';
+    
+    return `
+        <div class="word-examples">
+            <h3 class="section-title">例句</h3>
+            ${examples.map(example => `
+                <div class="example-item">
+                    <div class="example-english">${example.english}</div>
+                    ${example.chinese ? `<div class="example-chinese">${example.chinese}</div>` : ''}
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+/*
+// Enhanced render function
+function renderWordFamily(wordFamily) {
+    if (!wordFamily || wordFamily.length === 0) return '';
+    
+    return `
+        <div class="word-family">
+            <h3 class="section-title">词族</h3>
+            <div class="word-family-items">
+                ${wordFamily.map(item => `
+                    <span class="word-family-item" 
+                          title="${item.chinese || item.word || ''}">
+                        ${item.word || ''}
+                        ${item.type ? `(${item.type})` : ''}
+                        ${item.chinese ? `${item.chinese}` : ''}
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+*/
+
+function renderWordFamily(wordFamily) {
+    if (!wordFamily || wordFamily.length === 0) return '';
+    
+    return `
+        <div class="word-family">
+            <h3 class="section-title">词族</h3>
+            <div class="word-family-items">
+                ${wordFamily.map(item => `
+                    <span class="word-family-item">
+                        <span class="english">${item.english || item.word || ''}</span>: 
+                        <span class="chinese">${item.chinese || item.type || ''}</span>
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// Render collocations section
+function renderCollocations(collocations) {
+    if (!collocations || collocations.length === 0) return '';
+    
+    return `
+        <div class="collocations">
+            <h3 class="section-title">常见搭配</h3>
+            <div class="collocation-items">
+                ${collocations.map(item => `
+                    <span class="collocation-item" title="${item.translation || ''}">
+                        ${item.phrase}
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// Render synonyms section
+function renderSynonyms(synonyms) {
+    if (!synonyms || synonyms.length === 0) return '';
+    
+    return `
+        <div class="synonyms">
+            <h3 class="section-title">近义词</h3>
+            <div class="synonym-items">
+                ${synonyms.map(syn => `
+                    <div class="synonym-container">
+                        <span class="synonym-word">${syn.word}</span>
+                        ${syn.definition ? `<span class="synonym-def">- ${syn.definition}</span>` : ''}
+                        ${syn.chinese ? `<span class="synonym-chinese">${syn.chinese}</span>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// Render antonyms section
+function renderAntonyms(antonyms) {
+    if (!antonyms || antonyms.length === 0) return '';
+    
+    return `
+        <div class="antonyms">
+            <h3 class="section-title">反义词</h3>
+            <div class="antonym-items">
+                ${antonyms.map(ant => `
+                    <div class="antonym-container">
+                        <span class="antonym-word">${ant.word}</span>
+                        ${ant.definition ? `<span class="antonym-def">- ${ant.definition}</span>` : ''}
+                        ${ant.chinese ? `<span class="antonym-chinese">${ant.chinese}</span>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// Render learning tips section
+function renderLearningTips(tips) {
+    if (!tips || !tips.tip) return '';
+    
+    return `
+        <div class="learning-tips">
+            <h3 class="section-title">记忆技巧</h3>
+            <div class="tip-content">${tips.tip}</div>
+            ${tips.chinese ? `<div class="tip-content-chinese">${tips.chinese}</div>` : ''}
+        </div>
+    `;
+}
+
+// Add this function to handle word navigation
+function navigateWordCard(direction) {
+    console.log('Navigating word card:', direction);
+    
+    // Calculate new index
+    const newIndex = currentWordIndex + direction;
+    
+    // Check if new index is valid
+    if (newIndex >= 0 && newIndex < vocabularyWords.length) {
+        currentWordIndex = newIndex;
+        displayWordCard(currentWordIndex);
+        updateNavigationControls();
+    }
+}
+
+// Update the navigation controls function
+function updateNavigationControls() {
+    const prevButton = document.getElementById('prev-word-btn');
+    const nextButton = document.getElementById('next-word-btn');
+    const wordCounter = document.getElementById('word-counter');
+
+    if (prevButton) {
+        prevButton.disabled = currentWordIndex <= 0;
+        prevButton.style.cursor = currentWordIndex <= 0 ? 'not-allowed' : 'pointer';
+    }
+
+    if (nextButton) {
+        nextButton.disabled = currentWordIndex >= vocabularyWords.length - 1;
+        nextButton.style.cursor = currentWordIndex >= vocabularyWords.length - 1 ? 'not-allowed' : 'pointer';
+    }
+
+    if (wordCounter && vocabularyWords.length > 0) {
+        wordCounter.textContent = `${currentWordIndex + 1} / ${vocabularyWords.length}`;
+    }
+}
+
+// Update the handleTabSwitch function to properly manage container visibility
+function handleTabSwitch(containerType) {
+    console.log('Switching to tab:', containerType);
+    
+    // Get all possible containers
+    const qaContainer = document.getElementById('qa-container');
+    const createContainer = document.getElementById('create-container');
+    const poetryContainer = document.getElementById('poetry-container');
+    const vocabularyContainer = document.getElementById('vocabulary-container');
+    const questionsContainer = document.querySelector('.questions-container');
+    
+    // Hide all containers first
+    if (qaContainer) qaContainer.style.display = 'none';
+    if (createContainer) createContainer.style.display = 'none';
+    if (poetryContainer) poetryContainer.style.display = 'none';
+    if (vocabularyContainer) vocabularyContainer.style.display = 'none';
+    if (questionsContainer) questionsContainer.style.display = 'none';
+    
+    // Reset active states for all buttons
+    const qaButton = document.getElementById('qa-button');
+    const createButton = document.getElementById('create-button');
+    const poetryButton = document.getElementById('poetry-button');
+    const wordButton = document.getElementById('word-button');
+    
+    if (qaButton) qaButton.classList.remove('active');
+    if (createButton) createButton.classList.remove('active');
+    if (poetryButton) poetryButton.classList.remove('active');
+    if (wordButton) wordButton.classList.remove('active');
+    
+    // Show the appropriate container and set active button based on containerType
+    switch (containerType) {
+        case 'qa':
+            if (qaContainer) {
+                qaContainer.style.display = 'block';
+                if (qaButton) qaButton.classList.add('active');
+            }
+            break;
+            
+        case 'create':
+            if (createContainer) {
+                createContainer.style.display = 'block';
+                if (createButton) createButton.classList.add('active');
+                if (questionsContainer) questionsContainer.style.display = 'block';
+            }
+            break;
+            
+        case 'poetry':
+            if (poetryContainer) {
+                poetryContainer.style.display = 'block';
+                if (poetryButton) poetryButton.classList.add('active');
+            }
+            break;
+            
+        case 'vocabulary':
+            if (vocabularyContainer) {
+                vocabularyContainer.style.display = 'block';
+                if (wordButton) wordButton.classList.add('active');
+            }
+            break;
+    }
+}
+
+// Function to handle the about site popup
+function setupAboutSiteLink() {
+    console.log('Setting up about site link...');
+    const aboutSiteLink = document.getElementById('about-site-link');
+    console.log('About site link found:', !!aboutSiteLink);
+    
+    if (aboutSiteLink) {
+        // Remove any existing event listeners to avoid duplicates
+        aboutSiteLink.removeEventListener('click', showAboutSiteModal);
+        
+        // Add click event listener
+        aboutSiteLink.addEventListener('click', function(e) {
+            console.log('About site link clicked');
+            e.preventDefault();
+            showAboutSiteModal();
+        });
+        console.log('About site link event listener added');
+    } else {
+        console.error('About site link element not found');
+        // Try again in 500ms in case the DOM isn't fully loaded yet
+        setTimeout(setupAboutSiteLink, 500);
+    }
+}
+
+// Function to show the about site modal
+function showAboutSiteModal() {
+    console.log('Showing about site modal...');
+    
+    // Create modal container
+    const modalContainer = document.createElement('div');
+    modalContainer.id = 'about-site-modal';
+    modalContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    `;
+    
+    // Chinese content
+    const chineseContent = `
+        <div style="
+            font-size: 16px;
+            color: #4a5568;
+            line-height: 1.7;
+        ">
+            <p>这是一个由好奇心、探索欲与热忱促成的小小实验项目，它始于几个萦绕心头的问题：</p>
+            
+            <ul style="
+                padding-left: 20px;
+                margin: 15px 0;
+            ">
+                <li>生成式AI如此强大，如何让它适配个性化需求？</li>
+                <li>在AI时代，编程与创造是否真的人人可为？</li>
+                <li>如何利用AI帮助孩子学习？</li>
+            </ul>
+            
+            <p>以下是实践过程中的一些感悟：</p>
+            
+            <ul style="
+                padding-left: 20px;
+                margin: 15px 0;
+            ">
+                <li>拒绝躺平，开启思考</li>
+                <li>不要拖延，立即行动</li>
+                <li>无惧试错，在实践中成长</li>
+                <li>永不言弃，探索不止</li>
+                <li>坚信自己，终有所成</li>
+            </ul>
+            
+            <p>项目所用到的工具（这些都是实践过程中现学现用的）：</p>
+            
+            <ul style="
+                padding-left: 20px;
+                margin: 15px 0;
+            ">
+                <li>内容提供：DeepSeek API</li>
+                <li>代码：Claude-3.7-sonnet</li>
+                <li>编译器：Cursor / VS Code</li>
+                <li>网页部署：Github / Cloudflare</li>
+            </ul>
+        </div>
+    `;
+    
+    // English content
+    const englishContent = `
+        <div style="
+            font-size: 16px;
+            color: #4a5568;
+            line-height: 1.7;
+        ">
+            <p>This is a small experimental project fueled by curiosity, exploration, and passion. It began with several lingering questions:</p>
+            
+            <ul style="
+                padding-left: 20px;
+                margin: 15px 0;
+            ">
+                <li>With generative AI being so powerful, how can we adapt it to personalized needs?</li>
+                <li>In the AI era, can programming and creation truly become accessible to everyone?</li>
+                <li>How can we leverage AI to assist children's learning?</li>
+            </ul>
+            
+            <p>Here are some insights gained during implementation:</p>
+            
+            <ul style="
+                padding-left: 20px;
+                margin: 15px 0;
+            ">
+                <li>Reject complacency, start thinking</li>
+                <li>Resist procrastination, take immediate action</li>
+                <li>Embrace trial and error, grow through practice</li>
+                <li>Never give up, keep exploring</li>
+                <li>Believe in yourself, success will follow</li>
+            </ul>
+            
+            <p>Tools used in the project (all learned during implementation):</p>
+            
+            <ul style="
+                padding-left: 20px;
+                margin: 15px 0;
+            ">
+                <li>Content provider: DeepSeek API</li>
+                <li>Coding: Claude-3.7-sonnet</li>
+                <li>Code Editor: Cursor / VS Code</li>
+                <li>Web deployment: Github / Cloudflare</li>
+            </ul>
+        </div>
+    `;
+    
+    // Create modal content (initially with Chinese content)
+    const modalContent = `
+        <div class="modal-content" style="
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        ">
+            <button id="close-about-modal" style="
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #4a5568;
+                padding: 5px;
+                z-index: 1;
+            ">×</button>
+            
+            <div style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid #e2e8f0;
+            ">
+                <button id="lang-toggle" style="
+                    background-color: #edf2f7;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 4px;
+                    padding: 5px 10px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    color: #4a5568;
+                ">
+                    <span id="lang-indicator">EN</span>
+                    <span style="margin: 0 4px;">|</span>
+                    <span>中</span>
+                </button>
+                
+                <h2 id="about-title" style="
+                    font-size: 24px;
+                    color: #2d3748;
+                    margin: 0 auto;
+                    text-align: center;
+                ">关于本站</h2>
+                
+                <div style="width: 70px;"></div> <!-- Spacer to balance the layout -->
+            </div>
+            
+            <div id="about-content">
+                ${chineseContent}
+            </div>
+            
+            <div style="
+                text-align: center;
+                margin-top: 25px;
+            ">
+                <button id="close-about-button" style="
+                    padding: 10px 20px;
+                    background-color: #4299e1;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    cursor: pointer;
+                ">关闭</button>
+            </div>
+        </div>
+    `;
+    
+    modalContainer.innerHTML = modalContent;
+    document.body.appendChild(modalContainer);
+    console.log('Modal added to DOM');
+    
+    // Add event listeners
+    const closeButton = document.getElementById('close-about-modal');
+    const closeAboutButton = document.getElementById('close-about-button');
+    const langToggle = document.getElementById('lang-toggle');
+    const langIndicator = document.getElementById('lang-indicator');
+    const aboutContent = document.getElementById('about-content');
+    const aboutTitle = document.getElementById('about-title');
+    
+    // Track current language (start with Chinese)
+    let isEnglish = false;
+    
+    if (langToggle) {
+        langToggle.addEventListener('click', function() {
+            isEnglish = !isEnglish;
+            
+            if (isEnglish) {
+                // Switch to English
+                aboutContent.innerHTML = englishContent;
+                aboutTitle.textContent = 'About this website';
+                closeAboutButton.textContent = 'Close';
+                langIndicator.textContent = '中';
+            } else {
+                // Switch to Chinese
+                aboutContent.innerHTML = chineseContent;
+                aboutTitle.textContent = '关于本站';
+                closeAboutButton.textContent = '关闭';
+                langIndicator.textContent = 'EN';
+            }
+        });
+    }
+    
+    if (closeButton) {
+        closeButton.addEventListener('click', function() {
+            console.log('Close button clicked');
+            modalContainer.remove();
+        });
+    }
+    
+    if (closeAboutButton) {
+        closeAboutButton.addEventListener('click', function() {
+            console.log('Close button clicked');
+            modalContainer.remove();
+        });
+    }
+    
+    // Close modal when clicking outside content
+    modalContainer.addEventListener('click', function(e) {
+        if (e.target === modalContainer) {
+            console.log('Clicked outside modal content');
+            modalContainer.remove();
+        }
+    });
+}
+
+// Add direct event listener for the about-site-link
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Setting up direct about site link listener...');
+    const aboutSiteLink = document.getElementById('about-site-link');
+    if (aboutSiteLink) {
+        aboutSiteLink.onclick = function(e) {
+            console.log('About site link clicked (direct handler)');
+            e.preventDefault();
+            showAboutSiteModal();
+            return false;
+        };
+        console.log('Direct about site link event handler attached');
+    } else {
+        console.error('About site link not found for direct handler');
+    }
+});
+
+// Make the showAboutSiteModal function globally available
+window.showAboutModal = function() {
+    console.log('Show about modal called from global function');
+    showAboutSiteModal();
+    return false;
+};
+
+// Process related phrases
+function processRelatedPhrases(word) {
+    const phrases = [];
+    
+    try {
+        if (word.related_phrases && Array.isArray(word.related_phrases)) {
+            word.related_phrases.forEach(phrase => {
+                if (typeof phrase === 'object') {
+                    phrases.push({
+                        english: safeGet(phrase, 'english', ''),
+                        chinese: safeGet(phrase, 'chinese', ''),
+                        usage: safeGet(phrase, 'usage', '')
+                    });
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error processing related phrases:', error);
+    }
+    
+    return phrases;
+}
+
+// Render related phrases section
+function renderRelatedPhrases(phrases) {
+    if (!phrases || phrases.length === 0) return '';
+    
+    return `
+        <div class="word-section">
+            <h3>相关词组</h3>
+            <div class="related-phrases">
+                ${phrases.map(phrase => `
+                    <div class="phrase-item">
+                        <div class="phrase-english">${phrase.english}</div>
+                        <div class="phrase-chinese">${phrase.chinese}</div>
+                        ${phrase.usage ? `<div class="phrase-usage">${phrase.usage}</div>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
 }
