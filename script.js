@@ -6460,6 +6460,7 @@ function renderExamples(examples) {
 
 // Render word family section
 function renderWordFamily(wordFamily) {
+    console.log("testing wordfamily");
     console.log(wordFamily);
     if (!wordFamily || wordFamily.length === 0) return '';
 
