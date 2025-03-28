@@ -4401,7 +4401,7 @@ document.addEventListener('DOMContentLoaded', function() {
             请选择中国文学史上最著名、最经典的作品，这些作品应该是真实存在的，不要创作新的内容。
             
             【重要】这些诗词必须严格符合${school}${grade}学生的认知水平和学习需求：
-            1. 诗词长度：优先选择${wordCount}左右，内容完整，不能节选
+            1. 诗词长度：内容完整，不能节选
             2. 难度要求：选择难度${complexityLevel}、词汇量${vocabularyLevel}
             3. 内容要求：主题积极向上，意境清晰，适合${school}${grade}学生理解和背诵
             4. 教育价值：具有明确的情感表达和思想内涵，能够引发学生共鸣和思考
