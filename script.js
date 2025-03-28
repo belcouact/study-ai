@@ -3684,6 +3684,7 @@ function getSimplifiedContextSummary() {
     return summary;
 }
 
+
 // Set up all event listeners
 function setupEventListeners() {
     // Define elements object
@@ -6027,7 +6028,7 @@ function showAboutSiteModal() {
 // Add event listener to call init function when the document is ready
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Document ready, initializing application...');
-    init();
+    //init();
 });
 
 // Add direct event listener for the about-site-link
