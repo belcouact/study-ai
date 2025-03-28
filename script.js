@@ -4148,6 +4148,9 @@ document.addEventListener('DOMContentLoaded', function() {
         createButton.addEventListener('click', function() {
             console.log('Create button clicked');
             handleTabSwitch('create');
+            // populate subject dropdown based on selected school
+            const selectedSchool = document.getElementById('sidebar-school-select').value;
+            populateSidebarSubjectOptions(selectedSchool);
         });
     }
     
