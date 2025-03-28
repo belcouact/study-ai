@@ -6028,8 +6028,8 @@ Please format your response as a valid JSON array with objects having the follow
 
 Requirements:
 1. Choose vocabulary appropriate for ${grade} grade ${school} school students
-2. Include 2-3 related word family (词性变形) for each word
-2. Include 2-3 related phrases (词组) for each word
+2. Include 2 related word family (词性变形) for each word
+2. Include 2 related phrases (词组) for each word
 3. Include two example sentences for each word
 4. Provide both English and Chinese translations for all content
 5. Keep the JSON structure simple and valid
@@ -6505,29 +6505,6 @@ function renderExamples(examples) {
     `;
 }
 
-/*
-// Render word family section
-function renderWordFamily(wordFamily) {
-    console.log("testing wordfamily")
-    console.log(wordFamily);
-    if (!wordFamily || wordFamily.length === 0) return '';
-
-    return `
-        <div class="word-family">
-            <h3 class="section-title">词族</h3>
-            <div class="word-family-items">
-                ${wordFamily.map(item => `
-                    <span class="word-family-item" title="${item.english || ''}">
-                        ${item.english ? `${item.english}: ` : ''}${item.chinese}
-                    </span>
-                `).join('')}
-            </div>
-        </div>
-    `;
-
-}
-*/
-
 // Enhanced render function
 function renderWordFamily(wordFamily) {
     if (!wordFamily || wordFamily.length === 0) return '';
@@ -6540,8 +6517,8 @@ function renderWordFamily(wordFamily) {
                     <span class="word-family-item" 
                           title="${item.chinese || item.word || ''}">
                         ${item.word || ''}
-                        ${item.type ? `<small>(${item.type})</small>` : ''}
-                        ${item.chinese ? `<small>${item.chinese}</small>` : ''}
+                        ${item.type ? `(${item.type})` : ''}
+                        ${item.chinese ? `${item.chinese}` : ''}
                     </span>
                 `).join('')}
             </div>
