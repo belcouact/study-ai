@@ -5540,6 +5540,7 @@ function renderExamples(examples) {
     `;
 }
 
+/*
 // Enhanced render function
 function renderWordFamily(wordFamily) {
     if (!wordFamily || wordFamily.length === 0) return '';
@@ -5554,6 +5555,25 @@ function renderWordFamily(wordFamily) {
                         ${item.word || ''}
                         ${item.type ? `(${item.type})` : ''}
                         ${item.chinese ? `${item.chinese}` : ''}
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+*/
+
+function renderWordFamily(wordFamily) {
+    if (!wordFamily || wordFamily.length === 0) return '';
+    
+    return `
+        <div class="word-family">
+            <h3 class="section-title">词族</h3>
+            <div class="word-family-items">
+                ${wordFamily.map(item => `
+                    <span class="word-family-item">
+                        <span class="english">${item.english || item.word || ''}</span>: 
+                        <span class="chinese">${item.chinese || item.type || ''}</span>
                     </span>
                 `).join('')}
             </div>
