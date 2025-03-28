@@ -5763,7 +5763,7 @@ function showAboutSiteModal() {
             background: white;
             padding: 30px;
             border-radius: 12px;
-            max-width: 600px;
+            max-width: 800px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
