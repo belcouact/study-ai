@@ -6254,6 +6254,7 @@ function processExamples(word) {
     return examples;
 }
 
+/*
 // Process word family from various formats
 function processWordFamily(word) {
     const wordFamilyItems = [];
@@ -6286,6 +6287,52 @@ function processWordFamily(word) {
     
     return wordFamilyItems;
     //console.log(wordFamilyItems);
+}
+*/
+
+function processWordFamily(word) {
+    const wordFamilyItems = [];
+    
+    try {
+        if (word.word_family) {
+            if (Array.isArray(word.word_family)) {
+                word.word_family.forEach(item => {
+                    if (item && typeof item === 'object') {
+                        // Process objects with chinese and english properties
+                        if (item.chinese && item.english) {
+                            wordFamilyItems.push({
+                                type: item.chinese,  // Keep the full chinese string (e.g., "adv, 突然地")
+                                word: item.english  // The English word
+                            });
+                        }
+                        // Keep the original handling for other object types
+                        else {
+                            const keys = Object.keys(item);
+                            if (keys.length > 0) {
+                                wordFamilyItems.push({ 
+                                    type: keys[0], 
+                                    word: item[keys[0]]     
+                                });
+                            }
+                        }
+                    }
+                    // Keep the original handling for string items
+                    else if (typeof item === 'string') {
+                        wordFamilyItems.push({ word: item });
+                    }
+                });
+            } else if (typeof word.word_family === 'object') {
+                // Keep the original handling for plain objects
+                Object.entries(word.word_family).forEach(([type, value]) => {
+                    wordFamilyItems.push({ type, word: value });
+                });
+            }
+        }
+    } catch (e) {
+        console.warn('Error processing word family:', e);
+    }
+    
+    return wordFamilyItems;
 }
 
 // Process collocations from various formats
@@ -6460,7 +6507,7 @@ function renderExamples(examples) {
 
 // Render word family section
 function renderWordFamily(wordFamily) {
-    console.log("testing wordfamily");
+    console.log("testing wordfamily")
     console.log(wordFamily);
     if (!wordFamily || wordFamily.length === 0) return '';
 
@@ -6469,8 +6516,8 @@ function renderWordFamily(wordFamily) {
             <h3 class="section-title">词族</h3>
             <div class="word-family-items">
                 ${wordFamily.map(item => `
-                    <span class="word-family-item" title="${item.type || ''}">
-                        ${item.type ? `${item.type}: ` : ''}${item.word}
+                    <span class="word-family-item" title="${item.english || ''}">
+                        ${item.english ? `${item.english}: ` : ''}${item.chinese}
                     </span>
                 `).join('')}
             </div>
