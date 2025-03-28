@@ -3684,83 +3684,83 @@ function getSimplifiedContextSummary() {
     return summary;
 }
 
-    // Set up all event listeners
-    function setupEventListeners() {
-        // Define elements object
-        const elements = {
-            //sidebarToggle: document.getElementById('sidebar-toggle'),
-            qaButton: document.getElementById('qa-button'),
-            createButton: document.getElementById('create-button'),
-            poetryButton: document.getElementById('poetry-button'),
-            schoolSelectSidebar: document.getElementById('school-select-sidebar'),
-            poetryTypeSelect: document.getElementById('poetry-type-select'),
-            poetryStyleSelect: document.getElementById('poetry-style-select')
-        };
+// Set up all event listeners
+function setupEventListeners() {
+    // Define elements object
+    const elements = {
+        //sidebarToggle: document.getElementById('sidebar-toggle'),
+        qaButton: document.getElementById('qa-button'),
+        createButton: document.getElementById('create-button'),
+        poetryButton: document.getElementById('poetry-button'),
+        schoolSelectSidebar: document.getElementById('school-select-sidebar'),
+        poetryTypeSelect: document.getElementById('poetry-type-select'),
+        poetryStyleSelect: document.getElementById('poetry-style-select')
+    };
 
-        // Sidebar toggle
-        //elements.sidebarToggle.addEventListener('click', toggleSidebar);
-        
-        // Panel buttons
-        elements.qaButton.addEventListener('click', () => switchPanel('qa'));
-        elements.createButton.addEventListener('click', () => switchPanel('create'));
-        
-        // Make sure the poetry button has an event listener
-        if (elements.poetryButton) {
-            elements.poetryButton.addEventListener('click', () => switchPanel('poetry'));
-            console.log('Poetry button event listener added');
-        } else {
-            console.error('Poetry button element not found');
-        }
-        
-        // School select change
-        elements.schoolSelectSidebar.addEventListener('change', (e) => {
-            populateSidebarGradeOptions(e.target.value);
-            populateSidebarSubjectOptions(e.target.value);
-        });
-        
-        // Poetry type change
-        if (elements.poetryTypeSelect) {
-            elements.poetryTypeSelect.addEventListener('change', (e) => {
-                updatePoetryStyleOptions(e.target.value);
-            });
-            
-            // Initialize poetry style options based on default poetry type
-            updatePoetryStyleOptions(elements.poetryTypeSelect.value);
-        }
-        
-        // Chat buttons
-        setupChatButtons();
-        
-        // Navigation buttons
-        //setupNavigationButtons();
-        
-        // Poetry buttons
-        //setupPoetryButtons();
-        
-        // Button click handlers for sidebar navigation
-        if (qaButton) {
-            qaButton.addEventListener('click', () => handleTabSwitch('qa'));
-        }
-        
-        if (createButton) {
-            createButton.addEventListener('click', () => handleTabSwitch('create'));
-        }
-        
-        if (poetryButton) {
-            poetryButton.addEventListener('click', () => handleTabSwitch('poetry'));
-        }
-        
-        const wordButton = document.getElementById('word-button');
-        if (wordButton) {
-            wordButton.addEventListener('click', () => handleTabSwitch('vocabulary'));
-        }
-        
-        // Tab switching for any additional tabs using data-tab attributes
-        const tabs = document.querySelectorAll('.tab');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => handleTabSwitch(tab.dataset.tab));
-        });
+    // Sidebar toggle
+    //elements.sidebarToggle.addEventListener('click', toggleSidebar);
+    
+    // Panel buttons
+    elements.qaButton.addEventListener('click', () => switchPanel('qa'));
+    elements.createButton.addEventListener('click', () => switchPanel('create'));
+    
+    // Make sure the poetry button has an event listener
+    if (elements.poetryButton) {
+        elements.poetryButton.addEventListener('click', () => switchPanel('poetry'));
+        console.log('Poetry button event listener added');
+    } else {
+        console.error('Poetry button element not found');
     }
+    
+    // School select change
+    elements.schoolSelectSidebar.addEventListener('change', (e) => {
+        populateSidebarGradeOptions(e.target.value);
+        populateSidebarSubjectOptions(e.target.value);
+    });
+    
+    // Poetry type change
+    if (elements.poetryTypeSelect) {
+        elements.poetryTypeSelect.addEventListener('change', (e) => {
+            updatePoetryStyleOptions(e.target.value);
+        });
+        
+        // Initialize poetry style options based on default poetry type
+        updatePoetryStyleOptions(elements.poetryTypeSelect.value);
+    }
+    
+    // Chat buttons
+    setupChatButtons();
+    
+    // Navigation buttons
+    //setupNavigationButtons();
+    
+    // Poetry buttons
+    //setupPoetryButtons();
+    
+    // Button click handlers for sidebar navigation
+    if (qaButton) {
+        qaButton.addEventListener('click', () => handleTabSwitch('qa'));
+    }
+    
+    if (createButton) {
+        createButton.addEventListener('click', () => handleTabSwitch('create'));
+    }
+    
+    if (poetryButton) {
+        poetryButton.addEventListener('click', () => handleTabSwitch('poetry'));
+    }
+    
+    const wordButton = document.getElementById('word-button');
+    if (wordButton) {
+        wordButton.addEventListener('click', () => handleTabSwitch('vocabulary'));
+    }
+    
+    // Tab switching for any additional tabs using data-tab attributes
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => handleTabSwitch(tab.dataset.tab));
+    });
+}
 
 // Initialize the application
 function init() {
@@ -5044,7 +5044,7 @@ Please format your response as a valid JSON array with objects having the follow
     "word_family": [
       {
         "english": "examplary",
-        "chinese": "adj, 可作榜样的",
+        "chinese": "adj, -ɪɡˈzæm.pələri-, 可作榜样的",
       }
     ],
     "related_phrases": [
