@@ -10,28 +10,36 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadSentenceData() {
         try {
             const response = await fetch('600 english sentences.txt'); // Fetch the file
+            console.log("Fetch response status:", response.status, "ok:", response.ok); // Log fetch status
+
             if (!response.ok) {
-                // Check if the file was found - fetch for local files might fail differently
-                if (response.status === 404 || response.status === 0) { // status 0 can occur for local file errors
-                     throw new Error(`File not found or inaccessible: '600 english sentences.txt'. Ensure it's in the same folder as main.html.`);
+                if (response.status === 404 || response.status === 0) {
+                     throw new Error(`File not found or inaccessible: '600 english sentences.txt'. Ensure it's in the same folder and accessed via a web server (http://) not directly (file://).`);
                 }
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            // Fetch as ArrayBuffer instead of text
             const buffer = await response.arrayBuffer();
+            console.log("Fetched ArrayBuffer size:", buffer.byteLength); // Log buffer size
 
             // Decode the ArrayBuffer as UTF-8 text
             const decoder = new TextDecoder('utf-8');
             const text = decoder.decode(buffer);
+            console.log("Decoded text (first 500 chars):", text.substring(0, 500)); // Log the start of the decoded text
+
+            // Check if decoding produced replacement characters '' which indicates an encoding issue
+            if (text.includes('') && text.length > 0) {
+                 console.warn("Decoded text contains '' replacement characters, suggesting the source file might not be valid UTF-8 or was corrupted.");
+                 // You might still try parsing, but warn the user
+            }
 
             // Proceed with parsing the decoded text
             return parseSentenceData(text);
         } catch (error) {
             console.error("Error loading or parsing sentence data:", error);
-            // Display error message to the user
             categoryTitleElement.textContent = 'Error Loading Data';
-            sentenceCardsContainer.innerHTML = `<p>Could not load or decode sentence data. ${error.message}</p>`;
+            // Make the error message more prominent and informative
+            sentenceCardsContainer.innerHTML = `<p style="color: red; font-weight: bold;">Could not load or decode sentence data.</p><p><strong>Error message:</strong> ${error.message}</p><p>Please check the browser's developer console (F12) for more details. Also, verify '600 english sentences.txt' is correctly saved as UTF-8 and is in the same folder.</p>`;
             nextButton.disabled = true;
             return []; // Return empty array on error
         }
@@ -144,7 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
                  categoryTitleElement.textContent = 'No Data';
                  sentenceCardsContainer.innerHTML = '<p>No categories found in the data file or the file is empty/incorrectly formatted.</p>';
             }
-            nextButton.disabled = true;
+            // Ensure button is disabled if no data loaded
+             nextButton.disabled = true;
         }
     }
 
