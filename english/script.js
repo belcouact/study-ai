@@ -11,15 +11,27 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('600 english sentences.txt'); // Fetch the file
             if (!response.ok) {
+                // Check if the file was found - fetch for local files might fail differently
+                if (response.status === 404 || response.status === 0) { // status 0 can occur for local file errors
+                     throw new Error(`File not found or inaccessible: '600 english sentences.txt'. Ensure it's in the same folder as main.html.`);
+                }
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            const text = await response.text(); // Get the file content as text
-            return parseSentenceData(text); // Parse the text content
+
+            // Fetch as ArrayBuffer instead of text
+            const buffer = await response.arrayBuffer();
+
+            // Decode the ArrayBuffer as UTF-8 text
+            const decoder = new TextDecoder('utf-8');
+            const text = decoder.decode(buffer);
+
+            // Proceed with parsing the decoded text
+            return parseSentenceData(text);
         } catch (error) {
             console.error("Error loading or parsing sentence data:", error);
             // Display error message to the user
-            categoryTitleElement.textContent = 'Error';
-            sentenceCardsContainer.innerHTML = `<p>Could not load sentence data. Please ensure '600 english sentences.txt' is in the same folder and the page is served correctly.</p><p>Error: ${error.message}</p>`;
+            categoryTitleElement.textContent = 'Error Loading Data';
+            sentenceCardsContainer.innerHTML = `<p>Could not load or decode sentence data. ${error.message}</p>`;
             nextButton.disabled = true;
             return []; // Return empty array on error
         }
@@ -34,13 +46,20 @@ document.addEventListener('DOMContentLoaded', () => {
         lines.forEach(line => {
             line = line.trim(); // Remove leading/trailing whitespace
 
+            // Simple check for BOM (Byte Order Mark) - common in UTF-8 files from Windows editors
+            if (line.charCodeAt(0) === 0xFEFF) {
+                line = line.substring(1);
+            }
+
             if (line.startsWith('###')) {
                 // Start of a new category
                 const categoryName = line.substring(3).trim();
-                currentCategory = {
-                    category: categoryName,
-                    sentences: []
-                };
+                // Ignore potential BOM in category name if it wasn't trimmed above
+                 if (categoryName.charCodeAt(0) === 0xFEFF) {
+                    currentCategory = { category: categoryName.substring(1), sentences: [] };
+                 } else {
+                    currentCategory = { category: categoryName, sentences: [] };
+                 }
                 data.push(currentCategory);
             } else if (line.includes('/') && currentCategory) {
                 // Sentence pair line within a category
@@ -55,9 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             // Ignore empty lines or lines without '/' outside a category context
         });
-        return data;
+        // Filter out categories that might have been created but ended up empty
+        return data.filter(category => category.sentences.length > 0 || category.category);
     }
-
 
     function displayCategory(index) {
         if (index < 0 || index >= categoriesData.length) {
