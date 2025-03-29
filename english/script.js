@@ -95,18 +95,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayCategory(index) {
         if (!categoriesData || categoriesData.length === 0) {
              console.warn("displayCategory called with no data.");
-             return; // Don't try to display if no data
+             return;
         }
-        // Ensure index wraps around correctly if called with an out-of-bounds index initially
-        // Though the button logic should prevent this, it's safer.
         index = (index + categoriesData.length) % categoriesData.length;
-        currentCategoryIndex = index; // Update the global index
+        currentCategoryIndex = index;
 
         if (index < 0 || index >= categoriesData.length) {
             console.error("Invalid category index after wrap around:", index);
             sentenceCardsContainer.innerHTML = '<p>Error: Category not found.</p>';
             categoryTitleElement.textContent = 'Error';
-             // Disable buttons if something is wrong with index logic
             prevButton.disabled = true;
             nextButton.disabled = true;
             return;
@@ -118,10 +115,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clear previous cards
         sentenceCardsContainer.innerHTML = '';
 
-        // Create and append new sentence cards
-        category.sentences.forEach(sentencePair => {
+        // --- Animation Trigger ---
+        // Create and append new sentence cards with staggered delay
+        category.sentences.forEach((sentencePair, cardIndex) => {
             const card = document.createElement('div');
             card.classList.add('sentence-card');
+
+            // Apply staggered animation delay using CSS custom property
+            const delay = cardIndex * 0.07; // 70ms delay between cards
+            card.style.setProperty('--animation-delay', `${delay}s`);
 
             const englishP = document.createElement('p');
             englishP.classList.add('english-sentence');
@@ -135,13 +137,11 @@ document.addEventListener('DOMContentLoaded', () => {
             card.appendChild(chineseP);
             sentenceCardsContainer.appendChild(card);
         });
+        // --- End Animation Trigger ---
 
-         // Since we wrap around, buttons are usually always enabled
-         // unless there's only 0 or 1 category.
          const numCategories = categoriesData.length;
          prevButton.disabled = numCategories <= 1;
          nextButton.disabled = numCategories <= 1;
-
     }
 
     // Event listener for the NEXT button

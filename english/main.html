@@ -3,29 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Sentence Learning</title>
+    <title>English Sentence Learning Fun!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><span id="category-title"></span></h1>
+            <h1 class="category-header">Category: <span id="category-title">Loading...</span></h1>
         </header>
 
         <main id="sentence-cards-container">
             <!-- Sentence cards will be loaded here by JavaScript -->
         </main>
 
-        <!-- Navigation controls are now OUTSIDE the main container -->
-
+        <!-- New Navigation Buttons Container -->
+        <div class="navigation-controls">
+            <button id="prev-button" class="nav-button">◄</button>
+            <button id="next-button" class="nav-button">►</button>
+        </div>
     </div>
-
-    <!-- New Navigation Buttons Container - outside .container -->
-    <div class="navigation-controls">
-        <button id="prev-button" class="nav-button">◄ Prev</button> <!-- Optional: Use arrows -->
-        <button id="next-button" class="nav-button">Next ►</button> <!-- Optional: Use arrows -->
-    </div>
-
 
     <script src="script.js"></script>
 </body>
