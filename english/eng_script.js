@@ -50,7 +50,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Set up event listeners
         setupEventListeners();
         
-        // Fetch sentences
+        // Start with hardcoded data immediately for best experience
+        loadSampleData();
+        
+        // Then try to fetch the file
         fetchSentences();
     }
     
@@ -315,8 +318,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const hasEncodingIssues = Array.from(chineseDivs).some(div => {
             // More robust check for encoding issues
             const text = div.textContent;
-            return text.includes('') || text.includes('\\uFFFD') || 
-                   text.length < 2 || !/[\u4e00-\u9fa5]/.test(text);
+            return text.includes('') || 
+                   (text.length > 0 && !/[\u4e00-\u9fa5]/.test(text));
         });
         
         if (hasEncodingIssues) {
