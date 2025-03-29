@@ -3,38 +3,61 @@ document.addEventListener('DOMContentLoaded', () => {
     const sentenceCardsContainer = document.getElementById('sentence-cards-container');
     const nextButton = document.getElementById('next-button');
 
-    // --- IMPORTANT ---
-    // You need to convert your "600 english sentences.txt" file
-    // into this JavaScript array structure.
-    // Each object in the array represents a category.
-    // The 'category' key holds the category name (from lines starting with ###).
-    // The 'sentences' key holds an array of sentence pairs for that category.
-    // Each sentence pair is an object with 'en' (English) and 'zh' (Chinese) keys.
-
-    const categoriesData = [
-        // Example Structure: Replace this with your actual data
-        {
-            category: "日常问候 (Example)",
-            sentences: [
-                { en: "Hello.", zh: "你好。" },
-                { en: "How are you?", zh: "你好吗？" },
-                { en: "Good morning.", zh: "早上好。" }
-            ]
-        },
-        {
-            category: "问路 (Example)",
-            sentences: [
-                { en: "Excuse me, where is the station?", zh: "打扰一下，请问车站在哪里？" },
-                { en: "How can I get to the library?", zh: "我怎样才能去图书馆？" }
-            ]
-        },
-        // Add all your 60 categories and their sentences here...
-        // { category: "...", sentences: [ {en: "...", zh: "..."}, ... ] },
-        // { category: "...", sentences: [ {en: "...", zh: "..."}, ... ] },
-        // ... and so on
-    ];
-
+    let categoriesData = []; // Initialize as empty array
     let currentCategoryIndex = 0;
+
+    // Function to fetch and parse the text file
+    async function loadSentenceData() {
+        try {
+            const response = await fetch('600 english sentences.txt'); // Fetch the file
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const text = await response.text(); // Get the file content as text
+            return parseSentenceData(text); // Parse the text content
+        } catch (error) {
+            console.error("Error loading or parsing sentence data:", error);
+            // Display error message to the user
+            categoryTitleElement.textContent = 'Error';
+            sentenceCardsContainer.innerHTML = `<p>Could not load sentence data. Please ensure '600 english sentences.txt' is in the same folder and the page is served correctly.</p><p>Error: ${error.message}</p>`;
+            nextButton.disabled = true;
+            return []; // Return empty array on error
+        }
+    }
+
+    // Function to parse the raw text data into the structured format
+    function parseSentenceData(text) {
+        const lines = text.split(/\r?\n/); // Split text into lines (handle different line endings)
+        const data = [];
+        let currentCategory = null;
+
+        lines.forEach(line => {
+            line = line.trim(); // Remove leading/trailing whitespace
+
+            if (line.startsWith('###')) {
+                // Start of a new category
+                const categoryName = line.substring(3).trim();
+                currentCategory = {
+                    category: categoryName,
+                    sentences: []
+                };
+                data.push(currentCategory);
+            } else if (line.includes('/') && currentCategory) {
+                // Sentence pair line within a category
+                const parts = line.split('/');
+                if (parts.length >= 2) {
+                    const en = parts[0].trim();
+                    const zh = parts.slice(1).join('/').trim(); // Join remaining parts in case '/' is in the Chinese text
+                    if (en && zh) { // Only add if both parts are non-empty
+                       currentCategory.sentences.push({ en, zh });
+                    }
+                }
+            }
+            // Ignore empty lines or lines without '/' outside a category context
+        });
+        return data;
+    }
+
 
     function displayCategory(index) {
         if (index < 0 || index >= categoriesData.length) {
@@ -75,7 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
          // nextButton.disabled = (index === categoriesData.length - 1);
     }
 
+    // Event listener for the next button
     nextButton.addEventListener('click', () => {
+        if (!categoriesData || categoriesData.length === 0) return; // Don't do anything if data isn't loaded
+
         currentCategoryIndex++;
         // Wrap around to the first category if we've gone past the last one
         if (currentCategoryIndex >= categoriesData.length) {
@@ -84,13 +110,26 @@ document.addEventListener('DOMContentLoaded', () => {
         displayCategory(currentCategoryIndex);
     });
 
-    // Initial display of the first category
-    if (categoriesData.length > 0) {
-        displayCategory(currentCategoryIndex);
-    } else {
-        // Handle case where categoriesData is empty
-        categoryTitleElement.textContent = 'No Data';
-        sentenceCardsContainer.innerHTML = '<p>Please add category data to script.js</p>';
-        nextButton.disabled = true;
+    // Main function to initialize the page
+    async function initializePage() {
+        categoriesData = await loadSentenceData(); // Load and parse data
+
+        // Initial display of the first category if data loaded successfully
+        if (categoriesData && categoriesData.length > 0) {
+            displayCategory(currentCategoryIndex);
+            nextButton.disabled = false; // Ensure button is enabled
+        } else if (!categoriesData || categoriesData.length === 0) {
+            // Handle case where data loading failed or file was empty/incorrectly formatted
+            // Error message is already displayed by loadSentenceData in case of fetch errors
+            if (!document.querySelector('#sentence-cards-container p')) { // Avoid overwriting fetch error message
+                 categoryTitleElement.textContent = 'No Data';
+                 sentenceCardsContainer.innerHTML = '<p>No categories found in the data file or the file is empty/incorrectly formatted.</p>';
+            }
+            nextButton.disabled = true;
+        }
     }
+
+    // Start the initialization process
+    initializePage();
+
 }); 
