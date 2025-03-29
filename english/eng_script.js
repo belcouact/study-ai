@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Use hardcoded data as fallback
             cardContainer.innerHTML = '';
             categories = hardcodedData;
-            displayCategory(currentCategoryIndex);
+            //displayCategory(currentCategoryIndex);
         }
     }
     
