@@ -1,1 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Learning Cards</title>
+    <link rel="stylesheet" href="eng_style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>English Learning Cards</h1>
+            <h2 id="category-title">Loading category...</h2>
+        </header>
+        
+        <main>
+            <div class="card-container" id="card-container">
+                <!-- Cards will be dynamically inserted here -->
+                <div class="loading">Loading sentences...</div>
+            </div>
+            
+            <div class="navigation">
+                <button id="prev-category" class="nav-button">Previous Category</button>
+                <div id="category-progress">Category: <span id="current-category">0</span>/<span id="total-categories">0</span></div>
+                <button id="next-category" class="nav-button">Next Category</button>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Interactive English Learning Cards</p>
+        </footer>
+    </div>
 
+    <script src="eng_script.js"></script>
+</body>
+</html>
