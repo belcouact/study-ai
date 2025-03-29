@@ -170,7 +170,30 @@
         }
     });
 
-    // ... (getRandomQuote function remains the same) ...
+    // *** Add the missing getRandomQuote function here ***
+    let currentQuoteIndex = -1; // Keep track of the last shown index to avoid repeats
+
+    // Function to get a random quote, avoiding immediate repetition
+    function getRandomQuote() {
+        if (!quotes || quotes.length === 0) {
+            // Should ideally not happen if called after successful loading, but good fallback
+            return { english: "No quotes available.", chinese: "" };
+        }
+        if (quotes.length === 1) {
+            return quotes[0]; // Only one quote, return it
+        }
+
+        let randomIndex;
+        do {
+            // Generate a random index within the bounds of the array
+            randomIndex = Math.floor(Math.random() * quotes.length);
+        } while (randomIndex === currentQuoteIndex); // Keep trying if it's the same as the last one
+
+        currentQuoteIndex = randomIndex; // Update the last shown index
+        return quotes[randomIndex];
+    }
+    // *** End of added function ***
+
 
     // Function to update the HTML with the given quote
     function displayQuote(quote) {
