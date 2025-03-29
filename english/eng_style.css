@@ -120,9 +120,11 @@ main {
 .chinese {
     font-size: 1rem;
     color: var(--light-text);
-    font-family: 'Microsoft YaHei', 'SimHei', 'SimSun', 'Noto Sans SC', sans-serif;
+    font-family: 'Microsoft YaHei', 'SimHei', 'SimSun', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
     border-top: 1px solid #f0f0f0;
     padding-top: 8px;
+    word-break: normal;
+    overflow-wrap: break-word;
 }
 
 .loading {
@@ -268,4 +270,11 @@ footer {
         gap: 15px;
         align-items: center;
     }
+}
+
+/* Add a font-face for Chinese if needed */
+@font-face {
+    font-family: 'Noto Sans SC';
+    src: url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC&display=swap');
+    font-display: swap;
 } 
