@@ -5,6 +5,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>English Learning Cards</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="eng_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script>document.characterSet = "UTF-8";</script>
@@ -33,6 +36,10 @@
                 </div>
             </div>
         </main>
+        
+        <div class="debug-controls" style="display: none;">
+            <button id="use-hardcoded-btn" onclick="toggleHardcodedData()">Use Hardcoded Data</button>
+        </div>
         
         <footer>
             <p>Interactive English Learning Cards | <span id="mastered-count">0</span> sentences mastered</p>

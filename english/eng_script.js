@@ -289,6 +289,12 @@ document.addEventListener('DOMContentLoaded', function() {
             case 'ArrowRight':
                 navigateToNextCategory();
                 break;
+            case 'h':
+                if (e.ctrlKey) {
+                    e.preventDefault();
+                    toggleHardcodedData();
+                }
+                break;
         }
     }
     
@@ -306,8 +312,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const chineseDivs = document.querySelectorAll('.chinese');
         
         // Check if any Chinese text looks like it has encoding issues
-        const hasEncodingIssues = Array.from(chineseDivs).some(div => 
-            div.textContent.includes('') || div.textContent.length < 2);
+        const hasEncodingIssues = Array.from(chineseDivs).some(div => {
+            // More robust check for encoding issues
+            const text = div.textContent;
+            return text.includes('') || text.includes('\\uFFFD') || 
+                   text.length < 2 || !/[\u4e00-\u9fa5]/.test(text);
+        });
         
         if (hasEncodingIssues) {
             console.log("Detected Chinese encoding issues, applying fix...");
@@ -318,4 +328,29 @@ document.addEventListener('DOMContentLoaded', function() {
             displayCategory(currentCategoryIndex);
         }
     }
+    
+    // Add this at the beginning of your script
+    function toggleHardcodedData() {
+        console.log("Switching to hardcoded dataset");
+        categories = hardcodedData;
+        totalCategoriesSpan.textContent = categories.length;
+        currentCategoryIndex = 0;
+        displayCategory(currentCategoryIndex);
+        updateNavButtons();
+        updateProgressBar();
+    }
+
+    // Add this to expose the toggle function to the window
+    window.toggleHardcodedData = toggleHardcodedData;
+
+    // Add code to show debug controls when pressing Ctrl+Shift+D
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+            e.preventDefault();
+            const debugControls = document.querySelector('.debug-controls');
+            if (debugControls) {
+                debugControls.style.display = debugControls.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+    });
 }); 

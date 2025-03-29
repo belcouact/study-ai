@@ -120,11 +120,16 @@ main {
 .chinese {
     font-size: 1rem;
     color: var(--light-text);
-    font-family: 'Microsoft YaHei', 'SimHei', 'SimSun', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+    /* More specific font family with better fallbacks */
+    font-family: 'Noto Sans SC', 'Microsoft YaHei', 'SimHei', 'SimSun', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
     border-top: 1px solid #f0f0f0;
     padding-top: 8px;
     word-break: normal;
     overflow-wrap: break-word;
+    /* Add better CJK text rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 .loading {
@@ -277,4 +282,7 @@ footer {
     font-family: 'Noto Sans SC';
     src: url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC&display=swap');
     font-display: swap;
-} 
+}
+
+/* With the correct approach using Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&display=swap'); 
