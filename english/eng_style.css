@@ -120,16 +120,9 @@ main {
 .chinese {
     font-size: 1rem;
     color: var(--light-text);
-    /* Prioritize system Chinese fonts first, then web fonts */
-    font-family: 'Microsoft YaHei', 'SimHei', 'SimSun', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', sans-serif;
+    font-family: 'Microsoft YaHei', 'SimHei', 'SimSun', 'Noto Sans SC', sans-serif;
     border-top: 1px solid #f0f0f0;
     padding-top: 8px;
-    word-break: normal;
-    overflow-wrap: break-word;
-    /* Add better CJK text rendering */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
 }
 
 .loading {
@@ -275,50 +268,4 @@ footer {
         gap: 15px;
         align-items: center;
     }
-}
-
-/* With the correct approach using Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&display=swap');
-
-.card .mastered-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: var(--secondary-color);
-    color: white;
-    border-radius: 50%;
-    width: 25px;
-    height: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    transform: scale(0);
-    transition: transform 0.3s ease;
-}
-
-.card.mastered .mastered-badge {
-    transform: scale(1);
-}
-
-.debug-controls {
-    margin: 15px auto;
-    text-align: center;
-    background-color: #f8f9fa;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px dashed #ccc;
-}
-
-.debug-controls button {
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.debug-controls button:hover {
-    background-color: #5a6268;
 } 

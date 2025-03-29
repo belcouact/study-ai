@@ -14,35 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentCategoryIndex = 0;
     let masteredSentences = new Set();
     
-    // Add this at the top of your script
-    const hardcodedData = [
-        {
-            title: "日常问候",
-            sentences: [
-                { english: "Hello, how are you?", chinese: "你好，你好吗？", id: "hellohow" },
-                { english: "I'm fine, thank you. And you?", chinese: "我很好，谢谢。你呢？", id: "imfinethank" },
-                { english: "Good morning!", chinese: "早上好！", id: "goodmorning" },
-                { english: "Nice to meet you.", chinese: "很高兴认识你。", id: "nicetomeet" }
-            ]
-        },
-        {
-            title: "问候",
-            sentences: [
-                { english: "Hi there!", chinese: "你好！", id: "hithere" },
-                { english: "How's it going?", chinese: "近况如何？", id: "howsitgoing" },
-                { english: "What's up?", chinese: "怎么了？", id: "whatsup" }
-            ]
-        },
-        {
-            title: "天气",
-            sentences: [
-                { english: "It's a beautiful day today.", chinese: "今天天气真好。", id: "beautiful" },
-                { english: "It's raining.", chinese: "正在下雨。", id: "raining" },
-                { english: "It's quite cold.", chinese: "天气很冷。", id: "cold" }
-            ]
-        }
-    ];
-    
     // Initialize the app
     init();
     
@@ -50,10 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Set up event listeners
         setupEventListeners();
         
-        // Start with hardcoded data immediately for best experience
-        loadSampleData();
-        
-        // Then try to fetch the file
+        // Fetch sentences
         fetchSentences();
     }
     
@@ -70,60 +38,40 @@ document.addEventListener('DOMContentLoaded', function() {
         // Try to fetch the file with explicit UTF-8 handling
         const fileUrl = '600 english sentences.txt';
         
-        // Create a new XMLHttpRequest to explicitly set the encoding
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', fileUrl, true);
-        xhr.responseType = 'blob';
-        
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                const blob = xhr.response;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const text = e.target.result;
-                    console.log("Sample of loaded data:", text.substring(0, 100));
-                    
-                    try {
-                        parseContent(text);
-                        
-                        if (categories.length === 0) {
-                            throw new Error('No categories found in the file');
-                        }
-                        
-                        totalCategoriesSpan.textContent = categories.length;
-                        displayCategory(currentCategoryIndex);
-                        updateNavButtons();
-                        updateProgressBar();
-                    } catch (error) {
-                        console.error('Error parsing content:', error);
-                        loadSampleData();
-                    }
-                };
-                reader.readAsText(blob, 'UTF-8'); // Explicitly specify UTF-8 encoding
-            } else {
-                console.error('Error loading file:', xhr.statusText);
+        fetch(fileUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load sentence file');
+                }
+                return response.arrayBuffer();
+            })
+            .then(buffer => {
+                // Convert buffer to UTF-8 text
+                const decoder = new TextDecoder('utf-8');
+                const data = decoder.decode(buffer);
+                
+                console.log("Sample of loaded data:", data.substring(0, 100));
+                parseContent(data);
+                
+                if (categories.length === 0) {
+                    throw new Error('No categories found in the file');
+                }
+                
+                totalCategoriesSpan.textContent = categories.length;
+                displayCategory(currentCategoryIndex);
+                updateNavButtons();
+                updateProgressBar();
+            })
+            .catch(error => {
+                console.error('Error:', error);
                 cardContainer.innerHTML = `
                     <div class="loading">
-                        Error loading sentences: ${xhr.statusText}<br>
+                        Error loading sentences: ${error.message}<br>
                         Attempting to load sample data instead...<br>
                         <small>Make sure your "600 english sentences.txt" file is saved with UTF-8 encoding</small>
                     </div>`;
                 loadSampleData();
-            }
-        };
-        
-        xhr.onerror = function() {
-            console.error('Network error while fetching the file');
-            cardContainer.innerHTML = `
-                <div class="loading">
-                    Network error while fetching the file.<br>
-                    Attempting to load sample data instead...<br>
-                    <small>Make sure your "600 english sentences.txt" file is saved with UTF-8 encoding</small>
-                </div>`;
-            loadSampleData();
-        };
-        
-        xhr.send();
+            });
     }
     
     function parseContent(content) {
@@ -184,8 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         updateProgressBar();
-        
-        setTimeout(fixChineseDisplay, 500);
     }
     
     function createCategoryCards(category) {
@@ -292,68 +238,30 @@ document.addEventListener('DOMContentLoaded', function() {
             case 'ArrowRight':
                 navigateToNextCategory();
                 break;
-            case 'h':
-                if (e.ctrlKey) {
-                    e.preventDefault();
-                    toggleHardcodedData();
-                }
-                break;
         }
     }
     
     function loadSampleData() {
-        categories = hardcodedData;
+        const sampleData = `### 日常问候
+Hello, how are you? / 你好，你好吗？
+Good morning! / 早上好！
+Nice to meet you. / 很高兴认识你。
+
+### 问候
+Hi there! / 你好！
+How's it going? / 近况如何？
+What's up? / 怎么了？
+
+### 天气
+It's a beautiful day today. / 今天天气真好。
+It's raining. / 正在下雨。
+It's quite cold. / 天气很冷。`;
+
+        parseContent(sampleData);
         
         totalCategoriesSpan.textContent = categories.length;
         displayCategory(currentCategoryIndex);
         updateNavButtons();
         updateProgressBar();
     }
-    
-    // Add this function to manually set Chinese characters if encoding fails
-    function fixChineseDisplay() {
-        const chineseDivs = document.querySelectorAll('.chinese');
-        
-        // Check if any Chinese text looks like it has encoding issues
-        const hasEncodingIssues = Array.from(chineseDivs).some(div => {
-            // More robust check for encoding issues
-            const text = div.textContent;
-            return text.includes('') || 
-                   (text.length > 0 && !/[\u4e00-\u9fa5]/.test(text));
-        });
-        
-        if (hasEncodingIssues) {
-            console.log("Detected Chinese encoding issues, applying fix...");
-            
-            // Use hardcoded data as fallback
-            cardContainer.innerHTML = '';
-            categories = hardcodedData;
-            //displayCategory(currentCategoryIndex);
-        }
-    }
-    
-    // Add this at the beginning of your script
-    function toggleHardcodedData() {
-        console.log("Switching to hardcoded dataset");
-        categories = hardcodedData;
-        totalCategoriesSpan.textContent = categories.length;
-        currentCategoryIndex = 0;
-        displayCategory(currentCategoryIndex);
-        updateNavButtons();
-        updateProgressBar();
-    }
-
-    // Add this to expose the toggle function to the window
-    window.toggleHardcodedData = toggleHardcodedData;
-
-    // Add code to show debug controls when pressing Ctrl+Shift+D
-    document.addEventListener('keydown', function(e) {
-        if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-            e.preventDefault();
-            const debugControls = document.querySelector('.debug-controls');
-            if (debugControls) {
-                debugControls.style.display = debugControls.style.display === 'none' ? 'block' : 'none';
-            }
-        }
-    });
 }); 
