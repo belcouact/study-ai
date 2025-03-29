@@ -1,5 +1,9 @@
 <head>
     <style>
+        body { /* Add perspective parent */
+            perspective: 1000px; /* Crucial for 3D effect */
+        }
+
         #quote-container {
             background-color: #ffffff;
             padding: 30px 40px;
@@ -10,22 +14,23 @@
             width: 90%;
             /* Add cursor and transition for click feedback */
             cursor: pointer;
-            transition: transform 0.15s ease-out;
+            /* Update transition to handle transform for flip */
+            transition: transform 0.6s cubic-bezier(0.3, 1.2, 0.7, 1.0); /* Adjusted duration and easing */
+            transform-style: preserve-3d; /* Keep children in 3D space during transform */
+            transform: rotateX(0deg); /* Explicitly set initial state */
         }
-        /* Add class for visual feedback on click */
-        #quote-container.clicked {
-             transform: scale(0.99);
+
+        /* State for the first half of the flip (rotating out) */
+        #quote-container.flipping-out {
+            transform: rotateX(-90deg) scale(0.9); /* Rotate halfway and slightly shrink */
+            opacity: 0.5; /* Optional: fade slightly */
         }
 
         #english-quote, #chinese-quote {
-            /* Add transition for fade effect */
-            transition: opacity 0.4s ease-in-out;
-            opacity: 1; /* Start fully visible */
-        }
-
-        /* Class to trigger fade out */
-        .quote-fade-out {
-            opacity: 0 !important; /* Use !important to override inline style if needed, though transition should handle it */
+            /* Remove opacity transition, handled by container flip */
+            /* transition: opacity 0.4s ease-in-out; */
+            /* opacity: 1; */ /* Remove opacity styles */
+            backface-visibility: hidden; /* Hide text when facing away */
         }
 
         #english-quote {
@@ -66,9 +71,10 @@
 
         // If using the fetch method, uncomment and modify this section:
         window.addEventListener('DOMContentLoaded', async () => {
-            // Ensure 'quotes.csv' is the correct path relative to main.html
+            console.log("DOM Loaded. Starting quote load."); // Log DOM ready
             quotes = await loadQuotesFromCSV('quotes.csv');
             isLoading = false; // Mark loading as complete
+            console.log("Quote loading finished. isLoading:", isLoading); // Log loading finished
             displayRandomQuote(true); // Display the first quote AFTER loading (true indicates initial load)
         });
         // ... (keep the rest of loadQuotesFromCSV) ...
@@ -88,53 +94,65 @@
 
         // Function to update the HTML with the given quote
         function displayQuote(quote) {
-            englishQuoteElement.textContent = quote.english;
-            chineseQuoteElement.textContent = quote.chinese;
+            englishQuoteElement.textContent = quote.english || " "; // Use space if undefined
+            chineseQuoteElement.textContent = quote.chinese || " "; // Use space if undefined
         }
 
         // Function to get and display a new random quote with animation
         function displayRandomQuote(isInitialLoad = false) {
-            // Prevent action if already animating or if quotes haven't loaded yet
-             if (isAnimating || isLoading) return;
+             console.log(`displayRandomQuote called. isInitialLoad: ${isInitialLoad}, isAnimating: ${isAnimating}, isLoading: ${isLoading}`); // Log function call
 
-             if (quotes && quotes.length > 0 && !quotes[0].english.startsWith("Error")) {
+            // Prevent action if already animating or if quotes haven't loaded (unless it's the initial display)
+             if (isAnimating || (isLoading && !isInitialLoad)) {
+                 console.log("Animation/Loading prevented action."); // Log prevention
+                 return;
+             }
+
+             // Check if quotes are actually loaded and valid
+             const quotesAreValid = quotes && quotes.length > 0 && !(quotes[0]?.english?.startsWith("Error"));
+             console.log("Quotes are valid:", quotesAreValid); // Log validity check
+
+             if (quotesAreValid || isInitialLoad) { // Allow initial display even if errors occured during load
                 isAnimating = true; // Start animation lock
+                console.log("Starting animation."); // Log animation start
 
-                // Apply fade-out class
-                englishQuoteElement.classList.add('quote-fade-out');
-                chineseQuoteElement.classList.add('quote-fade-out');
+                const quoteToDisplay = quotesAreValid ? getRandomQuote() : quotes[0]; // Get new quote or show error
 
-                // Add click visual feedback if not the initial load
+                // Only animate if it's not the very first load
                 if (!isInitialLoad) {
-                    quoteContainer.classList.add('clicked');
+                    // Apply flip-out class
+                    quoteContainer.classList.add('flipping-out');
+
+                    // Wait for the first half of the flip animation (half of CSS transition duration)
+                    setTimeout(() => {
+                        console.log("Mid-animation: Updating text."); // Log text update
+                        displayQuote(quoteToDisplay); // Update text content while hidden/rotated
+
+                        // Remove flip-out class to trigger the flip-in animation
+                        quoteContainer.classList.remove('flipping-out');
+
+                         // Wait for the flip-in animation to complete (full CSS transition duration)
+                         setTimeout(() => {
+                            console.log("Animation finished."); // Log animation end
+                            isAnimating = false; // End animation lock
+                         }, 300); // Second half of the animation
+
+                    }, 300); // First half of the animation (0.6s / 2 = 300ms)
+                } else {
+                    // For initial load, just display the quote directly without animation
+                    console.log("Initial load: Displaying quote directly.");
+                    displayQuote(quoteToDisplay);
+                    isAnimating = false; // No animation was performed
                 }
 
-
-                // Wait for fade-out transition to complete (matches CSS transition duration)
-                setTimeout(() => {
-                    const randomQuote = getRandomQuote();
-                    displayQuote(randomQuote);
-
-                    // Remove fade-out class to trigger fade-in
-                    englishQuoteElement.classList.remove('quote-fade-out');
-                    chineseQuoteElement.classList.remove('quote-fade-out');
-
-
-                     // Remove click visual feedback after a short delay
-                    setTimeout(() => {
-                       quoteContainer.classList.remove('clicked');
-                       isAnimating = false; // End animation lock
-                    }, 150); // Matches container transition duration
-
-
-                }, 400); // Matches quote fade transition duration
-
-            } else if (!isLoading) { // Only display error if not currently loading
-                 // Handle case where quotes array might be empty or loading failed
+            } else if (!isLoading) { // Only display error if not currently loading AND not initial load
+                 console.log("Displaying error quote as fallback."); // Log error display
+                 // Handle case where quotes array might be empty or loading failed after DOMContentLoaded
                  const errorQuote = quotes.length > 0 ? quotes[0] : { english: "No quotes loaded.", chinese: "未能加载语录。" };
                  displayQuote(errorQuote);
-                 englishQuoteElement.classList.remove('quote-fade-out'); // Ensure visible
-                 chineseQuoteElement.classList.remove('quote-fade-out');
+                 // Ensure container is in default state if error occurs mid-interaction
+                 quoteContainer.classList.remove('flipping-out');
+                 isAnimating = false; // Reset flag if error occurred
             }
         }
 
@@ -142,7 +160,10 @@
         // nextQuoteBtn.addEventListener('click', displayRandomQuote);
 
         // Add event listener to the quote container
-        quoteContainer.addEventListener('click', () => displayRandomQuote(false)); // Pass false for non-initial loads
+        quoteContainer.addEventListener('click', () => {
+            console.log("Quote container clicked!"); // Log click event
+            displayRandomQuote(false)
+        }); // Pass false for non-initial loads
 
         // Initial display is now handled inside the 'DOMContentLoaded' listener after loading
         // ... remove any stray displayRandomQuote() calls from here ...
