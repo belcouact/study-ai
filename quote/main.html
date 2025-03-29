@@ -1,1 +1,219 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Quotes</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        #quote-container {
+            background-color: #ffffff;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            max-width: 700px;
+            width: 90%;
+        }
+        #english-quote {
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            color: #212529;
+            font-style: italic;
+        }
+        #chinese-quote {
+            font-size: 1.3em;
+            color: #495057;
+            font-family: "KaiTi", "SimSun", "Songti SC", serif; /* Common Chinese fonts */
+            line-height: 1.5;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="quote-container">
+        <p id="english-quote">Loading quote...</p>
+        <p id="chinese-quote"></p>
+    </div>
+
+    <button id="next-quote-btn">Next Quote</button>
+
+    <script>
+        // IMPORTANT: Replace this sample data with your actual quotes from quotes.csv
+        // You need to convert your CSV lines into this JavaScript array format.
+        // Each object should have an 'english' and 'chinese' property.
+        /* REMOVE THE HARDCODED QUOTES:
+        const quotes = [
+            { english: "The journey of a thousand miles begins with a single step.", chinese: "千里之行，始于足下。" },
+            { english: "Be the change that you wish to see in the world.", chinese: "欲变世界，先变其身。" },
+            { english: "That which does not kill us makes us stronger.", chinese: "杀不死我们的，只会让我们更强大。" },
+            { english: "To know what you know and what you do not know, that is true knowledge.", chinese: "知之为知之，不知为不知，是知也。" },
+            { english: "Simplicity is the ultimate sophistication.", chinese: "大道至简。" },
+            { english: "Give a man a fish and you feed him for a day; teach a man to fish and you feed him for a lifetime.", chinese: "授人以鱼不如授人以渔。" },
+            { english: "Failure is the mother of success.", chinese: "失败乃成功之母。" }
+            // Add all your 100+ quotes here in this format
+            // e.g., { english: "Your English Quote", chinese: "Your Chinese Quote" },
+        ];
+        */
+
+        // --- OPTIONAL: Code to fetch and parse quotes.csv if hosted ---
+        // UNCOMMENT AND ACTIVATE THE FETCHING CODE:
+
+        async function loadQuotesFromCSV(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const csvText = await response.text();
+                const lines = csvText.trim().split('\n'); // Split into lines
+                const parsedQuotes = lines.map(line => {
+                    // Split by the specific separator ",\,"
+                    // Ensure we handle potential variations in whitespace or quotes if necessary
+                    const parts = line.split(',\\,');
+                    if (parts.length === 2) {
+                        // Trim whitespace and remove potential surrounding quotes ""
+                        const english = parts[0].trim().replace(/^"|"$/g, '').trim();
+                        const chinese = parts[1].trim().replace(/^"|"$/g, '').trim();
+                        if (english && chinese) { // Ensure parts are not empty after trimming
+                           return { english: english, chinese: chinese };
+                        } else {
+                            console.warn("Skipping line with empty part:", line);
+                        }
+                    } else {
+                         console.warn("Skipping improperly formatted line:", line);
+                    }
+                    return null; // Return null for invalid or skipped lines
+                }).filter(quote => quote !== null); // Filter out nulls
+
+                if (parsedQuotes.length === 0 && lines.length > 0) {
+                     console.error("CSV loaded, but no valid quotes found. Check separator ',\,' and format.");
+                     return [ { english: "Error parsing quotes.", chinese: "解析语录时出错。" } ];
+                }
+                 if (parsedQuotes.length === 0) {
+                    console.error("No lines found or CSV is empty.");
+                    return [ { english: "No quotes found in file.", chinese: "文件中未找到语录。" } ];
+                }
+
+                console.log(`Loaded ${parsedQuotes.length} quotes.`);
+                return parsedQuotes;
+            } catch (error) {
+                console.error("Could not load or parse quotes from CSV:", error);
+                // Return fallback quotes or display an error message
+                return [ { english: "Error loading quotes file.", chinese: "加载语录文件时出错。" } ];
+            }
+        }
+
+        // Define quotes array globally but initialize it later
+        let quotes = [];
+
+        // If using the fetch method, uncomment and modify this section:
+        // UNCOMMENT this block
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Ensure 'quotes.csv' is the correct path relative to main.html
+            quotes = await loadQuotesFromCSV('quotes.csv');
+            displayRandomQuote(); // Display the first quote AFTER loading
+        });
+
+        // --- End of optional fetch code ---
+
+
+        // Get references to the HTML elements
+        const englishQuoteElement = document.getElementById('english-quote');
+        const chineseQuoteElement = document.getElementById('chinese-quote');
+        const nextQuoteBtn = document.getElementById('next-quote-btn');
+
+        let currentQuoteIndex = -1; // Keep track of the last shown index
+
+        // Function to get a random quote, avoiding immediate repetition
+        function getRandomQuote() {
+            if (!quotes || quotes.length === 0) {
+                // Return a more informative message if loading is ongoing or failed
+                return { english: "Loading quotes or none available...", chinese: "正在加载语录或无可用语录..." };
+            }
+            if (quotes.length === 1) {
+                return quotes[0]; // Only one quote, return it
+            }
+
+            let randomIndex;
+            do {
+                // Generate a random index within the bounds of the array
+                randomIndex = Math.floor(Math.random() * quotes.length);
+            } while (randomIndex === currentQuoteIndex); // Keep trying if it's the same as the last one
+
+            currentQuoteIndex = randomIndex; // Update the last shown index
+            return quotes[randomIndex];
+        }
+
+        // Function to update the HTML with the given quote
+        function displayQuote(quote) {
+            englishQuoteElement.textContent = quote.english;
+            chineseQuoteElement.textContent = quote.chinese;
+        }
+
+        // Function to get and display a new random quote
+        function displayRandomQuote() {
+             if (quotes && quotes.length > 0) {
+                const randomQuote = getRandomQuote();
+                // Handle potential error objects returned from loadQuotesFromCSV
+                if (randomQuote.english.startsWith("Error")) {
+                    displayQuote(randomQuote);
+                } else {
+                    displayQuote(randomQuote);
+                }
+            } else {
+                 // This case might be hit briefly before the async loading completes
+                 // or if loading fails completely and returns an empty array.
+                 displayQuote({ english: "Waiting for quotes to load...", chinese: "等待语录加载..." });
+            }
+        }
+
+        // Add event listener to the button
+        nextQuoteBtn.addEventListener('click', displayRandomQuote);
+
+        // Display the first random quote when the page loads
+        // Note: If using the async fetch method, this initial call should be inside the .then() or async function
+        // For the embedded array approach, call it directly.
+        /* REMOVE the old initial display call
+        if (quotes && quotes.length > 0) {
+           displayRandomQuote();
+        } else if (!window.loadQuotesFromCSV) { // Check if fetch isn't being used
+           displayQuote({ english: "No quotes defined in the script.", chinese: "脚本中未定义语录。" });
+        }
+        */
+
+
+    </script>
+
+</body>
+</html> 
