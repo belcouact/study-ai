@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const categoryTitleElement = document.getElementById('category-title');
     const sentenceCardsContainer = document.getElementById('sentence-cards-container');
+    // Get references to both buttons
+    const prevButton = document.getElementById('prev-button');
     const nextButton = document.getElementById('next-button');
 
     let categoriesData = []; // Initialize as empty array
@@ -28,11 +30,13 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Decoded text (first 500 chars):", text.substring(0, 500)); // Log the start of the decoded text
 
             // Check if decoding produced replacement characters '' which indicates an encoding issue
+            /*
             if (text.includes('') && text.length > 0) {
                  console.warn("Decoded text contains '' replacement characters, suggesting the source file might not be valid UTF-8 or was corrupted.");
                  // You might still try parsing, but warn the user
             }
-
+            */
+           
             // Proceed with parsing the decoded text
             return parseSentenceData(text);
         } catch (error) {
@@ -40,6 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
             categoryTitleElement.textContent = 'Error Loading Data';
             // Make the error message more prominent and informative
             sentenceCardsContainer.innerHTML = `<p style="color: red; font-weight: bold;">Could not load or decode sentence data.</p><p><strong>Error message:</strong> ${error.message}</p><p>Please check the browser's developer console (F12) for more details. Also, verify '600 english sentences.txt' is correctly saved as UTF-8 and is in the same folder.</p>`;
+            // Disable both buttons on error
+            prevButton.disabled = true;
             nextButton.disabled = true;
             return []; // Return empty array on error
         }
@@ -87,12 +93,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayCategory(index) {
+        if (!categoriesData || categoriesData.length === 0) {
+             console.warn("displayCategory called with no data.");
+             return; // Don't try to display if no data
+        }
+        // Ensure index wraps around correctly if called with an out-of-bounds index initially
+        // Though the button logic should prevent this, it's safer.
+        index = (index + categoriesData.length) % categoriesData.length;
+        currentCategoryIndex = index; // Update the global index
+
         if (index < 0 || index >= categoriesData.length) {
-            console.error("Invalid category index:", index);
-            // Optionally display an error message or handle gracefully
+            console.error("Invalid category index after wrap around:", index);
             sentenceCardsContainer.innerHTML = '<p>Error: Category not found.</p>';
             categoryTitleElement.textContent = 'Error';
-            nextButton.disabled = true; // Disable button if data is wrong
+             // Disable buttons if something is wrong with index logic
+            prevButton.disabled = true;
+            nextButton.disabled = true;
             return;
         }
 
@@ -120,12 +136,15 @@ document.addEventListener('DOMContentLoaded', () => {
             sentenceCardsContainer.appendChild(card);
         });
 
-         // Disable button if it's the last category (optional)
-         // Or let it loop back around as implemented in the click handler
-         // nextButton.disabled = (index === categoriesData.length - 1);
+         // Since we wrap around, buttons are usually always enabled
+         // unless there's only 0 or 1 category.
+         const numCategories = categoriesData.length;
+         prevButton.disabled = numCategories <= 1;
+         nextButton.disabled = numCategories <= 1;
+
     }
 
-    // Event listener for the next button
+    // Event listener for the NEXT button
     nextButton.addEventListener('click', () => {
         if (!categoriesData || categoriesData.length === 0) return; // Don't do anything if data isn't loaded
 
@@ -137,23 +156,39 @@ document.addEventListener('DOMContentLoaded', () => {
         displayCategory(currentCategoryIndex);
     });
 
+    // Event listener for the PREVIOUS button
+    prevButton.addEventListener('click', () => {
+        if (!categoriesData || categoriesData.length === 0) return; // Don't do anything if data isn't loaded
+
+        currentCategoryIndex--;
+        // Wrap around to the last category if we go below the first one
+        if (currentCategoryIndex < 0) {
+            currentCategoryIndex = categoriesData.length - 1;
+        }
+        displayCategory(currentCategoryIndex);
+    });
+
     // Main function to initialize the page
     async function initializePage() {
+        // Initially disable buttons until data is loaded
+        prevButton.disabled = true;
+        nextButton.disabled = true;
+
         categoriesData = await loadSentenceData(); // Load and parse data
 
         // Initial display of the first category if data loaded successfully
         if (categoriesData && categoriesData.length > 0) {
-            displayCategory(currentCategoryIndex);
-            nextButton.disabled = false; // Ensure button is enabled
+            displayCategory(currentCategoryIndex); // displayCategory handles enabling/disabling based on count
         } else if (!categoriesData || categoriesData.length === 0) {
             // Handle case where data loading failed or file was empty/incorrectly formatted
-            // Error message is already displayed by loadSentenceData in case of fetch errors
-            if (!document.querySelector('#sentence-cards-container p')) { // Avoid overwriting fetch error message
+            // Error message is already displayed by loadSentenceData
+            if (!document.querySelector('#sentence-cards-container p')) {
                  categoryTitleElement.textContent = 'No Data';
                  sentenceCardsContainer.innerHTML = '<p>No categories found in the data file or the file is empty/incorrectly formatted.</p>';
             }
-            // Ensure button is disabled if no data loaded
-             nextButton.disabled = true;
+            // Ensure buttons remain disabled
+            prevButton.disabled = true;
+            nextButton.disabled = true;
         }
     }
 

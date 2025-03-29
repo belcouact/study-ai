@@ -60,11 +60,14 @@ header h1 {
     font-size: 1em;
 }
 
-footer {
-    margin-top: 20px;
+/* New styles for navigation controls */
+.navigation-controls {
+    display: flex; /* Arrange buttons side-by-side */
+    justify-content: space-between; /* Space them out */
+    margin-top: 20px; /* Add some space above the buttons */
 }
 
-#next-button {
+.nav-button { /* Style for both buttons */
     background-color: #007bff;
     color: white;
     border: none;
@@ -73,13 +76,24 @@ footer {
     font-size: 1em;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    width: 48%; /* Make buttons take up roughly half the space each */
+    box-sizing: border-box; /* Include padding in width calculation */
 }
 
-#next-button:hover {
+.nav-button:hover {
     background-color: #0056b3;
 }
 
-#next-button:disabled {
+.nav-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+}
+
+/* Optional: specific styles if needed */
+#prev-button {
+    /* Specific styles for prev button if any */
+}
+
+#next-button {
+    /* Specific styles for next button if any */
 } 
