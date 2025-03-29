@@ -35,13 +35,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function fetchSentences() {
-        // Try to fetch the file with explicit UTF-8 handling
-        const fileUrl = '600 english sentences.txt';
+        // Try to fetch the CSV file with explicit UTF-8 handling
+        const fileUrl = '600 english sentences.csv';
         
         fetch(fileUrl)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Failed to load sentence file');
+                    throw new Error('Failed to load CSV file');
                 }
                 return response.arrayBuffer();
             })
@@ -51,10 +51,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = decoder.decode(buffer);
                 
                 console.log("Sample of loaded data:", data.substring(0, 100));
-                parseContent(data);
+                parseCSVContent(data);
                 
                 if (categories.length === 0) {
-                    throw new Error('No categories found in the file');
+                    throw new Error('No categories found in the CSV file');
                 }
                 
                 totalCategoriesSpan.textContent = categories.length;
@@ -68,21 +68,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="loading">
                         Error loading sentences: ${error.message}<br>
                         Attempting to load sample data instead...<br>
-                        <small>Make sure your "600 english sentences.txt" file is saved with UTF-8 encoding</small>
+                        <small>Make sure your "600 english sentences.csv" file is saved with UTF-8 encoding</small>
                     </div>`;
                 loadSampleData();
             });
     }
     
-    function parseContent(content) {
+    function parseCSVContent(content) {
+        // Split the content into lines
         const lines = content.split('\n');
         let currentCategory = null;
         
+        // Process each line
         for (const line of lines) {
             const trimmedLine = line.trim();
             
+            // Skip empty lines
             if (!trimmedLine) continue;
             
+            // Check if line starts with "###" for category
             if (trimmedLine.startsWith('###')) {
                 const categoryName = trimmedLine.substring(3).trim();
                 currentCategory = {
@@ -91,15 +95,65 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
                 categories.push(currentCategory);
             } 
+            // CSV format - try to parse as CSV first
+            else if (trimmedLine.includes(',')) {
+                // Split by comma, but be careful with commas inside quoted strings
+                let parts = parseCSVLine(trimmedLine);
+                
+                // If we got exactly 2 parts, assume it's English and Chinese
+                if (parts.length >= 2 && currentCategory) {
+                    const english = parts[0].trim();
+                    const chinese = parts[1].trim();
+                    
+                    if (english && chinese) {
+                        currentCategory.sentences.push({ 
+                            english, 
+                            chinese, 
+                            id: generateId(english) 
+                        });
+                    }
+                }
+            }
+            // Fallback to old format (with / separator)
             else if (currentCategory && trimmedLine.includes('/')) {
                 const [english, chinese] = trimmedLine.split('/').map(part => part.trim());
                 if (english && chinese) {
-                    currentCategory.sentences.push({ english, chinese, id: generateId(english) });
+                    currentCategory.sentences.push({ 
+                        english, 
+                        chinese, 
+                        id: generateId(english) 
+                    });
                 }
             }
         }
         
         console.log(`Parsed ${categories.length} categories with sentences`);
+    }
+    
+    // Helper function to parse CSV line properly handling quotes
+    function parseCSVLine(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                result.push(current);
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        
+        // Add the last part
+        result.push(current);
+        
+        // Remove quotes from results
+        return result.map(item => item.replace(/^"(.*)"$/, '$1'));
     }
     
     function generateId(text) {
@@ -242,22 +296,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function loadSampleData() {
+        // Updated sample data in CSV format
         const sampleData = `### 日常问候
-Hello, how are you? / 你好，你好吗？
-Good morning! / 早上好！
-Nice to meet you. / 很高兴认识你。
+"Hello, how are you?","你好，你好吗？"
+"Good morning!","早上好！"
+"Nice to meet you.","很高兴认识你。"
 
 ### 问候
-Hi there! / 你好！
-How's it going? / 近况如何？
-What's up? / 怎么了？
+"Hi there!","你好！"
+"How's it going?","近况如何？"
+"What's up?","怎么了？"
 
 ### 天气
-It's a beautiful day today. / 今天天气真好。
-It's raining. / 正在下雨。
-It's quite cold. / 天气很冷。`;
+"It's a beautiful day today.","今天天气真好。"
+"It's raining.","正在下雨。"
+"It's quite cold.","天气很冷。"`;
 
-        parseContent(sampleData);
+        parseCSVContent(sampleData);
         
         totalCategoriesSpan.textContent = categories.length;
         displayCategory(currentCategoryIndex);
