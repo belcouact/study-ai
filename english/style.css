@@ -4,10 +4,8 @@ body {
     margin: 0;
     padding: 20px;
     background-color: #f4f4f4;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Align to top */
     min-height: 100vh;
+    position: relative;
 }
 
 .container {
@@ -18,6 +16,9 @@ body {
     width: 90%;
     max-width: 800px;
     text-align: center;
+    margin: 20px auto;
+    z-index: 1;
+    position: relative;
 }
 
 header h1 {
@@ -34,7 +35,7 @@ header h1 {
 #sentence-cards-container {
     margin-top: 20px;
     margin-bottom: 30px;
-    text-align: left; /* Align card content left */
+    text-align: left;
 }
 
 .sentence-card {
@@ -60,24 +61,23 @@ header h1 {
     font-size: 1em;
 }
 
-/* New styles for navigation controls */
-.navigation-controls {
-    display: flex; /* Arrange buttons side-by-side */
-    justify-content: space-between; /* Space them out */
-    margin-top: 20px; /* Add some space above the buttons */
-}
+/* General style for nav buttons */
+.nav-button {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
 
-.nav-button { /* Style for both buttons */
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 12px 25px;
+    padding: 15px 10px;
     border-radius: 5px;
-    font-size: 1em;
+    font-size: 1.2em;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    width: 48%; /* Make buttons take up roughly half the space each */
-    box-sizing: border-box; /* Include padding in width calculation */
+    width: auto;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .nav-button:hover {
@@ -87,13 +87,14 @@ header h1 {
 .nav-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+    opacity: 0.7;
 }
 
-/* Optional: specific styles if needed */
+/* Specific positioning for each button */
 #prev-button {
-    /* Specific styles for prev button if any */
+    left: 15px;
 }
 
 #next-button {
-    /* Specific styles for next button if any */
+    right: 15px;
 } 
