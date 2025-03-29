@@ -17,7 +17,8 @@
 }
 
 body {
-    font-family: 'Segoe UI', 'Microsoft YaHei', 'SimHei', 'SimSun', Tahoma, Geneva, Verdana, sans-serif;
+    /* Added more common system fonts for Chinese */
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
     line-height: 1.6;
     color: var(--text-color);
     background-color: var(--bg-color);
@@ -120,7 +121,8 @@ main {
 .chinese {
     font-size: 1rem;
     color: var(--light-text);
-    font-family: 'Microsoft YaHei', 'SimHei', 'SimSun', 'Noto Sans SC', sans-serif;
+    /* More comprehensive list of Chinese fonts */
+    font-family: 'Microsoft YaHei', 'SimHei', 'SimSun', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', 'Noto Sans SC', sans-serif;
     border-top: 1px solid #f0f0f0;
     padding-top: 8px;
 }

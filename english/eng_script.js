@@ -50,7 +50,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 const decoder = new TextDecoder('utf-8');
                 const data = decoder.decode(buffer);
                 
-                console.log("Sample of loaded data:", data.substring(0, 100));
+                console.log("Decoded data sample:", data.substring(0, 200));
+                if (data.length > 50) {
+                    const sampleChars = data.substring(50, 70);
+                    console.log("Sample characters for code point check:", sampleChars);
+                    for (let i = 0; i < sampleChars.length; i++) {
+                        console.log(`Char: ${sampleChars[i]}, Code Point: ${sampleChars.charCodeAt(i)}`);
+                    }
+                }
+                
                 parseCSVContent(data);
                 
                 if (categories.length === 0) {
