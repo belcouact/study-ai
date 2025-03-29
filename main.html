@@ -1,0 +1,153 @@
+<head>
+    <style>
+        #quote-container {
+            background-color: #ffffff;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            max-width: 700px;
+            width: 90%;
+            /* Add cursor and transition for click feedback */
+            cursor: pointer;
+            transition: transform 0.15s ease-out;
+        }
+        /* Add class for visual feedback on click */
+        #quote-container.clicked {
+             transform: scale(0.99);
+        }
+
+        #english-quote, #chinese-quote {
+            /* Add transition for fade effect */
+            transition: opacity 0.4s ease-in-out;
+            opacity: 1; /* Start fully visible */
+        }
+
+        /* Class to trigger fade out */
+        .quote-fade-out {
+            opacity: 0 !important; /* Use !important to override inline style if needed, though transition should handle it */
+        }
+
+        #english-quote {
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            // ... existing styles ...
+        }
+        // ... existing styles ...
+        button { /* This style block can be removed entirely */
+            padding: 12px 25px;
+            font-size: 1.1em;
+            // ... remove rest of button styles ...
+        }
+        button:hover { /* Remove this */
+            // ...
+        }
+        button:active { /* Remove this */
+            // ...
+        }
+    </style>
+</head>
+<body>
+
+    <div id="quote-container">
+        <p id="english-quote">Loading quote...</p>
+        <p id="chinese-quote"></p>
+    </div>
+
+    <!-- Remove the button -->
+    <!-- <button id="next-quote-btn">Next Quote</button> -->
+
+    <script>
+        // ... (keep the async function loadQuotesFromCSV as is) ...
+
+        // Define quotes array globally but initialize it later
+        let quotes = [];
+        let isLoading = true; // Flag to track loading state
+
+        // If using the fetch method, uncomment and modify this section:
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Ensure 'quotes.csv' is the correct path relative to main.html
+            quotes = await loadQuotesFromCSV('quotes.csv');
+            isLoading = false; // Mark loading as complete
+            displayRandomQuote(true); // Display the first quote AFTER loading (true indicates initial load)
+        });
+        // ... (keep the rest of loadQuotesFromCSV) ...
+
+
+        // Get references to the HTML elements
+        const quoteContainer = document.getElementById('quote-container'); // Reference the container
+        const englishQuoteElement = document.getElementById('english-quote');
+        const chineseQuoteElement = document.getElementById('chinese-quote');
+        // Remove button reference:
+        // const nextQuoteBtn = document.getElementById('next-quote-btn');
+
+        let currentQuoteIndex = -1; // Keep track of the last shown index
+        let isAnimating = false; // Prevent clicking during animation
+
+        // ... (keep getRandomQuote function as is) ...
+
+        // Function to update the HTML with the given quote
+        function displayQuote(quote) {
+            englishQuoteElement.textContent = quote.english;
+            chineseQuoteElement.textContent = quote.chinese;
+        }
+
+        // Function to get and display a new random quote with animation
+        function displayRandomQuote(isInitialLoad = false) {
+            // Prevent action if already animating or if quotes haven't loaded yet
+             if (isAnimating || isLoading) return;
+
+             if (quotes && quotes.length > 0 && !quotes[0].english.startsWith("Error")) {
+                isAnimating = true; // Start animation lock
+
+                // Apply fade-out class
+                englishQuoteElement.classList.add('quote-fade-out');
+                chineseQuoteElement.classList.add('quote-fade-out');
+
+                // Add click visual feedback if not the initial load
+                if (!isInitialLoad) {
+                    quoteContainer.classList.add('clicked');
+                }
+
+
+                // Wait for fade-out transition to complete (matches CSS transition duration)
+                setTimeout(() => {
+                    const randomQuote = getRandomQuote();
+                    displayQuote(randomQuote);
+
+                    // Remove fade-out class to trigger fade-in
+                    englishQuoteElement.classList.remove('quote-fade-out');
+                    chineseQuoteElement.classList.remove('quote-fade-out');
+
+
+                     // Remove click visual feedback after a short delay
+                    setTimeout(() => {
+                       quoteContainer.classList.remove('clicked');
+                       isAnimating = false; // End animation lock
+                    }, 150); // Matches container transition duration
+
+
+                }, 400); // Matches quote fade transition duration
+
+            } else if (!isLoading) { // Only display error if not currently loading
+                 // Handle case where quotes array might be empty or loading failed
+                 const errorQuote = quotes.length > 0 ? quotes[0] : { english: "No quotes loaded.", chinese: "未能加载语录。" };
+                 displayQuote(errorQuote);
+                 englishQuoteElement.classList.remove('quote-fade-out'); // Ensure visible
+                 chineseQuoteElement.classList.remove('quote-fade-out');
+            }
+        }
+
+        // Remove event listener for the button:
+        // nextQuoteBtn.addEventListener('click', displayRandomQuote);
+
+        // Add event listener to the quote container
+        quoteContainer.addEventListener('click', () => displayRandomQuote(false)); // Pass false for non-initial loads
+
+        // Initial display is now handled inside the 'DOMContentLoaded' listener after loading
+        // ... remove any stray displayRandomQuote() calls from here ...
+
+    </script>
+
+</body>
+</html> 
