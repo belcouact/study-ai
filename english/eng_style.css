@@ -78,100 +78,51 @@ main {
 }
 
 .card-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
     margin-bottom: 30px;
-    perspective: 1000px;
 }
 
 .card {
     background-color: var(--card-bg);
     border-radius: 8px;
     box-shadow: var(--shadow);
-    padding: 20px;
-    width: 100%;
-    margin-bottom: 15px;
+    padding: 15px;
+    margin-bottom: 0;
     transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
     position: relative;
-    transform-style: preserve-3d;
     cursor: pointer;
     animation: cardAppear 0.5s ease forwards;
     opacity: 0;
+    height: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .card:hover {
-    transform: translateY(-5px) scale(1.01);
+    transform: translateY(-5px);
     box-shadow: 0 8px 15px rgba(0,0,0,0.15);
 }
 
+/* Remove flip-related styles since we're not using them anymore */
 .card .front, .card .back {
-    backface-visibility: hidden;
-    transition: transform 0.6s ease;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 20px;
-    border-radius: 8px;
-}
-
-.card .front {
-    transform: rotateY(0deg);
-    background-color: var(--card-bg);
-    z-index: 2;
-}
-
-.card .back {
-    transform: rotateY(180deg);
-    background-color: var(--card-bg);
-}
-
-.card.flipped .front {
-    transform: rotateY(180deg);
-}
-
-.card.flipped .back {
-    transform: rotateY(0deg);
-}
-
-.card .mastered-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: var(--secondary-color);
-    color: white;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    transform: scale(0);
-    transition: transform 0.3s ease;
-}
-
-.card.mastered .mastered-badge {
-    transform: scale(1);
+    display: none;
 }
 
 .english {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
     color: var(--text-color);
     font-weight: bold;
 }
 
 .chinese {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--light-text);
     font-family: 'Microsoft YaHei', 'SimHei', 'SimSun', 'Noto Sans SC', sans-serif;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 8px;
 }
 
 .loading {
@@ -192,19 +143,11 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: auto;
-    padding: 20px 0;
+    margin: 20px 0;
+    padding: 15px 0;
 }
 
-.interaction-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.nav-button, .action-button {
+.nav-button {
     background-color: var(--primary-color);
     color: white;
     border: none;
@@ -218,12 +161,12 @@ main {
     gap: 8px;
 }
 
-.nav-button:hover, .action-button:hover {
+.nav-button:hover {
     background-color: #2980b9;
     transform: translateY(-2px);
 }
 
-.nav-button:active, .action-button:active {
+.nav-button:active {
     transform: translateY(1px);
 }
 
@@ -231,24 +174,6 @@ main {
     background-color: #bdc3c7;
     cursor: not-allowed;
     transform: none;
-}
-
-.action-button {
-    background-color: var(--secondary-color);
-}
-
-.action-button:hover {
-    background-color: #27ae60;
-}
-
-#auto-play-btn.active {
-    background-color: var(--accent-color);
-}
-
-.speed-control {
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
 #category-progress {
@@ -326,19 +251,21 @@ footer {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .card {
-        width: 100%;
+    .card-container {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
     
-    .navigation, .interaction-buttons {
+    .english {
+        font-size: 0.95rem;
+    }
+    
+    .chinese {
+        font-size: 0.9rem;
+    }
+    
+    .navigation {
         flex-direction: column;
         gap: 15px;
         align-items: center;
-    }
-    
-    .speed-control {
-        width: 100%;
-        justify-content: center;
-        margin-top: 10px;
     }
 } 

@@ -7,16 +7,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentCategorySpan = document.getElementById('current-category');
     const totalCategoriesSpan = document.getElementById('total-categories');
     const progressBar = document.getElementById('progress-bar');
-    const shuffleBtn = document.getElementById('shuffle-btn');
-    const autoPlayBtn = document.getElementById('auto-play-btn');
-    const speedSlider = document.getElementById('speed-slider');
     const masteredCountSpan = document.getElementById('mastered-count');
     
     // Application state
     let categories = [];
     let currentCategoryIndex = 0;
-    let autoPlayInterval = null;
-    let autoPlaySpeed = 5000; // 5 seconds default
     let masteredSentences = new Set();
     
     // Initialize the app
@@ -28,9 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Fetch sentences
         fetchSentences();
-        
-        // Set initial speed based on slider
-        updateSpeed();
     }
     
     function setupEventListeners() {
@@ -38,24 +30,26 @@ document.addEventListener('DOMContentLoaded', function() {
         prevButton.addEventListener('click', navigateToPrevCategory);
         nextButton.addEventListener('click', navigateToNextCategory);
         
-        // Interactive features
-        shuffleBtn.addEventListener('click', shuffleCurrentCategory);
-        autoPlayBtn.addEventListener('click', toggleAutoPlay);
-        speedSlider.addEventListener('input', updateSpeed);
-        
         // Keyboard navigation
         document.addEventListener('keydown', handleKeyboardNavigation);
     }
     
     function fetchSentences() {
-        fetch('600 english sentences.txt')
+        // Try to fetch the file with explicit UTF-8 handling
+        const fileUrl = '600 english sentences.txt';
+        
+        fetch(fileUrl)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to load sentence file');
                 }
-                return response.text();
+                return response.arrayBuffer();
             })
-            .then(data => {
+            .then(buffer => {
+                // Convert buffer to UTF-8 text
+                const decoder = new TextDecoder('utf-8');
+                const data = decoder.decode(buffer);
+                
                 console.log("Sample of loaded data:", data.substring(0, 100));
                 parseContent(data);
                 
@@ -70,7 +64,12 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                cardContainer.innerHTML = `<div class="loading">Error loading sentences: ${error.message}<br>Attempting to load sample data instead...</div>`;
+                cardContainer.innerHTML = `
+                    <div class="loading">
+                        Error loading sentences: ${error.message}<br>
+                        Attempting to load sample data instead...<br>
+                        <small>Make sure your "600 english sentences.txt" file is saved with UTF-8 encoding</small>
+                    </div>`;
                 loadSampleData();
             });
     }
@@ -145,25 +144,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 card.classList.add('mastered');
             }
             
-            // Create front side (English)
-            const front = document.createElement('div');
-            front.className = 'front';
-            
+            // Display both English and Chinese together
             const englishDiv = document.createElement('div');
             englishDiv.className = 'english';
             englishDiv.textContent = sentence.english;
             
-            front.appendChild(englishDiv);
-            
-            // Create back side (Chinese)
-            const back = document.createElement('div');
-            back.className = 'back';
-            
             const chineseDiv = document.createElement('div');
             chineseDiv.className = 'chinese';
             chineseDiv.textContent = sentence.chinese;
-            
-            back.appendChild(chineseDiv);
             
             // Add mastered badge
             const masteredBadge = document.createElement('div');
@@ -171,20 +159,18 @@ document.addEventListener('DOMContentLoaded', function() {
             masteredBadge.innerHTML = '<i class="fas fa-check"></i>';
             
             // Add elements to card
-            card.appendChild(front);
-            card.appendChild(back);
+            card.appendChild(englishDiv);
+            card.appendChild(chineseDiv);
             card.appendChild(masteredBadge);
             
-            // Add card click event for flipping
+            // Change the click event to just toggle mastered status
             card.addEventListener('click', function(e) {
                 if (e.target.closest('.mastered-badge')) {
                     toggleMastered(sentence.id, card);
-                } else {
-                    card.classList.toggle('flipped');
                 }
             });
             
-            // Add double click event for marking as mastered
+            // Keep double click event for marking as mastered
             card.addEventListener('dblclick', function() {
                 toggleMastered(sentence.id, card);
             });
@@ -244,82 +230,6 @@ document.addEventListener('DOMContentLoaded', function() {
         progressBar.style.width = `${progress}%`;
     }
     
-    function shuffleCurrentCategory() {
-        if (categories.length === 0 || !categories[currentCategoryIndex]) return;
-        
-        // Shuffle the sentences in the current category
-        const category = categories[currentCategoryIndex];
-        shuffleArray(category.sentences);
-        
-        // Re-display the category
-        displayCategory(currentCategoryIndex);
-        
-        // Add animation to the button
-        shuffleBtn.classList.add('success');
-        setTimeout(() => shuffleBtn.classList.remove('success'), 500);
-    }
-    
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-    }
-    
-    function toggleAutoPlay() {
-        if (autoPlayInterval) {
-            clearInterval(autoPlayInterval);
-            autoPlayInterval = null;
-            autoPlayBtn.innerHTML = '<i class="fas fa-play"></i> Auto Play';
-            autoPlayBtn.classList.remove('active');
-        } else {
-            autoPlayCards();
-            autoPlayBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
-            autoPlayBtn.classList.add('active');
-        }
-    }
-    
-    function autoPlayCards() {
-        // First flip all cards to front
-        const cards = cardContainer.querySelectorAll('.card');
-        cards.forEach(card => card.classList.remove('flipped'));
-        
-        let cardIndex = 0;
-        
-        // Show each card one by one
-        autoPlayInterval = setInterval(() => {
-            if (cardIndex < cards.length) {
-                // First make all cards not flipped
-                cards.forEach(card => card.classList.remove('flipped'));
-                
-                // Then flip the current one
-                cards[cardIndex].classList.add('flipped');
-                cards[cardIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                cardIndex++;
-            } else {
-                // Move to next category when all cards are shown
-                if (currentCategoryIndex < categories.length - 1) {
-                    navigateToNextCategory();
-                    cardIndex = 0;
-                } else {
-                    toggleAutoPlay(); // Stop auto play when reached the end
-                }
-            }
-        }, autoPlaySpeed);
-    }
-    
-    function updateSpeed() {
-        // Map slider value (1-10) to milliseconds (7000ms - 1000ms)
-        const value = parseInt(speedSlider.value);
-        autoPlaySpeed = 8000 - (value * 700); // Faster as the value increases
-        
-        // If auto play is running, restart it with new speed
-        if (autoPlayInterval) {
-            clearInterval(autoPlayInterval);
-            autoPlayCards();
-        }
-    }
-    
     function handleKeyboardNavigation(e) {
         switch(e.key) {
             case 'ArrowLeft':
@@ -327,28 +237,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
             case 'ArrowRight':
                 navigateToNextCategory();
-                break;
-            case ' ': // Space bar
-                // Flip the first visible card or the first unflipped card
-                const cards = cardContainer.querySelectorAll('.card');
-                const unflippedCard = Array.from(cards).find(card => !card.classList.contains('flipped'));
-                if (unflippedCard) {
-                    unflippedCard.classList.add('flipped');
-                } else if (cards.length > 0) {
-                    cards.forEach(card => card.classList.remove('flipped'));
-                }
-                break;
-            case 's':
-                if (e.ctrlKey) {
-                    e.preventDefault();
-                    shuffleCurrentCategory();
-                }
-                break;
-            case 'p':
-                if (e.ctrlKey) {
-                    e.preventDefault();
-                    toggleAutoPlay();
-                }
                 break;
         }
     }
