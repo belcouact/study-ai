@@ -1,717 +1,717 @@
-### Ò»¡¢ÈÕ³£ÎÊºò
-Hello! / ÄãºÃ£¡  
-Hi! / àË£¡  
-Good morning! / ÔçÉÏºÃ£¡  
-Good afternoon! / ÏÂÎçºÃ£¡  
-Good evening! / ÍíÉÏºÃ£¡  
-How are you? / ÄãºÃÂğ£¿  
-I'm fine, thank you. And you? / ÎÒºÜºÃ£¬Ğ»Ğ»£¬ÄãÄØ£¿  
-Long time no see! / ºÃ¾Ã²»¼û£¡  
-What's up? / ×î½üÔõÃ´Ñù£¿  
-How have you been? / Äã½üÀ´¹ıµÃÈçºÎ£¿
+### ä¸€ã€æ—¥å¸¸é—®å€™
+Hello! / ä½ å¥½ï¼  
+Hi! / å—¨ï¼  
+Good morning! / æ—©ä¸Šå¥½ï¼  
+Good afternoon! / ä¸‹åˆå¥½ï¼  
+Good evening! / æ™šä¸Šå¥½ï¼  
+How are you? / ä½ å¥½å—ï¼Ÿ  
+I'm fine, thank you. And you? / æˆ‘å¾ˆå¥½ï¼Œè°¢è°¢ï¼Œä½ å‘¢ï¼Ÿ  
+Long time no see! / å¥½ä¹…ä¸è§ï¼  
+What's up? / æœ€è¿‘æ€ä¹ˆæ ·ï¼Ÿ  
+How have you been? / ä½ è¿‘æ¥è¿‡å¾—å¦‚ä½•ï¼Ÿ
 
-### ¶ş¡¢½éÉÜ
-I'm ... / ÎÒÊÇ...  
-Nice to meet you. / ºÜ¸ßĞË¼ûµ½Äã¡£  
-This is ... / ÕâÊÇ...  
-May I introduce you to ...? / ÎÒ¿ÉÒÔ°ÑÄã½éÉÜ¸ø...Âğ£¿  
-I'd like you to meet ... / ÎÒÏëÈÃÄãÈÏÊ¶...  
-What do you do? / ÄãÊÇ×öÊ²Ã´¹¤×÷µÄ£¿  
-I'm a/an ... / ÎÒÊÇÒ»Ãû...  
-Where are you from? / ÄãÀ´×ÔÄÄÀï£¿  
-I'm from ... / ÎÒÀ´×Ô...  
-My hometown is ... / ÎÒµÄ¼ÒÏçÊÇ...
+### äºŒã€ä»‹ç»
+I'm ... / æˆ‘æ˜¯...  
+Nice to meet you. / å¾ˆé«˜å…´è§åˆ°ä½ ã€‚  
+This is ... / è¿™æ˜¯...  
+May I introduce you to ...? / æˆ‘å¯ä»¥æŠŠä½ ä»‹ç»ç»™...å—ï¼Ÿ  
+I'd like you to meet ... / æˆ‘æƒ³è®©ä½ è®¤è¯†...  
+What do you do? / ä½ æ˜¯åšä»€ä¹ˆå·¥ä½œçš„ï¼Ÿ  
+I'm a/an ... / æˆ‘æ˜¯ä¸€å...  
+Where are you from? / ä½ æ¥è‡ªå“ªé‡Œï¼Ÿ  
+I'm from ... / æˆ‘æ¥è‡ª...  
+My hometown is ... / æˆ‘çš„å®¶ä¹¡æ˜¯...
 
-### Èı¡¢¹ºÎï
-Can I help you? / ÎÒÄÜ°ïÄãÂğ£¿  
-I'm just looking, thanks. / ÎÒÖ»ÊÇ¿´¿´£¬Ğ»Ğ»¡£  
-How much is this? / Õâ¸ö¶àÉÙÇ®£¿  
-Do you have this in another color/size? / Õâ¸öÓĞÆäËûÑÕÉ«/³ß´çÂğ£¿  
-I'll take it. / ÎÒÂòÁË¡£  
-Can I try it on? / ÎÒ¿ÉÒÔÊÔ´©Ò»ÏÂÂğ£¿  
-Where is the fitting room? / ÊÔÒÂ¼äÔÚÄÄÀï£¿  
-It's too expensive. Do you have anything cheaper? / Ì«¹óÁË¡£ÓĞ±ãÒËµãµÄÂğ£¿  
-Is there a discount? / ÓĞÕÛ¿ÛÂë£¿
+### ä¸‰ã€è´­ç‰©
+Can I help you? / æˆ‘èƒ½å¸®ä½ å—ï¼Ÿ  
+I'm just looking, thanks. / æˆ‘åªæ˜¯çœ‹çœ‹ï¼Œè°¢è°¢ã€‚  
+How much is this? / è¿™ä¸ªå¤šå°‘é’±ï¼Ÿ  
+Do you have this in another color/size? / è¿™ä¸ªæœ‰å…¶ä»–é¢œè‰²/å°ºå¯¸å—ï¼Ÿ  
+I'll take it. / æˆ‘ä¹°äº†ã€‚  
+Can I try it on? / æˆ‘å¯ä»¥è¯•ç©¿ä¸€ä¸‹å—ï¼Ÿ  
+Where is the fitting room? / è¯•è¡£é—´åœ¨å“ªé‡Œï¼Ÿ  
+It's too expensive. Do you have anything cheaper? / å¤ªè´µäº†ã€‚æœ‰ä¾¿å®œç‚¹çš„å—ï¼Ÿ  
+Is there a discount? / æœ‰æŠ˜æ‰£ç ï¼Ÿ
 
-### ËÄ¡¢²ÍÌüÓÃ²Í
-A table for two, please. / Çë¸øÎÒÒ»ÕÅÁ½ÈË×À¡£  
-May I see the menu? / ÎÒ¿ÉÒÔ¿´Ò»ÏÂ²Ëµ¥Âğ£¿  
-What would you recommend? / ÄãÓĞÊ²Ã´ÍÆ¼öµÄÂğ£¿  
-I'd like ... / ÎÒÏëÒª...  
-Could I have some water, please? / Çë¸øÎÒÒ»Ğ©Ë®ºÃÂğ£¿  
-How would you like your steak cooked? / ÄãµÄÅ£ÅÅÒª¼¸·ÖÊì£¿  
-Well-done, please. / È«Êì£¬Ğ»Ğ»¡£  
-Medium-rare, please. / Èı·ÖÊì£¬Ğ»Ğ»¡£  
-Can I have the bill, please? / Çë¸øÎÒÕËµ¥¡£  
-Check, please. / ½áÕË¡£
+### å››ã€é¤å…ç”¨é¤
+A table for two, please. / è¯·ç»™æˆ‘ä¸€å¼ ä¸¤äººæ¡Œã€‚  
+May I see the menu? / æˆ‘å¯ä»¥çœ‹ä¸€ä¸‹èœå•å—ï¼Ÿ  
+What would you recommend? / ä½ æœ‰ä»€ä¹ˆæ¨èçš„å—ï¼Ÿ  
+I'd like ... / æˆ‘æƒ³è¦...  
+Could I have some water, please? / è¯·ç»™æˆ‘ä¸€äº›æ°´å¥½å—ï¼Ÿ  
+How would you like your steak cooked? / ä½ çš„ç‰›æ’è¦å‡ åˆ†ç†Ÿï¼Ÿ  
+Well-done, please. / å…¨ç†Ÿï¼Œè°¢è°¢ã€‚  
+Medium-rare, please. / ä¸‰åˆ†ç†Ÿï¼Œè°¢è°¢ã€‚  
+Can I have the bill, please? / è¯·ç»™æˆ‘è´¦å•ã€‚  
+Check, please. / ç»“è´¦ã€‚
 
-### Îå¡¢ÎÊÂ·
-Excuse me, where is ...? / ´òÈÅÒ»ÏÂ£¬ÔÚÄÄÀï£¿  
-How can I get to ...? / ÎÒÔõÃ´È¥...£¿  
-Is it far from here? / ÀëÕâ¶ùÔ¶Âğ£¿  
-Go straight ahead. / Ò»Ö±ÍùÇ°×ß¡£  
-Turn left/right at the first intersection. / ÔÚµÚÒ»¸öÊ®×ÖÂ·¿Ú×ó×ª/ÓÒ×ª¡£  
-It's on your left/right. / ËüÔÚÄãµÄ×ó±ß/ÓÒ±ß¡£  
-You can take the bus/train/subway to ... / Äã¿ÉÒÔ×ø¹«½»³µ/»ğ³µ/µØÌúÈ¥...  
-Which bus should I take? / ÎÒÓ¦¸Ã×øÄÄÂ·¹«½»³µ£¿  
-Is there a bank near here? / Õâ¸½½üÓĞÒøĞĞÂğ£¿  
-How long does it take to get there? / µ½ÄÇÀïĞèÒª¶à³¤Ê±¼ä£¿
+### äº”ã€é—®è·¯
+Excuse me, where is ...? / æ‰“æ‰°ä¸€ä¸‹ï¼Œåœ¨å“ªé‡Œï¼Ÿ  
+How can I get to ...? / æˆ‘æ€ä¹ˆå»...ï¼Ÿ  
+Is it far from here? / ç¦»è¿™å„¿è¿œå—ï¼Ÿ  
+Go straight ahead. / ä¸€ç›´å¾€å‰èµ°ã€‚  
+Turn left/right at the first intersection. / åœ¨ç¬¬ä¸€ä¸ªåå­—è·¯å£å·¦è½¬/å³è½¬ã€‚  
+It's on your left/right. / å®ƒåœ¨ä½ çš„å·¦è¾¹/å³è¾¹ã€‚  
+You can take the bus/train/subway to ... / ä½ å¯ä»¥åå…¬äº¤è½¦/ç«è½¦/åœ°é“å»...  
+Which bus should I take? / æˆ‘åº”è¯¥åå“ªè·¯å…¬äº¤è½¦ï¼Ÿ  
+Is there a bank near here? / è¿™é™„è¿‘æœ‰é“¶è¡Œå—ï¼Ÿ  
+How long does it take to get there? / åˆ°é‚£é‡Œéœ€è¦å¤šé•¿æ—¶é—´ï¼Ÿ
 
-### Áù¡¢´òµç»°
-Hello, this is ... speaking. / ÄãºÃ£¬ÎÒÊÇ...  
-May I speak to ...? / ÎÒ¿ÉÒÔºÍ...Ëµ»°Âğ£¿  
-Who's that? / ÄãÊÇË­£¿  
-Hold on, please. / ÇëÉÔµÈ¡£  
-I'm sorry, he/she is not available right now. / ºÜ±§Ç¸£¬Ëû/ËıÏÖÔÚ²»ÔÚ¡£  
-Can I take a message? / ÎÒ¿ÉÒÔÁôÑÔÂğ£¿  
-Could you ask him/her to call me back? / ÄãÄÜÈÃËû/Ëı¸øÎÒ»Ø¸öµç»°Âğ£¿  
-What's your number? / ÄãµÄµç»°ºÅÂëÊÇ¶àÉÙ£¿  
-I'll call back later. / ÎÒÉÔºóÔÙ´ò¹ıÀ´¡£  
-The line is busy. / µç»°Õ¼Ïß¡£
+### å…­ã€æ‰“ç”µè¯
+Hello, this is ... speaking. / ä½ å¥½ï¼Œæˆ‘æ˜¯...  
+May I speak to ...? / æˆ‘å¯ä»¥å’Œ...è¯´è¯å—ï¼Ÿ  
+Who's that? / ä½ æ˜¯è°ï¼Ÿ  
+Hold on, please. / è¯·ç¨ç­‰ã€‚  
+I'm sorry, he/she is not available right now. / å¾ˆæŠ±æ­‰ï¼Œä»–/å¥¹ç°åœ¨ä¸åœ¨ã€‚  
+Can I take a message? / æˆ‘å¯ä»¥ç•™è¨€å—ï¼Ÿ  
+Could you ask him/her to call me back? / ä½ èƒ½è®©ä»–/å¥¹ç»™æˆ‘å›ä¸ªç”µè¯å—ï¼Ÿ  
+What's your number? / ä½ çš„ç”µè¯å·ç æ˜¯å¤šå°‘ï¼Ÿ  
+I'll call back later. / æˆ‘ç¨åå†æ‰“è¿‡æ¥ã€‚  
+The line is busy. / ç”µè¯å çº¿ã€‚
 
-### Æß¡¢±í´ïÒâ¼û
-I think ... / ÎÒÈÏÎª...  
-In my opinion ... / ÔÚÎÒ¿´À´...  
-I agree/disagree. / ÎÒÍ¬Òâ/²»Í¬Òâ¡£  
-That's a good idea. / ÄÇÊÇ¸öºÃÖ÷Òâ¡£  
-I'm not sure about that. / ¶Ô´ËÎÒ²»Ì«È·¶¨¡£  
-Why not? / ÎªÊ²Ã´²»ÄØ£¿  
-It depends. / ÊÓÇé¿ö¶ø¶¨¡£  
-I'm afraid I can't. / ¿ÖÅÂÎÒ²»ÄÜ¡£  
-I prefer ... / ÎÒ¸üÏ²»¶...  
-I'd rather ... / ÎÒÄş¿É...
+### ä¸ƒã€è¡¨è¾¾æ„è§
+I think ... / æˆ‘è®¤ä¸º...  
+In my opinion ... / åœ¨æˆ‘çœ‹æ¥...  
+I agree/disagree. / æˆ‘åŒæ„/ä¸åŒæ„ã€‚  
+That's a good idea. / é‚£æ˜¯ä¸ªå¥½ä¸»æ„ã€‚  
+I'm not sure about that. / å¯¹æ­¤æˆ‘ä¸å¤ªç¡®å®šã€‚  
+Why not? / ä¸ºä»€ä¹ˆä¸å‘¢ï¼Ÿ  
+It depends. / è§†æƒ…å†µè€Œå®šã€‚  
+I'm afraid I can't. / ææ€•æˆ‘ä¸èƒ½ã€‚  
+I prefer ... / æˆ‘æ›´å–œæ¬¢...  
+I'd rather ... / æˆ‘å®å¯...
 
-### °Ë¡¢ÇëÇó°ïÖú
-Excuse me, could you help me? / ´òÈÅÒ»ÏÂ£¬ÄãÄÜ°ïÎÒÒ»ÏÂÂğ£¿  
-Can you do me a favor? / ÄãÄÜ°ïÎÒ¸öÃ¦Âğ£¿  
-I need your help. / ÎÒĞèÒªÄãµÄ°ïÖú¡£  
-Could you pass me that book? / ÄãÄÜ°ÑÄÇ±¾Êéµİ¸øÎÒÂğ£¿  
-Would you mind opening the window? / Äã½éÒâ´ò¿ª´°»§Âğ£¿  
-Sure, no problem. / µ±È»£¬Ã»ÎÊÌâ¡£  
-I'm sorry, I'm busy right now. / ºÜ±§Ç¸£¬ÎÒÏÖÔÚºÜÃ¦¡£  
-How can I help? / ÎÒÄÜÔõÃ´°ïÃ¦£¿  
-Could you give me some advice? / ÄãÄÜ¸øÎÒÒ»Ğ©½¨ÒéÂğ£¿  
-Help! / ¾ÈÃü£¡
+### å…«ã€è¯·æ±‚å¸®åŠ©
+Excuse me, could you help me? / æ‰“æ‰°ä¸€ä¸‹ï¼Œä½ èƒ½å¸®æˆ‘ä¸€ä¸‹å—ï¼Ÿ  
+Can you do me a favor? / ä½ èƒ½å¸®æˆ‘ä¸ªå¿™å—ï¼Ÿ  
+I need your help. / æˆ‘éœ€è¦ä½ çš„å¸®åŠ©ã€‚  
+Could you pass me that book? / ä½ èƒ½æŠŠé‚£æœ¬ä¹¦é€’ç»™æˆ‘å—ï¼Ÿ  
+Would you mind opening the window? / ä½ ä»‹æ„æ‰“å¼€çª—æˆ·å—ï¼Ÿ  
+Sure, no problem. / å½“ç„¶ï¼Œæ²¡é—®é¢˜ã€‚  
+I'm sorry, I'm busy right now. / å¾ˆæŠ±æ­‰ï¼Œæˆ‘ç°åœ¨å¾ˆå¿™ã€‚  
+How can I help? / æˆ‘èƒ½æ€ä¹ˆå¸®å¿™ï¼Ÿ  
+Could you give me some advice? / ä½ èƒ½ç»™æˆ‘ä¸€äº›å»ºè®®å—ï¼Ÿ  
+Help! / æ•‘å‘½ï¼
 
-### ¾Å¡¢µÀ±ğ
-Goodbye! / ÔÙ¼û£¡  
-Bye! / °İ°İ£¡  
-See you later/tomorrow. / Ò»»á¶ù¼û/Ã÷Ìì¼û¡£  
-Take care! / ±£ÖØ£¡  
-Have a nice day! / ×£ÄãÓĞÃÀºÃµÄÒ»Ìì£¡  
-I have to go now. / ÎÒÏÖÔÚµÃ×ßÁË¡£  
-It was nice talking to you. / ºÍÄãÁÄÌìºÜÓä¿ì¡£  
-Until next time. / ÏÂ´Î¼û¡£  
-Farewell. / ÔÙ»á£¡£¨½ÏÎªÕıÊ½£©  
-Safe travels! / Ò»Â·Æ½°²£¡
+### ä¹ã€é“åˆ«
+Goodbye! / å†è§ï¼  
+Bye! / æ‹œæ‹œï¼  
+See you later/tomorrow. / ä¸€ä¼šå„¿è§/æ˜å¤©è§ã€‚  
+Take care! / ä¿é‡ï¼  
+Have a nice day! / ç¥ä½ æœ‰ç¾å¥½çš„ä¸€å¤©ï¼  
+I have to go now. / æˆ‘ç°åœ¨å¾—èµ°äº†ã€‚  
+It was nice talking to you. / å’Œä½ èŠå¤©å¾ˆæ„‰å¿«ã€‚  
+Until next time. / ä¸‹æ¬¡è§ã€‚  
+Farewell. / å†ä¼šï¼ï¼ˆè¾ƒä¸ºæ­£å¼ï¼‰  
+Safe travels! / ä¸€è·¯å¹³å®‰ï¼
 
-### Ê®¡¢Ê±¼äÓëÈÕÆÚ
-What time is it? / ÏÖÔÚ¼¸µãÁË£¿  
-It's six o'clock. / ÏÖÔÚÁùµã¡£  
-It's half past seven. / Æßµã°ë¡£  
-It's a quarter to ten. / ²îÒ»¿ÌÊ®µã¡£  
-When is your birthday? / ÄãµÄÉúÈÕÊÇÊ²Ã´Ê±ºò£¿  
-My birthday is on May 1st. / ÎÒµÄÉúÈÕÊÇÎåÔÂÒ»ÈÕ¡£  
-What day is it today? / ½ñÌìĞÇÆÚ¼¸£¿  
-It's Monday. / ½ñÌìĞÇÆÚÒ»¡£  
-What's the date today? / ½ñÌì¼¸ºÅ£¿  
-It's December 25th. / ½ñÌìÊÇ12ÔÂ25ÈÕ¡£
+### åã€æ—¶é—´ä¸æ—¥æœŸ
+What time is it? / ç°åœ¨å‡ ç‚¹äº†ï¼Ÿ  
+It's six o'clock. / ç°åœ¨å…­ç‚¹ã€‚  
+It's half past seven. / ä¸ƒç‚¹åŠã€‚  
+It's a quarter to ten. / å·®ä¸€åˆ»åç‚¹ã€‚  
+When is your birthday? / ä½ çš„ç”Ÿæ—¥æ˜¯ä»€ä¹ˆæ—¶å€™ï¼Ÿ  
+My birthday is on May 1st. / æˆ‘çš„ç”Ÿæ—¥æ˜¯äº”æœˆä¸€æ—¥ã€‚  
+What day is it today? / ä»Šå¤©æ˜ŸæœŸå‡ ï¼Ÿ  
+It's Monday. / ä»Šå¤©æ˜ŸæœŸä¸€ã€‚  
+What's the date today? / ä»Šå¤©å‡ å·ï¼Ÿ  
+It's December 25th. / ä»Šå¤©æ˜¯12æœˆ25æ—¥ã€‚
 
-### Ê®Ò»¡¢Ì¸ÂÛÌìÆø
-What's the weather like today? / ½ñÌìÌìÆøÔõÃ´Ñù£¿  
-It's sunny. / ÌìÆøÇçÀÊ¡£  
-It's cloudy. / ¶àÔÆ¡£  
-It's raining. / ÕıÔÚÏÂÓê¡£  
-It's windy. / ÓĞ·ç¡£  
-It's snowing. / ÕıÔÚÏÂÑ©¡£  
-It's hot/cold today. / ½ñÌìÈÈ/Àä¡£  
-The weather is getting warmer. / ÌìÆøÔ½À´Ô½Å¯ºÍÁË¡£  
-I hope it will be fine tomorrow. / ÎÒÏ£ÍûÃ÷ÌìÌìÆøºÃ¡£  
-What's the temperature? / ÆøÎÂÊÇ¶àÉÙ£¿
+### åä¸€ã€è°ˆè®ºå¤©æ°”
+What's the weather like today? / ä»Šå¤©å¤©æ°”æ€ä¹ˆæ ·ï¼Ÿ  
+It's sunny. / å¤©æ°”æ™´æœ—ã€‚  
+It's cloudy. / å¤šäº‘ã€‚  
+It's raining. / æ­£åœ¨ä¸‹é›¨ã€‚  
+It's windy. / æœ‰é£ã€‚  
+It's snowing. / æ­£åœ¨ä¸‹é›ªã€‚  
+It's hot/cold today. / ä»Šå¤©çƒ­/å†·ã€‚  
+The weather is getting warmer. / å¤©æ°”è¶Šæ¥è¶Šæš–å’Œäº†ã€‚  
+I hope it will be fine tomorrow. / æˆ‘å¸Œæœ›æ˜å¤©å¤©æ°”å¥½ã€‚  
+What's the temperature? / æ°”æ¸©æ˜¯å¤šå°‘ï¼Ÿ
 
-### Ê®¶ş¡¢×¡ËŞ
-I'd like to book a room. / ÎÒÏë¶©Ò»¸ö·¿¼ä¡£  
-Do you have a single/double room available? / ÄãÃÇÓĞµ¥ÈË¼ä/Ë«ÈË¼äÂğ£¿  
-How much is it per night? / Ã¿Íí¶àÉÙÇ®£¿  
-I'd like a room with a view. / ÎÒÏëÒªÒ»¼äÓĞ¾°¹ÛµÄ·¿¼ä¡£  
-Check-in, please. / Çë°ìÀíÈë×¡ÊÖĞø¡£  
-What time is check-out? / ÍË·¿Ê±¼äÊÇ¼¸µã£¿  
-The air-conditioner in my room doesn't work. / ÎÒ·¿¼äµÄ¿Õµ÷»µÁË¡£  
-Could you send someone to fix it? / ÄãÄÜÅÉÈËÀ´ĞŞÒ»ÏÂÂğ£¿  
-I left my key in the room. / ÎÒ°ÑÔ¿³×ÂäÔÚ·¿¼äÀïÁË¡£  
-Is breakfast included? / º¬Ôç²ÍÂğ£¿
+### åäºŒã€ä½å®¿
+I'd like to book a room. / æˆ‘æƒ³è®¢ä¸€ä¸ªæˆ¿é—´ã€‚  
+Do you have a single/double room available? / ä½ ä»¬æœ‰å•äººé—´/åŒäººé—´å—ï¼Ÿ  
+How much is it per night? / æ¯æ™šå¤šå°‘é’±ï¼Ÿ  
+I'd like a room with a view. / æˆ‘æƒ³è¦ä¸€é—´æœ‰æ™¯è§‚çš„æˆ¿é—´ã€‚  
+Check-in, please. / è¯·åŠç†å…¥ä½æ‰‹ç»­ã€‚  
+What time is check-out? / é€€æˆ¿æ—¶é—´æ˜¯å‡ ç‚¹ï¼Ÿ  
+The air-conditioner in my room doesn't work. / æˆ‘æˆ¿é—´çš„ç©ºè°ƒåäº†ã€‚  
+Could you send someone to fix it? / ä½ èƒ½æ´¾äººæ¥ä¿®ä¸€ä¸‹å—ï¼Ÿ  
+I left my key in the room. / æˆ‘æŠŠé’¥åŒ™è½åœ¨æˆ¿é—´é‡Œäº†ã€‚  
+Is breakfast included? / å«æ—©é¤å—ï¼Ÿ
 
-### Ê®Èı¡¢Çé¸Ğ±í´ï
-I'm happy/glad. / ÎÒºÜ¿ªĞÄ¡£  
-I'm sad. / ÎÒºÜÄÑ¹ı¡£  
-I'm angry. / ÎÒºÜÉúÆø¡£  
-I'm excited. / ÎÒºÜĞË·Ü¡£  
-I'm bored. / ÎÒºÜÎŞÁÄ¡£  
-That's amazing! / Ì«ÉñÆæÁË£¡  
-I'm disappointed. / ÎÒºÜÊ§Íû¡£  
-I'm worried. / ÎÒºÜµ£ĞÄ¡£  
-It's frustrating. / ÕæÁîÈË¾ÚÉ¥¡£  
-I feel relaxed. / ÎÒ¸Ğ¾õºÜ·ÅËÉ¡£
+### åä¸‰ã€æƒ…æ„Ÿè¡¨è¾¾
+I'm happy/glad. / æˆ‘å¾ˆå¼€å¿ƒã€‚  
+I'm sad. / æˆ‘å¾ˆéš¾è¿‡ã€‚  
+I'm angry. / æˆ‘å¾ˆç”Ÿæ°”ã€‚  
+I'm excited. / æˆ‘å¾ˆå…´å¥‹ã€‚  
+I'm bored. / æˆ‘å¾ˆæ— èŠã€‚  
+That's amazing! / å¤ªç¥å¥‡äº†ï¼  
+I'm disappointed. / æˆ‘å¾ˆå¤±æœ›ã€‚  
+I'm worried. / æˆ‘å¾ˆæ‹…å¿ƒã€‚  
+It's frustrating. / çœŸä»¤äººæ²®ä¸§ã€‚  
+I feel relaxed. / æˆ‘æ„Ÿè§‰å¾ˆæ”¾æ¾ã€‚
 
-### Ê®ËÄ¡¢½»Í¨³öĞĞ  
-I usually go to work by bus. / ÎÒÍ¨³£×ø¹«½»³µÉÏ°à¡£  
-He drives to school every day. / ËûÃ¿Ìì¿ª³µÈ¥Ñ§Ğ£¡£  
-She rides a bike to the park. / ËıÆï×ÔĞĞ³µÈ¥¹«Ô°¡£  
-I took a taxi because I was in a hurry. / ÒòÎª¸ÏÊ±¼ä£¬ÎÒ´òÁË³ö×â³µ¡£  
-How long does it take to get there by train? / ×ø»ğ³µµ½ÄÇÀïÒª¶à¾Ã£¿  
-The subway is very convenient. / µØÌú·Ç³£·½±ã¡£  
-Where is the bus stop? / ¹«½»³µÕ¾ÔÚÄÄÀï£¿  
-I missed the bus. / ÎÒ´í¹ıÁË¹«½»³µ¡£  
-The traffic is heavy. / ½»Í¨ºÜÓµ¶Â¡£  
-I need to buy a ticket for the plane. / ÎÒĞèÒªÂòÒ»ÕÅ»úÆ±¡£
+### åå››ã€äº¤é€šå‡ºè¡Œ  
+I usually go to work by bus. / æˆ‘é€šå¸¸åå…¬äº¤è½¦ä¸Šç­ã€‚  
+He drives to school every day. / ä»–æ¯å¤©å¼€è½¦å»å­¦æ ¡ã€‚  
+She rides a bike to the park. / å¥¹éª‘è‡ªè¡Œè½¦å»å…¬å›­ã€‚  
+I took a taxi because I was in a hurry. / å› ä¸ºèµ¶æ—¶é—´ï¼Œæˆ‘æ‰“äº†å‡ºç§Ÿè½¦ã€‚  
+How long does it take to get there by train? / åç«è½¦åˆ°é‚£é‡Œè¦å¤šä¹…ï¼Ÿ  
+The subway is very convenient. / åœ°é“éå¸¸æ–¹ä¾¿ã€‚  
+Where is the bus stop? / å…¬äº¤è½¦ç«™åœ¨å“ªé‡Œï¼Ÿ  
+I missed the bus. / æˆ‘é”™è¿‡äº†å…¬äº¤è½¦ã€‚  
+The traffic is heavy. / äº¤é€šå¾ˆæ‹¥å µã€‚  
+I need to buy a ticket for the plane. / æˆ‘éœ€è¦ä¹°ä¸€å¼ æœºç¥¨ã€‚
 
-### Ê®Îå¡¢ĞËÈ¤°®ºÃ  
-What are your hobbies? / ÄãµÄ°®ºÃÊÇÊ²Ã´£¿  
-I like reading books. / ÎÒÏ²»¶¶ÁÊé¡£  
-He enjoys playing basketball. / ËûÏ²»¶´òÀºÇò¡£  
-She loves listening to music. / ËıÏ²»¶ÌıÒôÀÖ¡£  
-My hobby is painting. / ÎÒµÄ°®ºÃÊÇ»æ»­¡£  
-Do you like watching movies? / ÄãÏ²»¶¿´µçÓ°Âğ£¿  
-I'm interested in traveling. / ÎÒ¶ÔÂÃĞĞ¸ĞĞËÈ¤¡£  
-They are fond of dancing. / ËûÃÇÏ²»¶ÌøÎè¡£  
-I like collecting stamps. / ÎÒÏ²»¶¼¯ÓÊ¡£  
-What kind of music do you like? / ÄãÏ²»¶Ê²Ã´ÀàĞÍµÄÒôÀÖ£¿
+### åäº”ã€å…´è¶£çˆ±å¥½  
+What are your hobbies? / ä½ çš„çˆ±å¥½æ˜¯ä»€ä¹ˆï¼Ÿ  
+I like reading books. / æˆ‘å–œæ¬¢è¯»ä¹¦ã€‚  
+He enjoys playing basketball. / ä»–å–œæ¬¢æ‰“ç¯®çƒã€‚  
+She loves listening to music. / å¥¹å–œæ¬¢å¬éŸ³ä¹ã€‚  
+My hobby is painting. / æˆ‘çš„çˆ±å¥½æ˜¯ç»˜ç”»ã€‚  
+Do you like watching movies? / ä½ å–œæ¬¢çœ‹ç”µå½±å—ï¼Ÿ  
+I'm interested in traveling. / æˆ‘å¯¹æ—…è¡Œæ„Ÿå…´è¶£ã€‚  
+They are fond of dancing. / ä»–ä»¬å–œæ¬¢è·³èˆã€‚  
+I like collecting stamps. / æˆ‘å–œæ¬¢é›†é‚®ã€‚  
+What kind of music do you like? / ä½ å–œæ¬¢ä»€ä¹ˆç±»å‹çš„éŸ³ä¹ï¼Ÿ
 
-### Ê®Áù¡¢Ñ§Ï°Ïà¹Ø  
-I'm studying English. / ÎÒÕıÔÚÑ§Ï°Ó¢Óï¡£  
-How do you learn English? / ÄãÊÇÔõÃ´Ñ§Ï°Ó¢ÓïµÄ£¿  
-I learn by listening to tapes. / ÎÒÍ¨¹ıÌı´Å´øÀ´Ñ§Ï°¡£  
-What subject do you like best? / Äã×îÏ²»¶Ê²Ã´Ñ§¿Æ£¿  
-Math is too difficult for me. / ÊıÑ§¶ÔÎÒÀ´ËµÌ«ÄÑÁË¡£  
-I have an exam tomorrow. / ÎÒÃ÷ÌìÓĞÒ»³¡¿¼ÊÔ¡£  
-I need to prepare for the test. / ÎÒĞèÒªÎª¿¼ÊÔ×ö×¼±¸¡£  
-Where is the library? / Í¼Êé¹İÔÚÄÄÀï£¿  
-I want to borrow a book. / ÎÒÏë½èÒ»±¾Êé¡£  
-The teacher is very strict. / ÀÏÊ¦ºÜÑÏ¸ñ¡£
+### åå…­ã€å­¦ä¹ ç›¸å…³  
+I'm studying English. / æˆ‘æ­£åœ¨å­¦ä¹ è‹±è¯­ã€‚  
+How do you learn English? / ä½ æ˜¯æ€ä¹ˆå­¦ä¹ è‹±è¯­çš„ï¼Ÿ  
+I learn by listening to tapes. / æˆ‘é€šè¿‡å¬ç£å¸¦æ¥å­¦ä¹ ã€‚  
+What subject do you like best? / ä½ æœ€å–œæ¬¢ä»€ä¹ˆå­¦ç§‘ï¼Ÿ  
+Math is too difficult for me. / æ•°å­¦å¯¹æˆ‘æ¥è¯´å¤ªéš¾äº†ã€‚  
+I have an exam tomorrow. / æˆ‘æ˜å¤©æœ‰ä¸€åœºè€ƒè¯•ã€‚  
+I need to prepare for the test. / æˆ‘éœ€è¦ä¸ºè€ƒè¯•åšå‡†å¤‡ã€‚  
+Where is the library? / å›¾ä¹¦é¦†åœ¨å“ªé‡Œï¼Ÿ  
+I want to borrow a book. / æˆ‘æƒ³å€Ÿä¸€æœ¬ä¹¦ã€‚  
+The teacher is very strict. / è€å¸ˆå¾ˆä¸¥æ ¼ã€‚
 
-### Ê®Æß¡¢ÃèÊöÊÂÎï  
-This is a beautiful flower. / ÕâÊÇÒ»¶äÃÀÀöµÄ»¨¡£  
-The house is very big. / Õâ·¿×ÓºÜ´ó¡£  
-The dress looks nice on you. / ÕâÌõÈ¹×ÓÄã´©ºÜºÃ¿´¡£  
-What does he look like? / Ëû³¤Ê²Ã´Ñù£¿  
-He is tall and thin. / ËûÓÖ¸ßÓÖÊİ¡£  
-The food tastes delicious. / ÕâÊ³Îï³¢ÆğÀ´ºÜÃÀÎ¶¡£  
-The movie is really interesting. / Õâ²¿µçÓ°ÕæµÄºÜÓĞÒâË¼¡£  
-The city is very modern. / Õâ×ù³ÇÊĞ·Ç³£ÏÖ´ú»¯¡£  
-The book is very useful. / Õâ±¾ÊéºÜÓĞÓÃ¡£  
-What color is your car? / ÄãµÄ³µÊÇÊ²Ã´ÑÕÉ«µÄ£¿
+### åä¸ƒã€æè¿°äº‹ç‰©  
+This is a beautiful flower. / è¿™æ˜¯ä¸€æœµç¾ä¸½çš„èŠ±ã€‚  
+The house is very big. / è¿™æˆ¿å­å¾ˆå¤§ã€‚  
+The dress looks nice on you. / è¿™æ¡è£™å­ä½ ç©¿å¾ˆå¥½çœ‹ã€‚  
+What does he look like? / ä»–é•¿ä»€ä¹ˆæ ·ï¼Ÿ  
+He is tall and thin. / ä»–åˆé«˜åˆç˜¦ã€‚  
+The food tastes delicious. / è¿™é£Ÿç‰©å°èµ·æ¥å¾ˆç¾å‘³ã€‚  
+The movie is really interesting. / è¿™éƒ¨ç”µå½±çœŸçš„å¾ˆæœ‰æ„æ€ã€‚  
+The city is very modern. / è¿™åº§åŸå¸‚éå¸¸ç°ä»£åŒ–ã€‚  
+The book is very useful. / è¿™æœ¬ä¹¦å¾ˆæœ‰ç”¨ã€‚  
+What color is your car? / ä½ çš„è½¦æ˜¯ä»€ä¹ˆé¢œè‰²çš„ï¼Ÿ
 
-### Ê®°Ë¡¢ÑûÇëÓë»ØÓ¦  
-Would you like to come to my party? / ÄãÔ¸ÒâÀ´²Î¼ÓÎÒµÄÅÉ¶ÔÂğ£¿  
-I'd love to. / ÎÒºÜÀÖÒâ¡£  
-I'm sorry, I have other plans. / ºÜ±§Ç¸£¬ÎÒÓĞÆäËû°²ÅÅ¡£  
-Can you come over for dinner tonight? / Äã½ñÍíÄÜ¹ıÀ´³ÔÍí·¹Âğ£¿  
-Sure, what time? / µ±È»£¬¼¸µã£¿  
-Thanks for the invitation, but I can't make it. / Ğ»Ğ»ÄãµÄÑûÇë£¬µ«ÎÒÀ´²»ÁË¡£  
-We are having a barbecue this weekend. Do you want to join us? / ÎÒÃÇÕâ¸öÖÜÄ©ÒªÈ¥ÉÕ¿¾£¬ÄãÏë¼ÓÈëÎÒÃÇÂğ£¿  
-That sounds great. Count me in. / ÌıÆğÀ´ºÜ°ô¡£ËãÎÒÒ»¸ö¡£  
-I'm afraid I'm busy then. Maybe another time. / ¿ÖÅÂÄÇÊ±ÎÒºÜÃ¦£¬Ò²ĞíÏÂ´Î°É¡£  
-How about going to the concert together? / Ò»ÆğÈ¥ÌıÒôÀÖ»áÔõÃ´Ñù£¿
+### åå…«ã€é‚€è¯·ä¸å›åº”  
+Would you like to come to my party? / ä½ æ„¿æ„æ¥å‚åŠ æˆ‘çš„æ´¾å¯¹å—ï¼Ÿ  
+I'd love to. / æˆ‘å¾ˆä¹æ„ã€‚  
+I'm sorry, I have other plans. / å¾ˆæŠ±æ­‰ï¼Œæˆ‘æœ‰å…¶ä»–å®‰æ’ã€‚  
+Can you come over for dinner tonight? / ä½ ä»Šæ™šèƒ½è¿‡æ¥åƒæ™šé¥­å—ï¼Ÿ  
+Sure, what time? / å½“ç„¶ï¼Œå‡ ç‚¹ï¼Ÿ  
+Thanks for the invitation, but I can't make it. / è°¢è°¢ä½ çš„é‚€è¯·ï¼Œä½†æˆ‘æ¥ä¸äº†ã€‚  
+We are having a barbecue this weekend. Do you want to join us? / æˆ‘ä»¬è¿™ä¸ªå‘¨æœ«è¦å»çƒ§çƒ¤ï¼Œä½ æƒ³åŠ å…¥æˆ‘ä»¬å—ï¼Ÿ  
+That sounds great. Count me in. / å¬èµ·æ¥å¾ˆæ£’ã€‚ç®—æˆ‘ä¸€ä¸ªã€‚  
+I'm afraid I'm busy then. Maybe another time. / ææ€•é‚£æ—¶æˆ‘å¾ˆå¿™ï¼Œä¹Ÿè®¸ä¸‹æ¬¡å§ã€‚  
+How about going to the concert together? / ä¸€èµ·å»å¬éŸ³ä¹ä¼šæ€ä¹ˆæ ·ï¼Ÿ
 
-### Ê®¾Å¡¢½¨ÒéÓëÌáÒé  
-Why don't we go for a walk? / ÎÒÃÇÎªÊ²Ã´²»È¥É¢²½ÄØ£¿  
-Let's watch a movie. / ÔÛÃÇ¿´³¡µçÓ°°É¡£  
-You should get more sleep. / ÄãÓ¦¸Ã¶àË¯Ò»»á¶ù¡£  
-If I were you, I'd talk to her. / Èç¹ûÎÒÊÇÄã£¬ÎÒ»áºÍËıÌ¸Ì¸¡£  
-Maybe you could try this new restaurant. / Ò²ĞíÄã¿ÉÒÔÊÔÊÔÕâ¼ÒĞÂ²ÍÌü¡£  
-Shall we have a picnic this Sunday? / Õâ¸öÖÜÈÕÎÒÃÇÈ¥Ò°²ÍºÃÂğ£¿  
-What about going swimming? / È¥ÓÎÓ¾ÔõÃ´Ñù£¿  
-It might be a good idea to take a break. / ĞİÏ¢Ò»ÏÂ¿ÉÄÜÊÇ¸öºÃÖ÷Òâ¡£  
-You'd better take an umbrella. It looks like rain. / Äã×îºÃ´ø°ÑÉ¡£¬¿´ÆğÀ´ÒªÏÂÓêÁË¡£  
-Consider buying a new computer. / ¿¼ÂÇÂòÌ¨ĞÂµçÄÔ°É¡£
+### åä¹ã€å»ºè®®ä¸æè®®  
+Why don't we go for a walk? / æˆ‘ä»¬ä¸ºä»€ä¹ˆä¸å»æ•£æ­¥å‘¢ï¼Ÿ  
+Let's watch a movie. / å’±ä»¬çœ‹åœºç”µå½±å§ã€‚  
+You should get more sleep. / ä½ åº”è¯¥å¤šç¡ä¸€ä¼šå„¿ã€‚  
+If I were you, I'd talk to her. / å¦‚æœæˆ‘æ˜¯ä½ ï¼Œæˆ‘ä¼šå’Œå¥¹è°ˆè°ˆã€‚  
+Maybe you could try this new restaurant. / ä¹Ÿè®¸ä½ å¯ä»¥è¯•è¯•è¿™å®¶æ–°é¤å…ã€‚  
+Shall we have a picnic this Sunday? / è¿™ä¸ªå‘¨æ—¥æˆ‘ä»¬å»é‡é¤å¥½å—ï¼Ÿ  
+What about going swimming? / å»æ¸¸æ³³æ€ä¹ˆæ ·ï¼Ÿ  
+It might be a good idea to take a break. / ä¼‘æ¯ä¸€ä¸‹å¯èƒ½æ˜¯ä¸ªå¥½ä¸»æ„ã€‚  
+You'd better take an umbrella. It looks like rain. / ä½ æœ€å¥½å¸¦æŠŠä¼ï¼Œçœ‹èµ·æ¥è¦ä¸‹é›¨äº†ã€‚  
+Consider buying a new computer. / è€ƒè™‘ä¹°å°æ–°ç”µè„‘å§ã€‚
 
-### ¶şÊ®¡¢±§Ô¹Óë²»Âú  
-This coffee is too cold. / Õâ¿§·ÈÌ«Á¹ÁË¡£  
-I'm tired of waiting. / ÎÒµÈµÃ²»ÄÍ·³ÁË¡£  
-The service here is really bad. / ÕâÀïµÄ·şÎñÕæ²î¡£  
-The noise is driving me crazy. / ÕâÔëÒô¿ì°ÑÎÒ±Æ·èÁË¡£  
-Why are you always late? / ÄãÔõÃ´×ÜÊÇ³Ùµ½£¿  
-I can't stand his rudeness. / ÎÒÊÜ²»ÁËËûµÄ´ÖÂ³¡£  
-This shirt shrank after I washed it. / Õâ¼ş³ÄÉÀÏ´ºóËõË®ÁË¡£  
-The traffic in this city is a nightmare. / Õâ¸ö³ÇÊĞµÄ½»Í¨¼òÖ±ÊÇØ¬ÃÎ¡£  
-I'm fed up with this job. / ÎÒÊÜ¹»Õâ·İ¹¤×÷ÁË¡£  
-They never clean up after themselves. / ËûÃÇ´Ó²»ÊÕÊ°×Ô¼ºÅªÂÒµÄ¶«Î÷¡£
+### äºŒåã€æŠ±æ€¨ä¸ä¸æ»¡  
+This coffee is too cold. / è¿™å’–å•¡å¤ªå‡‰äº†ã€‚  
+I'm tired of waiting. / æˆ‘ç­‰å¾—ä¸è€çƒ¦äº†ã€‚  
+The service here is really bad. / è¿™é‡Œçš„æœåŠ¡çœŸå·®ã€‚  
+The noise is driving me crazy. / è¿™å™ªéŸ³å¿«æŠŠæˆ‘é€¼ç–¯äº†ã€‚  
+Why are you always late? / ä½ æ€ä¹ˆæ€»æ˜¯è¿Ÿåˆ°ï¼Ÿ  
+I can't stand his rudeness. / æˆ‘å—ä¸äº†ä»–çš„ç²—é²ã€‚  
+This shirt shrank after I washed it. / è¿™ä»¶è¡¬è¡«æ´—åç¼©æ°´äº†ã€‚  
+The traffic in this city is a nightmare. / è¿™ä¸ªåŸå¸‚çš„äº¤é€šç®€ç›´æ˜¯å™©æ¢¦ã€‚  
+I'm fed up with this job. / æˆ‘å—å¤Ÿè¿™ä»½å·¥ä½œäº†ã€‚  
+They never clean up after themselves. / ä»–ä»¬ä»ä¸æ”¶æ‹¾è‡ªå·±å¼„ä¹±çš„ä¸œè¥¿ã€‚
 
-### ¶şÊ®Ò»¡¢±íÊ¾¾ªÑÈ  
-Really? / ÕæµÄÂğ£¿  
-Are you kidding me? / ÄãÔÚ¸úÎÒ¿ªÍæĞ¦°É£¿  
-Oh my god! / ÌìÄÄ£¡  
-That's incredible! / Ì«²»¿ÉË¼ÒéÁË£¡  
-Unbelievable! / ÄÑÒÔÖÃĞÅ£¡  
-What a surprise! / ÕæÊÇ¸ö¾ªÏ²£¡  
-I can't believe it. / ÎÒ¼òÖ±²»¸ÒÏàĞÅ¡£  
-You don't say! / ²»»á°É£¡  
-Holy cow! / ÍÛÈû£¡  
-It's hard to believe. / ºÜÄÑÏàĞÅ¡£
+### äºŒåä¸€ã€è¡¨ç¤ºæƒŠè®¶  
+Really? / çœŸçš„å—ï¼Ÿ  
+Are you kidding me? / ä½ åœ¨è·Ÿæˆ‘å¼€ç©ç¬‘å§ï¼Ÿ  
+Oh my god! / å¤©å“ªï¼  
+That's incredible! / å¤ªä¸å¯æ€è®®äº†ï¼  
+Unbelievable! / éš¾ä»¥ç½®ä¿¡ï¼  
+What a surprise! / çœŸæ˜¯ä¸ªæƒŠå–œï¼  
+I can't believe it. / æˆ‘ç®€ç›´ä¸æ•¢ç›¸ä¿¡ã€‚  
+You don't say! / ä¸ä¼šå§ï¼  
+Holy cow! / å“‡å¡ï¼  
+It's hard to believe. / å¾ˆéš¾ç›¸ä¿¡ã€‚
 
-### ¶şÊ®¶ş¡¢¹ÄÀøÓë°²Î¿  
-Come on! You can do it. / ¼ÓÓÍ£¡ÄãÄÜĞĞµÄ¡£  
-Don't worry. Everything will be okay. / ±ğµ£ĞÄ£¬Ò»ÇĞ¶¼»áºÃÆğÀ´µÄ¡£  
-Keep it up! / ¼á³ÖÏÂÈ¥£¡  
-I'm sure you'll succeed. / ÎÒÏàĞÅÄã»á³É¹¦µÄ¡£  
-It's not the end of the world. / ÕâÓÖ²»ÊÇÊÀ½çÄ©ÈÕ¡£  
-Cheer up! / Õñ×÷ÆğÀ´£¡  
-You've made great progress. / ÄãÒÑ¾­È¡µÃÁËºÜ´óµÄ½ø²½¡£  
-Everyone makes mistakes. / Ã¿¸öÈË¶¼»á·¸´í¡£  
-Hang in there. / Í¦×¡¡£  
-You're better than you think. / Äã±ÈÄãÏëÏóµÄÒªºÃ¡£
+### äºŒåäºŒã€é¼“åŠ±ä¸å®‰æ…°  
+Come on! You can do it. / åŠ æ²¹ï¼ä½ èƒ½è¡Œçš„ã€‚  
+Don't worry. Everything will be okay. / åˆ«æ‹…å¿ƒï¼Œä¸€åˆ‡éƒ½ä¼šå¥½èµ·æ¥çš„ã€‚  
+Keep it up! / åšæŒä¸‹å»ï¼  
+I'm sure you'll succeed. / æˆ‘ç›¸ä¿¡ä½ ä¼šæˆåŠŸçš„ã€‚  
+It's not the end of the world. / è¿™åˆä¸æ˜¯ä¸–ç•Œæœ«æ—¥ã€‚  
+Cheer up! / æŒ¯ä½œèµ·æ¥ï¼  
+You've made great progress. / ä½ å·²ç»å–å¾—äº†å¾ˆå¤§çš„è¿›æ­¥ã€‚  
+Everyone makes mistakes. / æ¯ä¸ªäººéƒ½ä¼šçŠ¯é”™ã€‚  
+Hang in there. / æŒºä½ã€‚  
+You're better than you think. / ä½ æ¯”ä½ æƒ³è±¡çš„è¦å¥½ã€‚
 
-### ¶şÊ®Èı¡¢¸øÓèÓë½ÓÊÜ  
-Here you are. / ¸øÄã¡£  
-Thank you. It's very kind of you. / Ğ»Ğ»Äã£¬ÄãÕæºÃ¡£  
-You're welcome. / ²»¿ÍÆø¡£  
-I'd like to offer you a drink. / ÎÒÏëÇëÄãºÈ±­ÒûÁÏ¡£  
-That's very nice of you, but I'm fine. / ÄãÕæºÃ£¬µ«ÎÒ²»ÓÃÁË¡£  
-Can I have a piece of cake? / ÎÒ¿ÉÒÔ³ÔÒ»¿éµ°¸âÂğ£¿  
-Sure, help yourself. / µ±È»£¬Ëæ±ã³Ô¡£  
-Accept this gift as a token of our friendship. / ÊÕÏÂÕâ·İÀñÎï£¬×÷ÎªÎÒÃÇÓÑÒêµÄÏóÕ÷¡£  
-I can't accept this. It's too expensive. / ÎÒ²»ÄÜÊÕÏÂÕâ¸ö£¬Ì«¹óÁË¡£  
-Thank you for your help. I really appreciate it. / ¸ĞĞ»ÄãµÄ°ïÖú£¬ÎÒÕæµÄºÜ¸Ğ¼¤¡£
+### äºŒåä¸‰ã€ç»™äºˆä¸æ¥å—  
+Here you are. / ç»™ä½ ã€‚  
+Thank you. It's very kind of you. / è°¢è°¢ä½ ï¼Œä½ çœŸå¥½ã€‚  
+You're welcome. / ä¸å®¢æ°”ã€‚  
+I'd like to offer you a drink. / æˆ‘æƒ³è¯·ä½ å–æ¯é¥®æ–™ã€‚  
+That's very nice of you, but I'm fine. / ä½ çœŸå¥½ï¼Œä½†æˆ‘ä¸ç”¨äº†ã€‚  
+Can I have a piece of cake? / æˆ‘å¯ä»¥åƒä¸€å—è›‹ç³•å—ï¼Ÿ  
+Sure, help yourself. / å½“ç„¶ï¼Œéšä¾¿åƒã€‚  
+Accept this gift as a token of our friendship. / æ”¶ä¸‹è¿™ä»½ç¤¼ç‰©ï¼Œä½œä¸ºæˆ‘ä»¬å‹è°Šçš„è±¡å¾ã€‚  
+I can't accept this. It's too expensive. / æˆ‘ä¸èƒ½æ”¶ä¸‹è¿™ä¸ªï¼Œå¤ªè´µäº†ã€‚  
+Thank you for your help. I really appreciate it. / æ„Ÿè°¢ä½ çš„å¸®åŠ©ï¼Œæˆ‘çœŸçš„å¾ˆæ„Ÿæ¿€ã€‚
 
-### ¶şÊ®ËÄ¡¢ÇëÇóĞí¿É  
-May I use your phone? / ÎÒ¿ÉÒÔÓÃÒ»ÏÂÄãµÄµç»°Âğ£¿  
-Can I have a look at your magazine? / ÎÒÄÜ¿´Ò»ÏÂÄãµÄÔÓÖ¾Âğ£¿  
-Is it alright if I sit here? / ÎÒ×øÕâ¶ù¿ÉÒÔÂğ£¿  
-Do you mind if I open the window? / Äã½éÒâÎÒ´ò¿ª´°»§Âğ£¿  
-I wonder if I could borrow your pen. / ²»ÖªÎÒÊÇ·ñ¿ÉÒÔ½èÄãµÄ¸Ö±Ê¡£  
-Sure, go ahead. / µ±È»¿ÉÒÔ£¬ÓÃ°É¡£  
-I'm afraid not. / ¿ÖÅÂ²»ĞĞ¡£  
-You'd better not. / Äã×îºÃ±ğÕâÑù¡£  
-Permission granted. / ×¼Ğí¡£  
-I'm sorry, it's not allowed. / ºÜ±§Ç¸£¬ÕâÊÇ²»ÔÊĞíµÄ¡£
+### äºŒåå››ã€è¯·æ±‚è®¸å¯  
+May I use your phone? / æˆ‘å¯ä»¥ç”¨ä¸€ä¸‹ä½ çš„ç”µè¯å—ï¼Ÿ  
+Can I have a look at your magazine? / æˆ‘èƒ½çœ‹ä¸€ä¸‹ä½ çš„æ‚å¿—å—ï¼Ÿ  
+Is it alright if I sit here? / æˆ‘åè¿™å„¿å¯ä»¥å—ï¼Ÿ  
+Do you mind if I open the window? / ä½ ä»‹æ„æˆ‘æ‰“å¼€çª—æˆ·å—ï¼Ÿ  
+I wonder if I could borrow your pen. / ä¸çŸ¥æˆ‘æ˜¯å¦å¯ä»¥å€Ÿä½ çš„é’¢ç¬”ã€‚  
+Sure, go ahead. / å½“ç„¶å¯ä»¥ï¼Œç”¨å§ã€‚  
+I'm afraid not. / ææ€•ä¸è¡Œã€‚  
+You'd better not. / ä½ æœ€å¥½åˆ«è¿™æ ·ã€‚  
+Permission granted. / å‡†è®¸ã€‚  
+I'm sorry, it's not allowed. / å¾ˆæŠ±æ­‰ï¼Œè¿™æ˜¯ä¸å…è®¸çš„ã€‚
 
-### ¶şÊ®Îå¡¢Ñ¯ÎÊ½øÕ¹  
-How's the project going? / ÏîÄ¿½øÕ¹µÃÔõÃ´ÑùÁË£¿  
-Have you finished your work yet? / ÄãÍê³É¹¤×÷ÁËÂğ£¿  
-What stage is the plan at? / ¼Æ»®½øĞĞµ½Ê²Ã´½×¶ÎÁË£¿  
-Are you making progress? / ÄãÓĞ½øÕ¹Âğ£¿  
-How far have you got with the report? / ÄãµÄ±¨¸æĞ´µÃÔõÃ´ÑùÁË£¿  
-We're on schedule. / ÎÒÃÇ°´¼Æ»®½øĞĞ¡£  
-There have been some delays. / ³öÏÖÁËÒ»Ğ©ÑÓÎó¡£  
-It's coming along well. / ½øÕ¹µÃºÜË³Àû¡£  
-I'm still working on it. / ÎÒ»¹ÔÚ×öÄØ¡£  
-We've completed half of it. / ÎÒÃÇÒÑ¾­Íê³ÉÒ»°ëÁË¡£
+### äºŒåäº”ã€è¯¢é—®è¿›å±•  
+How's the project going? / é¡¹ç›®è¿›å±•å¾—æ€ä¹ˆæ ·äº†ï¼Ÿ  
+Have you finished your work yet? / ä½ å®Œæˆå·¥ä½œäº†å—ï¼Ÿ  
+What stage is the plan at? / è®¡åˆ’è¿›è¡Œåˆ°ä»€ä¹ˆé˜¶æ®µäº†ï¼Ÿ  
+Are you making progress? / ä½ æœ‰è¿›å±•å—ï¼Ÿ  
+How far have you got with the report? / ä½ çš„æŠ¥å‘Šå†™å¾—æ€ä¹ˆæ ·äº†ï¼Ÿ  
+We're on schedule. / æˆ‘ä»¬æŒ‰è®¡åˆ’è¿›è¡Œã€‚  
+There have been some delays. / å‡ºç°äº†ä¸€äº›å»¶è¯¯ã€‚  
+It's coming along well. / è¿›å±•å¾—å¾ˆé¡ºåˆ©ã€‚  
+I'm still working on it. / æˆ‘è¿˜åœ¨åšå‘¢ã€‚  
+We've completed half of it. / æˆ‘ä»¬å·²ç»å®Œæˆä¸€åŠäº†ã€‚
 
-### ¶şÊ®Áù¡¢±í´ï¿ÉÄÜĞÔÓë²»È·¶¨ĞÔ  
-It might rain later. / Ò»»á¶ù¿ÉÄÜ»áÏÂÓê¡£  
-Maybe he's at home. / Ò²ĞíËûÔÚ¼Ò¡£  
-I'm not sure if she will come. / ÎÒ²»È·¶¨ËıÊÇ·ñ»áÀ´¡£  
-There's a possibility that we'll be late. / ÎÒÃÇÓĞ¿ÉÄÜ»á³Ùµ½¡£  
-It could be true. / Õâ¿ÉÄÜÊÇÕæµÄ¡£  
-He may not know the answer. / Ëû¿ÉÄÜ²»ÖªµÀ´ğ°¸¡£  
-I doubt whether he can finish the task on time. / ÎÒ»³ÒÉËûÊÇ·ñÄÜ°´Ê±Íê³ÉÈÎÎñ¡£  
-It's likely that he's forgotten about the meeting. / ºÜ¿ÉÄÜËûÍü¼ÇÁËÕâ´Î»áÒé¡£  
-Perhaps we should take a different route. / Ò²ĞíÎÒÃÇÓ¦¸Ã×ßÁíÒ»ÌõÂ·¡£  
-Chances are they've already left. / ºÜ¿ÉÄÜËûÃÇÒÑ¾­Àë¿ªÁË¡£
+### äºŒåå…­ã€è¡¨è¾¾å¯èƒ½æ€§ä¸ä¸ç¡®å®šæ€§  
+It might rain later. / ä¸€ä¼šå„¿å¯èƒ½ä¼šä¸‹é›¨ã€‚  
+Maybe he's at home. / ä¹Ÿè®¸ä»–åœ¨å®¶ã€‚  
+I'm not sure if she will come. / æˆ‘ä¸ç¡®å®šå¥¹æ˜¯å¦ä¼šæ¥ã€‚  
+There's a possibility that we'll be late. / æˆ‘ä»¬æœ‰å¯èƒ½ä¼šè¿Ÿåˆ°ã€‚  
+It could be true. / è¿™å¯èƒ½æ˜¯çœŸçš„ã€‚  
+He may not know the answer. / ä»–å¯èƒ½ä¸çŸ¥é“ç­”æ¡ˆã€‚  
+I doubt whether he can finish the task on time. / æˆ‘æ€€ç–‘ä»–æ˜¯å¦èƒ½æŒ‰æ—¶å®Œæˆä»»åŠ¡ã€‚  
+It's likely that he's forgotten about the meeting. / å¾ˆå¯èƒ½ä»–å¿˜è®°äº†è¿™æ¬¡ä¼šè®®ã€‚  
+Perhaps we should take a different route. / ä¹Ÿè®¸æˆ‘ä»¬åº”è¯¥èµ°å¦ä¸€æ¡è·¯ã€‚  
+Chances are they've already left. / å¾ˆå¯èƒ½ä»–ä»¬å·²ç»ç¦»å¼€äº†ã€‚
 
-### ¶şÊ®Æß¡¢±È½ÏÓë¶Ô±È  
-This book is more interesting than that one. / Õâ±¾Êé±ÈÄÇ±¾Êé¸üÓĞÈ¤¡£  
-My sister is taller than me. / ÎÒ½ã½ã±ÈÎÒ¸ß¡£  
-The new model is much better than the old one. / ĞÂÄ£ĞÍ±È¾ÉÄ£ĞÍºÃµÃ¶à¡£  
-In contrast, his brother is very quiet. / Ïà±ÈÖ®ÏÂ£¬ËûµÜµÜºÜ°²¾²¡£  
-This restaurant has better food, but that one has a nicer atmosphere. / Õâ¼Ò²ÍÌüÊ³Îï¸üºÃ£¬µ«ÄÇ¼Ò·ÕÎ§¸üºÃ¡£  
-My job is as challenging as yours. / ÎÒµÄ¹¤×÷ºÍÄãµÄÒ»ÑùÓĞÌôÕ½ĞÔ¡£  
-She is more outgoing than her classmates. / Ëı±ÈËıµÄÍ¬Ñ§¸üÍâÏò¡£  
-Cars are faster than bicycles, but bicycles are more environmentally friendly. / Æû³µ±È×ÔĞĞ³µ¿ì£¬µ«×ÔĞĞ³µ¸ü»·±£¡£  
-The weather here is different from that in my hometown. / ÕâÀïµÄÌìÆøºÍÎÒ¼ÒÏçµÄ²»Í¬¡£  
-The two cities are similar in some ways. / ÕâÁ½¸ö³ÇÊĞÔÚÄ³Ğ©·½ÃæºÜÏàËÆ¡£
+### äºŒåä¸ƒã€æ¯”è¾ƒä¸å¯¹æ¯”  
+This book is more interesting than that one. / è¿™æœ¬ä¹¦æ¯”é‚£æœ¬ä¹¦æ›´æœ‰è¶£ã€‚  
+My sister is taller than me. / æˆ‘å§å§æ¯”æˆ‘é«˜ã€‚  
+The new model is much better than the old one. / æ–°æ¨¡å‹æ¯”æ—§æ¨¡å‹å¥½å¾—å¤šã€‚  
+In contrast, his brother is very quiet. / ç›¸æ¯”ä¹‹ä¸‹ï¼Œä»–å¼Ÿå¼Ÿå¾ˆå®‰é™ã€‚  
+This restaurant has better food, but that one has a nicer atmosphere. / è¿™å®¶é¤å…é£Ÿç‰©æ›´å¥½ï¼Œä½†é‚£å®¶æ°›å›´æ›´å¥½ã€‚  
+My job is as challenging as yours. / æˆ‘çš„å·¥ä½œå’Œä½ çš„ä¸€æ ·æœ‰æŒ‘æˆ˜æ€§ã€‚  
+She is more outgoing than her classmates. / å¥¹æ¯”å¥¹çš„åŒå­¦æ›´å¤–å‘ã€‚  
+Cars are faster than bicycles, but bicycles are more environmentally friendly. / æ±½è½¦æ¯”è‡ªè¡Œè½¦å¿«ï¼Œä½†è‡ªè¡Œè½¦æ›´ç¯ä¿ã€‚  
+The weather here is different from that in my hometown. / è¿™é‡Œçš„å¤©æ°”å’Œæˆ‘å®¶ä¹¡çš„ä¸åŒã€‚  
+The two cities are similar in some ways. / è¿™ä¸¤ä¸ªåŸå¸‚åœ¨æŸäº›æ–¹é¢å¾ˆç›¸ä¼¼ã€‚
 
-### ¶şÊ®°Ë¡¢Òò¹û¹ØÏµ  
-I was late because of the traffic jam. / ÒòÎª½»Í¨¶ÂÈûÎÒ³Ùµ½ÁË¡£  
-Since it's raining, we'd better stay at home. / ¼ÈÈ»ÔÚÏÂÓê£¬ÎÒÃÇ×îºÃ´ıÔÚ¼ÒÀï¡£  
-He didn't study hard, so he failed the exam. / ËûÑ§Ï°²»Å¬Á¦£¬ËùÒÔ¿¼ÊÔ²»¼°¸ñ¡£  
-Because he was ill, he couldn't attend the party. / ÒòÎªËûÉú²¡ÁË£¬ËùÒÔ²»ÄÜ²Î¼ÓÅÉ¶Ô¡£  
-The reason why he is so happy is that he got a promotion. / ËûÕâÃ´¸ßĞËµÄÔ­ÒòÊÇËûÉıÖ°ÁË¡£  
-His carelessness led to the accident. / ËûµÄ´ÖĞÄµ¼ÖÂÁËÕâ³¡ÊÂ¹Ê¡£  
-Due to the bad weather, the flight was cancelled. / ÓÉÓÚÌìÆø¶ñÁÓ£¬º½°àÈ¡ÏûÁË¡£  
-The heavy snow caused the delay of the train. / ´óÑ©µ¼ÖÂÁË»ğ³µÍíµã¡£  
-As a result of his hard work, he achieved great success. / ÓÉÓÚËûµÄÅ¬Á¦¹¤×÷£¬ËûÈ¡µÃÁË¾Ş´óµÄ³É¹¦¡£  
-The project had to be stopped due to the lack of funds. / ÓÉÓÚÈ±·¦×Ê½ğ£¬Õâ¸öÏîÄ¿²»µÃ²»Í£Ö¹¡£
+### äºŒåå…«ã€å› æœå…³ç³»  
+I was late because of the traffic jam. / å› ä¸ºäº¤é€šå µå¡æˆ‘è¿Ÿåˆ°äº†ã€‚  
+Since it's raining, we'd better stay at home. / æ—¢ç„¶åœ¨ä¸‹é›¨ï¼Œæˆ‘ä»¬æœ€å¥½å¾…åœ¨å®¶é‡Œã€‚  
+He didn't study hard, so he failed the exam. / ä»–å­¦ä¹ ä¸åŠªåŠ›ï¼Œæ‰€ä»¥è€ƒè¯•ä¸åŠæ ¼ã€‚  
+Because he was ill, he couldn't attend the party. / å› ä¸ºä»–ç”Ÿç—…äº†ï¼Œæ‰€ä»¥ä¸èƒ½å‚åŠ æ´¾å¯¹ã€‚  
+The reason why he is so happy is that he got a promotion. / ä»–è¿™ä¹ˆé«˜å…´çš„åŸå› æ˜¯ä»–å‡èŒäº†ã€‚  
+His carelessness led to the accident. / ä»–çš„ç²—å¿ƒå¯¼è‡´äº†è¿™åœºäº‹æ•…ã€‚  
+Due to the bad weather, the flight was cancelled. / ç”±äºå¤©æ°”æ¶åŠ£ï¼Œèˆªç­å–æ¶ˆäº†ã€‚  
+The heavy snow caused the delay of the train. / å¤§é›ªå¯¼è‡´äº†ç«è½¦æ™šç‚¹ã€‚  
+As a result of his hard work, he achieved great success. / ç”±äºä»–çš„åŠªåŠ›å·¥ä½œï¼Œä»–å–å¾—äº†å·¨å¤§çš„æˆåŠŸã€‚  
+The project had to be stopped due to the lack of funds. / ç”±äºç¼ºä¹èµ„é‡‘ï¼Œè¿™ä¸ªé¡¹ç›®ä¸å¾—ä¸åœæ­¢ã€‚
 
-### ¶şÊ®¾Å¡¢ÊıÁ¿Óë³Ì¶È  
-There are a lot of people in the park. / ¹«Ô°ÀïÓĞºÜ¶àÈË¡£  
-I have a few friends in this city. / ÎÒÔÚÕâ¸ö³ÇÊĞÓĞ¼¸¸öÅóÓÑ¡£  
-He has little money left. / ËûÃ»Ê£¶àÉÙÇ®ÁË¡£  
-She is very good at singing. / Ëı·Ç³£ÉÃ³¤³ª¸è¡£  
-The problem is rather difficult. / Õâ¸öÎÊÌâÏàµ±ÄÑ¡£  
-It's extremely hot today. / ½ñÌì¼«ÆäÑ×ÈÈ¡£  
-I'm a bit tired. / ÎÒÓĞµãÀÛ¡£  
-There are several books on the table. / ×À×ÓÉÏÓĞ¼¸±¾Êé¡£  
-The movie is so boring that I almost fell asleep. / Õâ²¿µçÓ°Ì«ÎŞÁÄÁË£¬ÎÒ¼¸ºõË¯×ÅÁË¡£  
-He ate too much and felt sick. / Ëû³ÔµÃÌ«±¥£¬¸Ğ¾õ²»Êæ·ş¡£
+### äºŒåä¹ã€æ•°é‡ä¸ç¨‹åº¦  
+There are a lot of people in the park. / å…¬å›­é‡Œæœ‰å¾ˆå¤šäººã€‚  
+I have a few friends in this city. / æˆ‘åœ¨è¿™ä¸ªåŸå¸‚æœ‰å‡ ä¸ªæœ‹å‹ã€‚  
+He has little money left. / ä»–æ²¡å‰©å¤šå°‘é’±äº†ã€‚  
+She is very good at singing. / å¥¹éå¸¸æ“…é•¿å”±æ­Œã€‚  
+The problem is rather difficult. / è¿™ä¸ªé—®é¢˜ç›¸å½“éš¾ã€‚  
+It's extremely hot today. / ä»Šå¤©æå…¶ç‚çƒ­ã€‚  
+I'm a bit tired. / æˆ‘æœ‰ç‚¹ç´¯ã€‚  
+There are several books on the table. / æ¡Œå­ä¸Šæœ‰å‡ æœ¬ä¹¦ã€‚  
+The movie is so boring that I almost fell asleep. / è¿™éƒ¨ç”µå½±å¤ªæ— èŠäº†ï¼Œæˆ‘å‡ ä¹ç¡ç€äº†ã€‚  
+He ate too much and felt sick. / ä»–åƒå¾—å¤ªé¥±ï¼Œæ„Ÿè§‰ä¸èˆ’æœã€‚
 
-### ÈıÊ®¡¢Ç¿µ÷Óë¿Ï¶¨  
-I really mean it. / ÎÒÊÇÈÏÕæµÄ¡£  
-It's definitely a good idea. / Õâ¾ø¶ÔÊÇ¸öºÃÖ÷Òâ¡£  
-I'm positive that he will come. / ÎÒ¿Ï¶¨Ëû»áÀ´¡£  
-You must be careful. / ÄãÒ»¶¨ÒªĞ¡ĞÄ¡£  
-Absolutely! / ¾ø¶Ô£¡  
-Without a doubt, she is the best student in the class. / ºÁÎŞÒÉÎÊ£¬ËıÊÇ°àÉÏ×îÓÅĞãµÄÑ§Éú¡£  
-I do like this song. / ÎÒÈ·ÊµÏ²»¶ÕâÊ×¸è¡£  
-It's really important. / ÕâÕæµÄºÜÖØÒª¡£  
-Certainly! / µ±È»£¡  
-I strongly believe that we can make it. / ÎÒ¼áĞÅÎÒÃÇÄÜ×öµ½¡£
+### ä¸‰åã€å¼ºè°ƒä¸è‚¯å®š  
+I really mean it. / æˆ‘æ˜¯è®¤çœŸçš„ã€‚  
+It's definitely a good idea. / è¿™ç»å¯¹æ˜¯ä¸ªå¥½ä¸»æ„ã€‚  
+I'm positive that he will come. / æˆ‘è‚¯å®šä»–ä¼šæ¥ã€‚  
+You must be careful. / ä½ ä¸€å®šè¦å°å¿ƒã€‚  
+Absolutely! / ç»å¯¹ï¼  
+Without a doubt, she is the best student in the class. / æ¯«æ— ç–‘é—®ï¼Œå¥¹æ˜¯ç­ä¸Šæœ€ä¼˜ç§€çš„å­¦ç”Ÿã€‚  
+I do like this song. / æˆ‘ç¡®å®å–œæ¬¢è¿™é¦–æ­Œã€‚  
+It's really important. / è¿™çœŸçš„å¾ˆé‡è¦ã€‚  
+Certainly! / å½“ç„¶ï¼  
+I strongly believe that we can make it. / æˆ‘åšä¿¡æˆ‘ä»¬èƒ½åšåˆ°ã€‚
 
-### ÈıÊ®Ò»¡¢¹¤×÷Ö°³¡  
-I got a promotion last month. / ÎÒÉÏ¸öÔÂÉıÖ°ÁË¡£  
-How's your new job? / ÄãµÄĞÂ¹¤×÷ÔõÃ´Ñù£¿  
-I'm swamped with work these days. / ÕâĞ©ÌìÎÒ¹¤×÷Ã¦µÃ²»¿É¿ª½»¡£  
-We have a tight deadline for this project. / Õâ¸öÏîÄ¿ÎÒÃÇµÄ½ØÖ¹ÈÕÆÚºÜ½ôÆÈ¡£  
-I need to attend a meeting this afternoon. / ÎÒ½ñÌìÏÂÎçĞèÒª²Î¼ÓÒ»¸ö»áÒé¡£  
-Can you help me with this task? It's beyond my capacity. / ÄãÄÜ°ïÎÒ×öÕâ¸öÈÎÎñÂğ£¿Ëü³¬³öÎÒµÄÄÜÁ¦·¶Î§ÁË¡£  
-My boss is very demanding. / ÎÒµÄÀÏ°åÒªÇóºÜ¸ß¡£  
-I'm looking for a job change. / ÎÒÕıÔÚ¿¼ÂÇ»»¹¤×÷¡£  
-The company is downsizing. / ¹«Ë¾ÕıÔÚ²ÃÔ±¡£  
-I'm responsible for marketing in the company. / ÎÒÔÚ¹«Ë¾¸ºÔğÊĞ³¡ÓªÏú¡£
+### ä¸‰åä¸€ã€å·¥ä½œèŒåœº  
+I got a promotion last month. / æˆ‘ä¸Šä¸ªæœˆå‡èŒäº†ã€‚  
+How's your new job? / ä½ çš„æ–°å·¥ä½œæ€ä¹ˆæ ·ï¼Ÿ  
+I'm swamped with work these days. / è¿™äº›å¤©æˆ‘å·¥ä½œå¿™å¾—ä¸å¯å¼€äº¤ã€‚  
+We have a tight deadline for this project. / è¿™ä¸ªé¡¹ç›®æˆ‘ä»¬çš„æˆªæ­¢æ—¥æœŸå¾ˆç´§è¿«ã€‚  
+I need to attend a meeting this afternoon. / æˆ‘ä»Šå¤©ä¸‹åˆéœ€è¦å‚åŠ ä¸€ä¸ªä¼šè®®ã€‚  
+Can you help me with this task? It's beyond my capacity. / ä½ èƒ½å¸®æˆ‘åšè¿™ä¸ªä»»åŠ¡å—ï¼Ÿå®ƒè¶…å‡ºæˆ‘çš„èƒ½åŠ›èŒƒå›´äº†ã€‚  
+My boss is very demanding. / æˆ‘çš„è€æ¿è¦æ±‚å¾ˆé«˜ã€‚  
+I'm looking for a job change. / æˆ‘æ­£åœ¨è€ƒè™‘æ¢å·¥ä½œã€‚  
+The company is downsizing. / å…¬å¸æ­£åœ¨è£å‘˜ã€‚  
+I'm responsible for marketing in the company. / æˆ‘åœ¨å…¬å¸è´Ÿè´£å¸‚åœºè¥é”€ã€‚
 
-### ÈıÊ®¶ş¡¢½¡¿µÓë¾ÍÒ½  
-I don't feel well. I think I have a fever. / ÎÒ¸Ğ¾õ²»Êæ·ş£¬ÎÒÏëÎÒ·¢ÉÕÁË¡£  
-My head hurts. / ÎÒÍ·ÌÛ¡£  
-I've got a cough that just won't go away. / ÎÒ¿ÈËÔÒ»Ö±ºÃ²»ÁË¡£  
-You should go to see a doctor. / ÄãÓ¦¸ÃÈ¥¿´Ò½Éú¡£  
-I made an appointment with the dentist. / ÎÒºÍÑÀÒ½Ô¤Ô¼ºÃÁË¡£  
-What's wrong with me, doctor? / Ò½Éú£¬ÎÒÔõÃ´ÁË£¿  
-You need to take some medicine and rest. / ÄãĞèÒª³ÔĞ©Ò©²¢ĞİÏ¢¡£  
-I have a stomachache. Maybe I ate something bad. / ÎÒ¶Ç×ÓÌÛ£¬¿ÉÄÜ³Ô»µ¶«Î÷ÁË¡£  
-The doctor prescribed some antibiotics for me. / Ò½Éú¸øÎÒ¿ªÁËÒ»Ğ©¿¹ÉúËØ¡£  
-I need to get a physical examination annually. / ÎÒĞèÒªÃ¿Äê×öÒ»´ÎÌå¼ì¡£
+### ä¸‰åäºŒã€å¥åº·ä¸å°±åŒ»  
+I don't feel well. I think I have a fever. / æˆ‘æ„Ÿè§‰ä¸èˆ’æœï¼Œæˆ‘æƒ³æˆ‘å‘çƒ§äº†ã€‚  
+My head hurts. / æˆ‘å¤´ç–¼ã€‚  
+I've got a cough that just won't go away. / æˆ‘å’³å—½ä¸€ç›´å¥½ä¸äº†ã€‚  
+You should go to see a doctor. / ä½ åº”è¯¥å»çœ‹åŒ»ç”Ÿã€‚  
+I made an appointment with the dentist. / æˆ‘å’Œç‰™åŒ»é¢„çº¦å¥½äº†ã€‚  
+What's wrong with me, doctor? / åŒ»ç”Ÿï¼Œæˆ‘æ€ä¹ˆäº†ï¼Ÿ  
+You need to take some medicine and rest. / ä½ éœ€è¦åƒäº›è¯å¹¶ä¼‘æ¯ã€‚  
+I have a stomachache. Maybe I ate something bad. / æˆ‘è‚šå­ç–¼ï¼Œå¯èƒ½åƒåä¸œè¥¿äº†ã€‚  
+The doctor prescribed some antibiotics for me. / åŒ»ç”Ÿç»™æˆ‘å¼€äº†ä¸€äº›æŠ—ç”Ÿç´ ã€‚  
+I need to get a physical examination annually. / æˆ‘éœ€è¦æ¯å¹´åšä¸€æ¬¡ä½“æ£€ã€‚
 
-### ÈıÊ®Èı¡¢¼ÒÍ¥Éú»î  
-How many people are there in your family? / Äã¼ÒÓĞ¼¸¿ÚÈË£¿  
-My parents are retired. / ÎÒ¸¸Ä¸ÍËĞİÁË¡£  
-I have an elder brother and a younger sister. / ÎÒÓĞÒ»¸ö¸ç¸çºÍÒ»¸öÃÃÃÃ¡£  
-We usually have dinner together as a family. / ÎÒÃÇÒ»¼ÒÈËÍ¨³£Ò»Æğ³ÔÍí²Í¡£  
-My husband/wife is very supportive. / ÎÒµÄÕÉ·ò/ÆŞ×ÓºÜÖ§³ÖÎÒ¡£  
-My kids are growing up so fast. / ÎÒµÄº¢×ÓÃÇ³¤µÃÕæ¿ì¡£  
-We had a family gathering last weekend. / ÉÏÖÜÄ©ÎÒÃÇ¾ÙĞĞÁËÒ»´Î¼ÒÍ¥¾Û»á¡£  
-I help my parents with the housework. / ÎÒ°ï¸¸Ä¸×ö¼ÒÎñ¡£  
-My family is the most important thing to me. / ÎÒµÄ¼ÒÈË¶ÔÎÒÀ´ËµÊÇ×îÖØÒªµÄ¡£  
-My grandparents live in the countryside. / ÎÒµÄ×æ¸¸Ä¸×¡ÔÚÏçÏÂ¡£
+### ä¸‰åä¸‰ã€å®¶åº­ç”Ÿæ´»  
+How many people are there in your family? / ä½ å®¶æœ‰å‡ å£äººï¼Ÿ  
+My parents are retired. / æˆ‘çˆ¶æ¯é€€ä¼‘äº†ã€‚  
+I have an elder brother and a younger sister. / æˆ‘æœ‰ä¸€ä¸ªå“¥å“¥å’Œä¸€ä¸ªå¦¹å¦¹ã€‚  
+We usually have dinner together as a family. / æˆ‘ä»¬ä¸€å®¶äººé€šå¸¸ä¸€èµ·åƒæ™šé¤ã€‚  
+My husband/wife is very supportive. / æˆ‘çš„ä¸ˆå¤«/å¦»å­å¾ˆæ”¯æŒæˆ‘ã€‚  
+My kids are growing up so fast. / æˆ‘çš„å­©å­ä»¬é•¿å¾—çœŸå¿«ã€‚  
+We had a family gathering last weekend. / ä¸Šå‘¨æœ«æˆ‘ä»¬ä¸¾è¡Œäº†ä¸€æ¬¡å®¶åº­èšä¼šã€‚  
+I help my parents with the housework. / æˆ‘å¸®çˆ¶æ¯åšå®¶åŠ¡ã€‚  
+My family is the most important thing to me. / æˆ‘çš„å®¶äººå¯¹æˆ‘æ¥è¯´æ˜¯æœ€é‡è¦çš„ã€‚  
+My grandparents live in the countryside. / æˆ‘çš„ç¥–çˆ¶æ¯ä½åœ¨ä¹¡ä¸‹ã€‚
 
-### ÈıÊ®ËÄ¡¢ÂÃÓÎ³öĞĞ  
-I'm planning a trip to Paris. / ÎÒÕıÔÚ¼Æ»®È¥°ÍÀèÂÃĞĞ¡£  
-How do you like this place? / Äã¾õµÃÕâ¸öµØ·½ÔõÃ´Ñù£¿  
-This is a popular tourist attraction. / ÕâÊÇÒ»¸öÈÈÃÅµÄÂÃÓÎ¾°µã¡£  
-We stayed in a cozy hotel by the beach. / ÎÒÃÇ×¡ÔÚº£±ßÒ»¼ÒÊæÊÊµÄ¾Æµê¡£  
-I love exploring new places and experiencing different cultures. / ÎÒÏ²»¶Ì½Ë÷ĞÂµØ·½£¬ÌåÑé²»Í¬µÄÎÄ»¯¡£  
-The scenery here is breathtaking. / ÕâÀïµÄ·ç¾°ÁîÈË¾ªÌ¾¡£  
-We took a lot of pictures during the trip. / ÂÃĞĞÆÚ¼äÎÒÃÇÅÄÁËºÜ¶àÕÕÆ¬¡£  
-I'm going on a business trip next week. / ÎÒÏÂÖÜÒªÈ¥³ö²î¡£  
-What's the best time to visit this city? / ²Î¹ÛÕâ¸ö³ÇÊĞµÄ×î¼ÑÊ±¼äÊÇÊ²Ã´Ê±ºò£¿  
-I need to book a flight and a hotel in advance. / ÎÒĞèÒªÌáÇ°Ô¤¶©»úÆ±ºÍ¾Æµê¡£
+### ä¸‰åå››ã€æ—…æ¸¸å‡ºè¡Œ  
+I'm planning a trip to Paris. / æˆ‘æ­£åœ¨è®¡åˆ’å»å·´é»æ—…è¡Œã€‚  
+How do you like this place? / ä½ è§‰å¾—è¿™ä¸ªåœ°æ–¹æ€ä¹ˆæ ·ï¼Ÿ  
+This is a popular tourist attraction. / è¿™æ˜¯ä¸€ä¸ªçƒ­é—¨çš„æ—…æ¸¸æ™¯ç‚¹ã€‚  
+We stayed in a cozy hotel by the beach. / æˆ‘ä»¬ä½åœ¨æµ·è¾¹ä¸€å®¶èˆ’é€‚çš„é…’åº—ã€‚  
+I love exploring new places and experiencing different cultures. / æˆ‘å–œæ¬¢æ¢ç´¢æ–°åœ°æ–¹ï¼Œä½“éªŒä¸åŒçš„æ–‡åŒ–ã€‚  
+The scenery here is breathtaking. / è¿™é‡Œçš„é£æ™¯ä»¤äººæƒŠå¹ã€‚  
+We took a lot of pictures during the trip. / æ—…è¡ŒæœŸé—´æˆ‘ä»¬æ‹äº†å¾ˆå¤šç…§ç‰‡ã€‚  
+I'm going on a business trip next week. / æˆ‘ä¸‹å‘¨è¦å»å‡ºå·®ã€‚  
+What's the best time to visit this city? / å‚è§‚è¿™ä¸ªåŸå¸‚çš„æœ€ä½³æ—¶é—´æ˜¯ä»€ä¹ˆæ—¶å€™ï¼Ÿ  
+I need to book a flight and a hotel in advance. / æˆ‘éœ€è¦æå‰é¢„è®¢æœºç¥¨å’Œé…’åº—ã€‚
 
-### ÈıÊ®Îå¡¢Éç½»»î¶¯  
-I went to a party last night. It was so much fun. / ÎÒ×òÍíÈ¥²Î¼ÓÁËÒ»¸öÅÉ¶Ô£¬·Ç³£ÓĞÈ¤¡£  
-Do you often go to the gym? I want to meet new people there. / Äã¾­³£È¥½¡Éí·¿Âğ£¿ÎÒÏëÔÚÄÇÀï½áÊ¶ĞÂÅóÓÑ¡£  
-I joined a club to make friends with people who have the same interests. / ÎÒ¼ÓÈëÁËÒ»¸ö¾ãÀÖ²¿£¬ÒÔ±ãºÍÓĞÏàÍ¬ĞËÈ¤µÄÈË½»ÅóÓÑ¡£  
-We had a great conversation at the coffee shop. / ÎÒÃÇÔÚ¿§·ÈµêÁÄµÃºÜÓä¿ì¡£  
-She is very sociable and makes friends easily. / ËıºÜÉÆÓÚÉç½»£¬ºÜÈİÒ×½»µ½ÅóÓÑ¡£  
-I was introduced to a lot of new people at the networking event. / ÔÚÉç½»»î¶¯ÉÏÎÒ±»½éÉÜÈÏÊ¶ÁËºÜ¶àĞÂÅóÓÑ¡£  
-We are planning a get-together with old classmates. / ÎÒÃÇÕı¼Æ»®ºÍÀÏÍ¬Ñ§¾Û»á¡£  
-Making small talk is an important skill in social situations. / ÔÚÉç½»³¡ºÏÖĞ£¬ÏĞÁÄÊÇÒ»ÏîÖØÒªµÄ¼¼ÄÜ¡£  
-I don't feel like going out tonight. I'd rather stay in and relax. / ÎÒ½ñÍí²»Ïë³öÈ¥£¬ÎÒÄşÔ¸´ıÔÚ¼ÒÀï·ÅËÉ¡£  
-He is the life of the party. Everyone likes him. / ËûÊÇÅÉ¶ÔµÄ»îÔ¾·Ö×Ó£¬Ã¿¸öÈË¶¼Ï²»¶Ëû¡£
+### ä¸‰åäº”ã€ç¤¾äº¤æ´»åŠ¨  
+I went to a party last night. It was so much fun. / æˆ‘æ˜¨æ™šå»å‚åŠ äº†ä¸€ä¸ªæ´¾å¯¹ï¼Œéå¸¸æœ‰è¶£ã€‚  
+Do you often go to the gym? I want to meet new people there. / ä½ ç»å¸¸å»å¥èº«æˆ¿å—ï¼Ÿæˆ‘æƒ³åœ¨é‚£é‡Œç»“è¯†æ–°æœ‹å‹ã€‚  
+I joined a club to make friends with people who have the same interests. / æˆ‘åŠ å…¥äº†ä¸€ä¸ªä¿±ä¹éƒ¨ï¼Œä»¥ä¾¿å’Œæœ‰ç›¸åŒå…´è¶£çš„äººäº¤æœ‹å‹ã€‚  
+We had a great conversation at the coffee shop. / æˆ‘ä»¬åœ¨å’–å•¡åº—èŠå¾—å¾ˆæ„‰å¿«ã€‚  
+She is very sociable and makes friends easily. / å¥¹å¾ˆå–„äºç¤¾äº¤ï¼Œå¾ˆå®¹æ˜“äº¤åˆ°æœ‹å‹ã€‚  
+I was introduced to a lot of new people at the networking event. / åœ¨ç¤¾äº¤æ´»åŠ¨ä¸Šæˆ‘è¢«ä»‹ç»è®¤è¯†äº†å¾ˆå¤šæ–°æœ‹å‹ã€‚  
+We are planning a get-together with old classmates. / æˆ‘ä»¬æ­£è®¡åˆ’å’Œè€åŒå­¦èšä¼šã€‚  
+Making small talk is an important skill in social situations. / åœ¨ç¤¾äº¤åœºåˆä¸­ï¼Œé—²èŠæ˜¯ä¸€é¡¹é‡è¦çš„æŠ€èƒ½ã€‚  
+I don't feel like going out tonight. I'd rather stay in and relax. / æˆ‘ä»Šæ™šä¸æƒ³å‡ºå»ï¼Œæˆ‘å®æ„¿å¾…åœ¨å®¶é‡Œæ”¾æ¾ã€‚  
+He is the life of the party. Everyone likes him. / ä»–æ˜¯æ´¾å¯¹çš„æ´»è·ƒåˆ†å­ï¼Œæ¯ä¸ªäººéƒ½å–œæ¬¢ä»–ã€‚
 
-### ÈıÊ®Áù¡¢ÎÄ»¯ÓëÒÕÊõ  
-I love classical music. It's so soothing. / ÎÒÏ²»¶¹ÅµäÒôÀÖ£¬Ëü·Ç³£Êæ»º¡£  
-Have you seen the latest art exhibition? / Äã¿´¹ı×îĞÂµÄÒÕÊõÕ¹ÀÀÂğ£¿  
-Shakespeare's plays are classics of world literature. / É¯Ê¿±ÈÑÇµÄÏ·¾çÊÇÊÀ½çÎÄÑ§µÄ¾­µäÖ®×÷¡£  
-I'm interested in learning about different cultures. / ÎÒ¶ÔÁË½â²»Í¬ÎÄ»¯ºÜ¸ĞĞËÈ¤¡£  
-The museum has a large collection of ancient artifacts. / Õâ¸ö²©Îï¹İÊÕ²ØÁË´óÁ¿¹Å´úÎÄÎï¡£  
-Chinese calligraphy is a unique art form. / ÖĞ¹úÊé·¨ÊÇÒ»ÖÖ¶ÀÌØµÄÒÕÊõĞÎÊ½¡£  
-I enjoy watching ballet performances. They are so elegant. / ÎÒÏ²»¶¿´°ÅÀÙÎè±íÑİ£¬ËüÃÇ·Ç³£ÓÅÑÅ¡£  
-The film industry is booming in this country. / Õâ¸ö¹ú¼ÒµÄµçÓ°²úÒµÕıÔÚÅî²ª·¢Õ¹¡£  
-She is a talented painter. Her works are very expressive. / ËıÊÇÒ»Î»ÓĞ²Å»ªµÄ»­¼Ò£¬ËıµÄ×÷Æ·ºÜÓĞ±íÏÖÁ¦¡£  
-Literature can broaden our horizons and enrich our minds. / ÎÄÑ§¿ÉÒÔÍØ¿íÎÒÃÇµÄÊÓÒ°£¬·á¸»ÎÒÃÇµÄË¼Ïë¡£
+### ä¸‰åå…­ã€æ–‡åŒ–ä¸è‰ºæœ¯  
+I love classical music. It's so soothing. / æˆ‘å–œæ¬¢å¤å…¸éŸ³ä¹ï¼Œå®ƒéå¸¸èˆ’ç¼“ã€‚  
+Have you seen the latest art exhibition? / ä½ çœ‹è¿‡æœ€æ–°çš„è‰ºæœ¯å±•è§ˆå—ï¼Ÿ  
+Shakespeare's plays are classics of world literature. / èå£«æ¯”äºšçš„æˆå‰§æ˜¯ä¸–ç•Œæ–‡å­¦çš„ç»å…¸ä¹‹ä½œã€‚  
+I'm interested in learning about different cultures. / æˆ‘å¯¹äº†è§£ä¸åŒæ–‡åŒ–å¾ˆæ„Ÿå…´è¶£ã€‚  
+The museum has a large collection of ancient artifacts. / è¿™ä¸ªåšç‰©é¦†æ”¶è—äº†å¤§é‡å¤ä»£æ–‡ç‰©ã€‚  
+Chinese calligraphy is a unique art form. / ä¸­å›½ä¹¦æ³•æ˜¯ä¸€ç§ç‹¬ç‰¹çš„è‰ºæœ¯å½¢å¼ã€‚  
+I enjoy watching ballet performances. They are so elegant. / æˆ‘å–œæ¬¢çœ‹èŠ­è•¾èˆè¡¨æ¼”ï¼Œå®ƒä»¬éå¸¸ä¼˜é›…ã€‚  
+The film industry is booming in this country. / è¿™ä¸ªå›½å®¶çš„ç”µå½±äº§ä¸šæ­£åœ¨è“¬å‹ƒå‘å±•ã€‚  
+She is a talented painter. Her works are very expressive. / å¥¹æ˜¯ä¸€ä½æœ‰æ‰åçš„ç”»å®¶ï¼Œå¥¹çš„ä½œå“å¾ˆæœ‰è¡¨ç°åŠ›ã€‚  
+Literature can broaden our horizons and enrich our minds. / æ–‡å­¦å¯ä»¥æ‹“å®½æˆ‘ä»¬çš„è§†é‡ï¼Œä¸°å¯Œæˆ‘ä»¬çš„æ€æƒ³ã€‚
 
-### ÈıÊ®Æß¡¢¿Æ¼¼ÓëÍøÂç  
-My smartphone is running out of battery. / ÎÒµÄÖÇÄÜÊÖ»ú¿ìÃ»µçÁË¡£  
-I can't access the internet. There might be something wrong with the Wi-Fi. / ÎÒÁ¬²»ÉÏÍø£¬Wi-Fi¿ÉÄÜÓĞÎÊÌâ¡£  
-You can use this app to order food online. / Äã¿ÉÒÔÓÃÕâ¸öÓ¦ÓÃ³ÌĞòÔÚÏß¶©²Í¡£  
-The latest computer software has many new features. / ×îĞÂµÄ¼ÆËã»úÈí¼şÓĞºÜ¶àĞÂ¹¦ÄÜ¡£  
-I need to update my antivirus program to protect my computer. / ÎÒĞèÒª¸üĞÂÉ±¶¾Èí¼şÀ´±£»¤ÎÒµÄµçÄÔ¡£  
-I store all my photos in the cloud to save space on my device. / ÎÒ°ÑËùÓĞÕÕÆ¬¶¼´æµ½ÔÆ¶Ë£¬ÒÔ½ÚÊ¡Éè±¸¿Õ¼ä¡£  
-Have you heard about the new breakthrough in artificial intelligence? / ÄãÌıËµÈË¹¤ÖÇÄÜÁìÓòµÄĞÂÍ»ÆÆÁËÂğ£¿  
-Technology has made our lives much more convenient. / ¿Æ¼¼ÈÃÎÒÃÇµÄÉú»î±ãÀû¶àÁË¡£  
-Online shopping has become increasingly popular in recent years. / ½üÄêÀ´£¬Íø¹ºÔ½À´Ô½Á÷ĞĞ¡£  
-The digital age has brought about a lot of changes in the way we communicate. / Êı×ÖÊ±´ú¸øÎÒÃÇµÄ½»Á÷·½Ê½´øÀ´ÁËºÜ¶à±ä»¯¡£
+### ä¸‰åä¸ƒã€ç§‘æŠ€ä¸ç½‘ç»œ  
+My smartphone is running out of battery. / æˆ‘çš„æ™ºèƒ½æ‰‹æœºå¿«æ²¡ç”µäº†ã€‚  
+I can't access the internet. There might be something wrong with the Wi-Fi. / æˆ‘è¿ä¸ä¸Šç½‘ï¼ŒWi-Fiå¯èƒ½æœ‰é—®é¢˜ã€‚  
+You can use this app to order food online. / ä½ å¯ä»¥ç”¨è¿™ä¸ªåº”ç”¨ç¨‹åºåœ¨çº¿è®¢é¤ã€‚  
+The latest computer software has many new features. / æœ€æ–°çš„è®¡ç®—æœºè½¯ä»¶æœ‰å¾ˆå¤šæ–°åŠŸèƒ½ã€‚  
+I need to update my antivirus program to protect my computer. / æˆ‘éœ€è¦æ›´æ–°æ€æ¯’è½¯ä»¶æ¥ä¿æŠ¤æˆ‘çš„ç”µè„‘ã€‚  
+I store all my photos in the cloud to save space on my device. / æˆ‘æŠŠæ‰€æœ‰ç…§ç‰‡éƒ½å­˜åˆ°äº‘ç«¯ï¼Œä»¥èŠ‚çœè®¾å¤‡ç©ºé—´ã€‚  
+Have you heard about the new breakthrough in artificial intelligence? / ä½ å¬è¯´äººå·¥æ™ºèƒ½é¢†åŸŸçš„æ–°çªç ´äº†å—ï¼Ÿ  
+Technology has made our lives much more convenient. / ç§‘æŠ€è®©æˆ‘ä»¬çš„ç”Ÿæ´»ä¾¿åˆ©å¤šäº†ã€‚  
+Online shopping has become increasingly popular in recent years. / è¿‘å¹´æ¥ï¼Œç½‘è´­è¶Šæ¥è¶Šæµè¡Œã€‚  
+The digital age has brought about a lot of changes in the way we communicate. / æ•°å­—æ—¶ä»£ç»™æˆ‘ä»¬çš„äº¤æµæ–¹å¼å¸¦æ¥äº†å¾ˆå¤šå˜åŒ–ã€‚
 
-### ÈıÊ®°Ë¡¢ÔË¶¯½¡Éí  
-I go jogging every morning to keep fit. / ÎÒÃ¿ÌìÔçÉÏÂıÅÜÒÔ±£³Ö½¡¿µ¡£  
-He is really into playing tennis. He plays it every weekend. / Ëû·Ç³£ÈÈÖÔÓÚ´òÍøÇò£¬Ã¿¸öÖÜÄ©¶¼´ò¡£  
-I joined a fitness club to work out regularly. / ÎÒ¼ÓÈëÁË½¡Éí¾ãÀÖ²¿ÒÔ±ã¶¨ÆÚ¶ÍÁ¶¡£  
-Do you know how to do yoga? It's good for flexibility. / ÄãÖªµÀÔõÃ´×öè¤Ù¤Âğ£¿Ëü¶ÔÌá¸ßÈáÈÍĞÔÓĞºÃ´¦¡£  
-We had a basketball game yesterday. Our team won. / ÎÒÃÇ×òÌìÓĞÒ»³¡ÀºÇòÈü£¬ÎÒÃÇ¶ÓÓ®ÁË¡£  
-Running a marathon requires a lot of training and endurance. / ÅÜÂíÀ­ËÉĞèÒª´óÁ¿µÄÑµÁ·ºÍÄÍÁ¦¡£  
-I usually lift weights three times a week to build muscle. / ÎÒÍ¨³£Ò»ÖÜ¾ÙÈı´ÎÖØ£¬ÒÔÔöÇ¿¼¡Èâ¡£  
-Swimming is a great full-body workout. / ÓÎÓ¾ÊÇÒ»ÏîºÜºÃµÄÈ«ÉíÔË¶¯¡£  
-Playing sports not only keeps you healthy but also reduces stress. / ÔË¶¯²»½öÄÜÈÃÄã±£³Ö½¡¿µ£¬»¹ÄÜ¼õÇáÑ¹Á¦¡£  
-I need to buy a new pair of running shoes for my exercise. / ÎÒĞèÒªÎª¶ÍÁ¶ÂòÒ»Ë«ĞÂÅÜĞ¬¡£
+### ä¸‰åå…«ã€è¿åŠ¨å¥èº«  
+I go jogging every morning to keep fit. / æˆ‘æ¯å¤©æ—©ä¸Šæ…¢è·‘ä»¥ä¿æŒå¥åº·ã€‚  
+He is really into playing tennis. He plays it every weekend. / ä»–éå¸¸çƒ­è¡·äºæ‰“ç½‘çƒï¼Œæ¯ä¸ªå‘¨æœ«éƒ½æ‰“ã€‚  
+I joined a fitness club to work out regularly. / æˆ‘åŠ å…¥äº†å¥èº«ä¿±ä¹éƒ¨ä»¥ä¾¿å®šæœŸé”»ç‚¼ã€‚  
+Do you know how to do yoga? It's good for flexibility. / ä½ çŸ¥é“æ€ä¹ˆåšç‘œä¼½å—ï¼Ÿå®ƒå¯¹æé«˜æŸ”éŸ§æ€§æœ‰å¥½å¤„ã€‚  
+We had a basketball game yesterday. Our team won. / æˆ‘ä»¬æ˜¨å¤©æœ‰ä¸€åœºç¯®çƒèµ›ï¼Œæˆ‘ä»¬é˜Ÿèµ¢äº†ã€‚  
+Running a marathon requires a lot of training and endurance. / è·‘é©¬æ‹‰æ¾éœ€è¦å¤§é‡çš„è®­ç»ƒå’Œè€åŠ›ã€‚  
+I usually lift weights three times a week to build muscle. / æˆ‘é€šå¸¸ä¸€å‘¨ä¸¾ä¸‰æ¬¡é‡ï¼Œä»¥å¢å¼ºè‚Œè‚‰ã€‚  
+Swimming is a great full-body workout. / æ¸¸æ³³æ˜¯ä¸€é¡¹å¾ˆå¥½çš„å…¨èº«è¿åŠ¨ã€‚  
+Playing sports not only keeps you healthy but also reduces stress. / è¿åŠ¨ä¸ä»…èƒ½è®©ä½ ä¿æŒå¥åº·ï¼Œè¿˜èƒ½å‡è½»å‹åŠ›ã€‚  
+I need to buy a new pair of running shoes for my exercise. / æˆ‘éœ€è¦ä¸ºé”»ç‚¼ä¹°ä¸€åŒæ–°è·‘é‹ã€‚
 
-### ÈıÊ®¾Å¡¢ÒûÊ³ÓëÅëâ¿  
-I'm starving. Let's find a place to eat. / ÎÒ¶öËÀÁË£¬ÔÛÃÇÕÒ¸öµØ·½³Ô·¹°É¡£  
-What's your favorite cuisine? I like Italian food. / Äã×îÏ²»¶Ê²Ã´²ËÏµ£¿ÎÒÏ²»¶Òâ´óÀû²Ë¡£  
-I'm trying to cook more at home to eat healthier. / ÎÒÊÔ×Å¶àÔÚ¼Ò×ö·¹£¬³ÔµÃ¸ü½¡¿µ¡£  
-This dish is delicious. What's in it? / ÕâµÀ²ËÕæºÃ³Ô£¬ÀïÃæ¶¼ÓĞÊ²Ã´£¿  
-I'm allergic to seafood, so I can't eat shrimp. / ÎÒ¶Ôº£ÏÊ¹ıÃô£¬ËùÒÔ²»ÄÜ³ÔÏº¡£  
-Can you teach me how to make a simple salad? / ÄãÄÜ½ÌÎÒÔõÃ´×öÒ»·İ¼òµ¥µÄÉ³À­Âğ£¿  
-We usually have bread and milk for breakfast. / ÎÒÃÇÔç²ÍÍ¨³£³ÔÃæ°üºÈÅ£ÄÌ¡£  
-I'm on a diet, so I'm avoiding high-calorie foods. / ÎÒÔÚ½ÚÊ³£¬ËùÒÔ±ÜÃâ³Ô¸ßÈÈÁ¿Ê³Îï¡£  
-The chef here is famous for his steak. / ÕâÀïµÄ³øÊ¦ÒÔËû×öµÄÅ£ÅÅ¶øÎÅÃû¡£  
-I like to add some honey to my tea. / ÎÒÏ²»¶ÔÚ²èÀï¼ÓĞ©·äÃÛ¡£
+### ä¸‰åä¹ã€é¥®é£Ÿä¸çƒ¹é¥ª  
+I'm starving. Let's find a place to eat. / æˆ‘é¥¿æ­»äº†ï¼Œå’±ä»¬æ‰¾ä¸ªåœ°æ–¹åƒé¥­å§ã€‚  
+What's your favorite cuisine? I like Italian food. / ä½ æœ€å–œæ¬¢ä»€ä¹ˆèœç³»ï¼Ÿæˆ‘å–œæ¬¢æ„å¤§åˆ©èœã€‚  
+I'm trying to cook more at home to eat healthier. / æˆ‘è¯•ç€å¤šåœ¨å®¶åšé¥­ï¼Œåƒå¾—æ›´å¥åº·ã€‚  
+This dish is delicious. What's in it? / è¿™é“èœçœŸå¥½åƒï¼Œé‡Œé¢éƒ½æœ‰ä»€ä¹ˆï¼Ÿ  
+I'm allergic to seafood, so I can't eat shrimp. / æˆ‘å¯¹æµ·é²œè¿‡æ•ï¼Œæ‰€ä»¥ä¸èƒ½åƒè™¾ã€‚  
+Can you teach me how to make a simple salad? / ä½ èƒ½æ•™æˆ‘æ€ä¹ˆåšä¸€ä»½ç®€å•çš„æ²™æ‹‰å—ï¼Ÿ  
+We usually have bread and milk for breakfast. / æˆ‘ä»¬æ—©é¤é€šå¸¸åƒé¢åŒ…å–ç‰›å¥¶ã€‚  
+I'm on a diet, so I'm avoiding high-calorie foods. / æˆ‘åœ¨èŠ‚é£Ÿï¼Œæ‰€ä»¥é¿å…åƒé«˜çƒ­é‡é£Ÿç‰©ã€‚  
+The chef here is famous for his steak. / è¿™é‡Œçš„å¨å¸ˆä»¥ä»–åšçš„ç‰›æ’è€Œé—»åã€‚  
+I like to add some honey to my tea. / æˆ‘å–œæ¬¢åœ¨èŒ¶é‡ŒåŠ äº›èœ‚èœœã€‚
 
-### ËÄÊ®¡¢Ê±¼ä¹ÜÀí  
-I need to manage my time better to get everything done. / ÎÒµÃ¸üºÃµØ¹ÜÀíÊ±¼ä£¬²ÅÄÜ°ÑËùÓĞÊÂ×öÍê¡£  
-I make a to-do list every day to stay organized. / ÎÒÃ¿Ìì¶¼ÁĞÒ»¸ö´ı°ìÊÂÏîÇåµ¥£¬ÈÃÒ»ÇĞ¾®¾®ÓĞÌõ¡£  
-Don't waste your time on unimportant things. / ±ğ°ÑÊ±¼äÀË·ÑÔÚ²»ÖØÒªµÄÊÂÇéÉÏ¡£  
-Time flies! I can't believe it's already the end of the year. / Ê±¹â·ÉÊÅ£¡ÎÒ²»¸ÒÏàĞÅÒÑ¾­µ½Äêµ×ÁË¡£  
-I always set deadlines for myself to ensure completing tasks on time. / ÎÒ×ÜÊÇ¸ø×Ô¼ºÉè¶¨×îºóÆÚÏŞ£¬ÒÔÈ·±£°´Ê±Íê³ÉÈÎÎñ¡£  
-How do you spend your free time? / Äã¿ÕÏĞÊ±¼ä¶¼×öÊ²Ã´£¿  
-I'm running out of time. I have to hurry. / ÎÒÃ»Ê±¼äÁË£¬µÃ¸Ï½ôÁË¡£  
-It's important to balance work and leisure time. / Æ½ºâ¹¤×÷ºÍĞİÏĞÊ±¼äºÜÖØÒª¡£  
-I usually use my commute time to listen to podcasts. / ÎÒÍ¨³£ÀûÓÃÍ¨ÇÚÊ±¼äÌı²¥¿Í¡£  
-Make the most of your time while you're young. / ³ÃÄêÇáÒª³ä·ÖÀûÓÃÊ±¼ä¡£
+### å››åã€æ—¶é—´ç®¡ç†  
+I need to manage my time better to get everything done. / æˆ‘å¾—æ›´å¥½åœ°ç®¡ç†æ—¶é—´ï¼Œæ‰èƒ½æŠŠæ‰€æœ‰äº‹åšå®Œã€‚  
+I make a to-do list every day to stay organized. / æˆ‘æ¯å¤©éƒ½åˆ—ä¸€ä¸ªå¾…åŠäº‹é¡¹æ¸…å•ï¼Œè®©ä¸€åˆ‡äº•äº•æœ‰æ¡ã€‚  
+Don't waste your time on unimportant things. / åˆ«æŠŠæ—¶é—´æµªè´¹åœ¨ä¸é‡è¦çš„äº‹æƒ…ä¸Šã€‚  
+Time flies! I can't believe it's already the end of the year. / æ—¶å…‰é£é€ï¼æˆ‘ä¸æ•¢ç›¸ä¿¡å·²ç»åˆ°å¹´åº•äº†ã€‚  
+I always set deadlines for myself to ensure completing tasks on time. / æˆ‘æ€»æ˜¯ç»™è‡ªå·±è®¾å®šæœ€åæœŸé™ï¼Œä»¥ç¡®ä¿æŒ‰æ—¶å®Œæˆä»»åŠ¡ã€‚  
+How do you spend your free time? / ä½ ç©ºé—²æ—¶é—´éƒ½åšä»€ä¹ˆï¼Ÿ  
+I'm running out of time. I have to hurry. / æˆ‘æ²¡æ—¶é—´äº†ï¼Œå¾—èµ¶ç´§äº†ã€‚  
+It's important to balance work and leisure time. / å¹³è¡¡å·¥ä½œå’Œä¼‘é—²æ—¶é—´å¾ˆé‡è¦ã€‚  
+I usually use my commute time to listen to podcasts. / æˆ‘é€šå¸¸åˆ©ç”¨é€šå‹¤æ—¶é—´å¬æ’­å®¢ã€‚  
+Make the most of your time while you're young. / è¶å¹´è½»è¦å……åˆ†åˆ©ç”¨æ—¶é—´ã€‚
 
-### ËÄÊ®Ò»¡¢»·¾³Óë»·±£  
-We should do something to protect the environment. / ÎÒÃÇÓ¦¸Ã×öµãÊ²Ã´À´±£»¤»·¾³¡£  
-The air quality in this city is getting worse. / Õâ¸ö³ÇÊĞµÄ¿ÕÆøÖÊÁ¿Ô½À´Ô½²îÁË¡£  
-Recycling is a great way to reduce waste. / »ØÊÕÀûÓÃÊÇ¼õÉÙÀ¬»øµÄºÃ·½·¨¡£  
-We need to conserve water. Turn off the tap when you're not using it. / ÎÒÃÇĞèÒª½ÚÔ¼ÓÃË®£¬²»ÓÃË®µÄÊ±ºò°ÑË®ÁúÍ·¹ØÉÏ¡£  
-Planting trees can help improve the environment. / Ö²Ê÷ÓĞÖúÓÚ¸ÄÉÆ»·¾³¡£  
-The use of plastic bags should be restricted. / Ó¦¸ÃÏŞÖÆËÜÁÏ´üµÄÊ¹ÓÃ¡£  
-Many animals are losing their habitats due to environmental pollution. / ÓÉÓÚ»·¾³ÎÛÈ¾£¬ºÜ¶à¶¯ÎïÕıÔÚÊ§È¥ËüÃÇµÄÆÜÏ¢µØ¡£  
-We should encourage the use of renewable energy sources. / ÎÒÃÇÓ¦¸Ã¹ÄÀøÊ¹ÓÃ¿ÉÔÙÉúÄÜÔ´¡£  
-The government is taking measures to deal with environmental problems. / Õş¸®ÕıÔÚ²ÉÈ¡´ëÊ©½â¾ö»·¾³ÎÊÌâ¡£  
-Everyone can make a difference in protecting the environment. / Ã¿¸öÈËÔÚ±£»¤»·¾³·½Ãæ¶¼ÄÜÓĞËù×÷Îª¡£
+### å››åä¸€ã€ç¯å¢ƒä¸ç¯ä¿  
+We should do something to protect the environment. / æˆ‘ä»¬åº”è¯¥åšç‚¹ä»€ä¹ˆæ¥ä¿æŠ¤ç¯å¢ƒã€‚  
+The air quality in this city is getting worse. / è¿™ä¸ªåŸå¸‚çš„ç©ºæ°”è´¨é‡è¶Šæ¥è¶Šå·®äº†ã€‚  
+Recycling is a great way to reduce waste. / å›æ”¶åˆ©ç”¨æ˜¯å‡å°‘åƒåœ¾çš„å¥½æ–¹æ³•ã€‚  
+We need to conserve water. Turn off the tap when you're not using it. / æˆ‘ä»¬éœ€è¦èŠ‚çº¦ç”¨æ°´ï¼Œä¸ç”¨æ°´çš„æ—¶å€™æŠŠæ°´é¾™å¤´å…³ä¸Šã€‚  
+Planting trees can help improve the environment. / æ¤æ ‘æœ‰åŠ©äºæ”¹å–„ç¯å¢ƒã€‚  
+The use of plastic bags should be restricted. / åº”è¯¥é™åˆ¶å¡‘æ–™è¢‹çš„ä½¿ç”¨ã€‚  
+Many animals are losing their habitats due to environmental pollution. / ç”±äºç¯å¢ƒæ±¡æŸ“ï¼Œå¾ˆå¤šåŠ¨ç‰©æ­£åœ¨å¤±å»å®ƒä»¬çš„æ –æ¯åœ°ã€‚  
+We should encourage the use of renewable energy sources. / æˆ‘ä»¬åº”è¯¥é¼“åŠ±ä½¿ç”¨å¯å†ç”Ÿèƒ½æºã€‚  
+The government is taking measures to deal with environmental problems. / æ”¿åºœæ­£åœ¨é‡‡å–æªæ–½è§£å†³ç¯å¢ƒé—®é¢˜ã€‚  
+Everyone can make a difference in protecting the environment. / æ¯ä¸ªäººåœ¨ä¿æŠ¤ç¯å¢ƒæ–¹é¢éƒ½èƒ½æœ‰æ‰€ä½œä¸ºã€‚
 
-### ËÄÊ®¶ş¡¢Àí²ÆÏà¹Ø  
-I need to create a budget to control my expenses. / ÎÒĞèÒªÖÆ¶¨Ò»¸öÔ¤ËãÀ´¿ØÖÆ¿ªÖ§¡£  
-I'm saving money for a new car. / ÎÒÔÚ´æÇ®ÂòÒ»Á¾ĞÂ³µ¡£  
-He invested a lot of money in stocks but he lost a fortune. / ËûÔÚ¹ÉÆ±ÉÏÍ¶×ÊÁËºÜ¶àÇ®£¬µ«¿÷ÁËÒ»´ó±Ê¡£  
-You should open a savings account to earn some interest. / ÄãÓ¦¸Ã¿ªÒ»¸ö´¢ĞîÕË»§À´×¬µãÀûÏ¢¡£  
-I'm in debt because I overspent last month. / ÎÒÉÏ¸öÔÂ³¬Ö§ÁË£¬ËùÒÔÏÖÔÚ¸ºÕ®ÁË¡£  
-The cost of living is rising. We need to be more careful with our money. / Éú»î³É±¾ÔÚÉÏÉı£¬ÎÒÃÇµÃ¸ü¾«´òÏ¸ËãµØÓÃÇ®¡£  
-I'm thinking about taking out a loan to buy a house. / ÎÒÔÚ¿¼ÂÇ´û¿îÂò·¿¡£  
-I always compare prices before I make a purchase to get the best deal. / ÎÒÂò¶«Î÷Ç°×ÜÊÇ±È½Ï¼Û¸ñ£¬ÒÔ»ñµÃ×î»®ËãµÄ½»Ò×¡£  
-Financial planning is important for a stable life. / ²ÆÎñ¹æ»®¶ÔÎÈ¶¨µÄÉú»îºÜÖØÒª¡£  
-She is good at managing her finances and always has some money left at the end of the month. / ËıºÜÉÃ³¤Àí²Æ£¬Ã¿¸öÔÂµ××ÜÊÇÄÜÊ£ÏÂÒ»Ğ©Ç®¡£
+### å››åäºŒã€ç†è´¢ç›¸å…³  
+I need to create a budget to control my expenses. / æˆ‘éœ€è¦åˆ¶å®šä¸€ä¸ªé¢„ç®—æ¥æ§åˆ¶å¼€æ”¯ã€‚  
+I'm saving money for a new car. / æˆ‘åœ¨å­˜é’±ä¹°ä¸€è¾†æ–°è½¦ã€‚  
+He invested a lot of money in stocks but he lost a fortune. / ä»–åœ¨è‚¡ç¥¨ä¸ŠæŠ•èµ„äº†å¾ˆå¤šé’±ï¼Œä½†äºäº†ä¸€å¤§ç¬”ã€‚  
+You should open a savings account to earn some interest. / ä½ åº”è¯¥å¼€ä¸€ä¸ªå‚¨è“„è´¦æˆ·æ¥èµšç‚¹åˆ©æ¯ã€‚  
+I'm in debt because I overspent last month. / æˆ‘ä¸Šä¸ªæœˆè¶…æ”¯äº†ï¼Œæ‰€ä»¥ç°åœ¨è´Ÿå€ºäº†ã€‚  
+The cost of living is rising. We need to be more careful with our money. / ç”Ÿæ´»æˆæœ¬åœ¨ä¸Šå‡ï¼Œæˆ‘ä»¬å¾—æ›´ç²¾æ‰“ç»†ç®—åœ°ç”¨é’±ã€‚  
+I'm thinking about taking out a loan to buy a house. / æˆ‘åœ¨è€ƒè™‘è´·æ¬¾ä¹°æˆ¿ã€‚  
+I always compare prices before I make a purchase to get the best deal. / æˆ‘ä¹°ä¸œè¥¿å‰æ€»æ˜¯æ¯”è¾ƒä»·æ ¼ï¼Œä»¥è·å¾—æœ€åˆ’ç®—çš„äº¤æ˜“ã€‚  
+Financial planning is important for a stable life. / è´¢åŠ¡è§„åˆ’å¯¹ç¨³å®šçš„ç”Ÿæ´»å¾ˆé‡è¦ã€‚  
+She is good at managing her finances and always has some money left at the end of the month. / å¥¹å¾ˆæ“…é•¿ç†è´¢ï¼Œæ¯ä¸ªæœˆåº•æ€»æ˜¯èƒ½å‰©ä¸‹ä¸€äº›é’±ã€‚
 
-### ËÄÊ®Èı¡¢·¨ÂÉÓë¹æÔò  
-You should abide by the law. It's everyone's responsibility. / ÄãÓ¦¸Ã×ñÊØ·¨ÂÉ£¬ÕâÊÇÃ¿¸öÈËµÄÔğÈÎ¡£  
-Jaywalking is against the traffic rules. / ÂÒ´©ÂíÂ·Î¥·´½»Í¨¹æÔò¡£  
-The new law aims to protect the rights of consumers. / ÕâÏîĞÂ·¨ÂÉÖ¼ÔÚ±£»¤Ïû·ÑÕßÈ¨Òæ¡£  
-What are the regulations regarding smoking in public places here? / ÕâÀï¹ØÓÚ¹«¹²³¡ËùÎüÑÌÓĞÄÄĞ©¹æ¶¨£¿  
-If you break the law, you will be punished. / Èç¹ûÄãÎ¥·¨£¬¾Í»áÊÜµ½³Í·£¡£  
-The company has strict rules about punctuality. / ¹«Ë¾¶ÔÊØÊ±ÓĞÑÏ¸ñ¹æ¶¨¡£  
-I'm not sure if this action is legal. / ÎÒ²»È·¶¨Õâ¸öĞĞÎªÊÇ·ñºÏ·¨¡£  
-We need to follow the rules of the game. / ÎÒÃÇĞèÒª×ñÊØÓÎÏ·¹æÔò¡£  
-The law prohibits discrimination in employment. / ·¨ÂÉ½ûÖ¹ÔÚ¾ÍÒµ·½Ãæ´æÔÚÆçÊÓ¡£  
-The police are responsible for enforcing the law. / ¾¯²ì¸ºÔğÖ´·¨¡£
+### å››åä¸‰ã€æ³•å¾‹ä¸è§„åˆ™  
+You should abide by the law. It's everyone's responsibility. / ä½ åº”è¯¥éµå®ˆæ³•å¾‹ï¼Œè¿™æ˜¯æ¯ä¸ªäººçš„è´£ä»»ã€‚  
+Jaywalking is against the traffic rules. / ä¹±ç©¿é©¬è·¯è¿åäº¤é€šè§„åˆ™ã€‚  
+The new law aims to protect the rights of consumers. / è¿™é¡¹æ–°æ³•å¾‹æ—¨åœ¨ä¿æŠ¤æ¶ˆè´¹è€…æƒç›Šã€‚  
+What are the regulations regarding smoking in public places here? / è¿™é‡Œå…³äºå…¬å…±åœºæ‰€å¸çƒŸæœ‰å“ªäº›è§„å®šï¼Ÿ  
+If you break the law, you will be punished. / å¦‚æœä½ è¿æ³•ï¼Œå°±ä¼šå—åˆ°æƒ©ç½šã€‚  
+The company has strict rules about punctuality. / å…¬å¸å¯¹å®ˆæ—¶æœ‰ä¸¥æ ¼è§„å®šã€‚  
+I'm not sure if this action is legal. / æˆ‘ä¸ç¡®å®šè¿™ä¸ªè¡Œä¸ºæ˜¯å¦åˆæ³•ã€‚  
+We need to follow the rules of the game. / æˆ‘ä»¬éœ€è¦éµå®ˆæ¸¸æˆè§„åˆ™ã€‚  
+The law prohibits discrimination in employment. / æ³•å¾‹ç¦æ­¢åœ¨å°±ä¸šæ–¹é¢å­˜åœ¨æ­§è§†ã€‚  
+The police are responsible for enforcing the law. / è­¦å¯Ÿè´Ÿè´£æ‰§æ³•ã€‚
 
-### ËÄÊ®ËÄ¡¢¹Ûµã±çÂÛ  
-I take the view that technology has more negative impacts than positive ones. / ÎÒÈÏÎª¿Æ¼¼µÄ¸ºÃæÓ°Ïì´óÓÚÕıÃæÓ°Ïì¡£  
-Some people argue that students should be allowed to use mobile phones at school. What's your opinion? / ÓĞĞ©ÈËÈÏÎªÑ§ÉúÓ¦¸Ã±»ÔÊĞíÔÚÑ§Ğ£Ê¹ÓÃÊÖ»ú£¬ÄãÔõÃ´¿´£¿  
-On the contrary, I believe that hard work is the key to success, not talent alone. / Ïà·´£¬ÎÒÈÏÎªÅ¬Á¦¹¤×÷ÊÇ³É¹¦µÄÔ¿³×£¬¶ø²»½ö½öÊÇÌì¸³¡£  
-I understand your point, but don't you think we should consider the cost? / ÎÒÀí½âÄãµÄ¹Ûµã£¬µ«Äã²»¾õµÃÎÒÃÇÓ¦¸Ã¿¼ÂÇ³É±¾Âğ£¿  
-My opponent's argument lacks solid evidence. / ÎÒ¶ÔÊÖµÄÂÛµãÈ±·¦È·ÔäÖ¤¾İ¡£  
-We can't ignore the fact that environmental protection is urgent. / ÎÒÃÇ²»ÄÜºöÊÓ»·¾³±£»¤¿Ì²»Èİ»ºÕâÒ»ÊÂÊµ¡£  
-I'd like to counter your statement with some real-life examples. / ÎÒÏëÓÃÒ»Ğ©Êµ¼ÊÉú»îÖĞµÄÀı×ÓÀ´·´²µÄãµÄËµ·¨¡£  
-His view is one-sided. We need to look at the issue from multiple perspectives. / ËûµÄ¹ÛµãºÜÆ¬Ãæ£¬ÎÒÃÇĞèÒª´Ó¶à¸ö½Ç¶È¿´´ıÕâ¸öÎÊÌâ¡£  
-The core of our debate is whether we should invest more in space exploration. / ÎÒÃÇ±çÂÛµÄºËĞÄÊÇÊÇ·ñÓ¦¸ÃÔÚÌ«¿ÕÌ½Ë÷ÉÏÍ¶Èë¸ü¶à¡£  
-I stand firm in my belief that education should be free for all. / ÎÒ¼á¶¨µØÈÏÎª½ÌÓıÓ¦¸Ã¶ÔËùÓĞÈËÃâ·Ñ¡£
+### å››åå››ã€è§‚ç‚¹è¾©è®º  
+I take the view that technology has more negative impacts than positive ones. / æˆ‘è®¤ä¸ºç§‘æŠ€çš„è´Ÿé¢å½±å“å¤§äºæ­£é¢å½±å“ã€‚  
+Some people argue that students should be allowed to use mobile phones at school. What's your opinion? / æœ‰äº›äººè®¤ä¸ºå­¦ç”Ÿåº”è¯¥è¢«å…è®¸åœ¨å­¦æ ¡ä½¿ç”¨æ‰‹æœºï¼Œä½ æ€ä¹ˆçœ‹ï¼Ÿ  
+On the contrary, I believe that hard work is the key to success, not talent alone. / ç›¸åï¼Œæˆ‘è®¤ä¸ºåŠªåŠ›å·¥ä½œæ˜¯æˆåŠŸçš„é’¥åŒ™ï¼Œè€Œä¸ä»…ä»…æ˜¯å¤©èµ‹ã€‚  
+I understand your point, but don't you think we should consider the cost? / æˆ‘ç†è§£ä½ çš„è§‚ç‚¹ï¼Œä½†ä½ ä¸è§‰å¾—æˆ‘ä»¬åº”è¯¥è€ƒè™‘æˆæœ¬å—ï¼Ÿ  
+My opponent's argument lacks solid evidence. / æˆ‘å¯¹æ‰‹çš„è®ºç‚¹ç¼ºä¹ç¡®å‡¿è¯æ®ã€‚  
+We can't ignore the fact that environmental protection is urgent. / æˆ‘ä»¬ä¸èƒ½å¿½è§†ç¯å¢ƒä¿æŠ¤åˆ»ä¸å®¹ç¼“è¿™ä¸€äº‹å®ã€‚  
+I'd like to counter your statement with some real-life examples. / æˆ‘æƒ³ç”¨ä¸€äº›å®é™…ç”Ÿæ´»ä¸­çš„ä¾‹å­æ¥åé©³ä½ çš„è¯´æ³•ã€‚  
+His view is one-sided. We need to look at the issue from multiple perspectives. / ä»–çš„è§‚ç‚¹å¾ˆç‰‡é¢ï¼Œæˆ‘ä»¬éœ€è¦ä»å¤šä¸ªè§’åº¦çœ‹å¾…è¿™ä¸ªé—®é¢˜ã€‚  
+The core of our debate is whether we should invest more in space exploration. / æˆ‘ä»¬è¾©è®ºçš„æ ¸å¿ƒæ˜¯æ˜¯å¦åº”è¯¥åœ¨å¤ªç©ºæ¢ç´¢ä¸ŠæŠ•å…¥æ›´å¤šã€‚  
+I stand firm in my belief that education should be free for all. / æˆ‘åšå®šåœ°è®¤ä¸ºæ•™è‚²åº”è¯¥å¯¹æ‰€æœ‰äººå…è´¹ã€‚
 
-### ËÄÊ®Îå¡¢Î´À´Õ¹Íû  
-I hope to travel around the world in the future. / ÎÒÏ£ÍûÎ´À´ÄÜ»·ÓÎÊÀ½ç¡£  
-In the coming years, I think technology will develop at an even faster pace. / ÔÚÎ´À´¼¸Äê£¬ÎÒÈÏÎª¿Æ¼¼½«ÒÔ¸ü¿ìµÄËÙ¶È·¢Õ¹¡£  
-I'm looking forward to starting my own business someday. / ÎÒÆÚ´ıÓĞÒ»ÌìÄÜ´´°ì×Ô¼ºµÄÆóÒµ¡£  
-What do you think the future of transportation will be like? / ÄãÈÏÎªÎ´À´µÄ½»Í¨»áÊÇÊ²Ã´Ñù£¿  
-I believe that in the future, people will pay more attention to mental health. / ÎÒÏàĞÅÎ´À´ÈËÃÇ»á¸ü¼Ó¹Ø×¢ĞÄÀí½¡¿µ¡£  
-The future of renewable energy looks promising. / ¿ÉÔÙÉúÄÜÔ´µÄÎ´À´¿´ÆğÀ´ºÜÓĞÇ°¾°¡£  
-I plan to further my studies abroad in the near future. / ÎÒ¼Æ»®ÔÚ²»¾ÃµÄ½«À´³ö¹úÉîÔì¡£  
-Maybe one day, we will be able to colonize other planets. / Ò²ĞíÓĞÒ»Ìì£¬ÎÒÃÇÄÜ¹»ÔÚÆäËûĞÇÇòÉÏ¿ªÍØÖ³ÃñµØ¡£  
-I'm optimistic about the future of our society. / ÎÒ¶ÔÎÒÃÇÉç»áµÄÎ´À´³ÖÀÖ¹ÛÌ¬¶È¡£  
-The next generation will face new challenges and opportunities. / ÏÂÒ»´ú½«ÃæÁÙĞÂµÄÌôÕ½ºÍ»úÓö¡£
+### å››åäº”ã€æœªæ¥å±•æœ›  
+I hope to travel around the world in the future. / æˆ‘å¸Œæœ›æœªæ¥èƒ½ç¯æ¸¸ä¸–ç•Œã€‚  
+In the coming years, I think technology will develop at an even faster pace. / åœ¨æœªæ¥å‡ å¹´ï¼Œæˆ‘è®¤ä¸ºç§‘æŠ€å°†ä»¥æ›´å¿«çš„é€Ÿåº¦å‘å±•ã€‚  
+I'm looking forward to starting my own business someday. / æˆ‘æœŸå¾…æœ‰ä¸€å¤©èƒ½åˆ›åŠè‡ªå·±çš„ä¼ä¸šã€‚  
+What do you think the future of transportation will be like? / ä½ è®¤ä¸ºæœªæ¥çš„äº¤é€šä¼šæ˜¯ä»€ä¹ˆæ ·ï¼Ÿ  
+I believe that in the future, people will pay more attention to mental health. / æˆ‘ç›¸ä¿¡æœªæ¥äººä»¬ä¼šæ›´åŠ å…³æ³¨å¿ƒç†å¥åº·ã€‚  
+The future of renewable energy looks promising. / å¯å†ç”Ÿèƒ½æºçš„æœªæ¥çœ‹èµ·æ¥å¾ˆæœ‰å‰æ™¯ã€‚  
+I plan to further my studies abroad in the near future. / æˆ‘è®¡åˆ’åœ¨ä¸ä¹…çš„å°†æ¥å‡ºå›½æ·±é€ ã€‚  
+Maybe one day, we will be able to colonize other planets. / ä¹Ÿè®¸æœ‰ä¸€å¤©ï¼Œæˆ‘ä»¬èƒ½å¤Ÿåœ¨å…¶ä»–æ˜Ÿçƒä¸Šå¼€æ‹“æ®–æ°‘åœ°ã€‚  
+I'm optimistic about the future of our society. / æˆ‘å¯¹æˆ‘ä»¬ç¤¾ä¼šçš„æœªæ¥æŒä¹è§‚æ€åº¦ã€‚  
+The next generation will face new challenges and opportunities. / ä¸‹ä¸€ä»£å°†é¢ä¸´æ–°çš„æŒ‘æˆ˜å’Œæœºé‡ã€‚
 
-### ËÄÊ®Áù¡¢»ØÒäÍùÎô  
-Remember the first time we met? It was at a concert. / »¹¼ÇµÃÎÒÃÇµÚÒ»´Î¼ûÃæÂğ£¿ÄÇÊÇÔÚÒ»³¡ÒôÀÖ»áÉÏ¡£  
-I often look back on my childhood with fond memories. / ÎÒ³£³£´ø×ÅÃÀºÃµÄ»ØÒä»Ø¹ËÎÒµÄÍ¯Äê¡£  
-We had so much fun during our college days. / ÎÒÃÇ´óÑ§Ê±¹âÍæµÃºÜ¿ªĞÄ¡£  
-That trip to the mountains was an unforgettable experience. / ÄÇ´ÎÉ½ÇøÖ®ÂÃÊÇÒ»´ÎÄÑÍüµÄ¾­Àú¡£  
-I used to play football with my friends every weekend when I was young. / ÎÒĞ¡Ê±ºòÃ¿¸öÖÜÄ©¶¼ºÍÅóÓÑÃÇÒ»ÆğÌß×ãÇò¡£  
-Thinking back, I realize how much I've changed over the years. / »ØÏëÆğÀ´£¬ÎÒÒâÊ¶µ½ÕâĞ©ÄêÀ´ÎÒ¸Ä±äÁËºÜ¶à¡£  
-The old house where I grew up was full of memories. / ÎÒ³¤´óµÄÄÇ×ùÀÏ·¿×Ó³äÂúÁË»ØÒä¡£  
-I cherish the memories of spending time with my grandparents. / ÎÒÕäÏ§ºÍ×æ¸¸Ä¸¹²¶ÈÊ±¹âµÄ»ØÒä¡£  
-Do you still remember the song we used to listen to all the time? / Äã»¹¼ÇµÃÎÒÃÇÒÔÇ°¾­³£ÌıµÄÄÇÊ×¸èÂğ£¿  
-Those were the good old days. / ÄÇĞ©ÊÇ¹ıÈ¥µÄÃÀºÃÊ±¹â¡£
+### å››åå…­ã€å›å¿†å¾€æ˜”  
+Remember the first time we met? It was at a concert. / è¿˜è®°å¾—æˆ‘ä»¬ç¬¬ä¸€æ¬¡è§é¢å—ï¼Ÿé‚£æ˜¯åœ¨ä¸€åœºéŸ³ä¹ä¼šä¸Šã€‚  
+I often look back on my childhood with fond memories. / æˆ‘å¸¸å¸¸å¸¦ç€ç¾å¥½çš„å›å¿†å›é¡¾æˆ‘çš„ç«¥å¹´ã€‚  
+We had so much fun during our college days. / æˆ‘ä»¬å¤§å­¦æ—¶å…‰ç©å¾—å¾ˆå¼€å¿ƒã€‚  
+That trip to the mountains was an unforgettable experience. / é‚£æ¬¡å±±åŒºä¹‹æ—…æ˜¯ä¸€æ¬¡éš¾å¿˜çš„ç»å†ã€‚  
+I used to play football with my friends every weekend when I was young. / æˆ‘å°æ—¶å€™æ¯ä¸ªå‘¨æœ«éƒ½å’Œæœ‹å‹ä»¬ä¸€èµ·è¸¢è¶³çƒã€‚  
+Thinking back, I realize how much I've changed over the years. / å›æƒ³èµ·æ¥ï¼Œæˆ‘æ„è¯†åˆ°è¿™äº›å¹´æ¥æˆ‘æ”¹å˜äº†å¾ˆå¤šã€‚  
+The old house where I grew up was full of memories. / æˆ‘é•¿å¤§çš„é‚£åº§è€æˆ¿å­å……æ»¡äº†å›å¿†ã€‚  
+I cherish the memories of spending time with my grandparents. / æˆ‘çæƒœå’Œç¥–çˆ¶æ¯å…±åº¦æ—¶å…‰çš„å›å¿†ã€‚  
+Do you still remember the song we used to listen to all the time? / ä½ è¿˜è®°å¾—æˆ‘ä»¬ä»¥å‰ç»å¸¸å¬çš„é‚£é¦–æ­Œå—ï¼Ÿ  
+Those were the good old days. / é‚£äº›æ˜¯è¿‡å»çš„ç¾å¥½æ—¶å…‰ã€‚
 
-### ËÄÊ®Æß¡¢¼ÙÉèÓëĞéÄâ  
-If I had enough money, I would buy a big house. / Èç¹ûÎÒÓĞ×ã¹»µÄÇ®£¬ÎÒ»áÂòÒ»¶°´ó·¿×Ó¡£  
-What would you do if you won the lottery? / Èç¹ûÄãÖĞÁË²ÊÆ±£¬Äã»áÔõÃ´×ö£¿  
-If it were not for his help, I couldn't have finished the project on time. / Òª²»ÊÇËûµÄ°ïÖú£¬ÎÒ²»¿ÉÄÜ°´Ê±Íê³ÉÕâ¸öÏîÄ¿¡£  
-I wish I could speak fluent French. / ÎÒÏ£ÍûÎÒÄÜËµÒ»¿ÚÁ÷ÀûµÄ·¨Óï¡£  
-Suppose you were in my position, what would you do? / ¼ÙÉèÄã´¦ÔÚÎÒµÄÎ»ÖÃ£¬Äã»áÔõÃ´×ö£¿  
-If I were you, I would take this opportunity. / Èç¹ûÎÒÊÇÄã£¬ÎÒ»á×¥×¡Õâ¸ö»ú»á¡£  
-She acts as if she knew everything. / Ëı±íÏÖµÃºÃÏñÊ²Ã´¶¼ÖªµÀ¡£  
-If only I had studied harder in high school. / ÒªÊÇÎÒÔÚ¸ßÖĞÊ±Ñ§Ï°¸üÅ¬Á¦¾ÍºÃÁË¡£  
-Had I known the truth earlier, I would have made a different decision. / Èç¹ûÎÒÔçµãÖªµÀÕæÏà£¬ÎÒ¾Í»á×ö³ö²»Í¬µÄ¾ö¶¨¡£  
-I would go for a picnic if the weather were fine tomorrow. / Èç¹ûÃ÷ÌìÌìÆøºÃ£¬ÎÒ¾ÍÈ¥Ò°²Í¡£
+### å››åä¸ƒã€å‡è®¾ä¸è™šæ‹Ÿ  
+If I had enough money, I would buy a big house. / å¦‚æœæˆ‘æœ‰è¶³å¤Ÿçš„é’±ï¼Œæˆ‘ä¼šä¹°ä¸€æ ‹å¤§æˆ¿å­ã€‚  
+What would you do if you won the lottery? / å¦‚æœä½ ä¸­äº†å½©ç¥¨ï¼Œä½ ä¼šæ€ä¹ˆåšï¼Ÿ  
+If it were not for his help, I couldn't have finished the project on time. / è¦ä¸æ˜¯ä»–çš„å¸®åŠ©ï¼Œæˆ‘ä¸å¯èƒ½æŒ‰æ—¶å®Œæˆè¿™ä¸ªé¡¹ç›®ã€‚  
+I wish I could speak fluent French. / æˆ‘å¸Œæœ›æˆ‘èƒ½è¯´ä¸€å£æµåˆ©çš„æ³•è¯­ã€‚  
+Suppose you were in my position, what would you do? / å‡è®¾ä½ å¤„åœ¨æˆ‘çš„ä½ç½®ï¼Œä½ ä¼šæ€ä¹ˆåšï¼Ÿ  
+If I were you, I would take this opportunity. / å¦‚æœæˆ‘æ˜¯ä½ ï¼Œæˆ‘ä¼šæŠ“ä½è¿™ä¸ªæœºä¼šã€‚  
+She acts as if she knew everything. / å¥¹è¡¨ç°å¾—å¥½åƒä»€ä¹ˆéƒ½çŸ¥é“ã€‚  
+If only I had studied harder in high school. / è¦æ˜¯æˆ‘åœ¨é«˜ä¸­æ—¶å­¦ä¹ æ›´åŠªåŠ›å°±å¥½äº†ã€‚  
+Had I known the truth earlier, I would have made a different decision. / å¦‚æœæˆ‘æ—©ç‚¹çŸ¥é“çœŸç›¸ï¼Œæˆ‘å°±ä¼šåšå‡ºä¸åŒçš„å†³å®šã€‚  
+I would go for a picnic if the weather were fine tomorrow. / å¦‚æœæ˜å¤©å¤©æ°”å¥½ï¼Œæˆ‘å°±å»é‡é¤ã€‚
 
-### ËÄÊ®°Ë¡¢ÓïÑÔÑ§Ï°  
-Learning a new language is not easy, but it's rewarding. / Ñ§Ï°Ò»ÃÅĞÂÓïÑÔ²»ÈİÒ×£¬µ«ºÜÓĞÊÕ»ñ¡£  
-I'm having trouble with grammar. Can you give me some tips? / ÎÒÓï·¨ÓĞÀ§ÄÑ£¬ÄãÄÜ¸øÎÒÒ»Ğ©½¨ÒéÂğ£¿  
-What's the best way to improve my listening skills? / Ìá¸ßÌıÁ¦¼¼ÄÜµÄ×î¼Ñ·½·¨ÊÇÊ²Ã´£¿  
-I try to practice speaking English with native speakers whenever I can. / ÎÒ¾¡¿ÉÄÜµØ³¢ÊÔºÍÒÔÓ¢ÓïÎªÄ¸ÓïµÄÈËÁ·Ï°ËµÓ¢Óï¡£  
-Reading English books is a great way to expand your vocabulary. / ¶ÁÓ¢ÓïÊéÊÇÀ©´ó´Ê»ãÁ¿µÄºÃ·½·¨¡£  
-I'm considering taking a language course to enhance my language proficiency. / ÎÒÔÚ¿¼ÂÇ²Î¼ÓÒ»¸öÓïÑÔ¿Î³ÌÀ´Ìá¸ßÎÒµÄÓïÑÔÄÜÁ¦¡£  
-How long have you been learning Chinese? / ÄãÑ§ÖĞÎÄ¶à¾ÃÁË£¿  
-I find it difficult to remember new words. Do you have any tricks? / ÎÒ¾õµÃ¼ÇĞÂµ¥´ÊºÜÄÑ£¬ÄãÓĞÊ²Ã´ÇÏÃÅÂğ£¿  
-Using language learning apps can be very helpful. / Ê¹ÓÃÓïÑÔÑ§Ï°Ó¦ÓÃ³ÌĞò»áºÜÓĞ°ïÖú¡£  
-The more you practice, the better your language skills will be. / ÄãÁ·Ï°µÃÔ½¶à£¬ÄãµÄÓïÑÔ¼¼ÄÜ¾Í»áÔ½ºÃ¡£
+### å››åå…«ã€è¯­è¨€å­¦ä¹   
+Learning a new language is not easy, but it's rewarding. / å­¦ä¹ ä¸€é—¨æ–°è¯­è¨€ä¸å®¹æ˜“ï¼Œä½†å¾ˆæœ‰æ”¶è·ã€‚  
+I'm having trouble with grammar. Can you give me some tips? / æˆ‘è¯­æ³•æœ‰å›°éš¾ï¼Œä½ èƒ½ç»™æˆ‘ä¸€äº›å»ºè®®å—ï¼Ÿ  
+What's the best way to improve my listening skills? / æé«˜å¬åŠ›æŠ€èƒ½çš„æœ€ä½³æ–¹æ³•æ˜¯ä»€ä¹ˆï¼Ÿ  
+I try to practice speaking English with native speakers whenever I can. / æˆ‘å°½å¯èƒ½åœ°å°è¯•å’Œä»¥è‹±è¯­ä¸ºæ¯è¯­çš„äººç»ƒä¹ è¯´è‹±è¯­ã€‚  
+Reading English books is a great way to expand your vocabulary. / è¯»è‹±è¯­ä¹¦æ˜¯æ‰©å¤§è¯æ±‡é‡çš„å¥½æ–¹æ³•ã€‚  
+I'm considering taking a language course to enhance my language proficiency. / æˆ‘åœ¨è€ƒè™‘å‚åŠ ä¸€ä¸ªè¯­è¨€è¯¾ç¨‹æ¥æé«˜æˆ‘çš„è¯­è¨€èƒ½åŠ›ã€‚  
+How long have you been learning Chinese? / ä½ å­¦ä¸­æ–‡å¤šä¹…äº†ï¼Ÿ  
+I find it difficult to remember new words. Do you have any tricks? / æˆ‘è§‰å¾—è®°æ–°å•è¯å¾ˆéš¾ï¼Œä½ æœ‰ä»€ä¹ˆçªé—¨å—ï¼Ÿ  
+Using language learning apps can be very helpful. / ä½¿ç”¨è¯­è¨€å­¦ä¹ åº”ç”¨ç¨‹åºä¼šå¾ˆæœ‰å¸®åŠ©ã€‚  
+The more you practice, the better your language skills will be. / ä½ ç»ƒä¹ å¾—è¶Šå¤šï¼Œä½ çš„è¯­è¨€æŠ€èƒ½å°±ä¼šè¶Šå¥½ã€‚
 
-### ËÄÊ®¾Å¡¢ÉÌÆ·ÆÀ¼Û  
-I bought this product last week, and I'm really impressed with its quality. / ÎÒÉÏÖÜÂòÁËÕâ¸ö²úÆ·£¬ÆäÖÊÁ¿¸øÎÒÁôÏÂÁËÉî¿ÌÓ¡Ïó¡£  
-The design of this phone is very sleek, but the battery life is disappointing. / Õâ¿îÊÖ»úµÄÉè¼ÆºÜÊ±ÉĞ£¬µ«µç³ØĞøº½ÁîÈËÊ§Íû¡£  
-This brand of coffee has a rich flavor and a pleasant aroma. / Õâ¸öÆ·ÅÆµÄ¿§·ÈÎ¶µÀÅ¨Óô£¬ÏãÆøÒËÈË¡£  
-I've been using this laptop for a month and so far it's been very reliable. / ÎÒÓÃÕâÌ¨±Ê¼Ç±¾µçÄÔÒ»¸öÔÂÁË£¬µ½Ä¿Ç°ÎªÖ¹£¬Ëü¾­ÊÜ×¡ÁË´óÁ¿µÄÄ¥Ëğ¡£  
-The price of this dress is a bit high, but it's made of high-quality materials. / ÕâÌõÈ¹×Ó¼Û¸ñÓĞµã¸ß£¬µ«ËüÊÇÓÃ¸ßÆ·ÖÊ²ÄÁÏÖÆ×÷µÄ¡£  
-The service of this online store is excellent. They replied to my inquiry very quickly. / Õâ¼ÒÍøµêµÄ·şÎñ·Ç³£ºÃ¡£ËûÃÇºÜ¿ì¾Í»Ø¸´ÁËÎÒµÄ×ÉÑ¯¡£  
-I'm not satisfied with the size of this shirt. It runs a bit small. / ÎÒ¶ÔÕâ¼ş³ÄÉÀµÄ³ßÂë²»ÂúÒâ¡£ËüÓĞµãÆ«Ğ¡¡£  
-This TV has a great picture quality, but the sound could be better. / ÕâÌ¨µçÊÓ»­ÃæÖÊÁ¿ºÜ°ô£¬µ«ÉùÒô¿ÉÒÔÔÙºÃĞ©¡£  
-The durability of this product is remarkable. It has withstood a lot of wear and tear. / Õâ¸ö²úÆ·µÄÄÍÓÃĞÔºÜ³öÉ«£¬Ëü¾­ÊÜ×¡ÁË´óÁ¿µÄÄ¥Ëğ¡£  
-I would recommend this product to others. It's really worth buying. / ÎÒ»áÏòËûÈËÍÆ¼öÕâ¸ö²úÆ·¡£ËüÕæµÄÖµµÃ¹ºÂò¡£
+### å››åä¹ã€å•†å“è¯„ä»·  
+I bought this product last week, and I'm really impressed with its quality. / æˆ‘ä¸Šå‘¨ä¹°äº†è¿™ä¸ªäº§å“ï¼Œå…¶è´¨é‡ç»™æˆ‘ç•™ä¸‹äº†æ·±åˆ»å°è±¡ã€‚  
+The design of this phone is very sleek, but the battery life is disappointing. / è¿™æ¬¾æ‰‹æœºçš„è®¾è®¡å¾ˆæ—¶å°šï¼Œä½†ç”µæ± ç»­èˆªä»¤äººå¤±æœ›ã€‚  
+This brand of coffee has a rich flavor and a pleasant aroma. / è¿™ä¸ªå“ç‰Œçš„å’–å•¡å‘³é“æµ“éƒï¼Œé¦™æ°”å®œäººã€‚  
+I've been using this laptop for a month and so far it's been very reliable. / æˆ‘ç”¨è¿™å°ç¬”è®°æœ¬ç”µè„‘ä¸€ä¸ªæœˆäº†ï¼Œåˆ°ç›®å‰ä¸ºæ­¢ï¼Œå®ƒç»å—ä½äº†å¤§é‡çš„ç£¨æŸã€‚  
+The price of this dress is a bit high, but it's made of high-quality materials. / è¿™æ¡è£™å­ä»·æ ¼æœ‰ç‚¹é«˜ï¼Œä½†å®ƒæ˜¯ç”¨é«˜å“è´¨ææ–™åˆ¶ä½œçš„ã€‚  
+The service of this online store is excellent. They replied to my inquiry very quickly. / è¿™å®¶ç½‘åº—çš„æœåŠ¡éå¸¸å¥½ã€‚ä»–ä»¬å¾ˆå¿«å°±å›å¤äº†æˆ‘çš„å’¨è¯¢ã€‚  
+I'm not satisfied with the size of this shirt. It runs a bit small. / æˆ‘å¯¹è¿™ä»¶è¡¬è¡«çš„å°ºç ä¸æ»¡æ„ã€‚å®ƒæœ‰ç‚¹åå°ã€‚  
+This TV has a great picture quality, but the sound could be better. / è¿™å°ç”µè§†ç”»é¢è´¨é‡å¾ˆæ£’ï¼Œä½†å£°éŸ³å¯ä»¥å†å¥½äº›ã€‚  
+The durability of this product is remarkable. It has withstood a lot of wear and tear. / è¿™ä¸ªäº§å“çš„è€ç”¨æ€§å¾ˆå‡ºè‰²ï¼Œå®ƒç»å—ä½äº†å¤§é‡çš„ç£¨æŸã€‚  
+I would recommend this product to others. It's really worth buying. / æˆ‘ä¼šå‘ä»–äººæ¨èè¿™ä¸ªäº§å“ã€‚å®ƒçœŸçš„å€¼å¾—è´­ä¹°ã€‚
 
-### ÎåÊ®¡¢Çé¸ĞÓëÈË¼Ê¹ØÏµ  
-I'm really grateful to have such a supportive friend like you. / ÓĞÄãÕâÑùÒ»¸öÖ§³ÖÎÒµÄÅóÓÑ£¬ÎÒÕæµÄºÜ¸Ğ¼¤¡£  
-I'm falling in love with him gradually. He's so charming. / ÎÒ½¥½¥°®ÉÏËûÁË¡£ËûÌ«ÓĞ÷ÈÁ¦ÁË¡£  
-Our friendship has gone through a lot, but it remains strong. / ÎÒÃÇµÄÓÑÒêÀú¾­ÁËĞí¶à£¬µ«ÒÀÈ»¼á¹Ì¡£  
-I'm really hurt by what he said. He didn't mean to be so harsh. / ÎÒÕæµÄ±»ËûµÄ»°ÉËµ½ÁË¡£Ëû²¢·ÇÓĞÒâÈç´Ë¿Ì±¡¡£  
-She has a warm heart and always makes people around her feel comfortable. / ËıĞÄµØÉÆÁ¼£¬×ÜÊÇÈÃÖÜÎ§µÄÈË¸Ğµ½ÊæÊÊ¡£  
-I'm in a bit of a conflict with my roommate. We have different living habits. / ÎÒºÍÊÒÓÑÓĞµãÃ¬¶Ü¡£ÎÒÃÇÉú»îÏ°¹ß²»Í¬¡£  
-She's jealous of her sister's success. It's affecting their relationship. / Ëı¼µ¶ÊÃÃÃÃµÄ³É¹¦¡£ÕâÓ°ÏìÁËËıÃÇµÄ¹ØÏµ¡£  
-I feel a deep connection with her. We seem to understand each other without words. / ÎÒºÍËıÓĞÒ»ÖÖºÜÉîµÄÄ¬Æõ£¬ÎÒÃÇËÆºõÎŞĞèÑÔÓï¾ÍÄÜÀí½â¶Ô·½¡£  
-Building good relationships requires mutual respect and understanding. / ½¨Á¢Á¼ºÃµÄÈË¼Ê¹ØÏµĞèÒªÏà»¥×ğÖØºÍÀí½â¡£  
-I'm trying to mend my relationship with my parents. We had a big argument last week. / ÎÒÔÚÅ¬Á¦ĞŞ¸´ºÍ¸¸Ä¸µÄ¹ØÏµ¡£ÉÏÖÜÎÒÃÇ´ó³³ÁËÒ»¼Ü¡£
+### äº”åã€æƒ…æ„Ÿä¸äººé™…å…³ç³»  
+I'm really grateful to have such a supportive friend like you. / æœ‰ä½ è¿™æ ·ä¸€ä¸ªæ”¯æŒæˆ‘çš„æœ‹å‹ï¼Œæˆ‘çœŸçš„å¾ˆæ„Ÿæ¿€ã€‚  
+I'm falling in love with him gradually. He's so charming. / æˆ‘æ¸æ¸çˆ±ä¸Šä»–äº†ã€‚ä»–å¤ªæœ‰é­…åŠ›äº†ã€‚  
+Our friendship has gone through a lot, but it remains strong. / æˆ‘ä»¬çš„å‹è°Šå†ç»äº†è®¸å¤šï¼Œä½†ä¾ç„¶åšå›ºã€‚  
+I'm really hurt by what he said. He didn't mean to be so harsh. / æˆ‘çœŸçš„è¢«ä»–çš„è¯ä¼¤åˆ°äº†ã€‚ä»–å¹¶éæœ‰æ„å¦‚æ­¤åˆ»è–„ã€‚  
+She has a warm heart and always makes people around her feel comfortable. / å¥¹å¿ƒåœ°å–„è‰¯ï¼Œæ€»æ˜¯è®©å‘¨å›´çš„äººæ„Ÿåˆ°èˆ’é€‚ã€‚  
+I'm in a bit of a conflict with my roommate. We have different living habits. / æˆ‘å’Œå®¤å‹æœ‰ç‚¹çŸ›ç›¾ã€‚æˆ‘ä»¬ç”Ÿæ´»ä¹ æƒ¯ä¸åŒã€‚  
+She's jealous of her sister's success. It's affecting their relationship. / å¥¹å«‰å¦’å¦¹å¦¹çš„æˆåŠŸã€‚è¿™å½±å“äº†å¥¹ä»¬çš„å…³ç³»ã€‚  
+I feel a deep connection with her. We seem to understand each other without words. / æˆ‘å’Œå¥¹æœ‰ä¸€ç§å¾ˆæ·±çš„é»˜å¥‘ï¼Œæˆ‘ä»¬ä¼¼ä¹æ— éœ€è¨€è¯­å°±èƒ½ç†è§£å¯¹æ–¹ã€‚  
+Building good relationships requires mutual respect and understanding. / å»ºç«‹è‰¯å¥½çš„äººé™…å…³ç³»éœ€è¦ç›¸äº’å°Šé‡å’Œç†è§£ã€‚  
+I'm trying to mend my relationship with my parents. We had a big argument last week. / æˆ‘åœ¨åŠªåŠ›ä¿®å¤å’Œçˆ¶æ¯çš„å…³ç³»ã€‚ä¸Šå‘¨æˆ‘ä»¬å¤§åµäº†ä¸€æ¶ã€‚
 
-### ÎåÊ®Ò»¡¢ÉÌÒµÓë¾­¼Ã  
-The market for electric cars is growing rapidly. / µç¶¯Æû³µÊĞ³¡ÕıÔÚÑ¸ËÙÔö³¤¡£  
-Our company is facing tough competition from rival firms. / ÎÒÃÇ¹«Ë¾ÕıÃæÁÙÀ´×Ô¾ºÕù¶ÔÊÖµÄ¼¤ÁÒ¾ºÕù¡£  
-The economic situation is unstable, so we need to be cautious with our investments. / ¾­¼ÃĞÎÊÆ²»ÎÈ¶¨£¬ËùÒÔÎÒÃÇµÄÍ¶×ÊÒª½÷É÷¡£  
-They're planning to expand their business overseas. / ËûÃÇ¼Æ»®ÔÚº£ÍâÍØÕ¹ÒµÎñ¡£  
-The government's new policies have a significant impact on the economy. / Õş¸®µÄĞÂÕş²ß¶Ô¾­¼ÃÓĞÖØ´óÓ°Ïì¡£  
-The cost of raw materials has increased, which has led to a rise in product prices. / Ô­²ÄÁÏ³É±¾Ôö¼Ó£¬µ¼ÖÂ²úÆ·¼Û¸ñÉÏÕÇ¡£  
-We need to conduct market research before launching a new product. / ÔÚÍÆ³öĞÂ²úÆ·Ö®Ç°£¬ÎÒÃÇĞèÒª½øĞĞÊĞ³¡µ÷ÑĞ¡£  
-The company's profits have been declining in recent quarters. / ¹«Ë¾½ü¼¸¸ö¼¾¶ÈµÄÀûÈóÒ»Ö±ÔÚÏÂ½µ¡£  
-Small businesses play a crucial role in the local economy. / Ğ¡ÆóÒµÔÚµ±µØ¾­¼ÃÖĞÆğ×ÅÖÁ¹ØÖØÒªµÄ×÷ÓÃ¡£  
-The trade deficit has become a major concern for the country. / Ã³Ò×Äæ²îÒÑ³ÉÎª¸Ã¹úµÄÒ»¸öÖ÷Òªµ£ÓÇ¡£
+### äº”åä¸€ã€å•†ä¸šä¸ç»æµ  
+The market for electric cars is growing rapidly. / ç”µåŠ¨æ±½è½¦å¸‚åœºæ­£åœ¨è¿…é€Ÿå¢é•¿ã€‚  
+Our company is facing tough competition from rival firms. / æˆ‘ä»¬å…¬å¸æ­£é¢ä¸´æ¥è‡ªç«äº‰å¯¹æ‰‹çš„æ¿€çƒˆç«äº‰ã€‚  
+The economic situation is unstable, so we need to be cautious with our investments. / ç»æµå½¢åŠ¿ä¸ç¨³å®šï¼Œæ‰€ä»¥æˆ‘ä»¬çš„æŠ•èµ„è¦è°¨æ…ã€‚  
+They're planning to expand their business overseas. / ä»–ä»¬è®¡åˆ’åœ¨æµ·å¤–æ‹“å±•ä¸šåŠ¡ã€‚  
+The government's new policies have a significant impact on the economy. / æ”¿åºœçš„æ–°æ”¿ç­–å¯¹ç»æµæœ‰é‡å¤§å½±å“ã€‚  
+The cost of raw materials has increased, which has led to a rise in product prices. / åŸææ–™æˆæœ¬å¢åŠ ï¼Œå¯¼è‡´äº§å“ä»·æ ¼ä¸Šæ¶¨ã€‚  
+We need to conduct market research before launching a new product. / åœ¨æ¨å‡ºæ–°äº§å“ä¹‹å‰ï¼Œæˆ‘ä»¬éœ€è¦è¿›è¡Œå¸‚åœºè°ƒç ”ã€‚  
+The company's profits have been declining in recent quarters. / å…¬å¸è¿‘å‡ ä¸ªå­£åº¦çš„åˆ©æ¶¦ä¸€ç›´åœ¨ä¸‹é™ã€‚  
+Small businesses play a crucial role in the local economy. / å°ä¼ä¸šåœ¨å½“åœ°ç»æµä¸­èµ·ç€è‡³å…³é‡è¦çš„ä½œç”¨ã€‚  
+The trade deficit has become a major concern for the country. / è´¸æ˜“é€†å·®å·²æˆä¸ºè¯¥å›½çš„ä¸€ä¸ªä¸»è¦æ‹…å¿§ã€‚
 
-### ÎåÊ®¶ş¡¢½ÌÓıÓë³É³¤  
-A good education can open up many opportunities for your future. / Á¼ºÃµÄ½ÌÓıÄÜÎªÄãµÄÎ´À´¿ªÆôĞí¶à»ú»á¡£  
-The education system in this country is undergoing reform. / Õâ¸ö¹ú¼ÒµÄ½ÌÓıÌåÏµÕıÔÚ½øĞĞ¸Ä¸ï¡£  
-I learned a valuable lesson from that experience. It helped me grow. / ÎÒ´ÓÄÇ´Î¾­ÀúÖĞÑ§µ½ÁË±¦¹óµÄÒ»¿Î£¬Ëü°ïÖúÎÒ³É³¤¡£  
-Teachers should not only impart knowledge but also cultivate students' creativity. / ½ÌÊ¦²»½öÒª´«ÊÚÖªÊ¶£¬»¹ÒªÅàÑøÑ§ÉúµÄ´´ÔìÁ¦¡£  
-Extracurricular activities are an important part of a child's education. / ¿ÎÍâ»î¶¯ÊÇº¢×Ó½ÌÓıµÄÖØÒª×é³É²¿·Ö¡£  
-I'm self-studying to improve my professional skills. / ÎÒÔÚ×ÔÑ§ÒÔÌá¸ßÎÒµÄ×¨Òµ¼¼ÄÜ¡£  
-The quality of education in rural areas needs to be improved. / Å©´åµØÇøµÄ½ÌÓıÖÊÁ¿ĞèÒªÌá¸ß¡£  
-Lifelong learning is essential in the rapidly changing modern world. / ÔÚ¿ìËÙ±ä»¯µÄÏÖ´úÊÀ½ç£¬ÖÕÉíÑ§Ï°ÖÁ¹ØÖØÒª¡£  
-He received a well-rounded education which made him a versatile person. / Ëû½ÓÊÜÁËÈ«ÃæµÄ½ÌÓı£¬ÕâÊ¹Ëû³ÉÎªÒ»¸ö¶à²Å¶àÒÕµÄÈË¡£  
-Education is the key to breaking the cycle of poverty. / ½ÌÓıÊÇ´òÆÆÆ¶À§Ñ­»·µÄ¹Ø¼ü¡£
+### äº”åäºŒã€æ•™è‚²ä¸æˆé•¿  
+A good education can open up many opportunities for your future. / è‰¯å¥½çš„æ•™è‚²èƒ½ä¸ºä½ çš„æœªæ¥å¼€å¯è®¸å¤šæœºä¼šã€‚  
+The education system in this country is undergoing reform. / è¿™ä¸ªå›½å®¶çš„æ•™è‚²ä½“ç³»æ­£åœ¨è¿›è¡Œæ”¹é©ã€‚  
+I learned a valuable lesson from that experience. It helped me grow. / æˆ‘ä»é‚£æ¬¡ç»å†ä¸­å­¦åˆ°äº†å®è´µçš„ä¸€è¯¾ï¼Œå®ƒå¸®åŠ©æˆ‘æˆé•¿ã€‚  
+Teachers should not only impart knowledge but also cultivate students' creativity. / æ•™å¸ˆä¸ä»…è¦ä¼ æˆçŸ¥è¯†ï¼Œè¿˜è¦åŸ¹å…»å­¦ç”Ÿçš„åˆ›é€ åŠ›ã€‚  
+Extracurricular activities are an important part of a child's education. / è¯¾å¤–æ´»åŠ¨æ˜¯å­©å­æ•™è‚²çš„é‡è¦ç»„æˆéƒ¨åˆ†ã€‚  
+I'm self-studying to improve my professional skills. / æˆ‘åœ¨è‡ªå­¦ä»¥æé«˜æˆ‘çš„ä¸“ä¸šæŠ€èƒ½ã€‚  
+The quality of education in rural areas needs to be improved. / å†œæ‘åœ°åŒºçš„æ•™è‚²è´¨é‡éœ€è¦æé«˜ã€‚  
+Lifelong learning is essential in the rapidly changing modern world. / åœ¨å¿«é€Ÿå˜åŒ–çš„ç°ä»£ä¸–ç•Œï¼Œç»ˆèº«å­¦ä¹ è‡³å…³é‡è¦ã€‚  
+He received a well-rounded education which made him a versatile person. / ä»–æ¥å—äº†å…¨é¢çš„æ•™è‚²ï¼Œè¿™ä½¿ä»–æˆä¸ºä¸€ä¸ªå¤šæ‰å¤šè‰ºçš„äººã€‚  
+Education is the key to breaking the cycle of poverty. / æ•™è‚²æ˜¯æ‰“ç ´è´«å›°å¾ªç¯çš„å…³é”®ã€‚
 
-### ÎåÊ®Èı¡¢ÎÄ»¯²îÒì  
-In some cultures, it's polite to take off your shoes before entering a house, while in others, it's not necessary. / ÔÚÒ»Ğ©ÎÄ»¯ÖĞ£¬½øÎİÇ°ÍÑĞ¬ÊÇÀñÃ²µÄ£¬¶øÔÚÆäËûÎÄ»¯ÖĞÔòÃ»ÓĞ±ØÒª¡£  
-The concept of personal space varies greatly among different cultures. / ²»Í¬ÎÄ»¯ÖĞ¶Ô¸öÈË¿Õ¼äµÄ¸ÅÄî²îÒìºÜ´ó¡£  
-Gift-giving customs are quite different in Western and Eastern cultures. / Î÷·½ºÍ¶«·½ÎÄ»¯ÖĞµÄËÍÀñÏ°Ë×ÓĞºÜ´ó²»Í¬¡£  
-In my culture, we value family bonds very highly. How about yours? / ÔÚÎÒµÄÎÄ»¯ÖĞ£¬ÎÒÃÇ·Ç³£ÖØÊÓ¼ÒÍ¥Å¦´ø¡£ÄãÃÇµÄÎÄ»¯ÄØ£¿  
-Cultural differences can sometimes lead to misunderstandings in communication. / ÎÄ»¯²îÒìÓĞÊ±»áÔÚ½»Á÷ÖĞµ¼ÖÂÎó½â¡£  
-Learning about cultural differences can broaden your horizons. / ÁË½âÎÄ»¯²îÒì¿ÉÒÔÍØ¿íÄãµÄÊÓÒ°¡£  
-Some cultures have a more direct communication style, while others are more indirect. / Ò»Ğ©ÎÄ»¯µÄ¹µÍ¨·½Ê½¸üÖ±½Ó£¬¶øÁíÒ»Ğ©Ôò¸üº¬Ğî¡£  
-When traveling abroad, it's important to respect the local culture and traditions. / ³ö¹úÂÃĞĞÊ±£¬×ğÖØµ±µØÎÄ»¯ºÍ´«Í³ºÜÖØÒª¡£  
-The way people celebrate festivals reflects their unique cultural identities. / ÈËÃÇÇì×£½ÚÈÕµÄ·½Ê½·´Ó³ÁËËûÃÇ¶ÀÌØµÄÎÄ»¯Éí·İ¡£  
-We should embrace cultural differences and learn from each other. / ÎÒÃÇÓ¦¸Ã½ÓÄÉÎÄ»¯²îÒì²¢Ïà»¥Ñ§Ï°¡£
+### äº”åä¸‰ã€æ–‡åŒ–å·®å¼‚  
+In some cultures, it's polite to take off your shoes before entering a house, while in others, it's not necessary. / åœ¨ä¸€äº›æ–‡åŒ–ä¸­ï¼Œè¿›å±‹å‰è„±é‹æ˜¯ç¤¼è²Œçš„ï¼Œè€Œåœ¨å…¶ä»–æ–‡åŒ–ä¸­åˆ™æ²¡æœ‰å¿…è¦ã€‚  
+The concept of personal space varies greatly among different cultures. / ä¸åŒæ–‡åŒ–ä¸­å¯¹ä¸ªäººç©ºé—´çš„æ¦‚å¿µå·®å¼‚å¾ˆå¤§ã€‚  
+Gift-giving customs are quite different in Western and Eastern cultures. / è¥¿æ–¹å’Œä¸œæ–¹æ–‡åŒ–ä¸­çš„é€ç¤¼ä¹ ä¿—æœ‰å¾ˆå¤§ä¸åŒã€‚  
+In my culture, we value family bonds very highly. How about yours? / åœ¨æˆ‘çš„æ–‡åŒ–ä¸­ï¼Œæˆ‘ä»¬éå¸¸é‡è§†å®¶åº­çº½å¸¦ã€‚ä½ ä»¬çš„æ–‡åŒ–å‘¢ï¼Ÿ  
+Cultural differences can sometimes lead to misunderstandings in communication. / æ–‡åŒ–å·®å¼‚æœ‰æ—¶ä¼šåœ¨äº¤æµä¸­å¯¼è‡´è¯¯è§£ã€‚  
+Learning about cultural differences can broaden your horizons. / äº†è§£æ–‡åŒ–å·®å¼‚å¯ä»¥æ‹“å®½ä½ çš„è§†é‡ã€‚  
+Some cultures have a more direct communication style, while others are more indirect. / ä¸€äº›æ–‡åŒ–çš„æ²Ÿé€šæ–¹å¼æ›´ç›´æ¥ï¼Œè€Œå¦ä¸€äº›åˆ™æ›´å«è“„ã€‚  
+When traveling abroad, it's important to respect the local culture and traditions. / å‡ºå›½æ—…è¡Œæ—¶ï¼Œå°Šé‡å½“åœ°æ–‡åŒ–å’Œä¼ ç»Ÿå¾ˆé‡è¦ã€‚  
+The way people celebrate festivals reflects their unique cultural identities. / äººä»¬åº†ç¥èŠ‚æ—¥çš„æ–¹å¼åæ˜ äº†ä»–ä»¬ç‹¬ç‰¹çš„æ–‡åŒ–èº«ä»½ã€‚  
+We should embrace cultural differences and learn from each other. / æˆ‘ä»¬åº”è¯¥æ¥çº³æ–‡åŒ–å·®å¼‚å¹¶ç›¸äº’å­¦ä¹ ã€‚
 
-### ÎåÊ®ËÄ¡¢×ÔÈ»Óë¶¯Îï  
-The beauty of nature always amazes me. The mountains, the forests, everything is so wonderful. / ´ó×ÔÈ»µÄÃÀ×ÜÊÇÈÃÎÒ¾ªÌ¾¡£É½Âö¡¢É­ÁÖ£¬Ò»ÇĞ¶¼Èç´ËÃÀÃî¡£  
-Many species of animals are endangered due to habitat destruction. / ÓÉÓÚÆÜÏ¢µØÔâµ½ÆÆ»µ£¬Ğí¶à¶¯ÎïÎïÖÖ±ôÁÙÃğ¾ø¡£  
-I love watching birds. They have such beautiful plumage and songs. / ÎÒÏ²»¶¹Û²ìÄñÀà£¬ËüÃÇÓĞ×ÅÈç´ËÃÀÀöµÄÓğÃ«ºÍ¸èÉù¡£  
-The waterfall is a magnificent natural wonder. / ÆÙ²¼ÊÇ×³ÀöµÄ×ÔÈ»Ææ¹Û¡£  
-We need to protect the natural environment to ensure the survival of wild animals. / ÎÒÃÇĞèÒª±£»¤×ÔÈ»»·¾³£¬ÒÔÈ·±£Ò°Éú¶¯ÎïµÄÉú´æ¡£  
-The ocean is home to a vast variety of marine life. / º£ÑóÊÇ¸÷ÖÖ¸÷Ñùº£ÑóÉúÎïµÄ¼ÒÔ°¡£  
-Have you ever seen a shooting star? It's a magical natural phenomenon. / Äã¼û¹ıÁ÷ĞÇÂğ£¿ÄÇÊÇÒ»ÖÖÉñÆæµÄ×ÔÈ»ÏÖÏó¡£  
-Some animals hibernate during the winter to conserve energy. / Ò»Ğ©¶¯ÎïÔÚ¶¬Ìì¶¬ÃßÒÔ±£´æÄÜÁ¿¡£  
-The changing seasons bring different sceneries in nature. / ¼¾½ÚµÄ±ä»»¸ø´ó×ÔÈ»´øÀ´²»Í¬µÄ¾°É«¡£  
-We should not hunt wild animals for sport or profit. / ÎÒÃÇ²»Ó¦¸ÃÎªÁËÓéÀÖ»òÀûÒæ¶øÁÔÉ±Ò°Éú¶¯Îï¡£
+### äº”åå››ã€è‡ªç„¶ä¸åŠ¨ç‰©  
+The beauty of nature always amazes me. The mountains, the forests, everything is so wonderful. / å¤§è‡ªç„¶çš„ç¾æ€»æ˜¯è®©æˆ‘æƒŠå¹ã€‚å±±è„‰ã€æ£®æ—ï¼Œä¸€åˆ‡éƒ½å¦‚æ­¤ç¾å¦™ã€‚  
+Many species of animals are endangered due to habitat destruction. / ç”±äºæ –æ¯åœ°é­åˆ°ç ´åï¼Œè®¸å¤šåŠ¨ç‰©ç‰©ç§æ¿’ä¸´ç­ç»ã€‚  
+I love watching birds. They have such beautiful plumage and songs. / æˆ‘å–œæ¬¢è§‚å¯Ÿé¸Ÿç±»ï¼Œå®ƒä»¬æœ‰ç€å¦‚æ­¤ç¾ä¸½çš„ç¾½æ¯›å’Œæ­Œå£°ã€‚  
+The waterfall is a magnificent natural wonder. / ç€‘å¸ƒæ˜¯å£®ä¸½çš„è‡ªç„¶å¥‡è§‚ã€‚  
+We need to protect the natural environment to ensure the survival of wild animals. / æˆ‘ä»¬éœ€è¦ä¿æŠ¤è‡ªç„¶ç¯å¢ƒï¼Œä»¥ç¡®ä¿é‡ç”ŸåŠ¨ç‰©çš„ç”Ÿå­˜ã€‚  
+The ocean is home to a vast variety of marine life. / æµ·æ´‹æ˜¯å„ç§å„æ ·æµ·æ´‹ç”Ÿç‰©çš„å®¶å›­ã€‚  
+Have you ever seen a shooting star? It's a magical natural phenomenon. / ä½ è§è¿‡æµæ˜Ÿå—ï¼Ÿé‚£æ˜¯ä¸€ç§ç¥å¥‡çš„è‡ªç„¶ç°è±¡ã€‚  
+Some animals hibernate during the winter to conserve energy. / ä¸€äº›åŠ¨ç‰©åœ¨å†¬å¤©å†¬çœ ä»¥ä¿å­˜èƒ½é‡ã€‚  
+The changing seasons bring different sceneries in nature. / å­£èŠ‚çš„å˜æ¢ç»™å¤§è‡ªç„¶å¸¦æ¥ä¸åŒçš„æ™¯è‰²ã€‚  
+We should not hunt wild animals for sport or profit. / æˆ‘ä»¬ä¸åº”è¯¥ä¸ºäº†å¨±ä¹æˆ–åˆ©ç›Šè€ŒçŒæ€é‡ç”ŸåŠ¨ç‰©ã€‚
 
-### ÎåÊ®Îå¡¢ÈÕ³£Éú»îËöÊÂ  
-I need to do the laundry today. The clothes basket is full. / ÎÒ½ñÌìµÃÏ´ÒÂ·şÁË£¬Ï´ÒÂÀº¶¼ÂúÁË¡£  
-I have to mow the lawn this weekend. It's getting too long. / ÎÒÕâ¸öÖÜÄ©µÃĞŞ¼ô²İÆºÁË£¬²İ³¤µÃÌ«³¤ÁË¡£  
-Don't forget to take out the trash before you leave. / ³öÃÅÇ°±ğÍüÁËµ¹À¬»ø¡£  
-I spent the whole morning cleaning the house from top to bottom. / ÎÒ»¨ÁËÒ»ÉÏÎç°Ñ·¿×Ó³¹µ×´òÉ¨ÁËÒ»±é¡£  
-I need to iron my shirt for the meeting tomorrow. / ÎÒµÃ°ÑÃ÷Ìì¿ª»á´©µÄ³ÄÉÀìÙÒ»ÏÂ¡£  
-Can you help me fix the leaky faucet? / ÄãÄÜ°ïÎÒĞŞÒ»ÏÂÂ©Ë®µÄË®ÁúÍ·Âğ£¿  
-I lost my keys again. I'm always so forgetful. / ÎÒÓÖ°ÑÔ¿³×¶ªÁË£¬ÎÒ×ÜÊÇÕâÃ´½¡Íü¡£  
-I have to run some errands this afternoon, like going to the post office and the grocery store. / ÎÒ½ñÌìÏÂÎçµÃÈ¥°ìĞ©ÊÂ£¬±ÈÈçÈ¥ÓÊ¾ÖºÍÔÓ»õµê¡£  
-I need to change the sheets on my bed. They're dirty. / ÎÒµÃ»»Ò»ÏÂ´²ÉÏµÄ´²µ¥£¬ËüÃÇÔàÁË¡£  
-I'm trying to organize my closet. It's a complete mess. / ÎÒÔÚÊÔ×ÅÕûÀíÎÒµÄÒÂ¹ñ£¬ÀïÃæÂÒ³ÉÒ»ÍÅÁË¡£
+### äº”åäº”ã€æ—¥å¸¸ç”Ÿæ´»çäº‹  
+I need to do the laundry today. The clothes basket is full. / æˆ‘ä»Šå¤©å¾—æ´—è¡£æœäº†ï¼Œæ´—è¡£ç¯®éƒ½æ»¡äº†ã€‚  
+I have to mow the lawn this weekend. It's getting too long. / æˆ‘è¿™ä¸ªå‘¨æœ«å¾—ä¿®å‰ªè‰åªäº†ï¼Œè‰é•¿å¾—å¤ªé•¿äº†ã€‚  
+Don't forget to take out the trash before you leave. / å‡ºé—¨å‰åˆ«å¿˜äº†å€’åƒåœ¾ã€‚  
+I spent the whole morning cleaning the house from top to bottom. / æˆ‘èŠ±äº†ä¸€ä¸ŠåˆæŠŠæˆ¿å­å½»åº•æ‰“æ‰«äº†ä¸€éã€‚  
+I need to iron my shirt for the meeting tomorrow. / æˆ‘å¾—æŠŠæ˜å¤©å¼€ä¼šç©¿çš„è¡¬è¡«ç†¨ä¸€ä¸‹ã€‚  
+Can you help me fix the leaky faucet? / ä½ èƒ½å¸®æˆ‘ä¿®ä¸€ä¸‹æ¼æ°´çš„æ°´é¾™å¤´å—ï¼Ÿ  
+I lost my keys again. I'm always so forgetful. / æˆ‘åˆæŠŠé’¥åŒ™ä¸¢äº†ï¼Œæˆ‘æ€»æ˜¯è¿™ä¹ˆå¥å¿˜ã€‚  
+I have to run some errands this afternoon, like going to the post office and the grocery store. / æˆ‘ä»Šå¤©ä¸‹åˆå¾—å»åŠäº›äº‹ï¼Œæ¯”å¦‚å»é‚®å±€å’Œæ‚è´§åº—ã€‚  
+I need to change the sheets on my bed. They're dirty. / æˆ‘å¾—æ¢ä¸€ä¸‹åºŠä¸Šçš„åºŠå•ï¼Œå®ƒä»¬è„äº†ã€‚  
+I'm trying to organize my closet. It's a complete mess. / æˆ‘åœ¨è¯•ç€æ•´ç†æˆ‘çš„è¡£æŸœï¼Œé‡Œé¢ä¹±æˆä¸€å›¢äº†ã€‚
 
-### ÎåÊ®Áù¡¢ĞİÏĞÓéÀÖ  
-I often watch TV series in my free time. It's a great way to relax. / ÎÒ¿ÕÏĞÊ±¼ä¾­³£¿´µçÊÓ¾ç£¬ÕâÊÇ·ÅËÉµÄºÃ·½·¨¡£  
-We went to the amusement park last weekend. The roller coaster was so exciting. / ÎÒÃÇÉÏÖÜÄ©È¥ÁËÓÎÀÖÔ°£¬¹ıÉ½³µÌ«´Ì¼¤ÁË¡£  
-I like to play video games, especially strategy games. / ÎÒÏ²»¶Íæµç×ÓÓÎÏ·£¬ÓÈÆäÊÇ²ßÂÔÀàÓÎÏ·¡£  
-Let's go to the cinema tonight. There's a new movie I want to see. / ½ñÍíÔÛÃÇÈ¥¿´µçÓ°°É£¬ÓĞ²¿ĞÂµçÓ°ÎÒÏë¿´¡£  
-I enjoy reading novels. It allows me to escape into different worlds. / ÎÒÏ²»¶¶ÁĞ¡Ëµ£¬ËüÄÜÈÃÎÒ³Á½şÔÚ²»Í¬µÄÊÀ½çÀï¡£  
-We had a karaoke night with friends. Everyone had a great time singing. / ÎÒÃÇºÍÅóÓÑÀ´ÁË¸ö¿¨À­OKÖ®Ò¹£¬´ó¼Ò³ª¸è¶¼ºÜ¿ªĞÄ¡£  
-I'm thinking of taking up painting as a hobby. It seems really interesting. / ÎÒÔÚ¿¼ÂÇ°Ñ»æ»­µ±×÷°®ºÃ£¬¿´ÆğÀ´ºÜÓĞÒâË¼¡£  
-We usually play board games on rainy days. They're a lot of fun. / ÏÂÓêÌìÎÒÃÇÍ¨³£ÍæÆåÅÌÓÎÏ·£¬·Ç³£ÓĞÈ¤¡£  
-I like to listen to podcasts while I'm doing housework. / ÎÒÏ²»¶ÔÚ×ö¼ÒÎñµÄÊ±ºòÌı²¥¿Í¡£  
-Going to the beach and sunbathing is my favorite leisure activity in summer. / ÏÄÌìÎÒ×îÏ²»¶µÄĞİÏĞ»î¶¯¾ÍÊÇÈ¥º£Ì²É¹Ì«Ñô¡£
+### äº”åå…­ã€ä¼‘é—²å¨±ä¹  
+I often watch TV series in my free time. It's a great way to relax. / æˆ‘ç©ºé—²æ—¶é—´ç»å¸¸çœ‹ç”µè§†å‰§ï¼Œè¿™æ˜¯æ”¾æ¾çš„å¥½æ–¹æ³•ã€‚  
+We went to the amusement park last weekend. The roller coaster was so exciting. / æˆ‘ä»¬ä¸Šå‘¨æœ«å»äº†æ¸¸ä¹å›­ï¼Œè¿‡å±±è½¦å¤ªåˆºæ¿€äº†ã€‚  
+I like to play video games, especially strategy games. / æˆ‘å–œæ¬¢ç©ç”µå­æ¸¸æˆï¼Œå°¤å…¶æ˜¯ç­–ç•¥ç±»æ¸¸æˆã€‚  
+Let's go to the cinema tonight. There's a new movie I want to see. / ä»Šæ™šå’±ä»¬å»çœ‹ç”µå½±å§ï¼Œæœ‰éƒ¨æ–°ç”µå½±æˆ‘æƒ³çœ‹ã€‚  
+I enjoy reading novels. It allows me to escape into different worlds. / æˆ‘å–œæ¬¢è¯»å°è¯´ï¼Œå®ƒèƒ½è®©æˆ‘æ²‰æµ¸åœ¨ä¸åŒçš„ä¸–ç•Œé‡Œã€‚  
+We had a karaoke night with friends. Everyone had a great time singing. / æˆ‘ä»¬å’Œæœ‹å‹æ¥äº†ä¸ªå¡æ‹‰OKä¹‹å¤œï¼Œå¤§å®¶å”±æ­Œéƒ½å¾ˆå¼€å¿ƒã€‚  
+I'm thinking of taking up painting as a hobby. It seems really interesting. / æˆ‘åœ¨è€ƒè™‘æŠŠç»˜ç”»å½“ä½œçˆ±å¥½ï¼Œçœ‹èµ·æ¥å¾ˆæœ‰æ„æ€ã€‚  
+We usually play board games on rainy days. They're a lot of fun. / ä¸‹é›¨å¤©æˆ‘ä»¬é€šå¸¸ç©æ£‹ç›˜æ¸¸æˆï¼Œéå¸¸æœ‰è¶£ã€‚  
+I like to listen to podcasts while I'm doing housework. / æˆ‘å–œæ¬¢åœ¨åšå®¶åŠ¡çš„æ—¶å€™å¬æ’­å®¢ã€‚  
+Going to the beach and sunbathing is my favorite leisure activity in summer. / å¤å¤©æˆ‘æœ€å–œæ¬¢çš„ä¼‘é—²æ´»åŠ¨å°±æ˜¯å»æµ·æ»©æ™’å¤ªé˜³ã€‚
 
-### ÎåÊ®Æß¡¢Ó¦¼±Çé¿ö  
-Call the police! There's a thief in my house. / ¿ì±¨¾¯£¡ÎÒ¼ÒÀïÓĞĞ¡Íµ¡£  
-Help! Someone has fainted. / ¾ÈÃü£¡ÓĞÈËÔÎµ¹ÁË¡£  
-What should we do? There's a fire in the kitchen. / ÎÒÃÇ¸ÃÔõÃ´°ì£¿³ø·¿×Å»ğÁË¡£  
-I've just been in a car accident. I need an ambulance. / ÎÒ¸ÕÔâÓöÁËÒ»³¡³µ»ö£¬ÎÒĞèÒªÒ»Á¾¾È»¤³µ¡£  
-Stay calm. We'll get out of this building safely during the earthquake. / ±£³ÖÀä¾²£¬µØÕğÆÚ¼äÎÒÃÇ»á°²È«Àë¿ªÕâ¶°Â¥µÄ¡£  
-The power has gone out. Do you have any flashlights? / Í£µçÁË£¬ÄãÓĞÊÖµçÍ²Âğ£¿  
-I can't find my child in the mall. What should I do? / ÎÒÔÚÉÌ³¡ÕÒ²»µ½ÎÒµÄº¢×ÓÁË£¬ÎÒ¸ÃÔõÃ´°ì£¿  
-There's a gas leak. Don't turn on any electrical appliances. / ÓĞÃºÆøĞ¹Â©£¬²»Òª¿ªÈÎºÎµçÆ÷¡£  
-I cut my finger. It's bleeding badly. / ÎÒ¸îÆÆÁËÊÖÖ¸£¬Á÷ÑªºÜÑÏÖØ¡£  
-We're lost in the forest. We need to find a way out quickly. / ÎÒÃÇÔÚÉ­ÁÖÀïÃÔÂ·ÁË£¬µÃ¸Ï½ôÕÒµ½³öÈ¥µÄÂ·¡£
+### äº”åä¸ƒã€åº”æ€¥æƒ…å†µ  
+Call the police! There's a thief in my house. / å¿«æŠ¥è­¦ï¼æˆ‘å®¶é‡Œæœ‰å°å·ã€‚  
+Help! Someone has fainted. / æ•‘å‘½ï¼æœ‰äººæ™•å€’äº†ã€‚  
+What should we do? There's a fire in the kitchen. / æˆ‘ä»¬è¯¥æ€ä¹ˆåŠï¼Ÿå¨æˆ¿ç€ç«äº†ã€‚  
+I've just been in a car accident. I need an ambulance. / æˆ‘åˆšé­é‡äº†ä¸€åœºè½¦ç¥¸ï¼Œæˆ‘éœ€è¦ä¸€è¾†æ•‘æŠ¤è½¦ã€‚  
+Stay calm. We'll get out of this building safely during the earthquake. / ä¿æŒå†·é™ï¼Œåœ°éœ‡æœŸé—´æˆ‘ä»¬ä¼šå®‰å…¨ç¦»å¼€è¿™æ ‹æ¥¼çš„ã€‚  
+The power has gone out. Do you have any flashlights? / åœç”µäº†ï¼Œä½ æœ‰æ‰‹ç”µç­’å—ï¼Ÿ  
+I can't find my child in the mall. What should I do? / æˆ‘åœ¨å•†åœºæ‰¾ä¸åˆ°æˆ‘çš„å­©å­äº†ï¼Œæˆ‘è¯¥æ€ä¹ˆåŠï¼Ÿ  
+There's a gas leak. Don't turn on any electrical appliances. / æœ‰ç…¤æ°”æ³„æ¼ï¼Œä¸è¦å¼€ä»»ä½•ç”µå™¨ã€‚  
+I cut my finger. It's bleeding badly. / æˆ‘å‰²ç ´äº†æ‰‹æŒ‡ï¼Œæµè¡€å¾ˆä¸¥é‡ã€‚  
+We're lost in the forest. We need to find a way out quickly. / æˆ‘ä»¬åœ¨æ£®æ—é‡Œè¿·è·¯äº†ï¼Œå¾—èµ¶ç´§æ‰¾åˆ°å‡ºå»çš„è·¯ã€‚
 
-### ÎåÊ®°Ë¡¢Ö°Òµ·¢Õ¹  
-I'm aiming for a higher position in the company. I've been working hard for it. / ÎÒÄ¿±êÊÇÔÚ¹«Ë¾»ñµÃ¸ü¸ßµÄÖ°Î»£¬ÎÒÒ»Ö±Îª´ËÅ¬Á¦¹¤×÷¡£  
-I attended a professional training course to improve my skills. / ÎÒ²Î¼ÓÁËÒ»¸ö×¨ÒµÅàÑµ¿Î³ÌÀ´ÌáÉıÎÒµÄ¼¼ÄÜ¡£  
-My boss offered me a chance to lead a new project. It's a great opportunity for my career. / ÀÏ°å¸øÁËÎÒÒ»¸öÁìµ¼ĞÂÏîÄ¿µÄ»ú»á£¬Õâ¶ÔÎÒµÄÖ°ÒµÉúÑÄÊÇ¸öºÜºÃµÄ»úÓö¡£  
-I'm considering changing my career path. I want to explore new fields. / ÎÒÔÚ¿¼ÂÇ¸Ä±äÖ°ÒµµÀÂ·£¬ÎÒÏëÌ½Ë÷ĞÂµÄÁìÓò¡£  
-Building a good professional network is crucial for career development. / ½¨Á¢Á¼ºÃµÄÖ°ÒµÈËÂö¶ÔÖ°Òµ·¢Õ¹ÖÁ¹ØÖØÒª¡£  
-I need to update my resume to apply for better jobs. / ÎÒĞèÒª¸üĞÂÎÒµÄ¼òÀúÒÔÉêÇë¸üºÃµÄ¹¤×÷¡£  
-The industry is evolving rapidly, so I have to keep learning to stay competitive. / Õâ¸öĞĞÒµ·¢Õ¹Ñ¸ËÙ£¬ËùÒÔÎÒ±ØĞë²»¶ÏÑ§Ï°ÒÔ±£³Ö¾ºÕùÁ¦¡£  
-I got a job offer from another company. I'm not sure if I should accept it. / ÎÒÊÕµ½ÁËÁíÒ»¼Ò¹«Ë¾µÄÂ¼ÓÃÍ¨Öª£¬µ«ÎÒ²»È·¶¨ÊÇ·ñÓ¦¸Ã½ÓÊÜ¡£  
-I'm proud of my career achievements so far. / ÎÒÎª×Ô¼ºÄ¿Ç°µÄÖ°Òµ³É¾Í¸Ğµ½×ÔºÀ¡£  
-Mentorship can play a significant role in one's professional growth. / µ¼Ê¦Ö¸µ¼ÔÚ¸öÈËÖ°Òµ³É³¤ÖĞ¿ÉÒÔ·¢»ÓÖØÒª×÷ÓÃ¡£
+### äº”åå…«ã€èŒä¸šå‘å±•  
+I'm aiming for a higher position in the company. I've been working hard for it. / æˆ‘ç›®æ ‡æ˜¯åœ¨å…¬å¸è·å¾—æ›´é«˜çš„èŒä½ï¼Œæˆ‘ä¸€ç›´ä¸ºæ­¤åŠªåŠ›å·¥ä½œã€‚  
+I attended a professional training course to improve my skills. / æˆ‘å‚åŠ äº†ä¸€ä¸ªä¸“ä¸šåŸ¹è®­è¯¾ç¨‹æ¥æå‡æˆ‘çš„æŠ€èƒ½ã€‚  
+My boss offered me a chance to lead a new project. It's a great opportunity for my career. / è€æ¿ç»™äº†æˆ‘ä¸€ä¸ªé¢†å¯¼æ–°é¡¹ç›®çš„æœºä¼šï¼Œè¿™å¯¹æˆ‘çš„èŒä¸šç”Ÿæ¶¯æ˜¯ä¸ªå¾ˆå¥½çš„æœºé‡ã€‚  
+I'm considering changing my career path. I want to explore new fields. / æˆ‘åœ¨è€ƒè™‘æ”¹å˜èŒä¸šé“è·¯ï¼Œæˆ‘æƒ³æ¢ç´¢æ–°çš„é¢†åŸŸã€‚  
+Building a good professional network is crucial for career development. / å»ºç«‹è‰¯å¥½çš„èŒä¸šäººè„‰å¯¹èŒä¸šå‘å±•è‡³å…³é‡è¦ã€‚  
+I need to update my resume to apply for better jobs. / æˆ‘éœ€è¦æ›´æ–°æˆ‘çš„ç®€å†ä»¥ç”³è¯·æ›´å¥½çš„å·¥ä½œã€‚  
+The industry is evolving rapidly, so I have to keep learning to stay competitive. / è¿™ä¸ªè¡Œä¸šå‘å±•è¿…é€Ÿï¼Œæ‰€ä»¥æˆ‘å¿…é¡»ä¸æ–­å­¦ä¹ ä»¥ä¿æŒç«äº‰åŠ›ã€‚  
+I got a job offer from another company. I'm not sure if I should accept it. / æˆ‘æ”¶åˆ°äº†å¦ä¸€å®¶å…¬å¸çš„å½•ç”¨é€šçŸ¥ï¼Œä½†æˆ‘ä¸ç¡®å®šæ˜¯å¦åº”è¯¥æ¥å—ã€‚  
+I'm proud of my career achievements so far. / æˆ‘ä¸ºè‡ªå·±ç›®å‰çš„èŒä¸šæˆå°±æ„Ÿåˆ°è‡ªè±ªã€‚  
+Mentorship can play a significant role in one's professional growth. / å¯¼å¸ˆæŒ‡å¯¼åœ¨ä¸ªäººèŒä¸šæˆé•¿ä¸­å¯ä»¥å‘æŒ¥é‡è¦ä½œç”¨ã€‚
 
-### ÎåÊ®¾Å¡¢Éç»áÏÖÏó  
-The aging population is becoming a serious social issue in many countries. / ÈË¿ÚÀÏÁä»¯ÔÚĞí¶à¹ú¼ÒÕı³ÉÎªÒ»¸öÑÏÖØµÄÉç»áÎÊÌâ¡£  
-There's a growing concern about youth unemployment. / ÈËÃÇ¶ÔÇàÄêÊ§ÒµÎÊÌâÔ½À´Ô½µ£ÓÇ¡£  
-Social media has a huge impact on people's daily lives. / Éç½»Ã½Ìå¶ÔÈËÃÇµÄÈÕ³£Éú»îÓĞ¾Ş´óÓ°Ïì¡£  
-The rise of online shopping has led to the decline of some traditional brick-and-mortar stores. / Íø¹ºµÄĞËÆğµ¼ÖÂÒ»Ğ©´«Í³ÊµÌåµêµÄË¥Âä¡£  
-We should pay more attention to the problem of environmental pollution. It's a global social challenge. / ÎÒÃÇÓ¦¸Ã¸ü¼Ó¹Ø×¢»·¾³ÎÛÈ¾ÎÊÌâ£¬ÕâÊÇÒ»¸öÈ«ÇòĞÔµÄÉç»áÌôÕ½¡£  
-The phenomenon of cyberbullying is getting worse. We need to take measures to stop it. / ÍøÂçÆÛÁèÏÖÏóÔ½À´Ô½ÑÏÖØ£¬ÎÒÃÇĞèÒª²ÉÈ¡´ëÊ©ÖÆÖ¹Ëü¡£  
-Volunteerism is becoming more popular in society. It helps build a better community. / Ö¾Ô¸·şÎñÔÚÉç»áÉÏÔ½À´Ô½ÊÜ»¶Ó­£¬ËüÓĞÖúÓÚ½¨Éè¸üÃÀºÃµÄÉçÇø¡£  
-The gap between the rich and the poor is a complex social issue that needs to be addressed. / Æ¶¸»²î¾àÊÇÒ»¸öĞèÒª½â¾öµÄ¸´ÔÓÉç»áÎÊÌâ¡£  
-The development of technology has brought about new social changes and challenges. / ¿Æ¼¼µÄ·¢Õ¹´øÀ´ÁËĞÂµÄÉç»á±ä»¯ºÍÌôÕ½¡£  
-Community activities can strengthen social bonds among people. / ÉçÇø»î¶¯¿ÉÒÔ¼ÓÇ¿ÈËÓëÈËÖ®¼äµÄÉç»áÁªÏµ¡£
+### äº”åä¹ã€ç¤¾ä¼šç°è±¡  
+The aging population is becoming a serious social issue in many countries. / äººå£è€é¾„åŒ–åœ¨è®¸å¤šå›½å®¶æ­£æˆä¸ºä¸€ä¸ªä¸¥é‡çš„ç¤¾ä¼šé—®é¢˜ã€‚  
+There's a growing concern about youth unemployment. / äººä»¬å¯¹é’å¹´å¤±ä¸šé—®é¢˜è¶Šæ¥è¶Šæ‹…å¿§ã€‚  
+Social media has a huge impact on people's daily lives. / ç¤¾äº¤åª’ä½“å¯¹äººä»¬çš„æ—¥å¸¸ç”Ÿæ´»æœ‰å·¨å¤§å½±å“ã€‚  
+The rise of online shopping has led to the decline of some traditional brick-and-mortar stores. / ç½‘è´­çš„å…´èµ·å¯¼è‡´ä¸€äº›ä¼ ç»Ÿå®ä½“åº—çš„è¡°è½ã€‚  
+We should pay more attention to the problem of environmental pollution. It's a global social challenge. / æˆ‘ä»¬åº”è¯¥æ›´åŠ å…³æ³¨ç¯å¢ƒæ±¡æŸ“é—®é¢˜ï¼Œè¿™æ˜¯ä¸€ä¸ªå…¨çƒæ€§çš„ç¤¾ä¼šæŒ‘æˆ˜ã€‚  
+The phenomenon of cyberbullying is getting worse. We need to take measures to stop it. / ç½‘ç»œæ¬ºå‡Œç°è±¡è¶Šæ¥è¶Šä¸¥é‡ï¼Œæˆ‘ä»¬éœ€è¦é‡‡å–æªæ–½åˆ¶æ­¢å®ƒã€‚  
+Volunteerism is becoming more popular in society. It helps build a better community. / å¿—æ„¿æœåŠ¡åœ¨ç¤¾ä¼šä¸Šè¶Šæ¥è¶Šå—æ¬¢è¿ï¼Œå®ƒæœ‰åŠ©äºå»ºè®¾æ›´ç¾å¥½çš„ç¤¾åŒºã€‚  
+The gap between the rich and the poor is a complex social issue that needs to be addressed. / è´«å¯Œå·®è·æ˜¯ä¸€ä¸ªéœ€è¦è§£å†³çš„å¤æ‚ç¤¾ä¼šé—®é¢˜ã€‚  
+The development of technology has brought about new social changes and challenges. / ç§‘æŠ€çš„å‘å±•å¸¦æ¥äº†æ–°çš„ç¤¾ä¼šå˜åŒ–å’ŒæŒ‘æˆ˜ã€‚  
+Community activities can strengthen social bonds among people. / ç¤¾åŒºæ´»åŠ¨å¯ä»¥åŠ å¼ºäººä¸äººä¹‹é—´çš„ç¤¾ä¼šè”ç³»ã€‚
 
-### ÁùÊ®¡¢ÕÜÑ§Ë¼¿¼  
-What is the meaning of life? It's a question that has puzzled humanity for centuries. / ÉúÃüµÄÒâÒåÊÇÊ²Ã´£¿ÕâÊÇÒ»¸öÀ§ÈÅÈËÀà¼¸¸öÊÀ¼ÍµÄÎÊÌâ¡£  
-We should strive to find a balance between material and spiritual pursuits. / ÎÒÃÇÓ¦¸ÃÅ¬Á¦ÔÚÎïÖÊ×·ÇóºÍ¾«Éñ×·ÇóÖ®¼äÕÒµ½Æ½ºâ¡£  
-Do you believe that everything happens for a reason? / ÄãÏàĞÅÍòÊÂ½ÔÓĞÒòÂğ£¿  
-The concept of good and evil is often debated in philosophy. / ÉÆÓë¶ñµÄ¸ÅÄîÔÚÕÜÑ§ÖĞ³£³£±»ÌÖÂÛ¡£  
-I think self-reflection is an important part of personal growth. It helps us understand ourselves better. / ÎÒÈÏÎª×ÔÎÒ·´Ë¼ÊÇ¸öÈË³É³¤µÄÖØÒª²¿·Ö£¬Ëü°ïÖúÎÒÃÇ¸üºÃµØÁË½â×Ô¼º¡£  
-The pursuit of knowledge is a never-ending journey. It enriches our minds. / ¶ÔÖªÊ¶µÄ×·ÇóÊÇÒ»¶ÎÓÀÎŞÖ¹¾³µÄÂÃ³Ì£¬Ëü·á¸»ÁËÎÒÃÇµÄË¼Ïë¡£  
-How do we define happiness? It may vary from person to person. / ÎÒÃÇÈçºÎ¶¨ÒåĞÒ¸££¿Õâ¿ÉÄÜÒòÈË¶øÒì¡£  
-We should respect different philosophical views, as they all contribute to our understanding of the world. / ÎÒÃÇÓ¦¸Ã×ğÖØ²»Í¬µÄÕÜÑ§¹Ûµã£¬ÒòÎªËüÃÇ¶¼ÓĞÖúÓÚÎÒÃÇ¶ÔÊÀ½çµÄÀí½â¡£  
-Philosophy encourages us to think deeply about the fundamental questions of existence. / ÕÜÑ§¹ÄÀøÎÒÃÇÉîÈëË¼¿¼¹ØÓÚ´æÔÚµÄ»ù±¾ÎÊÌâ¡£
+### å…­åã€å“²å­¦æ€è€ƒ  
+What is the meaning of life? It's a question that has puzzled humanity for centuries. / ç”Ÿå‘½çš„æ„ä¹‰æ˜¯ä»€ä¹ˆï¼Ÿè¿™æ˜¯ä¸€ä¸ªå›°æ‰°äººç±»å‡ ä¸ªä¸–çºªçš„é—®é¢˜ã€‚  
+We should strive to find a balance between material and spiritual pursuits. / æˆ‘ä»¬åº”è¯¥åŠªåŠ›åœ¨ç‰©è´¨è¿½æ±‚å’Œç²¾ç¥è¿½æ±‚ä¹‹é—´æ‰¾åˆ°å¹³è¡¡ã€‚  
+Do you believe that everything happens for a reason? / ä½ ç›¸ä¿¡ä¸‡äº‹çš†æœ‰å› å—ï¼Ÿ  
+The concept of good and evil is often debated in philosophy. / å–„ä¸æ¶çš„æ¦‚å¿µåœ¨å“²å­¦ä¸­å¸¸å¸¸è¢«è®¨è®ºã€‚  
+I think self-reflection is an important part of personal growth. It helps us understand ourselves better. / æˆ‘è®¤ä¸ºè‡ªæˆ‘åæ€æ˜¯ä¸ªäººæˆé•¿çš„é‡è¦éƒ¨åˆ†ï¼Œå®ƒå¸®åŠ©æˆ‘ä»¬æ›´å¥½åœ°äº†è§£è‡ªå·±ã€‚  
+The pursuit of knowledge is a never-ending journey. It enriches our minds. / å¯¹çŸ¥è¯†çš„è¿½æ±‚æ˜¯ä¸€æ®µæ°¸æ— æ­¢å¢ƒçš„æ—…ç¨‹ï¼Œå®ƒä¸°å¯Œäº†æˆ‘ä»¬çš„æ€æƒ³ã€‚  
+How do we define happiness? It may vary from person to person. / æˆ‘ä»¬å¦‚ä½•å®šä¹‰å¹¸ç¦ï¼Ÿè¿™å¯èƒ½å› äººè€Œå¼‚ã€‚  
+We should respect different philosophical views, as they all contribute to our understanding of the world. / æˆ‘ä»¬åº”è¯¥å°Šé‡ä¸åŒçš„å“²å­¦è§‚ç‚¹ï¼Œå› ä¸ºå®ƒä»¬éƒ½æœ‰åŠ©äºæˆ‘ä»¬å¯¹ä¸–ç•Œçš„ç†è§£ã€‚  
+Philosophy encourages us to think deeply about the fundamental questions of existence. / å“²å­¦é¼“åŠ±æˆ‘ä»¬æ·±å…¥æ€è€ƒå…³äºå­˜åœ¨çš„åŸºæœ¬é—®é¢˜ã€‚
