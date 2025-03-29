@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Decode the ArrayBuffer as UTF-8 text
             const decoder = new TextDecoder('utf-8');
             const text = decoder.decode(buffer);
-            console.log("Decoded text (first 500 chars):", text.substring(0, 500)); // Log the start of the decoded text
+            //console.log("Decoded text (first 500 chars):", text.substring(0, 500)); // Log the start of the decoded text
 
             // Check if decoding produced replacement characters '' which indicates an encoding issue
             /*
