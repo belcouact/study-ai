@@ -5,12 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>English Learning Cards</title>
     <link rel="stylesheet" href="eng_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>English Learning Cards</h1>
             <h2 id="category-title">Loading category...</h2>
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
         </header>
         
         <main>
@@ -19,15 +23,26 @@
                 <div class="loading">Loading sentences...</div>
             </div>
             
-            <div class="navigation">
-                <button id="prev-category" class="nav-button">Previous Category</button>
-                <div id="category-progress">Category: <span id="current-category">0</span>/<span id="total-categories">0</span></div>
-                <button id="next-category" class="nav-button">Next Category</button>
+            <div class="controls">
+                <div class="navigation">
+                    <button id="prev-category" class="nav-button"><i class="fas fa-chevron-left"></i> Previous</button>
+                    <div id="category-progress">Category: <span id="current-category">0</span>/<span id="total-categories">0</span></div>
+                    <button id="next-category" class="nav-button">Next <i class="fas fa-chevron-right"></i></button>
+                </div>
+                
+                <div class="interaction-buttons">
+                    <button id="shuffle-btn" class="action-button"><i class="fas fa-random"></i> Shuffle</button>
+                    <button id="auto-play-btn" class="action-button"><i class="fas fa-play"></i> Auto Play</button>
+                    <div class="speed-control">
+                        <label for="speed-slider">Speed:</label>
+                        <input type="range" id="speed-slider" min="1" max="10" value="5">
+                    </div>
+                </div>
             </div>
         </main>
         
         <footer>
-            <p>Interactive English Learning Cards</p>
+            <p>Interactive English Learning Cards | <span id="mastered-count">0</span> sentences mastered</p>
         </footer>
     </div>
 
