@@ -91,7 +91,53 @@
 <!-- <button id="next-quote-btn">Next Quote</button> -->
 
 <script>
-    // ... (async function loadQuotesFromCSV remains the same) ...
+    // --- Function to fetch and parse quotes.csv ---
+    // Ensure this function definition exists and is placed here:
+    async function loadQuotesFromCSV(url) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const csvText = await response.text();
+            const lines = csvText.trim().split('\n'); // Split into lines
+            const parsedQuotes = lines.map(line => {
+                // Split by the specific separator ",\,"
+                const parts = line.split(',\\,');
+                if (parts.length === 2) {
+                    // Trim whitespace and remove potential surrounding quotes ""
+                    const english = parts[0].trim().replace(/^"|"$/g, '').trim();
+                    const chinese = parts[1].trim().replace(/^"|"$/g, '').trim();
+                    if (english && chinese) { // Ensure parts are not empty after trimming
+                       return { english: english, chinese: chinese };
+                    } else {
+                        console.warn("Skipping line with empty part:", line);
+                    }
+                } else {
+                     console.warn("Skipping improperly formatted line:", line);
+                }
+                return null; // Return null for invalid or skipped lines
+            }).filter(quote => quote !== null); // Filter out nulls
+
+            if (parsedQuotes.length === 0 && lines.length > 0) {
+                 console.error("CSV loaded, but no valid quotes found. Check separator ',\,' and format.");
+                 return [ { english: "Error parsing quotes.", chinese: "解析语录时出错。" } ];
+            }
+             if (parsedQuotes.length === 0) {
+                console.error("No lines found or CSV is empty.");
+                return [ { english: "No quotes found in file.", chinese: "文件中未找到语录。" } ];
+            }
+
+            console.log(`Loaded ${parsedQuotes.length} quotes.`);
+            return parsedQuotes;
+        } catch (error) {
+            console.error("Could not load or parse quotes from CSV:", error);
+            // Return fallback quotes or display an error message
+            return [ { english: "Error loading quotes file.", chinese: "加载语录文件时出错。" } ];
+        }
+    }
+    // --- End of loadQuotesFromCSV function ---
+
 
     // Define quotes array globally but initialize it later
     let quotes = [];
@@ -103,16 +149,24 @@
     const chineseQuoteElement = document.getElementById('chinese-quote');
     // const nextQuoteBtn = document.getElementById('next-quote-btn'); // Remove button reference
 
-    // If using the fetch method, uncomment and modify this section:
+    // Load quotes when the DOM is ready
     window.addEventListener('DOMContentLoaded', async () => {
         // Ensure 'quotes.csv' is the correct path relative to main.html
+        // Ensure the fetch path is correct if main.html is in a subfolder
+        // If main.html is in 'quote/', the path to quotes.csv in the same folder is just 'quotes.csv'
         quotes = await loadQuotesFromCSV('quotes.csv');
         // Display the first quote AFTER loading, without animation initially
          if (quotes && quotes.length > 0) {
-            const initialQuote = getRandomQuote();
-            displayQuote(initialQuote);
+            // Check if the loaded data contains an error message
+            if(quotes[0] && quotes[0].english.startsWith("Error")) {
+                displayQuote(quotes[0]);
+            } else {
+                const initialQuote = getRandomQuote();
+                displayQuote(initialQuote);
+            }
         } else {
-            displayQuote({ english: "Waiting for quotes to load...", chinese: "等待语录加载..." });
+            // This case handles if loadQuotesFromCSV returns an empty array
+            displayQuote({ english: "No quotes loaded.", chinese: "未能加载语录。" });
         }
     });
 
