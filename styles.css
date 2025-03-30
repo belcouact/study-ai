@@ -1023,20 +1023,19 @@ button:disabled {
     font-size: 1.05rem;
 }
 
-/* Navigation controls - CRITICAL: ONLY CHANGE APPEARANCE */
+/* Navigation controls - CRITICAL: ALWAYS STICKY BOTTOM CENTER */
 .navigation-controls {
-    /* Keep existing position, bottom, left, transform, z-index, width, etc. */
-    /* position: fixed; */
-    /* bottom: 20px; */
-    /* left: calc(50% + (var(--sidebar-width) / 2)); */
-    /* transform: translateX(-50%); */
-    /* z-index: 100; */
-    /* width: 90%; */
-    /* max-width: 600px; */
-    /* min-width: 300px; */
-    /* transition: left var(--transition-speed) ease; */
+    position: fixed; /* Ensure it's fixed to the viewport */
+    bottom: 20px;    /* Stick to the bottom */
+    left: 50%;       /* Position the left edge at the center */
+    transform: translateX(-50%); /* Shift left by half its width to center */
+    z-index: 100;    /* Ensure it's above other content */
+    width: 90%;      /* Default width (adjusts in media query) */
+    max-width: 600px; /* Max width */
+    min-width: 300px; /* Min width */
+    transition: box-shadow var(--transition-speed) ease; /* Keep existing transitions */
 
-    /* --- Appearance Changes START --- */
+    /* --- Appearance Changes (Keep these from previous Ghibli style) --- */
     background: rgba(255, 249, 230, 0.9); /* Cream background */
     backdrop-filter: blur(10px);
     padding: 12px 25px; /* Adjust padding */
@@ -1046,16 +1045,16 @@ button:disabled {
     gap: 25px; /* Adjust gap */
     border: 1px solid var(--ghibli-brown-light); /* Add border */
     border-top: 3px solid var(--ghibli-brown-mid); /* Thicker top border */
-    margin-top: 20px; /* Keep margin */
     box-shadow: 0 -3px 15px var(--ghibli-shadow-light); /* Softer shadow */
     border-radius: 15px; /* Rounded */
-    /* --- Appearance Changes END --- */
+    /* Remove margin-top as it's not needed for fixed positioning */
+    /* margin-top: 20px; */
 }
 
-/* Navigation controls position when sidebar is hidden - KEEP THIS */
-.left-panel.hidden ~ .content-area .navigation-controls {
+/* Remove this rule as centering is now independent of sidebar */
+/* .left-panel.hidden ~ .content-area .navigation-controls {
     left: 50%;
-}
+} */
 
 .navigation-controls:hover {
      /* Keep existing hover shadow or adjust appearance only */
@@ -1859,117 +1858,48 @@ button:disabled {
     z-index: 10;
 }
 
-/* Fix navigation controls at the bottom while scrolling */
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    /* ... other mobile styles ... */
+
+    /* Adjust navigation controls for mobile */
+    .navigation-controls {
+        /* Keep fixed positioning and centering from the main rule */
+        /* Remove mobile-specific position, left, transform overrides */
+        /* position: sticky; */ /* Removed */
+        /* left: 10px; */ /* Removed */
+        /* transform: translateX(0); */ /* Removed */
+
+        /* Keep mobile size/spacing adjustments */
+        width: calc(100% - 20px); /* Near full width */
+        bottom: 10px; /* Closer to bottom */
+        padding: 10px 15px;
+        gap: 15px;
+        max-width: none; /* Allow full width minus margins */
+        min-width: unset; /* Remove min-width on mobile */
+    }
+    /* Remove mobile sidebar-dependent positioning override */
+     /* .left-panel.hidden ~ .content-area .navigation-controls,
+     .left-panel:not(.hidden) ~ .content-area .navigation-controls {
+        left: 10px;
+        transform: translateX(0);
+     } */
+
+    /* ... other mobile styles ... */
+}
+
+/* Remove duplicated/conflicting rule if it exists near the end */
+/*
 .navigation-controls {
-    position: sticky;
+    position: fixed;
     bottom: 20px;
-    z-index: 90;
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-    padding: 15px;
-    background: rgb(108, 103, 103);
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
-    order: 3;
+    left: calc(50% + (var(--sidebar-width) / 2));
+    transform: translateX(-50%);
+    // ... other duplicated styles ...
 }
+*/
 
-.navigation-controls:hover {
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
-
-/* Style dropdowns more attractively */
-.control-panel select {
-    padding: 10px 14px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background-color: white;
-    min-width: 140px;
-    font-size: 14px;
-    transition: all 0.2s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 16px;
-    padding-right: 35px;
-}
-
-.control-panel select:hover {
-    border-color: #bdbdbd;
-}
-
-.control-panel select:focus {
-    outline: none;
-    border-color: #4CAF50;
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
-}
-
-/* Enhance the generate button */
-.control-panel button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    background-color: var(--secondary-color);
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-left: 10px;
-}
-
-.control-panel button:hover {
-    background-color: #2980b9;
-}
-
-.control-panel button:active {
-    background-color: #2472a4;
-}
-
-.control-panel button:disabled {
-    background-color: #bdc3c7;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-#evaluate-btn {
-    background-color: #27ae60;
-}
-
-#evaluate-btn:hover {
-    background-color: #219a52;
-}
-
-#evaluate-btn:active {
-    background-color: #1e8449;
-}
-
-#evaluate-btn:disabled {
-    background-color: #bdc3c7;
-}
-
-/* Enhance loading indicator */
-.loading-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px;
-}
-
-.loading-spinner {
-    border: 4px solid rgba(76, 175, 80, 0.2);
-    border-radius: 50%;
-    border-top: 4px solid #4CAF50;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+/* ... existing code ... */
 
 /* Add fade in animation for questions */
 .question-item {
