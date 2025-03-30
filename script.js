@@ -6018,3 +6018,198 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Preserve all existing JavaScript functionality
 // ... rest of the existing script.js code ...
+
+// Add these animations at the end of your script.js file
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Add Ghibli-style animations and effects
+    addGhibliEffects();
+    
+    // ... keep all your existing initialization code
+});
+
+function addGhibliEffects() {
+    // Create floating dust particles (like in Totoro)
+    createDustParticles();
+    
+    // Add subtle hover effects to cards
+    addMagicalHoverEffects();
+    
+    // Enhance button clicks with subtle ripple
+    addButtonRippleEffects();
+}
+
+function createDustParticles() {
+    const content = document.querySelector('.content-area');
+    if (!content) return;
+    
+    // Create dust container
+    const dustContainer = document.createElement('div');
+    dustContainer.className = 'dust-container';
+    dustContainer.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 1;
+    `;
+    content.appendChild(dustContainer);
+    
+    // Create dust particles
+    for (let i = 0; i < 15; i++) {
+        createDustParticle(dustContainer);
+    }
+}
+
+function createDustParticle(container) {
+    const particle = document.createElement('div');
+    const size = Math.random() * 6 + 2;
+    
+    // Random starting position
+    const x = Math.random() * 100;
+    const y = Math.random() * 100;
+    
+    // Random animation duration between 30-60s
+    const duration = Math.random() * 30 + 30;
+    
+    particle.style.cssText = `
+        position: absolute;
+        width: ${size}px;
+        height: ${size}px;
+        background-color: rgba(255, 255, 255, 0.4);
+        border-radius: 50%;
+        top: ${y}%;
+        left: ${x}%;
+        filter: blur(1px);
+        opacity: ${Math.random() * 0.5 + 0.3};
+        pointer-events: none;
+        animation: floatDust ${duration}s linear infinite;
+    `;
+    
+    container.appendChild(particle);
+}
+
+function addMagicalHoverEffects() {
+    const cards = document.querySelectorAll('.word-card, .poem-display, .question-item');
+    
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Calculate percentage relative to card size
+            const xPercent = x / rect.width;
+            const yPercent = y / rect.height;
+            
+            // Calculate rotation angle (subtle tilt)
+            const maxRotation = 1.5; // maximum rotation in degrees
+            const rotateX = (0.5 - yPercent) * maxRotation;
+            const rotateY = (xPercent - 0.5) * maxRotation;
+            
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(0) scale(1.02)`;
+            
+            // Add subtle highlight
+            const highlight = `radial-gradient(circle at ${xPercent * 100}% ${yPercent * 100}%, rgba(255,255,255,0.2) 0%, transparent 50%)`;
+            card.style.backgroundImage = highlight;
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+            card.style.backgroundImage = '';
+        });
+    });
+}
+
+function addButtonRippleEffects() {
+    const buttons = document.querySelectorAll('button, .vocabulary-load-btn');
+    
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const x = e.clientX - this.getBoundingClientRect().left;
+            const y = e.clientY - this.getBoundingClientRect().top;
+            
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple-effect');
+            ripple.style.cssText = `
+                position: absolute;
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 50%;
+                pointer-events: none;
+                width: 10px;
+                height: 10px;
+                top: ${y}px;
+                left: ${x}px;
+                transform: scale(0);
+                animation: ripple 0.6s linear;
+            `;
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+}
+
+// Add keyframe animation for the dust and ripple
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+    @keyframes floatDust {
+        0% {
+            transform: translateY(0) translateX(0) rotate(0deg);
+        }
+        25% {
+            transform: translateY(-20px) translateX(10px) rotate(90deg);
+        }
+        50% {
+            transform: translateY(-10px) translateX(20px) rotate(180deg);
+        }
+        75% {
+            transform: translateY(10px) translateX(10px) rotate(270deg);
+        }
+        100% {
+            transform: translateY(0) translateX(0) rotate(360deg);
+        }
+    }
+    
+    @keyframes ripple {
+        to {
+            transform: scale(20);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(styleSheet);
+
+// Handle sidebar toggle animation
+const sidebarToggle = document.getElementById('sidebar-toggle');
+if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', function() {
+        const leftPanel = document.querySelector('.left-panel');
+        const contentArea = document.querySelector('.content-area');
+        
+        if (leftPanel.classList.contains('hidden')) {
+            // Animate sidebar reveal
+            leftPanel.style.transform = 'translateX(-100%)';
+            leftPanel.classList.remove('hidden');
+            
+            setTimeout(() => {
+                leftPanel.style.transform = 'translateX(0)';
+                contentArea.style.marginLeft = 'var(--sidebar-width)';
+            }, 50);
+        } else {
+            // Animate sidebar hiding
+            leftPanel.style.transform = 'translateX(-100%)';
+            contentArea.style.marginLeft = '0';
+            
+            setTimeout(() => {
+                leftPanel.classList.add('hidden');
+            }, 300);
+        }
+    });
+}
