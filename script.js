@@ -5975,3 +5975,83 @@ function renderRelatedPhrases(phrases) {
         </div>
     `;
 }
+
+// Keep all existing functionality
+// Add these decorative enhancements at the end of the file
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Add Ghibli-inspired animated elements to the UI
+    addGhibliElementsToUI();
+});
+
+function addGhibliElementsToUI() {
+    // Add floating dust sprites to the content-area (like in Totoro)
+    const contentArea = document.querySelector('.content-area');
+    if (contentArea) {
+        for (let i = 0; i < 15; i++) {
+            const sprite = document.createElement('div');
+            sprite.className = 'dust-sprite';
+            sprite.style.left = `${Math.random() * 100}%`;
+            sprite.style.top = `${Math.random() * 100}%`;
+            sprite.style.animationDelay = `${Math.random() * 15}s`;
+            contentArea.appendChild(sprite);
+        }
+    }
+    
+    // Add CSS for the dust sprites
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+        .dust-sprite {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            animation: floatSprite 15s infinite linear;
+            box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.3);
+        }
+        
+        @keyframes floatSprite {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100px) translateX(${Math.random() > 0.5 ? '+' : '-'}50px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(styleSheet);
+    
+    // Enhance buttons with ghibli-style hover effects
+    const btnStyle = document.createElement('style');
+    btnStyle.textContent = `
+        button:after, .vocabulary-load-btn:after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        button:hover:after, .vocabulary-load-btn:hover:after {
+            opacity: 1;
+        }
+    `;
+    document.head.appendChild(btnStyle);
+}
