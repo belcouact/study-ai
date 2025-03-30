@@ -1,48 +1,63 @@
 /* Base styles and variables */
 :root {
-    --sidebar-width: 220px;
+    --sidebar-width: 230px; /* Slightly wider for a softer feel */
     /* Ghibli-inspired color palette */
-    --primary-color: #4a6670;    /* Muted blue-gray like Totoro's fur */
-    --secondary-color: #7ba69a;  /* Soft sage green from Ghibli landscapes */
-    --text-color: #2c3e50;
-    --light-bg: #f0f7f4;         /* Soft mint background */
-    --border-color: #c9d8d2;     /* Muted sage border */
-    --shadow: 0 4px 15px rgba(74, 102, 112, 0.1);
+    --ghibli-sky-light: #e0f2f7;   /* Very light blue */
+    --ghibli-sky-mid: #a5d1e1;    /* Soft sky blue */
+    --ghibli-green-light: #c8e6c9; /* Light meadow green */
+    --ghibli-green-mid: #81c784;   /* Meadow green */
+    --ghibli-green-dark: #558b2f;  /* Forest green */
+    --ghibli-cream: #fff9e6;      /* Warm cream */
+    --ghibli-brown-light: #d7ccc8; /* Light stone/wood */
+    --ghibli-brown-mid: #a1887f;   /* Stone/wood */
+    --ghibli-text: #4e443e;       /* Dark warm brown for text */
+    --ghibli-text-secondary: #795548; /* Lighter brown text */
+    --ghibli-accent-warm: #ffcc80; /* Warm sun/flower accent */
+    --ghibli-accent-cool: #90caf9; /* Cool water/sky accent */
+    --ghibli-shadow-light: rgba(117, 85, 72, 0.1); /* Soft brown shadow */
+    --ghibli-shadow-mid: rgba(117, 85, 72, 0.15);
+
+    /* Map Ghibli colors to existing role names */
+    --primary-color: #6d8c9e; /* Muted blue-grey, refined */
+    --secondary-color: var(--ghibli-green-mid);
+    --text-color: var(--ghibli-text);
+    --light-bg: var(--ghibli-cream);
+    --border-color: var(--ghibli-brown-light);
+    --shadow: var(--ghibli-shadow-mid);
     --transition-speed: 0.3s;
-    --poetry-accent: #e08d79;    /* Warm Ghibli sunset color */
-    
-    /* New Ghibli-specific variables */
-    --ghibli-cloud: #ffffff;
-    --ghibli-sky: #a5d1e1;
-    --ghibli-grass: #7ba69a;
-    --ghibli-warm: #e08d79;
-    --ghibli-dark: #4a6670;
-    --ghibli-light: #f0f7f4;
-    --ghibli-accent: #d1b48c;    /* Warm sand color */
-    --ghibli-shadow: 0 8px 32px rgba(74, 102, 112, 0.15);
+    --poetry-accent: var(--ghibli-accent-warm); /* Warm accent for poetry */
+    --ghibli-cloud: #ffffff; /* Keep white for contrast */
+    --ghibli-dark: var(--primary-color); /* Reuse primary */
+    --ghibli-light: var(--light-bg); /* Reuse light bg */
+    --ghibli-accent: var(--ghibli-accent-cool); /* Use cool accent */
 }
 
-/* Add Ghibli-inspired font imports */
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+/* Remove old font import if it exists */
+/* @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap'); */
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Quicksand', sans-serif;
+    /* Use Nunito as the base font, Caveat/Indie Flower for headings later */
+    font-family: 'Nunito', sans-serif;
 }
 
 body {
     height: 100vh;
-    background-color: var(--ghibli-light);
+    background-color: var(--ghibli-sky-light); /* Light sky background */
     color: var(--text-color);
     overflow: hidden;
+    /* Subtle gradient background */
     background-image: linear-gradient(
         to bottom,
-        var(--ghibli-sky) 0%,
-        var(--ghibli-light) 100%
+        var(--ghibli-sky-mid) 0%,
+        var(--ghibli-sky-light) 30%,
+        var(--ghibli-cream) 100%
     );
     background-attachment: fixed;
+    /* Add a subtle texture - replace with a suitable Ghibli-esque pattern */
+    /* background-image: url('path/to/subtle-ghibli-pattern.png'), linear-gradient(...); */
 }
 
 /* Layout containers */
@@ -55,14 +70,14 @@ body {
 
 .content-area {
     margin-left: var(--sidebar-width);
-    padding: 1.5rem;
+    padding: 2rem; /* Increase padding */
     height: 100vh;
     overflow-y: auto;
     transition: margin-left var(--transition-speed) ease;
     flex: 1;
     display: flex;
     justify-content: center;
-    padding-top: 20px;
+    padding-top: 30px; /* Adjust top padding */
 }
 
 .content-area.full-width {
@@ -74,25 +89,27 @@ body {
     width: 100%;
     max-width: 1200px;
     margin: 0;
-    padding: 1rem;
-    background-color: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    box-shadow: var(--ghibli-shadow);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1.5rem 2rem; /* Adjust padding */
+    background-color: rgba(255, 255, 255, 0.85); /* Slightly more transparent */
+    backdrop-filter: blur(12px); /* Increase blur */
+    border-radius: 25px; /* More rounded */
+    box-shadow: 0 10px 35px var(--ghibli-shadow-light); /* Softer shadow */
+    border: 1px solid rgba(255, 255, 255, 0.3);
     min-height: 80vh;
+    border-top: 5px solid var(--ghibli-green-light); /* Add top border accent */
 }
 
 /* Left panel / Sidebar */
 .left-panel {
     width: var(--sidebar-width);
+    /* Use a Ghibli green gradient */
     background: linear-gradient(
         135deg,
-        var(--ghibli-dark) 0%,
-        var(--primary-color) 100%
+        var(--ghibli-green-dark) 0%,
+        var(--ghibli-green-mid) 100%
     );
-    box-shadow: var(--ghibli-shadow);
-    color: white;
+    box-shadow: 5px 0px 15px var(--ghibli-shadow-light); /* Softer shadow */
+    color: var(--ghibli-cream); /* Use cream for text */
     height: 100%;
     position: fixed;
     left: 0;
@@ -102,6 +119,7 @@ body {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    border-right: 3px solid var(--ghibli-brown-light); /* Add a subtle border */
 }
 
 .left-panel.hidden {
@@ -116,8 +134,8 @@ body {
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background-color: var(--primary-color);
-    color: white;
+    background-color: var(--ghibli-green-dark); /* Match sidebar */
+    color: var(--ghibli-cream);
     border: none;
     display: flex;
     align-items: center;
@@ -125,10 +143,11 @@ body {
     cursor: pointer;
     transition: left var(--transition-speed) ease, transform var(--transition-speed) ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border: 2px solid var(--ghibli-brown-light);
 }
 
 .sidebar-toggle:hover {
-    background-color: var(--secondary-color);
+    background-color: var(--ghibli-green-mid);
 }
 
 .sidebar-toggle.collapsed i {
@@ -148,63 +167,68 @@ body {
 
 .panel-button {
     background-color: transparent;
-    color: white;
+    color: var(--ghibli-cream); /* Cream text */
     border: none;
-    padding: 0.7rem 0.8rem;
-    margin-bottom: 0.8rem;
-    border-radius: 12px;
+    padding: 0.8rem 1rem; /* Adjust padding */
+    margin-bottom: 0.6rem; /* Adjust margin */
+    border-radius: 15px; /* More rounded */
     cursor: pointer;
     text-align: left;
-    font-size: 0.95rem;
+    font-size: 1rem; /* Slightly larger font */
+    font-weight: 600;
     transition: all 0.3s ease;
+    border-left: 5px solid transparent; /* For active state */
 }
 
 .panel-button:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: translateX(5px);
+    background-color: rgba(255, 249, 230, 0.15); /* Cream hover */
+    transform: translateX(8px);
+    border-left-color: var(--ghibli-accent-warm);
 }
 
 .panel-button.active {
-    background-color: rgba(255, 255, 255, 0.2);
-    font-weight: bold;
+    background-color: rgba(255, 249, 230, 0.2); /* Cream active */
+    font-weight: 700; /* Bold active */
+    border-left-color: var(--ghibli-accent-warm);
+    color: white;
 }
 
 .panel-footer {
     width: 100%;
     padding: 10px;
     font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 249, 230, 0.7); /* Lighter cream text */
     text-align: center;
     line-height: 1.4;
     margin-top: auto;
-    background-color: rgba(0, 0, 0, 0.15);
+    background-color: rgba(0, 0, 0, 0.2); /* Darker footer bg */
 }
 
 .sidebar-slogan {
-    margin: 15px 10px 20px 10px;
-    padding: 15px 8px;
-    border-radius: 6px;
-    background-color: var(--primary-color);
+    margin: 20px 10px 25px 10px; /* Adjust margins */
+    padding: 18px 10px; /* Adjust padding */
+    border-radius: 12px; /* Rounded */
+    background-color: rgba(0, 0, 0, 0.15); /* Slightly darker bg */
     text-align: center;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: 'Caveat', cursive; /* Whimsical font */
+    font-size: 1rem;
 }
 
 .sidebar-slogan p {
     margin: 0;
-    line-height: 1.6;
-    font-size: 0.8rem;
+    line-height: 1.5;
 }
 
 .sidebar-slogan p:first-child {
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 500;
-    font-style: italic;
+    color: rgba(255, 249, 230, 0.95); /* Cream */
+    font-weight: 700;
     margin-bottom: 5px;
 }
 
 .sidebar-slogan p:last-child {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 249, 230, 0.85); /* Lighter Cream */
 }
 
 .panel-footer p {
@@ -222,19 +246,19 @@ body {
 }
 
 .footer-links a {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 249, 230, 0.85); /* Cream links */
     text-decoration: none;
-    font-size: 0.8rem;
+    font-size: 0.85rem; /* Slightly larger */
     transition: color 0.2s ease;
     padding: 2px 5px;
 }
 
 .footer-links a:hover {
-    color: white;
-    text-decoration: underline;
+    color: var(--ghibli-accent-warm); /* Warm accent hover */
+    text-decoration: none;
 }
 
-/* External services section */
+/* External services section (If applicable) */
 .external-services {
     margin-top: 1rem;
     margin-bottom: 0.8rem;
@@ -273,29 +297,34 @@ body {
 }
 
 .sidebar-frame {
-    background-color: rgba(255, 255, 255, 0.08);
-    border-radius: 6px;
-    padding: 0.7rem;
-    margin-bottom: 0.8rem;
+    background-color: rgba(255, 255, 255, 0.05); /* Less contrast */
+    border-radius: 10px;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px dashed rgba(255, 249, 230, 0.2); /* Dashed border */
 }
 
 .frame-title {
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #ecf0f1;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    color: var(--ghibli-accent-warm); /* Warm accent */
+    font-family: 'Caveat', cursive; /* Whimsical font */
     display: flex;
     align-items: center;
 }
 
 .frame-title::before {
-    content: '';
+    /* Maybe use a leaf or sparkle icon if possible */
+    content: '🍃'; /* Example: Leaf emoji */
     display: inline-block;
-    width: 4px;
-    height: 14px;
-    background-color: var(--secondary-color);
-    margin-right: 6px;
-    border-radius: 2px;
+    /* width: 4px; */
+    /* height: 14px; */
+    /* background-color: var(--ghibli-accent-warm); */
+    margin-right: 8px;
+    /* border-radius: 2px; */
+    font-size: 1em;
+    color: var(--ghibli-green-light);
 }
 
 .frame-content {
@@ -313,30 +342,32 @@ body {
 }
 
 .dropdown-container label {
-    font-size: 0.8rem;
-    color: #bdc3c7;
-    width: 35px;
+    font-size: 0.85rem;
+    color: var(--ghibli-cream); /* Cream label */
+    width: 40px; /* Adjust width */
     flex-shrink: 0;
+    font-weight: 600;
 }
 
 .dropdown-container select {
-    padding: 0.35rem 0.4rem;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.07);
+    padding: 0.4rem 0.5rem;
+    border: 1px solid rgba(255, 249, 230, 0.3); /* Cream border */
+    border-radius: 8px; /* Rounded */
+    background-color: rgba(0, 0, 0, 0.2); /* Darker background */
     color: white;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     flex-grow: 1;
+    cursor: pointer;
 }
 
 .dropdown-container select:focus {
     outline: none;
-    border-color: var(--secondary-color);
-    background-color: rgba(255, 255, 255, 0.12);
+    border-color: var(--ghibli-accent-warm);
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
 .dropdown-container select option {
-    background-color: var(--primary-color);
+    background-color: var(--ghibli-green-dark); /* Match sidebar */
     color: white;
 }
 
@@ -349,37 +380,44 @@ body {
 }
 
 .input-container {
-    padding: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    background-color: white;
-    border-radius: 8px 8px 0 0;
+    padding: 1.5rem;
+    border-bottom: 2px dashed var(--ghibli-brown-light); /* Dashed border */
+    background-color: transparent; /* Use container background */
+    border-radius: 15px 15px 0 0; /* Match container */
 }
 
 .welcome-message {
     margin-bottom: 1rem;
-    padding: 0.8rem;
-    color: #555;
-    font-size: 0.95rem;
+    padding: 1rem;
+    background-color: var(--ghibli-green-light); /* Light green bg */
+    color: var(--ghibli-text);
+    border-radius: 12px;
+    font-size: 1rem;
     text-align: left;
+    border-left: 5px solid var(--ghibli-green-mid);
+    font-weight: 600;
 }
 
 textarea#user-input {
     width: 100%;
-    min-height: 100px;
-    padding: 1.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 15px;
-    font-family: 'Quicksand', sans-serif;
+    min-height: 120px; /* Taller */
+    padding: 1rem;
+    border: 2px solid var(--ghibli-brown-light); /* Brown border */
+    border-radius: 15px; /* Rounded */
+    font-family: 'Nunito', sans-serif;
     transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.9); /* Keep light */
     backdrop-filter: blur(5px);
-    color: var(--text-color);
+    color: var(--ghibli-text);
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
 textarea#user-input:focus {
     outline: none;
-    border-color: var(--ghibli-grass);
-    box-shadow: 0 0 0 3px rgba(123, 166, 154, 0.2);
+    border-color: var(--ghibli-green-mid); /* Green focus */
+    box-shadow: 0 0 0 4px rgba(129, 199, 132, 0.2); /* Green shadow */
+    background: white;
 }
 
 .button-container {
@@ -394,211 +432,280 @@ textarea#user-input:focus {
 }
 
 /* Buttons */
-button {
-    padding: 0.6rem 1rem;
+button, .button /* Add class for consistent styling if needed */ {
+    padding: 0.7rem 1.2rem; /* Adjust padding */
     border: none;
-    border-radius: 4px;
-    background-color: #f0f0f0;
-    color: var(--text-color);
+    border-radius: 12px; /* Rounded */
+    background-color: var(--ghibli-brown-light); /* Light brown default */
+    color: var(--ghibli-text);
     cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.2s ease;
-}
-
-button:hover {
-    background-color: #e0e0e0;
-}
-
-button:active {
-    background-color: #d0d0d0;
-}
-
-#submit-button {
-    background: var(--ghibli-grass);
-    color: white;
-    border-radius: 12px;
-    padding: 10px 20px;
-    font-weight: 600;
+    font-size: 0.95rem;
+    font-weight: 600; /* Bolder */
     transition: all 0.3s ease;
-    border: none;
-    box-shadow: 0 4px 15px rgba(123, 166, 154, 0.3);
+    box-shadow: 0 3px 5px var(--ghibli-shadow-light);
 }
 
-#submit-button:hover {
-    background: var(--ghibli-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(74, 102, 112, 0.4);
-}
-
-#optimize-button {
-    background: var(--ghibli-grass);
+button:hover:not(:disabled) {
+    background-color: var(--ghibli-brown-mid); /* Darker brown hover */
     color: white;
-    border-radius: 12px;
-    padding: 10px 20px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    border: none;
-    box-shadow: 0 4px 15px rgba(123, 166, 154, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px var(--ghibli-shadow-light);
 }
 
-#optimize-button:hover {
-    background: var(--ghibli-dark);
+button:active:not(:disabled) {
+    transform: translateY(0px);
+    box-shadow: 0 2px 4px var(--ghibli-shadow-light);
+}
+
+button:disabled {
+    background-color: #e0e0e0; /* Grey disabled */
+    color: #a0a0a0;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Primary Action Buttons */
+#submit-button, #optimize-button, #generate-btn, #learn-poetry-button, .vocabulary-load-btn, #evaluate-btn.ready /* Style ready state */ {
+    background: var(--ghibli-green-mid); /* Green primary action */
+    color: white;
+    box-shadow: 0 4px 10px rgba(129, 199, 132, 0.4);
+}
+
+#submit-button:hover:not(:disabled),
+#optimize-button:hover:not(:disabled),
+#generate-btn:hover:not(:disabled),
+#learn-poetry-button:hover:not(:disabled),
+.vocabulary-load-btn:hover:not(:disabled),
+#evaluate-btn.ready:hover:not(:disabled) {
+    background: var(--ghibli-green-dark); /* Darker green hover */
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(74, 102, 112, 0.4);
+    box-shadow: 0 6px 15px rgba(85, 139, 47, 0.4);
 }
 
 #optimize-button.optimizing {
-    background-color: #e9ecef;
-    color: #6c757d;
+    background-color: var(--ghibli-accent-warm); /* Warm color while optimizing */
+    color: var(--ghibli-text);
     cursor: wait;
+    box-shadow: none;
 }
+
+/* Secondary/Specific Buttons */
+#evaluate-btn { /* Default evaluate button */
+    background-color: var(--ghibli-accent-cool); /* Cool accent */
+    color: white;
+}
+#evaluate-btn:hover:not(:disabled) {
+    background-color: #64b5f6; /* Darker cool */
+}
+
 
 /* Output container */
 .output-container {
     flex: 1;
-    padding: 1rem;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    background-color: var(--light-bg);
-    border-radius: 0 0 8px 8px;
+    background-color: transparent; /* Use container background */
+    border-radius: 0 0 15px 15px; /* Match container */
 }
 
 #output {
     min-height: 100px;
-    line-height: 1.6;
+    line-height: 1.7; /* Increase line height */
     width: 100%;
+    font-size: 1.05rem; /* Slightly larger text */
 }
 
 /* Output content styling */
 #output p {
-    margin-bottom: 1rem;
-    line-height: 1.6;
+    margin-bottom: 1.2rem; /* More spacing */
+    line-height: 1.7;
 }
 
-#output h1, #output h2, #output h3 {
-    margin-top: 1.5rem;
+#output h1, #output h2, #output h3, #output h4, #output h5, #output h6 {
+    margin-top: 1.8rem;
     margin-bottom: 1rem;
-    color: var(--primary-color);
-    font-weight: 600;
+    color: var(--ghibli-text); /* Main text color */
+    font-family: 'Caveat', cursive; /* Whimsical heading font */
+    font-weight: 700;
+    line-height: 1.3;
 }
 
 #output h1 {
-    font-size: 1.5rem;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 0.5rem;
+    font-size: 2rem;
+    border-bottom: 3px dotted var(--ghibli-brown-light); /* Dotted border */
+    padding-bottom: 0.6rem;
+    color: var(--ghibli-green-dark); /* Dark green for h1 */
 }
 
 #output h2 {
-    font-size: 1.3rem;
+    font-size: 1.7rem;
+    color: var(--ghibli-green-mid); /* Mid green for h2 */
 }
 
 #output h3 {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
+    color: var(--ghibli-text-secondary); /* Secondary text brown */
 }
 
 #output ul, #output ol {
     margin-left: 1.5rem;
-    margin-bottom: 1rem;
-    padding-left: 1rem;
+    margin-bottom: 1.2rem;
+    padding-left: 1.5rem; /* More padding */
+    list-style: none; /* Remove default */
 }
 
 #output li {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem; /* More spacing */
+    position: relative;
 }
 
+/* Custom list bullets */
+#output ul > li::before {
+    content: '🌿'; /* Leaf bullet */
+    position: absolute;
+    left: -1.8rem;
+    color: var(--ghibli-green-mid);
+    font-size: 1em;
+}
+#output ol {
+    counter-reset: ghibli-counter;
+}
+#output ol > li {
+    counter-increment: ghibli-counter;
+}
+#output ol > li::before {
+    content: counter(ghibli-counter) ". ";
+    position: absolute;
+    left: -2rem;
+    color: var(--ghibli-brown-mid);
+    font-weight: 600;
+}
+
+
 #output code {
-    background-color: #f0f0f0;
-    padding: 0.2rem 0.4rem;
-    border-radius: 3px;
+    background-color: var(--ghibli-cream); /* Cream background */
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px; /* Rounded */
     font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    color: #e74c3c;
+    font-size: 0.95rem;
+    color: var(--ghibli-accent-warm); /* Warm color */
+    border: 1px solid var(--ghibli-brown-light);
 }
 
 #output pre {
-    background-color: #f5f5f5;
-    padding: 1rem;
-    border-radius: 5px;
+    background-color: rgba(255, 249, 230, 0.5); /* Light cream background */
+    padding: 1.2rem;
+    border-radius: 10px;
     overflow-x: auto;
-    margin-bottom: 1rem;
-    border-left: 3px solid var(--secondary-color);
+    margin-bottom: 1.2rem;
+    border: 1px solid var(--ghibli-brown-light);
+    border-left: 5px solid var(--ghibli-green-mid); /* Green left border */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 #output pre code {
     background-color: transparent;
     padding: 0;
-    color: #333;
-    font-size: 0.9rem;
+    color: var(--ghibli-text); /* Main text color */
+    font-size: 0.95rem;
+    border: none;
 }
 
 #output blockquote {
-    border-left: 3px solid var(--secondary-color);
-    padding-left: 1rem;
-    margin-left: 0;
-    margin-bottom: 1rem;
-    color: #555;
+    border-left: 5px solid var(--ghibli-accent-cool); /* Cool accent border */
+    padding-left: 1.5rem;
+    margin-left: 0.5rem;
+    margin-bottom: 1.2rem;
+    color: var(--ghibli-text-secondary); /* Secondary text color */
+    font-style: italic;
+    background-color: rgba(144, 202, 249, 0.08); /* Light cool bg */
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+    border-radius: 0 8px 8px 0;
 }
 
 #output table {
-    border-collapse: collapse;
+    border-collapse: separate; /* Use separate */
     width: 100%;
-    margin-bottom: 1rem;
-    border: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--ghibli-brown-light);
+    border-spacing: 0;
+    border-radius: 10px; /* Rounded table */
+    overflow: hidden; /* Clip corners */
+    box-shadow: 0 3px 8px var(--ghibli-shadow-light);
 }
 
 #output th, #output td {
-    padding: 0.5rem;
+    padding: 0.8rem 1rem; /* Adjust padding */
     text-align: left;
-    border: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--ghibli-brown-light);
+    border-right: 1px solid var(--ghibli-brown-light);
+}
+#output th:last-child, #output td:last-child {
+    border-right: none;
+}
+#output tr:last-child td {
+    border-bottom: none;
 }
 
 #output th {
-    background-color: #f5f5f5;
-    font-weight: 600;
+    background-color: var(--ghibli-green-light); /* Light green header */
+    font-weight: 700;
+    color: var(--ghibli-text);
+    font-family: 'Nunito', sans-serif; /* Use body font for headers */
 }
 
-#output tr:nth-child(even) {
-    background-color: #f9f9f9;
+#output tr:nth-child(even) td {
+    background-color: rgba(255, 249, 230, 0.3); /* Very light cream */
+}
+#output tr:hover td {
+    background-color: rgba(129, 199, 132, 0.15); /* Light green hover */
 }
 
 #output a {
-    color: var(--secondary-color);
+    color: var(--ghibli-green-dark); /* Dark green links */
     text-decoration: none;
-    border-bottom: 1px dotted var(--secondary-color);
+    border-bottom: 2px dotted var(--ghibli-accent-warm); /* Dotted warm underline */
+    font-weight: 600;
+    transition: all var(--transition-speed) ease;
 }
 
 #output a:hover {
-    border-bottom: 1px solid var(--secondary-color);
+    color: var(--ghibli-accent-warm); /* Warm hover */
+    border-bottom: 2px solid var(--ghibli-accent-warm); /* Solid warm underline */
 }
 
 /* System messages */
 .system-message {
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin: 15px 0;
+    padding: 1rem 1.5rem;
+    border-radius: 12px; /* Rounded */
+    margin: 1rem 0;
     display: flex;
     align-items: center;
-    animation: slideInFromTop 0.3s ease;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    animation: slideInFromTop 0.4s ease-out; /* Smoother animation */
+    box-shadow: 0 4px 10px var(--ghibli-shadow-light);
+    font-weight: 600;
+    border-left-width: 6px; /* Thicker border */
 }
 
 .system-message.info {
-    background-color: #e3f2fd;
-    border-left: 4px solid #2196F3;
-    color: #0d47a1;
+    background-color: var(--ghibli-sky-light);
+    border-left-color: var(--ghibli-accent-cool);
+    color: #1e3a8a; /* Darker blue text */
 }
 
 .system-message.error {
-    background-color: #ffebee;
-    border-left: 4px solid #f44336;
-    color: #b71c1c;
+    background-color: #ffebee; /* Keep light red */
+    border-left-color: #e57373; /* Softer red */
+    color: #c62828; /* Darker red text */
 }
 
 .system-message.success {
-    background-color: #e8f5e9;
-    border-left: 4px solid #4CAF50;
-    color: #1b5e20;
+    background-color: var(--ghibli-green-light);
+    border-left-color: var(--ghibli-green-mid);
+    color: var(--ghibli-green-dark);
 }
 
 @keyframes slideInFromTop {
@@ -608,14 +715,15 @@ button:active {
 
 /* AI message */
 .ai-message {
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    padding: 1.2rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    font-size: 1rem;
-    color: #333;
+    background-color: rgba(255, 255, 255, 0.7); /* More transparent */
+    border-radius: 12px; /* Rounded */
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 6px var(--ghibli-shadow-light);
+    font-size: 1.05rem; /* Match output text */
+    color: var(--ghibli-text);
     width: 100%;
+    border-left: 5px solid var(--ghibli-brown-light); /* Subtle border */
 }
 
 /* Loading indicator */
@@ -625,17 +733,17 @@ button:active {
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    color: #6c757d;
-    font-size: 0.9rem;
+    color: var(--ghibli-text-secondary);
+    font-size: 1rem;
 }
 
 .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid rgba(0,0,0,0.1);
+    width: 45px;
+    height: 45px;
+    border: 4px solid rgba(129, 199, 132, 0.2); /* Light green border */
     border-radius: 50%;
-    border-top-color: var(--secondary-color);
-    animation: spin 1s ease-in-out infinite;
+    border-top-color: var(--ghibli-green-mid); /* Green top */
+    animation: spin 1s linear infinite;
     margin-bottom: 1rem;
 }
 
@@ -801,17 +909,18 @@ button:active {
 
 /* Questions display container */
 .questions-display-container {
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 1.5rem 2rem;
-    margin-top: 15px;
-    box-shadow: var(--shadow);
+    background-color: rgba(255, 255, 255, 0.6); /* More transparent */
+    border-radius: 15px; /* Rounded */
+    padding: 2rem;
+    margin-top: 20px; /* Adjust spacing */
+    box-shadow: 0 5px 15px var(--ghibli-shadow-light);
     transition: all var(--transition-speed) ease;
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 90px; /* More space for fixed nav */
     flex: 1;
     position: relative;
     z-index: 10;
+    border: 1px solid var(--ghibli-brown-light);
 }
 
 #question-navigation {
@@ -824,118 +933,168 @@ button:active {
 }
 
 #question-counter {
-    font-weight: 500;
-    color: var(--primary-color);
+    font-weight: 700;
+    color: var(--ghibli-brown-mid); /* Brown counter */
+    font-size: 1rem;
+    background-color: var(--ghibli-cream);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
 }
 
 .question-text {
-    font-size: 1.2rem;
-    line-height: 1.7;
-    margin-bottom: 2rem;
-    color: var(--text-color);
-    padding: 0 1rem;
+    font-size: 1.3rem; /* Larger question text */
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+    color: var(--ghibli-text);
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
 }
 
 .choices-container {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .choice-item {
     display: flex;
-    align-items: flex-start;
+    align-items: center; /* Center align radio and text */
     margin-bottom: 1rem;
     padding: 1rem 1.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    transition: background-color 0.2s;
+    border: 2px solid var(--ghibli-brown-light); /* Thicker border */
+    border-radius: 12px; /* Rounded */
+    transition: all 0.2s ease-in-out;
+    background-color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
 }
 
 .choice-item:hover {
-    background-color: #f5f9ff;
+    background-color: var(--ghibli-cream); /* Cream hover */
+    border-color: var(--ghibli-green-mid);
+    transform: scale(1.02); /* Slight scale effect */
 }
 
 .choice-item input[type="radio"] {
-    margin-top: 0.2rem;
-    margin-right: 0.8rem;
+    margin-right: 1rem; /* More space */
+    accent-color: var(--ghibli-green-mid); /* Green radio */
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 }
 
 .choice-item label {
     flex: 1;
     cursor: pointer;
+    font-size: 1.05rem;
+    color: var(--ghibli-text);
 }
+
+/* Style checked state */
+.choice-item input[type="radio"]:checked + label {
+    font-weight: 700;
+    color: var(--ghibli-green-dark);
+}
+.choice-item:has(input[type="radio"]:checked) {
+    background-color: var(--ghibli-green-light);
+    border-color: var(--ghibli-green-dark);
+}
+
 
 .answer-container {
-    background-color: #f8f9fa;
-    border-radius: 6px;
+    background-color: var(--ghibli-cream); /* Cream background */
+    border-radius: 10px;
     padding: 1.5rem 2rem;
     margin-bottom: 1.5rem;
-    border-left: 4px solid var(--secondary-color);
+    border: 1px solid var(--ghibli-brown-light);
+    border-left: 6px solid var(--ghibli-green-mid); /* Green accent */
+    box-shadow: 0 3px 8px var(--ghibli-shadow-light);
 }
 
-.answer-header {
-    font-weight: 600;
-    margin-bottom: 0.8rem;
-    color: var(--primary-color);
+.answer-header { /* If you add a header */
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--ghibli-green-dark);
+    font-family: 'Caveat', cursive;
+    font-size: 1.5rem;
 }
 
 .answer-explanation {
-    line-height: 1.6;
-    color: var(--text-color);
+    line-height: 1.7;
+    color: var(--ghibli-text);
+    font-size: 1.05rem;
 }
 
-/* Navigation controls */
+/* Navigation controls - CRITICAL: ONLY CHANGE APPEARANCE */
 .navigation-controls {
-    position: fixed;
-    bottom: 20px;
-    left: calc(50% + (var(--sidebar-width) / 2));
-    transform: translateX(-50%);
-    background: var(--card-bg);
-    padding: 15px 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
-    border-top: 1px solid var(--border-color);
-    margin-top: 20px;
-    z-index: 100;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    border-radius: 12px;
-    width: 90%;
-    max-width: 600px;
-    min-width: 300px;
-    transition: left var(--transition-speed) ease;
+    /* Keep existing position, bottom, left, transform, z-index, width, etc. */
+    /* position: fixed; */
+    /* bottom: 20px; */
+    /* left: calc(50% + (var(--sidebar-width) / 2)); */
+    /* transform: translateX(-50%); */
+    /* z-index: 100; */
+    /* width: 90%; */
+    /* max-width: 600px; */
+    /* min-width: 300px; */
+    /* transition: left var(--transition-speed) ease; */
+
+    /* --- Appearance Changes START --- */
+    background: rgba(255, 249, 230, 0.9); /* Cream background */
+    backdrop-filter: blur(10px);
+    padding: 12px 25px; /* Adjust padding */
+    display: flex; /* Keep flex */
+    justify-content: center; /* Keep center */
+    align-items: center; /* Keep center */
+    gap: 25px; /* Adjust gap */
+    border: 1px solid var(--ghibli-brown-light); /* Add border */
+    border-top: 3px solid var(--ghibli-brown-mid); /* Thicker top border */
+    margin-top: 20px; /* Keep margin */
+    box-shadow: 0 -3px 15px var(--ghibli-shadow-light); /* Softer shadow */
+    border-radius: 15px; /* Rounded */
+    /* --- Appearance Changes END --- */
 }
 
-/* When sidebar is hidden, adjust the navigation controls position */
+/* Navigation controls position when sidebar is hidden - KEEP THIS */
 .left-panel.hidden ~ .content-area .navigation-controls {
     left: 50%;
 }
 
 .navigation-controls:hover {
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+     /* Keep existing hover shadow or adjust appearance only */
+    box-shadow: 0 -4px 20px var(--ghibli-shadow-mid);
 }
 
 .nav-button {
-    padding: 10px 20px;
-    background-color: #4299e1;
+    /* Keep existing font-size if needed, or adjust */
+    padding: 10px 18px; /* Adjust padding */
+    background-color: var(--ghibli-brown-mid); /* Brown buttons */
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 10px; /* Rounded */
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 16px;
-    font-weight: 500;
+    font-weight: 700;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .nav-button:disabled {
-    background-color: #cbd5e0;
+    background-color: var(--ghibli-brown-light); /* Lighter disabled */
+    color: rgba(255, 255, 255, 0.7);
     cursor: not-allowed;
+    box-shadow: none;
 }
 
 .nav-button:not(:disabled):hover {
-    background-color: #3182ce;
-    transform: translateY(-1px);
+    background-color: var(--ghibli-text); /* Darker brown hover */
+    transform: translateY(-2px) scale(1.05); /* Add scale effect */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
+/* Specific nav button styles if needed, e.g., for word nav */
+#prev-word-btn, #next-word-btn {
+    width: 45px; /* Adjust size */
+    height: 45px;
+    border-radius: 50%; /* Circular */
+    font-size: 1.2rem;
+}
+
 
 /* Empty state styling */
 .empty-state {
@@ -944,95 +1103,125 @@ button:active {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 60px 30px;
-    background-color: #f8fafc;
-    border-radius: 12px;
+    padding: 50px 30px;
+    background-color: rgba(255, 249, 230, 0.5); /* Light cream bg */
+    border-radius: 20px; /* Rounded */
     margin: 30px 0;
     transition: all 0.3s ease;
-    border: 2px dashed #e0e0e0;
+    border: 2px dashed var(--ghibli-brown-light); /* Dashed border */
     order: 1;
 }
 
+.empty-state:hover {
+    border-color: var(--ghibli-green-mid);
+    background-color: rgba(129, 199, 132, 0.1);
+}
+
 .empty-state h3 {
-    margin-bottom: 15px;
-    font-size: 22px;
-    color: #333;
+    margin-bottom: 1rem;
+    font-size: 1.8rem; /* Larger */
+    color: var(--ghibli-text);
+    font-family: 'Caveat', cursive; /* Whimsical */
 }
 
 .empty-state p {
-    color: #666;
+    color: var(--ghibli-text-secondary); /* Secondary text */
     max-width: 500px;
     margin: 0 auto 20px;
-    line-height: 1.6;
+    line-height: 1.7;
+    font-size: 1.05rem;
 }
 
-.empty-state img {
-    width: 120px;
+.empty-state img, .empty-state i.empty-state-icon /* Style FontAwesome icons too */ {
+    width: 80px; /* Adjust size */
     height: auto;
-    margin-bottom: 20px;
-    opacity: 0.8;
+    margin-bottom: 1.5rem;
+    opacity: 0.7;
     transition: all 0.3s ease;
+    color: var(--ghibli-green-mid); /* Color icon */
 }
 
-.empty-state:hover img {
+.empty-state:hover img, .empty-state:hover i.empty-state-icon {
     opacity: 1;
-    transform: scale(1.05);
+    transform: scale(1.1) rotate(3deg); /* Slight rotation */
 }
 
-/* Utility classes */
-.hidden {
-    display: none !important;
-}
 
-.highlight {
-    background-color: rgba(255, 255, 0, 0.3);
-    padding: 0.1rem 0.2rem;
-    border-radius: 2px;
-}
-
-/* Create container */
-#create-container {
+/* Control panel (for Quiz/Poetry) */
+.control-panel, .poetry-header { /* Apply to both */
+    position: sticky; /* Keep sticky */
+    top: 0; /* Keep sticky */
+    z-index: 100; /* Keep sticky */
     display: flex;
-    flex-direction: column;
-    padding: 20px;
-    min-height: calc(100vh - 60px);
-    position: relative;
-    height: auto;
-    overflow: visible;
-}
-
-/* Loading indicator for tests */
-#test-loading-indicator {
-    display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 15px; /* Adjust gap */
+    margin-bottom: 2rem; /* More space */
+    padding: 1rem 1.5rem; /* Adjust padding */
+    background-color: rgba(255, 249, 230, 0.85); /* Cream background */
+    backdrop-filter: blur(8px);
+    border-radius: 15px; /* Rounded */
+    box-shadow: 0 4px 15px var(--ghibli-shadow-light);
     align-items: center;
-    justify-content: center;
-    padding: 40px;
+    transition: all 0.3s ease;
+    order: -1; /* Keep order */
+    width: 100%;
+    border: 1px solid var(--ghibli-brown-light);
+    border-bottom: 3px solid var(--ghibli-brown-mid);
+}
+
+.control-panel label, .selector-group label {
+    font-weight: 600;
+    color: var(--ghibli-text-secondary); /* Secondary brown */
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    white-space: nowrap;
+    min-width: auto; /* Adjust width */
+    margin-right: 5px; /* Space after label */
+}
+
+.control-panel select, .poetry-select {
+    padding: 0.6rem 1rem; /* Adjust padding */
+    border: 1px solid var(--ghibli-brown-light);
+    border-radius: 8px; /* Rounded */
     background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    margin: 20px auto;
-    width: 80%;
-    max-width: 500px;
+    min-width: 150px; /* Adjust width */
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23a1887f'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E"); /* Brown arrow */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    padding-right: 35px;
+    cursor: pointer;
+    color: var(--ghibli-text);
 }
 
-.spinner-icon {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #e2e8f0;
-    border-top: 4px solid #4299e1;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 20px;
+.control-panel select:hover, .poetry-select:hover {
+    border-color: var(--ghibli-brown-mid);
 }
 
-/* Poetry panel specific styles */
-/* Removing the poetry-config-frame style since we removed that section */
+.control-panel select:focus, .poetry-select:focus {
+    outline: none;
+    border-color: var(--ghibli-green-mid);
+    box-shadow: 0 0 0 3px rgba(129, 199, 132, 0.2);
+}
+
+/* Style the main buttons in the control panel */
+.control-panel button, .poetry-button {
+    /* Uses general button styles, primary button styles applied above */
+    margin-left: 5px; /* Adjust margin */
+    align-self: center; /* Keep alignment */
+}
+
+
+/* --- Poetry Specific Styles --- */
 
 #poetry-container {
     display: flex;
     flex-direction: column;
-    padding: 2rem;
+    padding: 1rem 1.5rem; /* Adjust padding */
     height: auto;
     min-height: calc(100vh - 60px);
     overflow-y: visible;
@@ -1041,142 +1230,95 @@ button:active {
 .poetry-header {
     display: flex;
     flex-direction: column;
-    padding: 18px;
-    margin-bottom: 25px;
-    border-radius: 10px;
-    background-color: #f8f9fa;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    width: 100%;
-    position: relative;
-    z-index: 1;
-}
-
-.poetry-header:hover {
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-}
-
-.poetry-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.poetry-selectors {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-    margin-bottom: 0;
-    padding: 0;
-    transition: background-color 0.3s ease;
-}
-
-.selector-group {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    height: 38px;
-    min-width: 220px;
-    gap: 10px;
-}
-
-.selector-group label {
-    font-weight: 600;
-    color: #2c3e50;
-    font-size: 0.9rem;
-    transition: color 0.2s;
-    margin-bottom: 0;
-    white-space: nowrap;
-    min-width: 50px;
-}
-
-.selector-group:hover label {
-    color: var(--poetry-accent, #8e44ad);
-}
-
-.poetry-select {
-    flex: 1;
-    height: 38px;
-    padding: 10px 14px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background-color: white;
-    color: #333;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 16px;
-    padding-right: 35px;
-}
-
-.poetry-select:hover {
-    border-color: #bdbdbd;
-}
-
-.poetry-select:focus {
-    outline: none;
-    border-color: var(--poetry-accent, #8e44ad);
-    box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.2);
-}
-
-.poetry-button {
-    margin-top: 0;
-    height: 38px;
-    padding: 0 20px;
-    background-color: var(--poetry-accent, #8e44ad);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 500;
-    transition: all 0.3s;
-    box-shadow: 0 2px 6px rgba(142, 68, 173, 0.4);
-    align-self: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.poetry-button:hover {
-    background-color: #7d3c98;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(142, 68, 173, 0.5);
-}
-
-.poetry-button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(142, 68, 173, 0.4);
-}
-
-.poetry-content {
-    padding: 0 1rem 1rem;
-    overflow-y: auto;
-    flex: 1;
-}
-
-/* Poetry Navigation */
-.poem-navigation {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
 }
 
+.poetry-header h2 {
+    margin: 0;
+    color: var(--primary-color);
+}
+
+.poetry-config-frame {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.config-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.config-row label {
+    font-weight: 500;
+    min-width: 80px;
+}
+
+.config-row select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-width: 120px;
+}
+
+.poetry-button {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    align-self: flex-start;
+}
+
+.poetry-button:hover {
+    background-color: #0056b3;
+}
+
+.poetry-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 2rem;
+    text-align: center;
+    color: #666;
+}
+
+#poetry-display {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.poem-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem; /* More gap */
+    margin-bottom: 2rem; /* More space */
+}
+
 .poem-nav-button {
-    background-color: var(--button-bg);
-    border: 1px solid var(--border-color);
+    background-color: var(--ghibli-cream); /* Cream background */
+    border: 1px solid var(--ghibli-brown-light);
     border-radius: 50%;
-    width: 36px;
-    height: 36px;
+    width: 40px; /* Larger */
+    height: 40px; /* Larger */
+    color: var(--ghibli-brown-mid); /* Brown icon */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1185,7 +1327,9 @@ button:active {
 }
 
 .poem-nav-button:hover:not(:disabled) {
-    background-color: var(--button-hover-bg);
+    background-color: var(--ghibli-accent-warm); /* Warm hover */
+    color: var(--ghibli-text);
+    border-color: var(--ghibli-brown-mid);
 }
 
 .poem-nav-button:disabled {
@@ -1194,26 +1338,26 @@ button:active {
 }
 
 .poem-counter {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
+    font-size: 1rem;
+    color: var(--ghibli-text-secondary);
+    font-weight: 600;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
 }
 
 /* Poem Display */
 .poem-display {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.9); /* Slightly less transparent */
     backdrop-filter: blur(10px);
-    border-radius: 24px;
-    box-shadow: var(--ghibli-shadow);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px; /* Rounded */
+    box-shadow: 0 8px 25px var(--ghibli-shadow-light); /* Softer shadow */
+    border: 1px solid var(--ghibli-brown-light);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     position: relative;
     overflow: hidden;
     margin-bottom: 2rem;
-}
-
-.poem-display:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    padding: 2rem 2.5rem; /* More padding */
 }
 
 /* Fix for poem-display::before and poem-display::after syntax errors */
@@ -1223,7 +1367,7 @@ button:active {
     top: 10px;
     left: 20px;
     font-size: 120px;
-    color: rgba(142, 68, 173, 0.08);
+    color: rgba(161, 136, 127, 0.1); /* Softer brown quote */
     font-family: serif;
     line-height: 1;
 }
@@ -1234,19 +1378,20 @@ button:active {
     bottom: 10px;
     right: 20px;
     font-size: 120px;
-    color: rgba(142, 68, 173, 0.08);
+    color: rgba(161, 136, 127, 0.1); /* Softer brown quote */
     font-family: serif;
     line-height: 1;
 }
 
 .poem-title {
-    font-size: 2rem;
+    font-size: 2.2rem; /* Larger */
     font-weight: 700;
-    color: var(--ghibli-dark);
-    margin-bottom: 0.8rem;
+    color: var(--ghibli-green-dark); /* Dark green title */
+    margin-bottom: 1rem;
     text-align: center;
     position: relative;
-    padding-bottom: 15px;
+    padding-bottom: 1rem;
+    font-family: 'Caveat', cursive; /* Whimsical font */
 }
 
 .poem-title::after {
@@ -1255,44 +1400,46 @@ button:active {
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
-    background-color: var(--poetry-accent, #8e44ad);
+    width: 100px; /* Wider */
+    height: 4px; /* Thicker */
+    background-color: var(--ghibli-accent-warm); /* Warm accent */
     border-radius: 3px;
 }
 
 .poem-author {
-    font-size: 1.1rem;
-    color: #7f8c8d;
+    font-size: 1.2rem; /* Larger */
+    color: var(--ghibli-text-secondary);
     margin-bottom: 2.5rem;
     text-align: center;
     font-style: italic;
+    font-weight: 600;
 }
 
 .poem-content {
-    font-size: 1.2rem;
-    line-height: 2;
+    font-size: 1.3rem; /* Larger */
+    line-height: 2.2; /* More line height */
     text-align: center;
-    margin-bottom: 2.5rem;
-    color: var(--text-color);
+    margin-bottom: 3rem;
+    color: var(--ghibli-text);
     transition: color 0.3s;
     white-space: pre-wrap;
     position: relative;
     z-index: 1;
+    font-family: 'Times New Roman', serif; /* Serif for poem content */
+    background-color: rgba(255, 249, 230, 0.3);
+    padding: 1.5rem;
+    border-radius: 10px;
 }
 
 .poem-section {
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    padding: 1.8rem;
-    margin-bottom: 1.5rem;
+    background-color: rgba(255, 249, 230, 0.6); /* Lighter cream */
+    border-radius: 12px;
+    padding: 1.5rem 2rem; /* Adjust padding */
+    margin-bottom: 2rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
-    border-left: 4px solid var(--poetry-accent, #8e44ad);
-    position: relative;
-    overflow: hidden;
-    display: block !important;
-    opacity: 1 !important;
+    border: 1px solid var(--ghibli-brown-light);
+    border-left: 5px solid var(--ghibli-accent-warm); /* Warm accent */
 }
 
 .poem-section:hover {
@@ -1301,12 +1448,13 @@ button:active {
 }
 
 .poem-section h3 {
-    font-size: 1.3rem;
-    color: var(--poetry-accent, #8e44ad);
-    margin-bottom: 1.2rem;
+    font-size: 1.5rem; /* Larger */
+    color: var(--ghibli-brown-mid); /* Brown heading */
+    margin-bottom: 1rem;
     position: relative;
-    padding-bottom: 10px;
-    font-weight: 600;
+    padding-bottom: 0.8rem;
+    font-weight: 700;
+    font-family: 'Caveat', cursive; /* Whimsical font */
 }
 
 .poem-section h3::after {
@@ -1314,9 +1462,9 @@ button:active {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 50px;
-    height: 2px;
-    background-color: var(--poetry-accent, #8e44ad);
+    width: 60px;
+    height: 3px; /* Thicker */
+    background-color: var(--ghibli-accent-warm);
     border-radius: 2px;
 }
 
@@ -1339,7 +1487,7 @@ button:active {
 .poem-explanation {
     font-size: 1.05rem;
     line-height: 1.8;
-    color: #34495e;
+    color: var(--ghibli-text); /* Main text color */
     display: block !important;
     opacity: 1 !important;
 }
@@ -1977,15 +2125,16 @@ button:active {
 .vocabulary-card-container {
     flex: 1;
     overflow-y: auto;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 24px;
-    box-shadow: var(--ghibli-shadow);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 2rem 2.5rem; /* Adjust padding */
+    background: rgba(255, 255, 255, 0.85); /* Match main container */
+    backdrop-filter: blur(12px);
+    border-radius: 25px; /* Match main container */
+    box-shadow: 0 10px 35px var(--ghibli-shadow-light); /* Match main container */
+    border: 1px solid rgba(255, 255, 255, 0.3);
     position: relative;
-    padding-bottom: 80px;
+    padding-bottom: 100px; /* Space for nav */
     width: 100%;
+    border-top: 5px solid var(--ghibli-accent-warm); /* Warm accent top */
 }
 
 .vocabulary-header {
@@ -1993,14 +2142,15 @@ button:active {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    border-bottom: 2px dashed var(--ghibli-brown-light); /* Dashed border */
 }
 
 .vocabulary-header h2 {
     margin: 0;
-    color: var(--ghibli-dark);
-    font-size: 1.5rem;
+    color: var(--ghibli-brown-mid); /* Brown title */
+    font-size: 1.8rem; /* Larger */
+    font-family: 'Caveat', cursive;
 }
 
 .vocabulary-load-btn {
@@ -2027,33 +2177,42 @@ button:active {
 
 .initial-message {
     text-align: center;
-    color: #64748b;
-    font-size: 18px;
+    color: var(--ghibli-text-secondary);
+    font-size: 1.1rem;
     padding: 50px 30px;
-    border-radius: 10px;
-    background-color: white;
+    border-radius: 15px;
+    background-color: rgba(255, 249, 230, 0.7); /* Cream bg */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     width: 100%;
-    max-width: 800px;
+    max-width: 600px; /* Adjust width */
     margin: 40px auto;
+    border: 2px dashed var(--ghibli-brown-light);
+}
+.initial-message::before { /* Add decorative element */
+    content: '📖';
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 1rem;
+    color: var(--ghibli-green-mid);
 }
 
 .word-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 24px;
-    box-shadow: var(--ghibli-shadow);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 2rem;
+    background: rgba(255, 255, 255, 0.9); /* Light background */
+    backdrop-filter: blur(5px);
+    border-radius: 20px; /* Rounded */
+    box-shadow: 0 6px 20px var(--ghibli-shadow-light);
+    border: 1px solid var(--ghibli-brown-light);
+    padding: 2.5rem; /* More padding */
     width: 100%;
-    max-width: 1200px;
+    max-width: 100%; /* Use full width of container */
     margin: 0 auto;
-    min-height: 500px;
+    min-height: 450px; /* Adjust height */
     transition: transform 0.4s ease, box-shadow 0.4s ease;
     display: flex;
     flex-direction: column;
     animation: cardEntrance 0.6s ease-out;
-    gap: 20px;
+    gap: 1.5rem; /* Adjust gap */
+    border-top: 5px solid var(--ghibli-green-mid); /* Green top accent */
 }
 
 @keyframes cardEntrance {
@@ -2068,24 +2227,25 @@ button:active {
 }
 
 .word-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px var(--ghibli-shadow-mid); /* Stronger shadow */
 }
 
 .word-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px dotted var(--ghibli-brown-light); /* Dotted border */
 }
 
 .word-english {
-    font-size: 38px;
+    font-size: 2.8rem; /* Larger */
     font-weight: 700;
-    color: var(--ghibli-dark);
+    color: var(--ghibli-green-dark); /* Dark green word */
     animation: fadeIn 0.8s ease-out;
+    font-family: 'Nunito', sans-serif; /* Keep readable */
 }
 
 .word-details {
@@ -2095,126 +2255,151 @@ button:active {
 }
 
 .word-form {
-    font-size: 16px;
-    color: #64748b;
-    background-color: #f1f5f9;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-weight: 500;
+    font-size: 0.9rem; /* Smaller */
+    color: var(--ghibli-text-secondary);
+    background-color: var(--ghibli-green-light); /* Light green tag */
+    padding: 0.4rem 0.9rem;
+    border-radius: 15px;
+    font-weight: 600;
     animation: slideIn 0.8s ease-out;
+    border: 1px solid var(--ghibli-green-mid);
 }
 
 .word-pronunciation {
-    font-family: monospace;
-    color: #64748b;
-    font-size: 16px;
-    background-color: #f1f5f9;
-    padding: 6px 14px;
-    border-radius: 20px;
+    font-family: 'Courier New', monospace; /* Keep mono */
+    color: var(--ghibli-text-secondary);
+    font-size: 0.95rem;
+    background-color: var(--ghibli-cream); /* Cream tag */
+    padding: 0.4rem 0.9rem;
+    border-radius: 15px;
+    border: 1px solid var(--ghibli-brown-light);
 }
 
 .word-meanings {
-    margin-bottom: 25px;
+    margin-bottom: 1.5rem;
     animation: fadeInUp 1s ease-out;
 }
 
 .meaning-row {
     display: flex;
-    margin-bottom: 15px;
+    margin-bottom: 1rem;
+    background-color: rgba(255, 249, 230, 0.3); /* Light cream row bg */
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--ghibli-accent-cool); /* Cool accent */
 }
 
 .meaning-label {
-    width: 100px;
-    font-weight: 600;
-    color: #334155;
+    width: 80px; /* Adjust width */
+    font-weight: 700;
+    color: var(--ghibli-text);
+    flex-shrink: 0; /* Prevent shrinking */
+    margin-right: 1rem; /* Space after label */
+    font-size: 0.95rem;
 }
 
 .meaning-content {
     flex: 1;
-    color: #475569;
-    line-height: 1.6;
-    font-size: 16px;
+    color: var(--ghibli-text);
+    line-height: 1.7;
+    font-size: 1rem;
 }
 
 .section-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--ghibli-dark);
-    margin-bottom: 12px;
+    font-size: 1.3rem; /* Larger */
+    font-weight: 700;
+    color: var(--ghibli-brown-mid); /* Brown title */
+    margin-bottom: 1rem;
     position: relative;
-    padding-left: 15px;
+    padding-left: 20px; /* Space for icon */
+    font-family: 'Caveat', cursive; /* Whimsical */
 }
 
 .section-title::before {
-    content: '';
+    content: '🍃'; /* Leaf icon */
     position: absolute;
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    height: 18px;
-    width: 4px;
-    background-color: var(--ghibli-warm);
-    border-radius: 2px;
+    /* height: 18px; */
+    /* width: 4px; */
+    /* background-color: var(--ghibli-green-mid); */ /* Use icon color */
+    /* border-radius: 2px; */
+    color: var(--ghibli-green-mid);
+    font-size: 1.2em;
 }
 
-.word-examples, .word-family, .collocations, .word-relationships, .learning-tips {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #f1f5f9;
+/* Sub-section styling (Examples, Family etc.) */
+.word-examples, .word-family, .collocations, .word-relationships, .learning-tips, .related-phrases {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--ghibli-brown-light); /* Dashed border */
     animation: fadeInUp 1.3s ease-out;
 }
 
-.example-item {
+.example-item, .phrase-item /* Style phrases similarly */ {
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(5px);
-    border-radius: 15px;
-    border: 1px solid var(--border-color);
+    border-radius: 12px; /* Rounded */
+    border: 1px solid var(--ghibli-brown-light);
     transition: all 0.3s ease;
-    padding: 15px 20px;
-    margin-bottom: 15px;
-    border-left: 4px solid var(--secondary-color, #3498db);
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--ghibli-green-mid); /* Green accent */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.example-item:hover {
-    transform: translateX(5px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+.example-item:hover, .phrase-item:hover {
+    transform: translateX(6px); /* More shift */
+    box-shadow: 0 4px 12px var(--ghibli-shadow-light); /* Softer shadow */
+    border-left-color: var(--ghibli-green-dark); /* Darker green */
 }
 
-.example-english {
-    color: #334155;
-    margin-bottom: 8px;
-    font-weight: 500;
-    font-size: 16px;
+.example-english, .phrase-english {
+    color: var(--ghibli-text);
+    margin-bottom: 0.5rem;
+    font-weight: 600; /* Bolder */
+    font-size: 1.05rem;
 }
 
-.example-chinese {
-    color: #64748b;
-    font-size: 15px;
+.example-chinese, .phrase-chinese {
+    color: var(--ghibli-text-secondary);
+    font-size: 1rem;
 }
+.phrase-usage { /* Specific style for phrase usage */
+    color: var(--ghibli-text-secondary);
+    font-size: 0.9rem;
+    font-style: italic;
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+    border-top: 1px dotted var(--ghibli-brown-light);
+}
+
 
 .word-family-items, .collocation-items {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 12px;
+    gap: 12px;
+    margin-top: 0.8rem;
 }
 
 .word-family-item, .collocation-item {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(5px);
-    border-radius: 15px;
-    border: 1px solid var(--border-color);
+    background: var(--ghibli-cream); /* Cream background */
+    border-radius: 15px; /* Pill shape */
+    border: 1px solid var(--ghibli-brown-light);
     transition: all 0.3s ease;
-    padding: 8px 14px;
-    font-size: 15px;
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    color: var(--ghibli-text-secondary);
+    cursor: default; /* Non-interactive appearance */
 }
 
 .word-family-item:hover, .collocation-item:hover {
-    background-color: #4338ca;
-    color: white;
+    background-color: var(--ghibli-accent-warm); /* Warm hover */
+    color: var(--ghibli-text);
     transform: translateY(-2px);
-    box-shadow: var(--ghibli-shadow);
+    border-color: var(--ghibli-brown-mid);
+    box-shadow: 0 2px 5px var(--ghibli-shadow-light);
 }
 
 .word-relationships {
@@ -2236,105 +2421,83 @@ button:active {
 .synonym-items, .antonym-items {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-top: 12px;
+    gap: 0.8rem;
+    margin-top: 0.8rem;
 }
 
 .synonym-container, .antonym-container {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 15px;
-    background-color: #f8fafc;
-    border-radius: 8px;
-    transition: transform 0.2s ease;
+    gap: 0.8rem;
+    padding: 0.8rem 1rem;
+    background-color: rgba(255, 255, 255, 0.8); /* Light background */
+    border-radius: 10px; /* Rounded */
+    border: 1px solid var(--ghibli-brown-light);
+    transition: transform 0.2s ease, background-color 0.2s ease;
 }
+/* Different accents for synonyms/antonyms */
+.synonyms .synonym-container { border-left: 4px solid var(--ghibli-green-mid); }
+.antonyms .antonym-container { border-left: 4px solid var(--ghibli-accent-warm); }
+
 
 .synonym-container:hover, .antonym-container:hover {
     transform: translateX(5px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 5px var(--ghibli-shadow-light);
+    background-color: white;
 }
 
 .synonym-word, .antonym-word {
-    font-weight: 600;
-    color: #334155;
+    font-weight: 700; /* Bolder */
+    color: var(--ghibli-text);
 }
 
 .synonym-def, .antonym-def {
-    color: #64748b;
-    font-size: 14px;
+    color: var(--ghibli-text-secondary);
+    font-size: 0.9rem; /* Smaller */
 }
 
 .learning-tips {
-    background-color: #ecfdf5;
-    border-left: 4px solid #10b981;
-    padding: 18px 20px;
-    border-radius: 8px;
-    margin-top: 20px;
+    background-color: var(--ghibli-green-light); /* Light green */
+    border-left: 4px solid var(--ghibli-green-dark); /* Dark green border */
+    padding: 1.2rem 1.5rem;
+    border-radius: 10px;
+    margin-top: 1.5rem;
 }
+.learning-tips .section-title::before { content: '💡'; color: var(--ghibli-accent-warm); } /* Lightbulb */
+.learning-tips .section-title { color: var(--ghibli-green-dark); }
+
 
 .tip-content {
-    color: #065f46;
-    line-height: 1.6;
-    font-size: 15px;
+    color: var(--ghibli-text); /* Main text */
+    line-height: 1.7;
+    font-size: 1rem;
 }
 
 .error-message {
-    background-color: #fee2e2;
-    border-left: 4px solid #ef4444;
-    padding: 20px;
-    border-radius: 10px;
-    color: #b91c1c;
+    background-color: #ffcdd2; /* Softer red */
+    border-left: 4px solid #e57373; /* Softer red border */
+    padding: 1.5rem;
+    border-radius: 12px;
+    color: #b71c1c; /* Dark red text */
     text-align: center;
     width: 100%;
-    max-width: 800px;
+    max-width: 700px;
     margin: 40px auto;
+    font-weight: 600;
+}
+.error-message::before {
+    content: '⚠️ ';
 }
 
-/* Navigation buttons styling to match the site theme */
-.nav-button {
-    background-color: #f1f5f9;
-    color: #64748b;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 18px;
-}
+/* Nav button styles updated earlier */
+/* #word-counter style updated earlier with .poem-counter */
 
-.nav-button:hover:not(:disabled) {
-    background-color: var(--secondary-color, #3498db);
-    color: white;
-    transform: scale(1.1);
-}
-
-.nav-button:active:not(:disabled) {
-    transform: scale(0.95);
-}
-
-.nav-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-#word-counter {
-    font-size: 16px;
-    color: #64748b;
-    font-weight: 500;
-    margin: 0 15px;
-}
-
-/* Add loading spinner for the load button */
-.loading-spinner {
+/* Loading spinner for vocabulary */
+.loading-spinner { /* Used by optimize button etc */
     display: inline-block;
     width: 18px;
     height: 18px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.4); /* White border */
     border-radius: 50%;
     border-top-color: white;
     animation: spin 0.8s linear infinite;
@@ -2389,29 +2552,30 @@ button:active {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px;
+    padding: 50px;
     text-align: center;
 }
 
 .vocabulary-spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid rgba(52, 152, 219, 0.2);
+    width: 55px;
+    height: 55px;
+    border: 5px solid rgba(129, 199, 132, 0.2); /* Light green */
     border-radius: 50%;
-    border-top-color: var(--secondary-color, #3498db);
+    border-top-color: var(--ghibli-green-mid); /* Green */
     animation: spin 1s ease-in-out infinite;
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
 }
 
 .loading-message p {
-    color: #64748b;
-    font-size: 18px;
+    color: var(--ghibli-text-secondary);
+    font-size: 1.1rem;
     margin: 5px 0;
+    font-weight: 600;
 }
 
 .loading-message p:last-child {
-    color: #94a3b8;
-    font-size: 16px;
+    color: var(--ghibli-brown-mid); /* Brown italic */
+    font-size: 1rem;
     font-style: italic;
 }
 
