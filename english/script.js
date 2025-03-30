@@ -178,8 +178,18 @@ document.addEventListener('DOMContentLoaded', () => {
         category.sentences.forEach((sentencePair, cardIndex) => {
             const card = document.createElement('div');
             card.classList.add('sentence-card');
-            const delay = cardIndex * 0.07;
+            // Add Ghibli-inspired animation delay
+            const delay = cardIndex * 0.1;
             card.style.setProperty('--animation-delay', `${delay}s`);
+
+            // Add decorative elements
+            const decorLeft = document.createElement('span');
+            decorLeft.classList.add('card-decor', 'left');
+            decorLeft.textContent = '❀';
+            
+            const decorRight = document.createElement('span');
+            decorRight.classList.add('card-decor', 'right');
+            decorRight.textContent = '❀';
 
             const englishP = document.createElement('p');
             englishP.classList.add('english-sentence');
@@ -191,6 +201,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             card.appendChild(englishP);
             card.appendChild(chineseP);
+
+            card.prepend(decorLeft);
+            card.appendChild(decorRight);
+
+            // Add hover animation class
+            card.addEventListener('mouseenter', () => {
+                card.classList.add('card-hover');
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.classList.remove('card-hover');
+            });
 
             // --- Add Event Listeners Here ---
             const englishText = sentencePair.en; // Get text directly
@@ -272,4 +294,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start the initialization process
     initializePage();
-}); 
+});

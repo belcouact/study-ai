@@ -1,19 +1,20 @@
 /* Import Google Font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@300;400;600;700&display=swap');
 
 /* Define CSS Variables for easier theme management */
 :root {
-    --primary-color: #007bff;
-    --primary-light: #4da3ff;
-    --primary-dark: #0056b3;
-    --background-light: #f8f9fa;
-    --background-gradient: linear-gradient(135deg, #eef7ff 0%, #ffffff 100%);
-    --card-background: linear-gradient(120deg, #ffffff 0%, #e9f5ff 100%);
-    --text-dark: #343a40;
-    --text-light: #6c757d;
-    --shadow-color: rgba(0, 0, 0, 0.1);
-    --shadow-hover-color: rgba(0, 0, 0, 0.2);
-    --font-family: 'Poppins', sans-serif;
+    --primary-color: #5C9EAD;
+    --primary-light: #7FB9C6;
+    --primary-dark: #4A8896;
+    --background-light: #F7F3E9;
+    --background-gradient: linear-gradient(135deg, #E6F3F7 0%, #F7F3E9 100%);
+    --card-background: linear-gradient(120deg, #ffffff 0%, #F0F7FA 100%);
+    --text-dark: #2C4A52;
+    --text-light: #5C7A83;
+    --shadow-color: rgba(92, 158, 173, 0.2);
+    --shadow-hover-color: rgba(92, 158, 173, 0.3);
+    --font-family: 'Overpass', 'Poppins', sans-serif;
 }
 
 body {
@@ -23,6 +24,7 @@ body {
     padding: 20px;
     /* Subtle gradient background */
     background: var(--background-gradient);
+    background-attachment: fixed;
     color: var(--text-dark);
     min-height: 100vh;
     position: relative;
@@ -30,7 +32,7 @@ body {
 }
 
 .container {
-    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.95);
     padding: 30px 40px; /* Slightly more horizontal padding */
     border-radius: 12px; /* Softer corners */
     /* Enhanced shadow */
@@ -43,6 +45,8 @@ body {
     position: relative;
     /* Adding a transition for potential future container animations */
     transition: transform 0.3s ease-in-out;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.8);
 }
 
 /* Style the header and category title */
@@ -54,6 +58,19 @@ body {
     border-bottom: 2px solid var(--primary-light); /* Underline effect */
     padding-bottom: 10px;
     display: inline-block; /* Allows border to fit content */
+    font-family: var(--font-family);
+    position: relative;
+}
+
+.category-header::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--primary-light);
+    opacity: 0.6;
 }
 
 #category-title {
@@ -87,21 +104,32 @@ body {
     background: var(--card-background);
     border: none; /* Remove default border */
     border-left: 5px solid var(--primary-light); /* Accent border on the left */
-    border-radius: 8px;
+    border-radius: 15px;
     padding: 20px 25px; /* More padding */
     margin-bottom: 20px;
-    box-shadow: 0 3px 10px var(--shadow-color);
+    box-shadow: 0 5px 15px var(--shadow-color),
+                inset 0 -2px 0 rgba(255, 255, 255, 0.7);
     /* Apply animation */
     opacity: 0; /* Start hidden before animation */
     animation: cardEnter 0.5s ease-out forwards;
     /* Stagger animation delay (will be set by JS) */
     animation-delay: var(--animation-delay, 0s);
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    cursor: pointer;
+    position: relative;
 }
 
 .sentence-card:hover {
     transform: translateY(-3px); /* Slight lift on hover */
     box-shadow: 0 6px 15px var(--shadow-hover-color);
+    background-color: #f0f0f0; /* Slightly change background */
+    outline: 2px solid dodgerblue;
+    outline-offset: 2px;
+}
+
+.sentence-card:active {
+    transform: scale(0.98); /* Slightly shrink the card when clicked */
+    background-color: #e8e8e8;
 }
 
 .sentence-card p {
@@ -112,12 +140,14 @@ body {
     font-weight: 600; /* Bold */
     color: var(--text-dark);
     font-size: 1.15em;
+    font-family: var(--font-family);
 }
 
 .chinese-translation {
     color: var(--text-light);
     font-size: 1.05em;
     font-style: italic; /* Italicize translation */
+    font-family: var(--font-family);
 }
 
 /* --- Navigation Buttons Styling --- */
@@ -131,16 +161,16 @@ body {
     transform: translateY(-50%);
     z-index: 10;
 
-    background: linear-gradient(145deg, var(--primary-light), var(--primary-color)); /* Gradient background */
+    background: var(--primary-color);
     color: white;
-    border: none;
+    border: 2px solid white;
     /* Make buttons circular or rounded */
     border-radius: 50%;
     width: 55px;  /* Fixed width */
     height: 55px; /* Fixed height */
     font-size: 1.5em; /* Larger icon/arrow */
     cursor: pointer;
-    box-shadow: 0 4px 10px var(--shadow-hover-color);
+    box-shadow: 0 4px 15px var(--shadow-color);
     /* Smooth transitions */
     transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
     display: flex; /* Center content inside button */
@@ -148,6 +178,7 @@ body {
     align-items: center;
     line-height: 1; /* Ensure icon is vertically centered */
     padding: 0; /* Remove default padding */
+    font-family: var(--font-family);
 }
 
 .nav-button:hover {
