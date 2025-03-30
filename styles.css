@@ -1148,9 +1148,6 @@ button:disabled {
 
 /* Control panel (for Quiz/Poetry) */
 .control-panel, .poetry-header { /* Apply to both */
-    position: sticky; /* Keep sticky */
-    top: 0; /* Keep sticky */
-    z-index: 100; /* Keep sticky */
     display: flex;
     flex-wrap: wrap;
     gap: 15px; /* Adjust gap */
@@ -1226,44 +1223,20 @@ button:disabled {
     overflow-y: visible;
 }
 
-.poetry-header {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.poetry-header h2 {
+.poetry-header h2 { /* Keep this rule if needed for the title */
     margin: 0;
     color: var(--primary-color);
-}
-
-.poetry-config-frame {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1rem;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    margin-bottom: 1rem;
+    /* Add flex properties if h2 should be part of the row */
+    flex-basis: 100%; /* Make title take full width initially */
+    margin-bottom: 1rem; /* Add space below title */
 }
 
 .config-row {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-}
-
-.config-row label {
-    font-weight: 500;
-    min-width: 80px;
-}
-
-.config-row select {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    min-width: 120px;
+    /* Maybe add some margin if needed after removing the frame */
+    /* margin-bottom: 0.5rem; */ /* Example */
 }
 
 .poetry-button {
@@ -1627,44 +1600,20 @@ button:disabled {
     width: 100%; /* Ensure it takes full width */
 }
 
-.poetry-header {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.poetry-header h2 {
+.poetry-header h2 { /* Keep this rule if needed for the title */
     margin: 0;
     color: var(--primary-color);
-}
-
-.poetry-config-frame {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1rem;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    margin-bottom: 1rem;
+    /* Add flex properties if h2 should be part of the row */
+    flex-basis: 100%; /* Make title take full width initially */
+    margin-bottom: 1rem; /* Add space below title */
 }
 
 .config-row {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-}
-
-.config-row label {
-    font-weight: 500;
-    min-width: 80px;
-}
-
-.config-row select {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    min-width: 120px;
+    /* Maybe add some margin if needed after removing the frame */
+    /* margin-bottom: 0.5rem; */ /* Example */
 }
 
 .poetry-button {
@@ -1779,10 +1728,6 @@ button:disabled {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .poetry-config-frame {
-        flex-direction: column;
-    }
-    
     .poem-display {
         padding: 1rem;
     }
@@ -1800,18 +1745,6 @@ button:disabled {
     margin-left: 250px;
     padding: 20px;
     position: relative;
-}
-
-/* Control panel - scroll with page but stick at top when scrolled to */
-.control-panel {
-    /* position: sticky; */ /* Removed sticky positioning */
-    /* top: 0; */ /* Removed top property */
-    background-color: #f8f9fa;
-    padding: 10px;
-    z-index: 10; /* Kept z-index, might be adjusted later if needed */
-    border-bottom: 1px solid #dee2e6;
-    /* Add some margin or padding if needed for spacing */
-    margin-bottom: 15px; /* Added some margin for spacing */
 }
 
 /* Create container adjustments */
