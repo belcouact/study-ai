@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Study Assistant by Alex</title>
+    <title>Ghibli Study Assistant</title>
     <link rel="icon" href="logo_btrfly.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://polyfill.io">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Load critical CSS first -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <!-- Add Google Fonts for Ghibli-style typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Add MathJax for rendering math formulas with defer -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -81,7 +85,7 @@
             <div id="qa-container" class="container">
                 <div class="chat-container">
                     <div class="input-container">
-                        <div class="welcome-message">你好，我是你的AI老师，有什么我可以帮你的吗？</div>
+                        <div class="welcome-message">你好，我是你的AI老师，欢迎来到吉卜力风格的学习助手。有什么我可以帮你的吗？</div>
                         <textarea id="user-input" placeholder="请输入你的问题..."></textarea>
                         <div class="button-container">
                             <div class="right-controls">
@@ -94,7 +98,7 @@
                     <div class="output-container">
                         <div id="loading" class="hidden">
                             <div class="spinner"></div>
-                            <p>出题中...</p>
+                            <p>魔法启动中...</p>
                         </div>
                         <div id="output">
                             <!-- Output will appear here -->
@@ -159,6 +163,7 @@
                 <!-- Navigation controls moved to the bottom -->
                 <div class="navigation-controls">
                     <button id="prev-question-button" class="nav-button" disabled> &#10094; </button>
+                    <span id="question-counter-nav">1 / 5</span>
                     <button id="next-question-button" class="nav-button" disabled> &#10095; </button>
                 </div>
             </div>
@@ -202,8 +207,8 @@
                     </div>
                 </div>
                 <div class="poetry-content">
-                    <div id="poetry-empty-state" class="empty-state">
-                        <!-- <img src="assets/poetry-icon.svg" alt="Poetry Icon" class="empty-state-icon"> -->
+                    <div id="poetry-empty-state" class="empty-state poetry-empty-state">
+                        <i class="fas fa-feather-alt empty-state-icon"></i>
                         <h3>开始学习古诗词</h3>
                         <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成适合您学习阶段的诗词。</p>
                     </div>
