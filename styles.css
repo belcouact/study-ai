@@ -1813,21 +1813,14 @@ button:disabled {
 
 /* Control panel - scroll with page but stick at top when scrolled to */
 .control-panel {
-    /*position: sticky;*/
-    top: 0;
-    z-index: 100;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 25px;
-    padding: 18px;
+    /* position: sticky; */ /* Removed sticky positioning */
+    /* top: 0; */ /* Removed top property */
     background-color: #f8f9fa;
-    border-radius: 10px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
-    align-items: center;
-    transition: all 0.3s ease;
-    order: -1;
-    width: 100%;
+    padding: 10px;
+    z-index: 10; /* Kept z-index, might be adjusted later if needed */
+    border-bottom: 1px solid #dee2e6;
+    /* Add some margin or padding if needed for spacing */
+    margin-bottom: 15px; /* Added some margin for spacing */
 }
 
 /* Create container adjustments */
