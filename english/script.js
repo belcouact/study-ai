@@ -92,6 +92,19 @@ document.addEventListener('DOMContentLoaded', () => {
         return data.filter(category => category.sentences.length > 0 || category.category);
     }
 
+    // Function to handle text-to-speech for sentence cards
+    function speakEnglishSentence(englishText) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(englishText);
+            utterance.lang = 'en-US';
+            window.speechSynthesis.speak(utterance);
+        } else {
+            console.error("Browser doesn't support speech synthesis.");
+            alert("Sorry, your browser doesn't support text-to-speech.");
+        }
+    }
+
     function displayCategory(index) {
         if (!categoriesData || categoriesData.length === 0) {
              console.warn("displayCategory called with no data.");
@@ -111,18 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const category = categoriesData[index];
         categoryTitleElement.textContent = category.category;
+        sentenceCardsContainer.innerHTML = ''; // Clear previous cards
 
-        // Clear previous cards
-        sentenceCardsContainer.innerHTML = '';
-
-        // --- Animation Trigger ---
-        // Create and append new sentence cards with staggered delay
+        // Create and append new sentence cards
         category.sentences.forEach((sentencePair, cardIndex) => {
             const card = document.createElement('div');
             card.classList.add('sentence-card');
-
-            // Apply staggered animation delay using CSS custom property
-            const delay = cardIndex * 0.07; // 70ms delay between cards
+            const delay = cardIndex * 0.07;
             card.style.setProperty('--animation-delay', `${delay}s`);
 
             const englishP = document.createElement('p');
@@ -135,13 +143,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
             card.appendChild(englishP);
             card.appendChild(chineseP);
+
+            // --- Add Event Listeners Here ---
+            const englishText = sentencePair.en; // Get text directly
+
+            // Make card focusable and announce its role
+            card.setAttribute('role', 'button');
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('aria-label', `Read sentence: ${englishText}`); // Accessibility label
+
+            // Add click listener
+            card.addEventListener('click', () => {
+                speakEnglishSentence(englishText);
+            });
+
+            // Add keyboard listener (Enter or Space)
+            card.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault(); // Prevent default space bar scroll/action
+                    speakEnglishSentence(englishText);
+                }
+            });
+            // --- End Event Listener Addition ---
+
             sentenceCardsContainer.appendChild(card);
         });
-        // --- End Animation Trigger ---
 
-         const numCategories = categoriesData.length;
-         prevButton.disabled = numCategories <= 1;
-         nextButton.disabled = numCategories <= 1;
+        const numCategories = categoriesData.length;
+        prevButton.disabled = numCategories <= 1;
+        nextButton.disabled = numCategories <= 1;
     }
 
     // Event listener for the NEXT button
@@ -194,53 +224,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start the initialization process
     initializePage();
-
-    // Function to handle text-to-speech for sentence cards
-    function speakEnglishSentence(englishText) {
-        if ('speechSynthesis' in window) {
-            // Cancel any previous speech to avoid overlap
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(englishText);
-            utterance.lang = 'en-US'; // Specify the language as English
-            // Optional: You could try selecting a specific voice here
-            // const voices = window.speechSynthesis.getVoices();
-            // utterance.voice = voices.find(voice => voice.lang === 'en-US');
-            window.speechSynthesis.speak(utterance);
-        } else {
-            console.error("Browser doesn't support speech synthesis.");
-            // Notify the user if TTS is not supported
-            alert("Sorry, your browser doesn't support text-to-speech.");
-        }
-    }
-
-    // Add event listeners to sentence cards once the DOM is loaded
-    const sentenceCards = document.querySelectorAll('.sentence-card');
-
-    sentenceCards.forEach(card => {
-        // Make card focusable and announce its role
-        card.setAttribute('role', 'button');
-        card.setAttribute('tabindex', '0');
-
-        // Extract English text (assuming it's in an element with class 'sentence-en')
-        const englishElement = card.querySelector('.sentence-en');
-        if (englishElement) {
-            const englishText = englishElement.textContent;
-            card.setAttribute('aria-label', `Read sentence: ${englishText}`); // Accessibility label
-
-            // Add click listener
-            card.addEventListener('click', () => {
-                speakEnglishSentence(englishText);
-            });
-
-            // Add keyboard listener (Enter or Space)
-            card.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault(); // Prevent default space bar scroll/action
-                    speakEnglishSentence(englishText);
-                }
-            });
-        } else {
-            console.warn('Could not find element with class "sentence-en" inside a sentence card.');
-        }
-    });
 }); 
