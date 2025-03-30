@@ -1,19 +1,14 @@
 /* Base styles and variables */
 :root {
-    /* Ghibli-inspired Palette */
     --sidebar-width: 220px;
-    --primary-color: #6F8F72; /* Muted Green */
-    --secondary-color: #87A1B0; /* Soft Blue-Gray */
-    --text-color: #4F4840; /* Dark Earthy Brown */
-    --light-bg: #FDFBF5; /* Warm Cream */
-    --border-color: #D3CBBF; /* Light Tan/Beige */
-    --shadow: 0 3px 8px rgba(111, 143, 114, 0.15); /* Softer Shadow */
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --text-color: #333;
+    --light-bg: #f9f9f9;
+    --border-color: #e0e0e0;
+    --shadow: 0 2px 10px rgba(0,0,0,0.05);
     --transition-speed: 0.3s;
-    --poetry-accent: #B48A76; /* Muted Terracotta/Brown */
-    
-    /* Suggesting a softer, rounded font (ensure it's imported/available) */
-    --body-font: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-    --heading-font: 'Merriweather', serif; /* Optional: for headings */
+    --poetry-accent: #8e44ad;
 }
 
 * {
@@ -24,10 +19,10 @@
 
 body {
     height: 100vh;
-    background-color: #EAE6E0; /* Lighter earthy background */
+    background-color: #f5f5f5;
     color: var(--text-color);
     overflow: hidden;
-    font-family: var(--body-font); /* Apply new body font */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Layout containers */
@@ -48,7 +43,6 @@ body {
     display: flex;
     justify-content: center;
     padding-top: 20px;
-    background-color: var(--light-bg); /* Apply light cream background to content area */
 }
 
 .content-area.full-width {
@@ -61,24 +55,23 @@ body {
     max-width: 1200px;
     margin: 0;
     padding: 1rem;
-    background-color: #FFFFFF; /* Keep main container white for contrast, or use var(--light-bg) */
-    border-radius: 12px; /* Slightly more rounded corners */
+    background-color: white;
+    border-radius: 8px;
     box-shadow: var(--shadow);
     min-height: 80vh;
-    border: 1px solid var(--border-color); /* Add subtle border */
 }
 
 /* Left panel / Sidebar */
 .left-panel {
     width: var(--sidebar-width);
-    background-color: var(--primary-color); /* Use new primary color */
-    color: #FDFBF5; /* Use light cream for text */
+    background-color: var(--primary-color);
+    color: white;
     height: 100%;
     position: fixed;
     left: 0;
     top: 0;
     z-index: 10;
-    box-shadow: 3px 0 10px rgba(0,0,0,0.1); /* Slightly adjust shadow */
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
     transition: transform var(--transition-speed) ease;
     display: flex;
     flex-direction: column;
@@ -129,26 +122,23 @@ body {
 
 .panel-button {
     background-color: transparent;
-    color: var(--light-bg); /* Use light cream text */
+    color: white;
     border: none;
     padding: 0.7rem 0.8rem;
     margin-bottom: 0.8rem;
-    border-radius: 8px; /* Keep slightly less rounded than main buttons */
+    border-radius: 4px;
     cursor: pointer;
     text-align: left;
     font-size: 0.95rem;
     transition: background-color 0.2s ease;
-    box-shadow: none; /* Remove shadow for flatter look */
 }
 
 .panel-button:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-    transform: none; /* No lift effect */
-    box-shadow: none;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .panel-button.active {
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.2);
     font-weight: bold;
 }
 
@@ -231,7 +221,7 @@ body {
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.2);
     padding: 0.6rem 0.8rem;
-    border-radius: 15px; /* More rounded buttons */
+    border-radius: 4px;
     cursor: pointer;
     text-decoration: none;
     display: flex;
@@ -239,16 +229,11 @@ body {
     gap: 0.5rem;
     transition: background-color var(--transition-speed), border-color var(--transition-speed);
     font-size: 0.85rem;
-    border: 1px solid transparent; /* Prepare for potential borders */
-    font-family: var(--body-font); /* Ensure consistent font */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08); /* Subtle shadow */
 }
 
 .external-button:hover {
     background-color: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.12); /* Slightly raise on hover */
-    transform: translateY(-1px);
 }
 
 .external-button i {
@@ -356,7 +341,7 @@ textarea#user-input {
     min-height: 100px;
     padding: 1rem;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 4px;
     resize: vertical;
     font-size: 1rem;
     line-height: 1.5;
@@ -367,7 +352,7 @@ textarea#user-input {
 textarea#user-input:focus {
     outline: none;
     border-color: var(--secondary-color);
-    box-shadow: 0 0 0 3px rgba(135, 161, 176, 0.2); /* Soft focus ring */
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
 .button-container {
@@ -385,7 +370,7 @@ textarea#user-input:focus {
 button {
     padding: 0.6rem 1rem;
     border: none;
-    border-radius: 15px; /* More rounded buttons */
+    border-radius: 4px;
     background-color: #f0f0f0;
     color: var(--text-color);
     cursor: pointer;
@@ -402,25 +387,24 @@ button:active {
 }
 
 #submit-button {
-    background-color: var(--secondary-color); /* Use secondary color */
+    background-color: var(--secondary-color);
     color: white;
     font-weight: 500;
-    border: 1px solid darken(var(--secondary-color), 5%); /* Slightly darker border */
 }
 
 #submit-button:hover {
-    background-color: lighten(var(--secondary-color), 5%); /* Lighten on hover */
+    background-color: #2980b9;
 }
 
 #optimize-button {
-    background-color: #FFFFFF;
-    color: var(--secondary-color);
-    border: 1px solid var(--secondary-color);
+    background-color: #f8f9fa;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
     font-weight: 500;
 }
 
 #optimize-button:hover {
-    background-color: var(--light-bg);
+    background-color: #e9ecef;
 }
 
 #optimize-button.optimizing {
@@ -484,26 +468,27 @@ button:active {
 }
 
 #output code {
-    background-color: #EAE6E0; /* Use body background color */
-    color: #8F7E6F; /* Muted color for code */
-    border-radius: 4px;
-    font-size: 0.85rem;
+    background-color: #f0f0f0;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #e74c3c;
 }
 
 #output pre {
-    background-color: #FDFBF5; /* Use light background */
-    border: 1px solid var(--border-color);
-    border-left: 4px solid var(--secondary-color); /* Keep accent border */
-    border-radius: 8px;
-    box-shadow: var(--shadow);
+    background-color: #f5f5f5;
     padding: 1rem;
+    border-radius: 5px;
     overflow-x: auto;
     margin-bottom: 1rem;
+    border-left: 3px solid var(--secondary-color);
 }
 
 #output pre code {
     background-color: transparent;
-    color: var(--text-color);
+    padding: 0;
+    color: #333;
     font-size: 0.9rem;
 }
 
@@ -771,7 +756,7 @@ button:active {
 .form-group select:focus {
     outline: none;
     border-color: var(--secondary-color);
-    box-shadow: 0 0 0 3px rgba(135, 161, 176, 0.2); /* Soft focus ring */
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
 /* Questions display container */
@@ -1503,7 +1488,7 @@ button:active {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    border-radius: 15px; /* More rounded buttons */
+    border-radius: 4px;
     cursor: pointer;
     font-weight: 500;
     align-self: flex-start;
