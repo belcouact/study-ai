@@ -1,4 +1,4 @@
-import { speakEnglishSentence } from '../functions/speech.js';
+import { speakEnglishSentence } from '/functions/speech.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const categoryTitleElement = document.getElementById('category-title');
