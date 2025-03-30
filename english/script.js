@@ -195,4 +195,52 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start the initialization process
     initializePage();
 
+    // Function to handle text-to-speech for sentence cards
+    function speakEnglishSentence(englishText) {
+        if ('speechSynthesis' in window) {
+            // Cancel any previous speech to avoid overlap
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(englishText);
+            utterance.lang = 'en-US'; // Specify the language as English
+            // Optional: You could try selecting a specific voice here
+            // const voices = window.speechSynthesis.getVoices();
+            // utterance.voice = voices.find(voice => voice.lang === 'en-US');
+            window.speechSynthesis.speak(utterance);
+        } else {
+            console.error("Browser doesn't support speech synthesis.");
+            // Notify the user if TTS is not supported
+            alert("Sorry, your browser doesn't support text-to-speech.");
+        }
+    }
+
+    // Add event listeners to sentence cards once the DOM is loaded
+    const sentenceCards = document.querySelectorAll('.sentence-card');
+
+    sentenceCards.forEach(card => {
+        // Make card focusable and announce its role
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+
+        // Extract English text (assuming it's in an element with class 'sentence-en')
+        const englishElement = card.querySelector('.sentence-en');
+        if (englishElement) {
+            const englishText = englishElement.textContent;
+            card.setAttribute('aria-label', `Read sentence: ${englishText}`); // Accessibility label
+
+            // Add click listener
+            card.addEventListener('click', () => {
+                speakEnglishSentence(englishText);
+            });
+
+            // Add keyboard listener (Enter or Space)
+            card.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault(); // Prevent default space bar scroll/action
+                    speakEnglishSentence(englishText);
+                }
+            });
+        } else {
+            console.warn('Could not find element with class "sentence-en" inside a sentence card.');
+        }
+    });
 }); 
