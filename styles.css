@@ -1,14 +1,21 @@
 /* Base styles and variables */
 :root {
     --sidebar-width: 220px;
-    --primary-color: #2c3e50;
-    --secondary-color: #3498db;
-    --text-color: #333;
-    --light-bg: #f9f9f9;
-    --border-color: #e0e0e0;
-    --shadow: 0 2px 10px rgba(0,0,0,0.05);
+    /* Ghibli-inspired color palette */
+    --primary-color: #4a6670;       /* Deep teal-blue */
+    --secondary-color: #75a9a4;     /* Muted teal */
+    --accent-color: #d16b54;        /* Soft terracotta */
+    --accent-color-light: #f4cca1;  /* Sandy beige */
+    --text-color: #33454e;          /* Dark slate */
+    --light-bg: #f5f3ee;            /* Cream paper */
+    --border-color: #d9d2c6;        /* Soft beige */
+    --shadow: 0 4px 12px rgba(74, 102, 112, 0.12);
     --transition-speed: 0.3s;
-    --poetry-accent: #8e44ad;
+    --poetry-accent: #9e7a7a;       /* Dusty rose */
+    --card-bg: #f8f6f1;             /* Light cream */
+    --button-bg: #75a9a4;
+    --button-hover-bg: #5d8c88;
+    --text-secondary: #6e7c80;
 }
 
 * {
@@ -19,7 +26,8 @@
 
 body {
     height: 100vh;
-    background-color: #f5f5f5;
+    background-color: var(--light-bg);
+    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h100v100H0z" fill-opacity="0"/><circle cx="20" cy="20" r="1" fill="%234a6670" fill-opacity="0.06"/><circle cx="60" cy="20" r="1" fill="%234a6670" fill-opacity="0.06"/><circle cx="20" cy="60" r="1" fill="%234a6670" fill-opacity="0.06"/><circle cx="60" cy="60" r="1" fill="%234a6670" fill-opacity="0.06"/><circle cx="40" cy="40" r="1" fill="%234a6670" fill-opacity="0.06"/><circle cx="80" cy="40" r="1" fill="%234a6670" fill-opacity="0.06"/><circle cx="40" cy="80" r="1" fill="%234a6670" fill-opacity="0.06"/><circle cx="80" cy="80" r="1" fill="%234a6670" fill-opacity="0.06"/></svg>');
     color: var(--text-color);
     overflow: hidden;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -54,28 +62,33 @@ body {
     width: 100%;
     max-width: 1200px;
     margin: 0;
-    padding: 1rem;
-    background-color: white;
-    border-radius: 8px;
+    padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.85);
+    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="%23ffffff" fill-opacity="0.02"/></svg>');
+    border-radius: 12px;
     box-shadow: var(--shadow);
     min-height: 80vh;
+    position: relative;
+    border: 1px solid var(--border-color);
 }
 
 /* Left panel / Sidebar */
 .left-panel {
     width: var(--sidebar-width);
     background-color: var(--primary-color);
+    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="%23ffffff" fill-opacity="0.04"/></svg>');
     color: white;
     height: 100%;
     position: fixed;
     left: 0;
     top: 0;
     z-index: 10;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
     transition: transform var(--transition-speed) ease;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    border-right: 3px solid rgba(255, 255, 255, 0.1);
 }
 
 .left-panel.hidden {
@@ -87,30 +100,39 @@ body {
     left: var(--sidebar-width);
     top: 10px;
     z-index: 20;
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background-color: var(--primary-color);
     color: white;
-    border: none;
+    border: 2px solid rgba(255, 255, 255, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: left var(--transition-speed) ease, transform var(--transition-speed) ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: left var(--transition-speed) ease, transform var(--transition-speed) ease, background-color 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
 }
 
 .sidebar-toggle:hover {
     background-color: var(--secondary-color);
+    transform: rotate(5deg);
 }
 
-.sidebar-toggle.collapsed i {
-    transform: rotate(180deg);
+.sidebar-toggle::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    top: 0;
+    left: -100%;
+    transition: left 0.5s;
 }
 
-.sidebar-toggle.collapsed {
-    left: 10px;
+.sidebar-toggle:hover::after {
+    left: 100%;
 }
 
 .panel-buttons {
@@ -124,22 +146,45 @@ body {
     background-color: transparent;
     color: white;
     border: none;
-    padding: 0.7rem 0.8rem;
-    margin-bottom: 0.8rem;
-    border-radius: 4px;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.9rem;
+    border-radius: 8px;
     cursor: pointer;
     text-align: left;
     font-size: 0.95rem;
-    transition: background-color 0.2s ease;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-weight: 500;
+    letter-spacing: 0.3px;
 }
 
 .panel-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.12);
+    padding-left: 1.2rem;
+}
+
+.panel-button::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: 8px 8px 0 0;
+}
+
+.panel-button:hover::after {
+    opacity: 1;
 }
 
 .panel-button.active {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.16);
     font-weight: bold;
+    border-left: 3px solid var(--accent-color-light);
 }
 
 .panel-footer {
@@ -155,29 +200,36 @@ body {
 
 .sidebar-slogan {
     margin: 15px 10px 20px 10px;
-    padding: 15px 8px;
-    border-radius: 6px;
-    background-color: var(--primary-color);
+    padding: 16px 10px;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.15);
     text-align: center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1) inset;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
 }
 
-.sidebar-slogan p {
-    margin: 0;
-    line-height: 1.6;
-    font-size: 0.8rem;
+.sidebar-slogan:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
 }
 
-.sidebar-slogan p:first-child {
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 500;
-    font-style: italic;
-    margin-bottom: 5px;
+.sidebar-slogan::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    transition: left 0.5s ease;
 }
 
-.sidebar-slogan p:last-child {
-    color: rgba(255, 255, 255, 0.8);
+.sidebar-slogan:hover::after {
+    left: 100%;
 }
 
 .panel-footer p {
@@ -338,21 +390,24 @@ body {
 
 textarea#user-input {
     width: 100%;
-    min-height: 100px;
-    padding: 1rem;
+    min-height: 120px;
+    padding: 1.2rem;
     border: 1px solid var(--border-color);
-    border-radius: 4px;
+    border-radius: 12px;
     resize: vertical;
     font-size: 1rem;
     line-height: 1.5;
     color: var(--text-color);
-    transition: border-color var(--transition-speed) ease;
+    transition: all 0.3s ease;
+    background-color: white;
+    background-image: url('data:image/svg+xml;utf8,<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="%23f5f3ee" fill-opacity="0.4"/></svg>');
 }
 
 textarea#user-input:focus {
     outline: none;
     border-color: var(--secondary-color);
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    box-shadow: 0 0 0 3px rgba(117, 169, 164, 0.2);
+    transform: translateY(-2px);
 }
 
 .button-container {
@@ -368,32 +423,58 @@ textarea#user-input:focus {
 
 /* Buttons */
 button {
-    padding: 0.6rem 1rem;
+    padding: 0.7rem 1.2rem;
     border: none;
-    border-radius: 4px;
-    background-color: #f0f0f0;
-    color: var(--text-color);
+    border-radius: 8px;
+    background-color: var(--button-bg);
+    color: white;
     cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.2s ease;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-weight: 500;
+    letter-spacing: 0.3px;
 }
 
 button:hover {
-    background-color: #e0e0e0;
+    background-color: var(--button-hover-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 button:active {
-    background-color: #d0d0d0;
+    background-color: var(--button-hover-bg);
+    transform: translateY(0);
+}
+
+button::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+    top: 0;
+    left: -100%;
+    transition: left 0.5s;
+}
+
+button:hover::after {
+    left: 100%;
 }
 
 #submit-button {
     background-color: var(--secondary-color);
     color: white;
     font-weight: 500;
+    padding: 0.8rem 1.5rem;
+    border-radius: 30px;
+    box-shadow: 0 4px 10px rgba(117, 169, 164, 0.3);
 }
 
 #submit-button:hover {
-    background-color: #2980b9;
+    background-color: var(--button-hover-bg);
+    box-shadow: 0 6px 15px rgba(117, 169, 164, 0.4);
 }
 
 #optimize-button {
@@ -568,14 +649,28 @@ button:active {
 
 /* AI message */
 .ai-message {
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    padding: 1.2rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.4rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     font-size: 1rem;
-    color: #333;
+    color: var(--text-color);
     width: 100%;
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.ai-message::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--secondary-color), var(--accent-color-light));
+    opacity: 0.7;
 }
 
 /* Loading indicator */
@@ -846,55 +941,67 @@ button:active {
 /* Navigation controls */
 .navigation-controls {
     position: fixed;
-    bottom: 20px;
+    bottom: 25px;
     left: calc(50% + (var(--sidebar-width) / 2));
     transform: translateX(-50%);
-    background: var(--card-bg);
+    background: white;
     padding: 15px 30px;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 30px;
+    gap: 35px;
     border-top: 1px solid var(--border-color);
     margin-top: 20px;
     z-index: 100;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    border-radius: 40px;
     width: 90%;
     max-width: 600px;
     min-width: 300px;
-    transition: left var(--transition-speed) ease;
+    transition: all var(--transition-speed) ease;
+    border: 1px solid var(--border-color);
 }
 
-/* When sidebar is hidden, adjust the navigation controls position */
 .left-panel.hidden ~ .content-area .navigation-controls {
     left: 50%;
 }
 
 .navigation-controls:hover {
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    transform: translateX(-50%) translateY(-3px);
 }
 
 .nav-button {
-    padding: 10px 20px;
-    background-color: #4299e1;
-    color: white;
-    border: none;
-    border-radius: 6px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--light-bg);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 16px;
-    font-weight: 500;
+    transition: all 0.3s ease;
+    font-size: 18px;
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-button:hover:not(:disabled) {
+    background-color: var(--secondary-color);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(117, 169, 164, 0.3);
+}
+
+.nav-button:active:not(:disabled) {
+    transform: scale(0.95);
 }
 
 .nav-button:disabled {
-    background-color: #cbd5e0;
+    opacity: 0.5;
     cursor: not-allowed;
-}
-
-.nav-button:not(:disabled):hover {
-    background-color: #3182ce;
-    transform: translateY(-1px);
 }
 
 /* Empty state styling */
@@ -1161,48 +1268,51 @@ button:active {
 /* Poem Display */
 .poem-display {
     background-color: white;
-    border-radius: 12px;
-    padding: 3rem 2.5rem;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-image: url('data:image/svg+xml;utf8,<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="%23f5f3ee" fill-opacity="0.2"/></svg>');
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+    padding: 3.5rem 3rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 2rem;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
     position: relative;
     overflow: hidden;
-    margin-bottom: 2rem;
+    border: 1px solid rgba(217, 210, 198, 0.5);
 }
 
 .poem-display:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
 }
 
-/* Fix for poem-display::before and poem-display::after syntax errors */
 .poem-display::before {
-    content: "\201C"; /* Unicode for opening double quote */
+    content: "\201C";
     position: absolute;
-    top: 10px;
-    left: 20px;
+    top: 20px;
+    left: 25px;
     font-size: 120px;
-    color: rgba(142, 68, 173, 0.08);
+    color: rgba(158, 122, 122, 0.12);
     font-family: serif;
     line-height: 1;
 }
 
 .poem-display::after {
-    content: "\201D"; /* Unicode for closing double quote */
+    content: "\201D";
     position: absolute;
-    bottom: 10px;
-    right: 20px;
+    bottom: 20px;
+    right: 25px;
     font-size: 120px;
-    color: rgba(142, 68, 173, 0.08);
+    color: rgba(158, 122, 122, 0.12);
     font-family: serif;
     line-height: 1;
 }
 
 .poem-title {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 0.8rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
     text-align: center;
     position: relative;
     padding-bottom: 15px;
@@ -1216,24 +1326,24 @@ button:active {
     transform: translateX(-50%);
     width: 80px;
     height: 3px;
-    background-color: var(--poetry-accent, #8e44ad);
+    background: linear-gradient(90deg, var(--poetry-accent), var(--accent-color-light));
     border-radius: 3px;
 }
 
 .poem-author {
-    font-size: 1.1rem;
-    color: #7f8c8d;
-    margin-bottom: 2.5rem;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 2.8rem;
     text-align: center;
     font-style: italic;
 }
 
 .poem-content {
-    font-size: 1.4rem;
-    line-height: 2.2;
+    font-size: 1.5rem;
+    line-height: 2.3;
     text-align: center;
-    margin-bottom: 2.5rem;
-    color: #34495e;
+    margin-bottom: 2.8rem;
+    color: var(--text-color);
     transition: color 0.3s;
     white-space: pre-wrap;
     position: relative;
@@ -1673,21 +1783,23 @@ button:active {
 /* Fix navigation controls at the bottom while scrolling */
 .navigation-controls {
     position: sticky;
-    bottom: 20px;
+    bottom: 25px;
     z-index: 90;
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
     padding: 15px;
-    background: rgb(108, 103, 103);
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
+    background: white;
+    border-radius: 40px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    transition: all var(--transition-speed) ease;
+    border: 1px solid var(--border-color);
     order: 3;
 }
 
 .navigation-controls:hover {
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    transform: translateX(-50%) translateY(-3px);
 }
 
 /* Style dropdowns more attractively */
@@ -1799,7 +1911,7 @@ button:active {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -1962,23 +2074,43 @@ button:active {
 
 .vocabulary-load-btn {
     padding: 8px 16px;
-    background: var(--secondary-color); 
+    background: var(--accent-color);
     color: white;                     
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
     text-decoration: none;            
     margin-left: 10px;
     display: inline-block;            
     font-weight: 500; 
     font-size: 15px; 
     vertical-align: middle; 
+    box-shadow: 0 4px 10px rgba(209, 107, 84, 0.2);
+    position: relative;
+    overflow: hidden;
 }
 
 .vocabulary-load-btn:hover {
-    background: #2980b9; 
+    background: #b85a46; 
     color: white; 
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(209, 107, 84, 0.3);
+}
+
+.vocabulary-load-btn::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+    top: 0;
+    left: -100%;
+    transition: left 0.5s;
+}
+
+.vocabulary-load-btn:hover::after {
+    left: 100%;
 }
 
 .initial-message {
@@ -1996,8 +2128,9 @@ button:active {
 
 .word-card {
     background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    background-image: url('data:image/svg+xml;utf8,<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="%23f5f3ee" fill-opacity="0.2"/></svg>');
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     padding: 35px 40px;
     width: 100%;
     max-width: 1200px;
@@ -2008,22 +2141,31 @@ button:active {
     flex-direction: column;
     animation: cardEntrance 0.6s ease-out;
     gap: 20px;
+    border: 1px solid rgba(217, 210, 198, 0.5);
+    position: relative;
+    overflow: hidden;
 }
 
-@keyframes cardEntrance {
-    0% {
-        transform: translateY(20px);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
+.word-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background-image: url('data:image/svg+xml;utf8,<svg width="150" height="150" xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L150 0 L150 150 Z" fill="%23f4cca1" fill-opacity="0.15"/></svg>');
+    z-index: 0;
 }
 
-.word-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+.word-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100px;
+    height: 100px;
+    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="0" cy="100" r="100" fill="%2375a9a4" fill-opacity="0.08"/></svg>');
+    z-index: 0;
 }
 
 .word-header {
@@ -2370,24 +2512,26 @@ button:active {
 
 .navigation-controls {
     position: fixed;
-    bottom: 20px;
+    bottom: 25px;
     left: calc(50% + (var(--sidebar-width) / 2));
     transform: translateX(-50%);
-    background: var(--card-bg);
+    background: white;
     padding: 15px 30px;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 30px;
+    gap: 35px;
     border-top: 1px solid var(--border-color);
     margin-top: 20px;
     z-index: 100;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    border-radius: 40px;
     width: 90%;
     max-width: 600px;
     min-width: 300px;
-    transition: left var(--transition-speed) ease;
+    transition: all var(--transition-speed) ease;
+    border: 1px solid var(--border-color);
+    order: 3;
 }
 
 #vocabulary-container {
