@@ -1722,7 +1722,7 @@ function handleGenerateQuestionsClick() {
 
     示例格式：
     题目：[题目内容]
-    A. [选项A内容] 
+    A. [选项A内容]
     B. [选项B内容] 
     C. [选项C内容]
     D. [选项D内容]
@@ -5975,53 +5975,3 @@ function renderRelatedPhrases(phrases) {
         </div>
     `;
 }
-
-// Add these functions to your script.js
-
-// Function to add Ghibli-inspired animation effects
-function addGhibliAnimations() {
-    // Add floating animation to certain elements
-    const elementsToFloat = document.querySelectorAll('.sidebar-logo, .poem-title, .empty-state img');
-    elementsToFloat.forEach((elem, index) => {
-        // Add different animation delays for a more natural feel
-        elem.style.animation = `floatUp ${5 + index}s ease-in-out infinite`;
-        elem.style.animationDelay = `${index * 0.3}s`;
-    });
-    
-    // Animate section headers on scroll
-    const sectionHeaders = document.querySelectorAll('.section-title, .poem-section h3');
-    
-    // Simple function to check if element is in viewport
-    function isInViewport(element) {
-        if (!element) return false;
-        const rect = element.getBoundingClientRect();
-        return (
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-        );
-    }
-    
-    // Add scroll event listener
-    window.addEventListener('scroll', function() {
-        sectionHeaders.forEach(header => {
-            if (isInViewport(header)) {
-                header.classList.add('animate-in');
-            }
-        });
-    });
-    
-    // Trigger once on load
-    setTimeout(() => {
-        window.dispatchEvent(new Event('scroll'));
-    }, 500);
-}
-
-// Call this function after the page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Your existing initialization code...
-    
-    // Add Ghibli animations
-    addGhibliAnimations();
-});
