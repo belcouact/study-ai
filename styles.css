@@ -1071,10 +1071,10 @@ textarea:focus, input:focus, select:focus {
 }
 
 /* Navigation controls */
+/*
 .navigation-controls {
     position: fixed;
     bottom: 20px;
-    /* Center properly by using left: 50% of viewport and translateX */
     left: 50%; 
     transform: translateX(-50%);
     background: var(--card-bg);
@@ -1092,6 +1092,7 @@ textarea:focus, input:focus, select:focus {
     max-width: 600px;
     min-width: 300px;
 }
+*/
 
 .navigation-controls:hover {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
