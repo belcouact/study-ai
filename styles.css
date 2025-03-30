@@ -1,17 +1,19 @@
 /* Base styles and variables */
 :root {
     --sidebar-width: 220px;
-    /* Ghibli-inspired color palette */
-    --primary-color: #4a6670;    /* Muted teal blue */
-    --secondary-color: #7c9885;  /* Soft sage green */
-    --text-color: #2c3e50;      /* Deep navy */
-    --light-bg: #f0f7f4;        /* Pale mint */
-    --border-color: #d8e3e7;    /* Soft gray-blue */
-    --shadow: 0 4px 15px rgba(74, 102, 112, 0.1);
+    /* Refined Ghibli color palette */
+    --primary-color: #3c7a89;    /* Teal blue from ocean scenes */
+    --secondary-color: #81b29a;  /* Soft sage green from forests */
+    --accent-color: #f2cc8f;     /* Warm gold from sunlight */
+    --text-color: #2c3e50;       /* Deep navy */
+    --light-bg: #e8f3f1;         /* Pale mint */
+    --border-color: #d1e8e2;     /* Soft gray-blue */
+    --shadow: 0 4px 15px rgba(60, 122, 137, 0.15);
     --transition-speed: 0.3s;
-    --poetry-accent: #b68d72;   /* Earthy brown */
-    --ghibli-gradient: linear-gradient(135deg, #e6f3ec 0%, #f0f7f4 100%);
-    --card-bg: rgba(255, 255, 255, 0.9);
+    --poetry-accent: #e07a5f;    /* Warm terracotta */
+    --ghibli-gradient: linear-gradient(135deg, #e8f3f1 0%, #d1e8e2 100%);
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --hover-color: #2a6d7c;      /* Darker teal for hover states */
 }
 
 /* Import Ghibli-style font */
@@ -29,8 +31,10 @@ body {
     background: var(--ghibli-gradient);
     color: var(--text-color);
     overflow: hidden;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20" fill="%23f0f7f4"><circle cx="50" cy="50" r="1"/></svg>');
-    background-size: 20px 20px;
+    /* Add subtle clouds pattern */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100' opacity='0.07'%3E%3Cpath fill='%23ffffff' d='M30,20 Q40,10 50,20 Q60,30 70,20 Q80,10 90,20 L90,30 Q80,40 70,30 Q60,20 50,30 Q40,40 30,30 L30,20 Z'%3E%3C/path%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    font-family: 'Quicksand', sans-serif;
 }
 
 /* Layout containers */
@@ -64,29 +68,46 @@ body {
     margin: 0;
     padding: 1.5rem;
     background-color: var(--card-bg);
-    border-radius: 15px;
+    border-radius: 18px;
     box-shadow: var(--shadow);
-    min-height: 80vh;
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+    min-height: 80vh;
+}
+
+/* Add subtle decorative elements to containers */
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100' opacity='0.05'%3E%3Cpath fill='%2381b29a' d='M95,50 Q90,80 50,90 Q20,95 10,50 Q5,20 50,10 Q80,5 95,50 Z'%3E%3C/path%3E%3C/svg%3E");
+    background-size: cover;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 0;
 }
 
 /* Left panel / Sidebar */
 .left-panel {
     width: var(--sidebar-width);
-    background: linear-gradient(180deg, var(--primary-color) 0%, #3d5a66 100%);
+    background: linear-gradient(180deg, var(--primary-color) 0%, #2a6d7c 100%);
     color: white;
     height: 100%;
     position: fixed;
     left: 0;
     top: 0;
     z-index: 10;
-    box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+    box-shadow: 2px 0 15px rgba(0,0,0,0.15);
     transition: transform var(--transition-speed) ease;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .left-panel.hidden {
@@ -135,25 +156,43 @@ body {
     background-color: transparent;
     color: white;
     border: none;
-    padding: 0.8rem 1rem;
+    padding: 1rem 1.2rem;
     margin-bottom: 0.8rem;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     text-align: left;
     font-size: 0.95rem;
+    font-weight: 500;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
 }
 
+.panel-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.panel-button:hover::before {
+    left: 100%;
+}
+
 .panel-button:hover {
     background-color: rgba(255, 255, 255, 0.15);
     transform: translateX(5px);
+    letter-spacing: 0.03em;
 }
 
 .panel-button.active {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.25);
     font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .panel-footer {
@@ -168,30 +207,42 @@ body {
 }
 
 .sidebar-slogan {
-    margin: 15px 10px 20px 10px;
-    padding: 15px 8px;
-    border-radius: 6px;
-    background-color: var(--primary-color);
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin: 1rem 0;
     text-align: center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.sidebar-slogan:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar-slogan p {
-    margin: 0;
-    line-height: 1.6;
-    font-size: 0.8rem;
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    position: relative;
+    z-index: 1;
 }
 
-.sidebar-slogan p:first-child {
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 500;
-    font-style: italic;
-    margin-bottom: 5px;
-}
-
-.sidebar-slogan p:last-child {
-    color: rgba(255, 255, 255, 0.8);
+.sidebar-slogan::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 60px;
+    height: 60px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%23ffffff' opacity='0.1'%3E%3Cpath d='M30,20 Q50,5 70,20 Q85,40 70,60 Q50,75 30,60 Q15,40 30,20 Z'%3E%3C/path%3E%3C/svg%3E");
+    background-size: contain;
+    opacity: 0.2;
+    z-index: 0;
 }
 
 .panel-footer p {
@@ -401,13 +452,29 @@ button:active {
 }
 
 #submit-button {
-    background-color: var(--secondary-color);
+    background: var(--primary-color);
     color: white;
     font-weight: 500;
+    border: none;
+    border-radius: 10px;
+    padding: 0.8rem 1.5rem;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(60, 122, 137, 0.3);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
 }
 
 #submit-button:hover {
-    background-color: #2980b9;
+    background: var(--hover-color);
+    box-shadow: 0 5px 15px rgba(60, 122, 137, 0.4);
+}
+
+#submit-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(129, 178, 154, 0.4);
 }
 
 #optimize-button {
@@ -454,21 +521,21 @@ button:active {
     margin-top: 1.5rem;
     margin-bottom: 1rem;
     color: var(--primary-color);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 #output h1 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     border-bottom: 1px solid #eee;
     padding-bottom: 0.5rem;
 }
 
 #output h2 {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
 }
 
 #output h3 {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
 }
 
 #output ul, #output ol {
@@ -758,19 +825,31 @@ button:active {
 
 .form-group select {
     width: 100%;
-    padding: 0.8rem;
+    padding: 0.8rem 1.2rem;
+    border-radius: 10px;
     border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background-color: #fff;
-    font-size: 1rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    font-family: 'Quicksand', sans-serif;
     color: var(--text-color);
-    transition: border-color var(--transition-speed);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233c7a89' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 15px;
+    padding-right: 30px;
+}
+
+.form-group select:hover {
+    border-color: var(--secondary-color);
 }
 
 .form-group select:focus {
     outline: none;
-    border-color: var(--secondary-color);
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(60, 122, 137, 0.2);
 }
 
 /* Questions display container */
@@ -859,499 +938,84 @@ button:active {
 
 /* Navigation controls */
 .navigation-controls {
-    position: fixed;
-    bottom: 20px;
-    left: calc(50% + (var(--sidebar-width) / 2));
-    transform: translateX(-50%);
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 15px;
     padding: 1rem 2rem;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 30px;
-    margin-top: 20px;
-    z-index: 100;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.3s ease;
-    order: 3;
-    width: 90%;
-    max-width: 600px;
-    min-width: 300px;
-    transition: left var(--transition-speed) ease;
+    margin: 1.5rem 0;
+    box-shadow: var(--shadow);
 }
 
-/* When sidebar is hidden, adjust the navigation controls position */
-.left-panel.hidden ~ .content-area .navigation-controls {
-    left: 50%;
+/* Add animated elements */
+@keyframes floatingCloud {
+    0% { transform: translateY(0) translateX(0); }
+    50% { transform: translateY(-15px) translateX(10px); }
+    100% { transform: translateY(0) translateX(0); }
 }
 
-.navigation-controls:hover {
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
-
-.nav-button {
-    padding: 10px 20px;
-    background-color: var(--secondary-color);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 16px;
-    font-weight: 500;
-    box-shadow: 0 2px 8px rgba(124, 152, 133, 0.3);
-}
-
-.nav-button:disabled {
-    background-color: #cbd5e0;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-.nav-button:not(:disabled):hover {
-    background-color: #6a8573;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(124, 152, 133, 0.4);
-}
-
-/* Empty state styling */
 .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    position: relative;
+    padding: 2.5rem;
     text-align: center;
-    padding: 60px 30px;
-    background-color: #f8fafc;
-    border-radius: 12px;
-    margin: 30px 0;
-    transition: all 0.3s ease;
-    border: 2px dashed #e0e0e0;
-    order: 1;
-}
-
-.empty-state h3 {
-    margin-bottom: 15px;
-    font-size: 22px;
-    color: #333;
-}
-
-.empty-state p {
-    color: #666;
-    max-width: 500px;
-    margin: 0 auto 20px;
-    line-height: 1.6;
-}
-
-.empty-state img {
-    width: 120px;
-    height: auto;
-    margin-bottom: 20px;
-    opacity: 0.8;
-    transition: all 0.3s ease;
-}
-
-.empty-state:hover img {
-    opacity: 1;
-    transform: scale(1.05);
-}
-
-/* Utility classes */
-.hidden {
-    display: none !important;
-}
-
-.highlight {
-    background-color: rgba(255, 255, 0, 0.3);
-    padding: 0.1rem 0.2rem;
-    border-radius: 2px;
-}
-
-/* Create container */
-#create-container {
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    min-height: calc(100vh - 60px);
-    position: relative;
-    height: auto;
-    overflow: visible;
-}
-
-/* Loading indicator for tests */
-#test-loading-indicator {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    margin: 20px auto;
-    width: 80%;
-    max-width: 500px;
-}
-
-.spinner-icon {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #e2e8f0;
-    border-top: 4px solid #4299e1;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 20px;
-}
-
-/* Poetry panel specific styles */
-/* Removing the poetry-config-frame style since we removed that section */
-
-#poetry-container {
-    display: flex;
-    flex-direction: column;
-    padding: 2rem;
-    height: auto;
-    min-height: calc(100vh - 60px);
-    overflow-y: visible;
-}
-
-.poetry-header {
-    display: flex;
-    flex-direction: column;
-    padding: 18px;
-    margin-bottom: 25px;
-    border-radius: 10px;
-    background-color: #f8f9fa;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    width: 100%;
-    position: relative;
-    z-index: 1;
-}
-
-.poetry-header:hover {
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-}
-
-.poetry-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.poetry-selectors {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-    margin-bottom: 0;
-    padding: 0;
-    transition: background-color 0.3s ease;
-}
-
-.selector-group {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    height: 38px;
-    min-width: 220px;
-    gap: 10px;
-}
-
-.selector-group label {
-    font-weight: 600;
-    color: #2c3e50;
-    font-size: 0.9rem;
-    transition: color 0.2s;
-    margin-bottom: 0;
-    white-space: nowrap;
-    min-width: 50px;
-}
-
-.selector-group:hover label {
-    color: var(--poetry-accent, #8e44ad);
-}
-
-.poetry-select {
-    flex: 1;
-    height: 38px;
-    padding: 10px 14px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background-color: white;
-    color: #333;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 16px;
-    padding-right: 35px;
-}
-
-.poetry-select:hover {
-    border-color: #bdbdbd;
-}
-
-.poetry-select:focus {
-    outline: none;
-    border-color: var(--poetry-accent, #8e44ad);
-    box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.2);
-}
-
-.poetry-button {
-    margin-top: 0;
-    height: 38px;
-    padding: 0 20px;
-    background-color: var(--poetry-accent, #8e44ad);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 500;
-    transition: all 0.3s;
-    box-shadow: 0 2px 6px rgba(142, 68, 173, 0.4);
-    align-self: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.poetry-button:hover {
-    background-color: #7d3c98;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(142, 68, 173, 0.5);
-}
-
-.poetry-button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(142, 68, 173, 0.4);
-}
-
-.poetry-content {
-    padding: 0 1rem 1rem;
-    overflow-y: auto;
-    flex: 1;
-}
-
-/* Poetry Navigation */
-.poem-navigation {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.poem-nav-button {
-    background-color: var(--button-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.poem-nav-button:hover:not(:disabled) {
-    background-color: var(--button-hover-bg);
-}
-
-.poem-nav-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.poem-counter {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-}
-
-/* Poem Display */
-.poem-display {
-    background-color: white;
-    border-radius: 12px;
-    padding: 3rem 2.5rem;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    margin: 2rem auto;
+    max-width: 600px;
+    box-shadow: var(--shadow);
     overflow: hidden;
-    margin-bottom: 2rem;
 }
 
-.poem-display:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-}
-
-/* Fix for poem-display::before and poem-display::after syntax errors */
-.poem-display::before {
-    content: "\201C"; /* Unicode for opening double quote */
+.empty-state::before {
+    content: '';
     position: absolute;
-    top: 10px;
+    top: 20px;
     left: 20px;
-    font-size: 120px;
-    color: rgba(142, 68, 173, 0.08);
-    font-family: serif;
-    line-height: 1;
+    width: 60px;
+    height: 60px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' opacity='0.1'%3E%3Cpath fill='%233c7a89' d='M30,30 Q50,10 70,30 Q90,50 70,70 Q50,90 30,70 Q10,50 30,30 Z'%3E%3C/path%3E%3C/svg%3E");
+    background-size: contain;
+    opacity: 0.2;
+    animation: floatingCloud 8s ease-in-out infinite;
 }
 
-.poem-display::after {
-    content: "\201D"; /* Unicode for closing double quote */
+.empty-state::after {
+    content: '';
     position: absolute;
-    bottom: 10px;
+    bottom: 20px;
     right: 20px;
-    font-size: 120px;
-    color: rgba(142, 68, 173, 0.08);
-    font-family: serif;
-    line-height: 1;
-}
-
-.poem-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 0.8rem;
-    text-align: center;
-    position: relative;
-    padding-bottom: 15px;
-}
-
-.poem-title::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
     width: 80px;
-    height: 3px;
-    background-color: var(--poetry-accent, #8e44ad);
-    border-radius: 3px;
+    height: 80px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' opacity='0.1'%3E%3Cpath fill='%2381b29a' d='M20,40 Q40,20 60,40 Q80,60 60,80 Q40,100 20,80 Q0,60 20,40 Z'%3E%3C/path%3E%3C/svg%3E");
+    background-size: contain;
+    opacity: 0.2;
+    animation: floatingCloud 12s ease-in-out infinite reverse;
 }
 
-.poem-author {
-    font-size: 1.1rem;
-    color: #7f8c8d;
-    margin-bottom: 2.5rem;
-    text-align: center;
-    font-style: italic;
-}
-
-.poem-content {
-    font-size: 1.4rem;
-    line-height: 2.2;
-    text-align: center;
-    margin-bottom: 2.5rem;
-    color: #34495e;
-    transition: color 0.3s;
-    white-space: pre-wrap;
-    position: relative;
-    z-index: 1;
-}
-
-.poem-section {
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    padding: 1.8rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+/* Add subtle hover interaction to all cards */
+.word-card, .poem-display, .question-item {
     transition: all 0.3s ease;
-    border-left: 4px solid var(--poetry-accent, #8e44ad);
-    position: relative;
-    overflow: hidden;
-    display: block !important;
-    opacity: 1 !important;
 }
 
-.poem-section:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
-}
-
-.poem-section h3 {
-    font-size: 1.3rem;
-    color: var(--poetry-accent, #8e44ad);
-    margin-bottom: 1.2rem;
-    position: relative;
-    padding-bottom: 10px;
-    font-weight: 600;
-}
-
-.poem-section h3::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 50px;
-    height: 2px;
-    background-color: var(--poetry-accent, #8e44ad);
-    border-radius: 2px;
-}
-
-.poem-background-section, 
-.poem-analysis-section {
-    display: block !important;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-}
-
-.poem-background-section h3::before {
-    content: "📜 ";
-}
-
-.poem-analysis-section h3::before {
-    content: "✨ ";
-}
-
-.poem-background, 
-.poem-explanation {
-    font-size: 1.05rem;
-    line-height: 1.8;
-    color: #34495e;
-    display: block !important;
-    opacity: 1 !important;
-}
-
-/* Add subtle decorative element */
-.poem-section::after {
-    content: '';
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 100px;
-    height: 100px;
-    background: radial-gradient(circle, rgba(142, 68, 173, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
-    border-radius: 50%;
-    z-index: 0;
+.word-card:hover, .poem-display:hover, .question-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .selector-group {
-        flex-direction: row; /* Keep it as row even on mobile */
-        width: 100%;
+    :root {
+        --sidebar-width: 200px;
     }
     
-    .selector-group label {
-        min-width: 60px;
+    .panel-button {
+        padding: 0.8rem 1rem;
     }
     
-    .poetry-select {
-        flex: 1;
-    }
-    
-    .poem-display {
+    .word-card, .poem-display {
         padding: 1.5rem;
     }
     
@@ -1360,280 +1024,8 @@ button:active {
     }
     
     .poem-content {
-        font-size: 1.1rem;
-    }
-}
-
-/* Loading spinner for poetry */
-#poetry-loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem;
-    margin: 2rem auto;
-}
-
-#poetry-loading .spinner {
-    width: 60px;
-    height: 60px;
-    border: 4px solid rgba(142, 68, 173, 0.1);
-    border-radius: 50%;
-    border-top-color: var(--poetry-accent, #8e44ad);
-    animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
-    margin-bottom: 1.5rem;
-}
-
-#poetry-loading p {
-    color: #7f8c8d;
-    font-size: 1.1rem;
-    text-align: center;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Empty State Enhancement */
-.poetry-empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem 2rem;
-    background-color: #f8f9fa;
-    border-radius: 12px;
-    margin: 2rem 0;
-    border: 2px dashed #d5d8dc;
-    transition: all 0.3s ease;
-}
-
-.poetry-empty-state:hover {
-    border-color: var(--poetry-accent, #8e44ad);
-    background-color: rgba(142, 68, 173, 0.03);
-}
-
-.poetry-empty-state img {
-    width: 120px;
-    height: auto;
-    margin-bottom: 1.5rem;
-    opacity: 0.7;
-    transition: all 0.3s ease;
-}
-
-.poetry-empty-state:hover img {
-    opacity: 1;
-    transform: scale(1.1) rotate(5deg);
-}
-
-.poetry-empty-state h3 {
-    font-size: 1.5rem;
-    color: #2c3e50;
-    margin-bottom: 1rem;
-}
-
-.poetry-empty-state p {
-    color: #7f8c8d;
-    text-align: center;
-    max-width: 500px;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-}
-
-/* Poetry Panel */
-#poetry-panel {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-}
-
-#poetry-panel.hidden {
-    display: none;
-}
-
-#poetry-container {
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    min-height: calc(100vh - 60px);
-    position: relative;
-    height: auto;
-    overflow: visible;
-}
-
-.poetry-header {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.poetry-header h2 {
-    margin: 0;
-    color: var(--primary-color);
-}
-
-.poetry-config-frame {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1rem;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-}
-
-.config-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.config-row label {
-    font-weight: 500;
-    min-width: 80px;
-}
-
-.config-row select {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    min-width: 120px;
-}
-
-.poetry-button {
-    padding: 0.75rem 1.5rem;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    align-self: flex-start;
-}
-
-.poetry-button:hover {
-    background-color: #0056b3;
-}
-
-.poetry-content {
-    flex: 1;
-    overflow-y: auto;
-}
-
-.empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    padding: 2rem;
-    text-align: center;
-    color: #666;
-}
-
-#poetry-display {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.poem-navigation {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.poem-nav-button {
-    padding: 0.5rem 1rem;
-    background-color: #f0f0f0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.poem-nav-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.poem-display {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1.5rem;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.poem-title {
-    margin: 0;
-    font-size: 1.5rem;
-    color: var(--primary-color);
-    text-align: center;
-}
-
-.poem-author {
-    margin: 0.5rem 0 1rem;
-    font-style: italic;
-    text-align: center;
-    color: #666;
-}
-
-.poem-content {
-    font-size: 1.2rem;
-    line-height: 1.8;
-    text-align: center;
-    margin: 1rem 0;
-    padding: 1rem;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    white-space: pre-line;
-}
-
-.poem-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.poem-section {
-    padding: 1rem;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-}
-
-.poem-section h4 {
-    margin: 0 0 0.5rem;
-    color: var(--primary-color);
-}
-
-.poem-section p {
-    margin: 0;
-    line-height: 1.6;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .poetry-config-frame {
-        flex-direction: column;
-    }
-    
-    .poem-display {
-        padding: 1rem;
-    }
-    
-    .poem-title {
-        font-size: 1.3rem;
-    }
-    
-    .poem-content {
         font-size: 1rem;
+        line-height: 1.8;
     }
 }
 
@@ -1985,7 +1377,7 @@ button:active {
     background: var(--secondary-color); 
     color: white;                     
     border: none;
-    border-radius: 6px;
+    border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.3s;
     text-decoration: none;            
@@ -1997,7 +1389,7 @@ button:active {
 }
 
 .vocabulary-load-btn:hover {
-    background: #2980b9; 
+    background: #6a9d85; 
     color: white; 
 }
 
@@ -2015,35 +1407,35 @@ button:active {
 }
 
 .word-card {
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-    padding: 35px 40px;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    min-height: 500px;
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
-    display: flex;
-    flex-direction: column;
-    animation: cardEntrance 0.6s ease-out;
-    gap: 20px;
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    padding: 1.8rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-@keyframes cardEntrance {
-    0% {
-        transform: translateY(20px);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
+.word-card::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 100px;
+    height: 100px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' opacity='0.05'%3E%3Cpath fill='%233c7a89' d='M70,20 Q90,50 70,80 Q50,95 30,80 Q10,50 30,20 Q50,5 70,20 Z'%3E%3C/path%3E%3C/svg%3E");
+    background-size: contain;
+    opacity: 0.1;
+    z-index: 0;
+    pointer-events: none;
 }
 
 .word-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 12px 30px rgba(60, 122, 137, 0.15);
 }
 
 .word-header {
