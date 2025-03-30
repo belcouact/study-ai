@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.speechSynthesis.cancel(); // Stop any ongoing speech
             const utterance = new SpeechSynthesisUtterance(englishText);
             utterance.lang = 'en-US'; // Set desired language
-            utterance.rate = 0.85; // Keep the slower rate
+            utterance.rate = 0.75; // Keep the slower rate
 
             // Attempt to find a female US English voice
             const voices = window.speechSynthesis.getVoices();
