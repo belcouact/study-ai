@@ -1962,29 +1962,23 @@ button:active {
 
 .vocabulary-load-btn {
     padding: 8px 16px;
-    /* Change background to secondary color */
     background: var(--secondary-color); 
-    /* Ensure text color is white for both button and anchor */
     color: white;                     
     border: none;
     border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.3s;
-    text-decoration: none;            /* Keep this to remove underline from anchor */
-    /* Remove color: inherit; if present */
+    text-decoration: none;            
     margin-left: 10px;
-    display: inline-block;            /* Keep this for consistent layout */
-    font-weight: 500; /* Slightly bolder text */
+    display: inline-block;            
+    font-weight: 500; 
+    font-size: 15px; 
+    vertical-align: middle; 
 }
 
 .vocabulary-load-btn:hover {
-    /* Use a darker shade for hover, similar to submit button hover */
     background: #2980b9; 
-    /* Ensure text color remains white on hover */
     color: white; 
-    /* Optional: Add a subtle lift effect */
-    /* transform: translateY(-1px); */
-    /* box-shadow: 0 2px 4px rgba(0,0,0,0.1); */
 }
 
 .initial-message {
