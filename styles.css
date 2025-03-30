@@ -1968,6 +1968,10 @@ button:active {
     border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.3s;
+    text-decoration: none;
+    color: inherit;
+    margin-left: 10px;
+    display: inline-block;
 }
 
 .vocabulary-load-btn:hover {
