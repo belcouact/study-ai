@@ -18,10 +18,15 @@
     --ghibli-dust: #e5c9b0;
     --ghibli-stone: #928d8a;
     --card-bg: #fffcf7;
+    --title-font: "Comic Sans MS", "Marker Felt", cursive; /* Whimsical title font replacement */
+    --body-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    --accent-font: "Papyrus", "Brush Script MT", cursive; /* Decorative accent font */
 }
 
 /* Add Ghibli-inspired fonts */
+/* Remove or comment out this line:
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Sue+Ellen+Francisco&family=Indie+Flower&display=swap');
+*/
 
 * {
     margin: 0;
@@ -34,17 +39,17 @@ body {
     background-color: var(--light-bg);
     color: var(--text-color);
     overflow: hidden;
-    font-family: 'Quicksand', sans-serif;
-    background-image: url('https://i.imgur.com/JfVVJQl.png');
-    background-size: 20%;
+    font-family: var(--body-font);
+    /* Replace imgur background with a subtle pattern */
+    background-image: radial-gradient(#d9d2c5 1px, transparent 1px);
+    background-size: 20px 20px;
     background-repeat: repeat;
     background-attachment: fixed;
     background-position: center;
-    background-blend-mode: overlay;
     position: relative;
 }
 
-/* Add clouds to the top of the page */
+/* Replace clouds with CSS-generated alternative */
 body::before {
     content: '';
     position: absolute;
@@ -52,16 +57,14 @@ body::before {
     left: 0;
     width: 100%;
     height: 20%;
-    background-image: url('https://i.imgur.com/vvv7Wd3.png');
-    background-size: contain;
-    background-repeat: repeat-x;
-    background-position: top;
-    opacity: 0.5;
+    /* Replace clouds with gradient and CSS shapes */
+    background: linear-gradient(to bottom, rgba(255,255,255,0.7), rgba(255,255,255,0));
+    opacity: 0.7;
     pointer-events: none;
     z-index: -1;
 }
 
-/* Add grass to the bottom of the page */
+/* Replace grass with CSS alternative */
 body::after {
     content: '';
     position: absolute;
@@ -69,11 +72,10 @@ body::after {
     left: 0;
     width: 100%;
     height: 10%;
-    background-image: url('https://i.imgur.com/lRzNeMj.png');
-    background-size: contain;
-    background-repeat: repeat-x;
-    background-position: bottom;
-    opacity: 0.7;
+    /* Replace grass with gradient and triangles */
+    background-image: linear-gradient(to top, var(--ghibli-grass), transparent);
+    mask-image: repeating-linear-gradient(135deg, #000 0px, #000 10px, transparent 10px, transparent 20px);
+    opacity: 0.5;
     pointer-events: none;
     z-index: -1;
 }
@@ -93,7 +95,7 @@ body::after {
     overflow: hidden;
 }
 
-/* Add a subtle dust sprite pattern to containers */
+/* Replace dust sprite in container */
 .container::before {
     content: '';
     position: absolute;
@@ -101,21 +103,20 @@ body::after {
     right: 0;
     width: 150px;
     height: 150px;
-    background-image: url('https://i.imgur.com/x4yFs4B.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    opacity: 0.1;
+    /* Replace dust sprite with radial gradient */
+    background: radial-gradient(circle at center, var(--ghibli-dust) 0%, transparent 70%);
+    opacity: 0.2;
     pointer-events: none;
 }
 
 /* Page heading styles */
 h1, h2, h3 {
-    font-family: 'Sue Ellen Francisco', cursive;
+    font-family: var(--title-font);
     letter-spacing: 1px;
 }
 
 h4, h5, h6 {
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--body-font);
     font-weight: 600;
 }
 
@@ -183,11 +184,11 @@ button:hover, .panel-button:hover, .vocabulary-load-btn:hover, .poetry-button:ho
     flex-direction: column;
     overflow-y: auto;
     border-right: 1px solid rgba(255, 255, 255, 0.2);
-    background-image: url('https://i.imgur.com/nvdXRvT.png');
+    /* Replace sidebar background with gradient */
+    background-image: linear-gradient(135deg, var(--primary-color), #5d8ba3);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-blend-mode: overlay;
 }
 
 .left-panel.hidden {
@@ -236,7 +237,7 @@ button:hover, .panel-button:hover, .vocabulary-load-btn:hover, .poetry-button:ho
     text-align: left;
     font-size: 1rem;
     transition: all 0.3s ease;
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--body-font);
     font-weight: 500;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
@@ -282,7 +283,7 @@ button:hover, .panel-button:hover, .vocabulary-load-btn:hover, .poetry-button:ho
     font-weight: 500;
     font-style: italic;
     margin-bottom: 5px;
-    font-family: 'Indie Flower', cursive;
+    font-family: var(--accent-font);
     font-size: 1.1rem;
 }
 
@@ -290,18 +291,61 @@ button:hover, .panel-button:hover, .vocabulary-load-btn:hover, .poetry-button:ho
     color: rgba(255, 255, 255, 0.9);
 }
 
-/* Whimsical decoration for the slogan */
-.sidebar-slogan::before {
-    content: '';
+/* Replace poem display decoration */
+.poem-display::before {
+    content: "\201C";
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    font-size: 150px;
+    color: rgba(156, 123, 148, 0.1);
+    font-family: var(--accent-font);
+    line-height: 1;
+}
+
+.poem-display::after {
+    content: '🍃';
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 40px;
+    opacity: 0.1;
+}
+
+/* Replace word card decoration */
+.word-card::after {
+    content: '📚';
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 40px;
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+/* Replace example item decoration */
+.example-item::after {
+    content: '✓';
     position: absolute;
     bottom: 5px;
     right: 5px;
-    width: 30px;
-    height: 30px;
-    background-image: url('https://i.imgur.com/tfBKGAx.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    opacity: 0.6;
+    font-size: 20px;
+    opacity: 0.1;
+}
+
+/* Replace any other background image references with CSS alternatives */
+.questions-display-container::after,
+.question-form-container::after,
+.poetry-header::after,
+.vocabulary-card-container::after,
+.poem-section::after {
+    content: '✦';
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    font-size: 20px;
+    opacity: 0.05;
+    pointer-events: none;
 }
 
 .panel-footer {
@@ -509,7 +553,7 @@ button {
     cursor: pointer;
     font-size: 0.95rem;
     transition: all 0.3s ease;
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--body-font);
     font-weight: 500;
     box-shadow: 0 3px 6px rgba(0,0,0,0.1);
     position: relative;
@@ -550,7 +594,7 @@ button:active {
 
 /* Form elements */
 textarea, input, select {
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--body-font);
     border-radius: 12px;
     border: 1px solid var(--border-color);
     transition: all 0.3s ease;
@@ -578,7 +622,7 @@ textarea:focus, input:focus, select:focus {
     display: inline-block;
     font-weight: 500;
     font-size: 15px;
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--body-font);
     box-shadow: 0 3px 8px rgba(0,0,0,0.1);
 }
 
@@ -1373,25 +1417,21 @@ textarea:focus, input:focus, select:focus {
     left: 30px;
     font-size: 150px;
     color: rgba(156, 123, 148, 0.1);
-    font-family: 'Indie Flower', cursive;
+    font-family: var(--accent-font);
     line-height: 1;
 }
 
 .poem-display::after {
-    content: '';
+    content: '🍃';
     position: absolute;
     bottom: 10px;
     right: 10px;
-    width: 100px;
-    height: 100px;
-    background-image: url('https://i.imgur.com/NE9C9mt.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    opacity: 0.07;
+    font-size: 40px;
+    opacity: 0.1;
 }
 
 .poem-title {
-    font-family: 'Sue Ellen Francisco', cursive;
+    font-family: var(--title-font);
     font-size: 2.5rem;
     font-weight: 700;
     color: var(--poetry-accent);
@@ -1403,7 +1443,7 @@ textarea:focus, input:focus, select:focus {
 }
 
 .poem-content {
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--body-font);
     font-size: 1.5rem;
     line-height: 2.2;
     text-align: center;
@@ -1478,15 +1518,13 @@ textarea:focus, input:focus, select:focus {
 
 /* Add subtle decorative element */
 .poem-section::after {
-    content: '';
+    content: '✦';
     position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 100px;
-    height: 100px;
-    background: radial-gradient(circle, rgba(142, 68, 173, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
-    border-radius: 50%;
-    z-index: 0;
+    bottom: 5px;
+    right: 5px;
+    font-size: 20px;
+    opacity: 0.05;
+    pointer-events: none;
 }
 
 /* Responsive adjustments */
@@ -2187,16 +2225,12 @@ textarea:focus, input:focus, select:focus {
 }
 
 .word-card::after {
-    content: '';
+    content: '📚';
     position: absolute;
     bottom: 10px;
     right: 10px;
-    width: 120px;
-    height: 120px;
-    background-image: url('https://i.imgur.com/J91geef.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    opacity: 0.05;
+    font-size: 40px;
+    opacity: 0.1;
     pointer-events: none;
 }
 
@@ -2215,7 +2249,7 @@ textarea:focus, input:focus, select:focus {
 }
 
 .word-english {
-    font-family: 'Sue Ellen Francisco', cursive;
+    font-family: var(--title-font);
     font-size: 42px;
     font-weight: 700;
     color: var(--primary-color);
@@ -2315,15 +2349,11 @@ textarea:focus, input:focus, select:focus {
 }
 
 .example-item::after {
-    content: '';
+    content: '✓';
     position: absolute;
     bottom: 5px;
     right: 5px;
-    width: 25px;
-    height: 25px;
-    background-image: url('https://i.imgur.com/vbIb0kN.png');
-    background-size: contain;
-    background-repeat: no-repeat;
+    font-size: 20px;
     opacity: 0.1;
 }
 
@@ -2848,7 +2878,7 @@ textarea:focus, input:focus, select:focus {
 
 /* Typography enhancements for Ghibli theme */
 .vocabulary-header h2, .poetry-header h2, .section-title, .poem-section h3 {
-    font-family: 'Sue Ellen Francisco', cursive;
+    font-family: var(--title-font);
     letter-spacing: 1px;
     font-size: 1.8rem;
     color: var(--primary-color);
@@ -2869,9 +2899,42 @@ textarea:focus, input:focus, select:focus {
 }
 
 .word-english {
-    font-family: 'Sue Ellen Francisco', cursive;
+    font-family: var(--title-font);
     font-size: 42px;
     font-weight: 700;
     color: var(--primary-color);
     letter-spacing: 1px;
+}
+
+/* Self-hosted fonts */
+@font-face {
+    font-family: 'Sue Ellen Francisco';
+    src: url('./fonts/sue-ellen-francisco.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Indie Flower';
+    src: url('./fonts/indie-flower.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Quicksand';
+    src: url('./fonts/quicksand-regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Quicksand';
+    src: url('./fonts/quicksand-bold.woff2') format('woff2');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
 }
