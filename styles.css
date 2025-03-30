@@ -2597,7 +2597,7 @@ textarea:focus, input:focus, select:focus {
 .navigation-controls {
     position: fixed;
     bottom: 20px;
-    left: calc(50% + (var(--sidebar-width) / 2));
+    left: 50%;
     transform: translateX(-50%);
     background: var(--card-bg);
     padding: 15px 30px;
@@ -2613,7 +2613,6 @@ textarea:focus, input:focus, select:focus {
     width: 90%;
     max-width: 600px;
     min-width: 300px;
-    transition: left var(--transition-speed) ease;
 }
 
 #vocabulary-container {
