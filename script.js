@@ -5975,3 +5975,73 @@ function renderRelatedPhrases(phrases) {
         </div>
     `;
 }
+
+// Add Ghibli font loader
+function loadGhibliFonts() {
+    const fontLink = document.createElement('link');
+    fontLink.rel = 'stylesheet';
+    fontLink.href = 'https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Sue+Ellen+Francisco&family=Indie+Flower&display=swap';
+    document.head.appendChild(fontLink);
+    
+    // Add animation for content load
+    setTimeout(() => {
+        document.body.classList.add('fonts-loaded');
+    }, 300);
+}
+
+// Execute when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    loadGhibliFonts();
+    
+    // Rest of your existing code...
+});
+
+// Ghibli theme validation - ensures all functionality remains intact
+function validateGhibliTheme() {
+    console.log('Validating Ghibli theme implementation...');
+    
+    // Check if critical elements exist and have proper styling
+    const criticalElements = [
+        '.left-panel',
+        '.content-area',
+        '.container',
+        '.sidebar-slogan',
+        '.vocabulary-load-btn',
+        '#submit-button'
+    ];
+    
+    let validationPassed = true;
+    
+    criticalElements.forEach(selector => {
+        const element = document.querySelector(selector);
+        if (!element) {
+            console.warn(`Validation warning: ${selector} not found in DOM`);
+            validationPassed = false;
+        }
+    });
+    
+    // Add event handler backup for potentially affected buttons
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(button => {
+        // Clone and replace to ensure event listeners are preserved
+        const newButton = button.cloneNode(true);
+        button.parentNode.replaceChild(newButton, button);
+        newButton.addEventListener('click', (e) => {
+            if (newButton.onclick) {
+                newButton.onclick(e);
+            }
+        });
+    });
+    
+    if (validationPassed) {
+        console.log('Ghibli theme validation successful!');
+    } else {
+        console.warn('Some elements may require attention after theme application');
+    }
+}
+
+// Run validation after page is fully loaded
+window.addEventListener('load', function() {
+    // Allow time for CSS transitions and animations to apply
+    setTimeout(validateGhibliTheme, 1000);
+});

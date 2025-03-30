@@ -18,8 +18,13 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Left Panel -->
+        <!-- Left sidebar with Ghibli styling -->
         <div class="left-panel">
+            <div class="sidebar-header">
+                <img src="https://i.imgur.com/pWp7e0s.png" alt="Ghibli Study Logo" class="sidebar-logo">
+                <h1 class="sidebar-title">Study LLM</h1>
+            </div>
+            
             <div class="panel-buttons">
                 <button id="qa-button" class="panel-button active">问答</button>
                 <button id="create-button" class="panel-button">测验</button>
@@ -50,12 +55,14 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Slogan -->
+            </div>
+            
+            <div class="sidebar-content">
                 <a href="https://study-llm.pages.dev/quote/main" target="_blank" title="click for more inspirational quotes" style="text-decoration: none; color: inherit;">
                     <div class="sidebar-slogan">
                         <p>Stay hungry, stay foolish</p>
                         <p>求知若饥，虚心若愚</p>
+                        Loading quote...
                     </div>
                 </a>
             </div>
@@ -70,8 +77,8 @@
             </div>
         </div>
         
-        <!-- Sidebar Toggle Button -->
-        <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
+        <!-- Sidebar toggle with Ghibli styling -->
+        <button class="sidebar-toggle" id="sidebar-toggle">
             <i class="fas fa-chevron-left"></i>
         </button>
         
