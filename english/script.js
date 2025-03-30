@@ -95,61 +95,47 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to handle text-to-speech for sentence cards
     function speakEnglishSentence(englishText) {
         if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel(); // Stop any ongoing speech
-            const utterance = new SpeechSynthesisUtterance(englishText);
-            utterance.lang = 'en-US'; // Set desired language
-            utterance.rate = 0.75; // Keep the slower rate
+            console.log("Attempting to speak:", englishText); // Add log for debugging
 
-            // Attempt to find a female US English voice
-            const voices = window.speechSynthesis.getVoices();
-            let femaleVoice = null;
+            try {
+                window.speechSynthesis.cancel(); // Stop any ongoing speech
 
-            // Filter for US English voices first
-            const usEnglishVoices = voices.filter(voice => voice.lang === 'en-US');
+                const utterance = new SpeechSynthesisUtterance(englishText);
+                utterance.lang = 'en-US'; // Set desired language - Browser will use its default for this
+                utterance.rate = 0.85; // Keep the slower rate (adjust if needed: 1 is normal)
+                // utterance.pitch = 1; // Default pitch
+                // --- Voice selection removed for better mobile compatibility ---
+                // We are no longer calling getVoices() or setting utterance.voice directly.
 
-            // Try to find a voice with "Female" or common female names in its name
-            femaleVoice = usEnglishVoices.find(voice => /female|zira|susan|samantha/i.test(voice.name));
+                // Add event listeners for debugging utterance events
+                utterance.onstart = () => {
+                    console.log('Speech synthesis started.');
+                };
+                utterance.onend = () => {
+                    console.log('Speech synthesis finished.');
+                };
+                utterance.onerror = (event) => {
+                    console.error('Speech synthesis error:', event.error);
+                    // Optionally alert the user on error, but console is less intrusive
+                    // alert(`Speech error: ${event.error}`);
+                };
 
-            // If no specific female voice is found, just use the first available US English voice
-            if (!femaleVoice && usEnglishVoices.length > 0) {
-                // Fallback to the first available US English voice
-                // You could refine this fallback logic if needed
-                femaleVoice = usEnglishVoices[0];
-                 // console.log("Using first available US English voice:", femaleVoice.name);
-            } else if (femaleVoice) {
-                // console.log("Using specific female voice:", femaleVoice.name);
-            } else {
-                 // console.log("No US English voices found, using default.");
+                console.log("Calling window.speechSynthesis.speak()...");
+                window.speechSynthesis.speak(utterance);
+
+            } catch (error) {
+                 console.error("Error in speakEnglishSentence function:", error);
+                 // Alert might be annoying, but useful for mobile debugging if console isn't accessible
+                 // alert("An error occurred trying to speak.");
             }
-
-
-            // Assign the found voice (if any) to the utterance
-            if (femaleVoice) {
-                utterance.voice = femaleVoice;
-            }
-            // If no suitable voice was found, the browser will use the default for the specified lang.
-
-            window.speechSynthesis.speak(utterance);
-
-            // Note: getVoices() might be asynchronous. If voices aren't found initially,
-            // you might need a more complex setup involving the 'onvoiceschanged' event.
-            // However, calling it right before speak() often works in modern browsers.
-            /* Example of listening for voices:
-            let voices = [];
-            function populateVoiceList() {
-              voices = window.speechSynthesis.getVoices();
-              // Now you could use the 'voices' array
-            }
-            populateVoiceList();
-            if (speechSynthesis.onvoiceschanged !== undefined) {
-              speechSynthesis.onvoiceschanged = populateVoiceList;
-            }
-            // Then use the 'voices' array within speakEnglishSentence
-            */
 
         } else {
             console.error("Browser doesn't support speech synthesis.");
-            alert("Sorry, your browser doesn't support text-to-speech.");
+            // Alert the user ONCE if the API is missing entirely
+            if (!window.speechSynthesisSupportNotified) {
+                alert("Sorry, your browser doesn't support text-to-speech.");
+                window.speechSynthesisSupportNotified = true; // Prevent repeated alerts
+            }
         }
     }
 
@@ -193,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.appendChild(chineseP);
 
             // --- Add Event Listeners Here ---
-            const englishText = sentencePair.en; // Get text directly
+            const englishText = sentencePair.en;
 
             // Make card focusable and announce its role
             card.setAttribute('role', 'button');
@@ -201,14 +187,18 @@ document.addEventListener('DOMContentLoaded', () => {
             card.setAttribute('aria-label', `Read sentence: ${englishText}`); // Accessibility label
 
             // Add click listener
-            card.addEventListener('click', () => {
+            card.addEventListener('click', (event) => {
+                // It can sometimes help mobile browsers if the call is clearly
+                // within the user-initiated event handler context.
+                console.log("Card clicked!");
                 speakEnglishSentence(englishText);
             });
 
             // Add keyboard listener (Enter or Space)
             card.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault(); // Prevent default space bar scroll/action
+                    e.preventDefault();
+                    console.log("Card keypress!");
                     speakEnglishSentence(englishText);
                 }
             });
@@ -269,6 +259,9 @@ document.addEventListener('DOMContentLoaded', () => {
             nextButton.disabled = true;
         }
     }
+
+    // Initialize a flag to prevent repeated 'not supported' alerts
+    window.speechSynthesisSupportNotified = false;
 
     // Start the initialization process
     initializePage();
