@@ -1281,11 +1281,6 @@ button:disabled {
     background-color: #0056b3;
 }
 
-.poetry-content {
-    /* flex: 1; */ /* Removed: Let container manage height */
-    /* overflow-y: auto; */ /* Removed: Scrolling handled by content-area */
-}
-
 .empty-state {
     display: flex;
     flex-direction: column;
@@ -1685,11 +1680,6 @@ button:disabled {
 
 .poetry-button:hover {
     background-color: #0056b3;
-}
-
-.poetry-content {
-    /* flex: 1; */ /* Removed: Let container manage height */
-    /* overflow-y: auto; */ /* Removed: Scrolling handled by content-area */
 }
 
 .empty-state {
