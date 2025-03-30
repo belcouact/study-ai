@@ -5975,3 +5975,100 @@ function renderRelatedPhrases(phrases) {
         </div>
     `;
 }
+
+// Add Ghibli UI enhancements
+document.addEventListener('DOMContentLoaded', function() {
+    // Add floating dust particles (Ghibli style)
+    addGhibliParticles();
+    
+    // Add gentle hover animations to UI elements
+    addGhibliAnimations();
+    
+    // Create decorative elements
+    addDecorativeElements();
+});
+
+function addGhibliParticles() {
+    const particlesContainer = document.createElement('div');
+    particlesContainer.className = 'ghibli-particles';
+    document.body.appendChild(particlesContainer);
+    
+    // Create dust particles (small floating elements)
+    for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'dust-particle';
+        
+        // Randomize positions and animation delay
+        const size = Math.random() * 8 + 2;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        particle.style.animationDelay = `${Math.random() * 10}s`;
+        particle.style.animationDuration = `${Math.random() * 15 + 15}s`;
+        
+        particlesContainer.appendChild(particle);
+    }
+}
+
+function addGhibliAnimations() {
+    // Add subtle hover animations to main elements
+    const interactiveElements = document.querySelectorAll('.container, .word-card, .poem-display, button');
+    
+    interactiveElements.forEach(element => {
+        element.addEventListener('mouseover', function() {
+            element.classList.add('ghibli-hover');
+        });
+        
+        element.addEventListener('mouseout', function() {
+            element.classList.remove('ghibli-hover');
+        });
+    });
+}
+
+function addDecorativeElements() {
+    // Add random nature elements to the UI
+    const decorElements = [
+        'https://i.imgur.com/FGThkaa.png', // leaf
+        'https://i.imgur.com/tGu3Ugj.png', // dust sprite
+        'https://i.imgur.com/M9tH9ZB.png'  // cloud
+    ];
+    
+    const containers = document.querySelectorAll('.container, .word-card, .poem-display');
+    
+    containers.forEach(container => {
+        const decor = document.createElement('div');
+        decor.className = 'ghibli-decor';
+        
+        // Get random decoration and position
+        const randomDecor = decorElements[Math.floor(Math.random() * decorElements.length)];
+        const randomX = Math.random() * 80 + 10;
+        const randomY = Math.random() * 80 + 10;
+        
+        decor.style.backgroundImage = `url(${randomDecor})`;
+        decor.style.top = `${randomY}%`;
+        decor.style.left = `${randomX}%`;
+        
+        container.appendChild(decor);
+    });
+}
+
+// Add a smooth transition when clicking sidebar-slogan
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarSlogan = document.querySelector('.sidebar-slogan');
+    if (sidebarSlogan) {
+        sidebarSlogan.addEventListener('click', function() {
+            // Add a brief glow effect before navigation
+            this.classList.add('slogan-click');
+            
+            // After animation completes, navigate to the quote page
+            setTimeout(() => {
+                window.open('https://study-llm.pages.dev/quote/main', '_blank');
+            }, 300);
+        });
+        
+        sidebarSlogan.addEventListener('animationend', function() {
+            this.classList.remove('slogan-click');
+        });
+    }
+});
