@@ -20,21 +20,10 @@
     --ghibli-light: #f0f7f4;
     --ghibli-accent: #d1b48c;    /* Warm sand color */
     --ghibli-shadow: 0 8px 32px rgba(74, 102, 112, 0.15);
-    --ghibli-blue: #6FC7E1;
-    --ghibli-green: #85C99E;
-    --ghibli-yellow: #F9E559;
-    --ghibli-pink: #F5B7C1;
-    --ghibli-orange: #F8C178;
-    --ghibli-brown: #BF9D7A;
-    --ghibli-light: #F9F7E8;
-    --ghibli-dark: #5E6F64;
-    --ghibli-shadow: rgba(94, 111, 100, 0.3);
 }
 
 /* Add Ghibli-inspired font imports */
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Comic+Sans+MS:wght@400;700&display=swap');
 
 * {
     margin: 0;
@@ -48,13 +37,12 @@ body {
     background-color: var(--ghibli-light);
     color: var(--text-color);
     overflow: hidden;
-    background-image: url('https://i.imgur.com/xDwDcXq.png');
+    background-image: linear-gradient(
+        to bottom,
+        var(--ghibli-sky) 0%,
+        var(--ghibli-light) 100%
+    );
     background-attachment: fixed;
-    background-size: cover;
-    background-position: center;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
 }
 
 /* Layout containers */
@@ -85,11 +73,12 @@ body {
 .container {
     width: 100%;
     max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
     border-radius: 20px;
-    box-shadow: 0 6px 15px var(--ghibli-shadow);
+    box-shadow: var(--ghibli-shadow);
     border: 1px solid rgba(255, 255, 255, 0.2);
     min-height: 80vh;
 }
