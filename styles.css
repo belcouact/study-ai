@@ -1,32 +1,15 @@
-/* Base styles and variables - Ghibli-inspired color palette */
+/* Base styles and variables */
 :root {
-    --sidebar-width: 240px;
-    --primary-color: #4a6a82; /* Muted blue-green from Howl's Moving Castle */
-    --secondary-color: #73a28e; /* Soft forest green from Totoro */
-    --accent-color: #ee8c6c; /* Warm terracotta from Spirited Away */
-    --text-color: #4a4a4a; /* Soft charcoal */
-    --light-bg: #f4f1e9; /* Off-white cream paper */
-    --border-color: #d9d2c5; /* Soft beige */
-    --shadow: 0 5px 15px rgba(0,0,0,0.08);
+    --sidebar-width: 220px;
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --text-color: #333;
+    --light-bg: #f9f9f9;
+    --border-color: #e0e0e0;
+    --shadow: 0 2px 10px rgba(0,0,0,0.05);
     --transition-speed: 0.3s;
-    --poetry-accent: #9c7b94; /* Soft purple from Spirited Away */
-    
-    /* New Ghibli-specific variables */
-    --ghibli-cloud: #f8f9ff;
-    --ghibli-sky: #b0d5e8; 
-    --ghibli-grass: #83b991;
-    --ghibli-dust: #e5c9b0;
-    --ghibli-stone: #928d8a;
-    --card-bg: #fffcf7;
-    --title-font: "Comic Sans MS", "Marker Felt", cursive; /* Whimsical title font replacement */
-    --body-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-    --accent-font: "Papyrus", "Brush Script MT", cursive; /* Decorative accent font */
+    --poetry-accent: #8e44ad;
 }
-
-/* Add Ghibli-inspired fonts */
-/* Remove or comment out this line:
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Sue+Ellen+Francisco&family=Indie+Flower&display=swap');
-*/
 
 * {
     margin: 0;
@@ -36,98 +19,10 @@
 
 body {
     height: 100vh;
-    background-color: var(--light-bg);
+    background-color: #f5f5f5;
     color: var(--text-color);
     overflow: hidden;
-    font-family: var(--body-font);
-    /* Replace imgur background with a subtle pattern */
-    background-image: radial-gradient(#d9d2c5 1px, transparent 1px);
-    background-size: 20px 20px;
-    background-repeat: repeat;
-    background-attachment: fixed;
-    background-position: center;
-    position: relative;
-}
-
-/* Replace clouds with CSS-generated alternative */
-body::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 20%;
-    /* Replace clouds with gradient and CSS shapes */
-    background: linear-gradient(to bottom, rgba(255,255,255,0.7), rgba(255,255,255,0));
-    opacity: 0.7;
-    pointer-events: none;
-    z-index: -1;
-}
-
-/* Replace grass with CSS alternative */
-body::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 10%;
-    /* Replace grass with gradient and triangles */
-    background-image: linear-gradient(to top, var(--ghibli-grass), transparent);
-    mask-image: repeating-linear-gradient(135deg, #000 0px, #000 10px, transparent 10px, transparent 20px);
-    opacity: 0.5;
-    pointer-events: none;
-    z-index: -1;
-}
-
-/* Modified container styles for Ghibli feel */
-.container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0;
-    padding: 1.5rem;
-    background-color: var(--card-bg);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    min-height: 80vh;
-    border: 1px solid var(--border-color);
-    position: relative;
-    overflow: hidden;
-}
-
-/* Replace dust sprite in container */
-.container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 150px;
-    height: 150px;
-    /* Replace dust sprite with radial gradient */
-    background: radial-gradient(circle at center, var(--ghibli-dust) 0%, transparent 70%);
-    opacity: 0.2;
-    pointer-events: none;
-}
-
-/* Page heading styles */
-h1, h2, h3 {
-    font-family: var(--title-font);
-    letter-spacing: 1px;
-}
-
-h4, h5, h6 {
-    font-family: var(--body-font);
-    font-weight: 600;
-}
-
-/* Add whimsical hover animations */
-button, .panel-button, .vocabulary-load-btn, .poetry-button, .nav-button {
-    transition: all 0.3s ease;
-}
-
-button:hover, .panel-button:hover, .vocabulary-load-btn:hover, .poetry-button:hover, .nav-button:hover {
-    transform: translateY(-3px) rotate(1deg);
-    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Layout containers */
@@ -138,18 +33,16 @@ button:hover, .panel-button:hover, .vocabulary-load-btn:hover, .poetry-button:ho
     width: 100%;
 }
 
-/* Content area styling - Ghibli inspired */
 .content-area {
     margin-left: var(--sidebar-width);
-    padding: 2rem;
+    padding: 1.5rem;
     height: 100vh;
     overflow-y: auto;
     transition: margin-left var(--transition-speed) ease;
     flex: 1;
     display: flex;
     justify-content: center;
-    padding-top: 30px;
-    background-color: transparent;
+    padding-top: 20px;
 }
 
 .content-area.full-width {
@@ -168,7 +61,7 @@ button:hover, .panel-button:hover, .vocabulary-load-btn:hover, .poetry-button:ho
     min-height: 80vh;
 }
 
-/* Left panel / Sidebar - Ghibli-inspired */
+/* Left panel / Sidebar */
 .left-panel {
     width: var(--sidebar-width);
     background-color: var(--primary-color);
@@ -178,180 +71,75 @@ button:hover, .panel-button:hover, .vocabulary-load-btn:hover, .poetry-button:ho
     left: 0;
     top: 0;
     z-index: 10;
-    box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
     transition: transform var(--transition-speed) ease;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    border-right: 1px solid rgba(255, 255, 255, 0.2);
-    /* Replace sidebar background with gradient */
-    background-image: linear-gradient(135deg, var(--primary-color), #5d8ba3);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
 }
 
 .left-panel.hidden {
     transform: translateX(-100%);
 }
 
-/* Fix 1: Make sidebar toggle button move correctly when sidebar is collapsed */
 .sidebar-toggle {
     position: fixed;
     left: var(--sidebar-width);
-    top: 20px;
+    top: 10px;
     z-index: 20;
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     background-color: var(--primary-color);
     color: white;
-    border: a2px solid white;
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: left var(--transition-speed) ease, transform var(--transition-speed) ease;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-}
-
-/* Add this rule to move the toggle button when sidebar is hidden */
-.left-panel.hidden ~ .sidebar-toggle {
-    left: 20px; /* Move to left edge with some padding */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .sidebar-toggle:hover {
-    background-color: var(--accent-color);
-    transform: rotate(5deg);
+    background-color: var(--secondary-color);
+}
+
+.sidebar-toggle.collapsed i {
+    transform: rotate(180deg);
+}
+
+.sidebar-toggle.collapsed {
+    left: 10px;
 }
 
 .panel-buttons {
     display: flex;
     flex-direction: column;
-    padding: 1rem;
+    padding: 0.8rem;
     flex-grow: 1;
 }
 
 .panel-button {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: transparent;
     color: white;
     border: none;
-    padding: 0.8rem 1rem;
-    margin-bottom: 1rem;
-    border-radius: 12px;
+    padding: 0.7rem 0.8rem;
+    margin-bottom: 0.8rem;
+    border-radius: 4px;
     cursor: pointer;
     text-align: left;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    font-family: var(--body-font);
-    font-weight: 500;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
 }
 
 .panel-button:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: translateX(5px);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .panel-button.active {
-    background-color: var(--accent-color);
-    font-weight: bold;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-}
-
-.sidebar-slogan {
-    margin: 15px 10px 20px 10px;
-    padding: 18px 12px;
-    border-radius: 15px;
-    background-color: rgba(255, 255, 255, 0.15);
-    text-align: center;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.sidebar-slogan:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     background-color: rgba(255, 255, 255, 0.2);
-}
-
-.sidebar-slogan p {
-    margin: 0;
-    line-height: 1.6;
-    font-size: 0.9rem;
-}
-
-.sidebar-slogan p:first-child {
-    color: rgba(255, 255, 255, 1);
-    font-weight: 500;
-    font-style: italic;
-    margin-bottom: 5px;
-    font-family: var(--accent-font);
-    font-size: 1.1rem;
-}
-
-.sidebar-slogan p:last-child {
-    color: rgba(255, 255, 255, 0.9);
-}
-
-/* Replace poem display decoration */
-.poem-display::before {
-    content: "\201C";
-    position: absolute;
-    top: 20px;
-    left: 30px;
-    font-size: 150px;
-    color: rgba(156, 123, 148, 0.1);
-    font-family: var(--accent-font);
-    line-height: 1;
-}
-
-.poem-display::after {
-    content: '🍃';
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    font-size: 40px;
-    opacity: 0.1;
-}
-
-/* Replace word card decoration */
-.word-card::after {
-    content: '📚';
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    font-size: 40px;
-    opacity: 0.1;
-    pointer-events: none;
-}
-
-/* Replace example item decoration */
-.example-item::after {
-    content: '✓';
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    font-size: 20px;
-    opacity: 0.1;
-}
-
-/* Replace any other background image references with CSS alternatives */
-.questions-display-container::after,
-.question-form-container::after,
-.poetry-header::after,
-.vocabulary-card-container::after,
-.poem-section::after {
-    content: '✦';
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    font-size: 20px;
-    opacity: 0.05;
-    pointer-events: none;
+    font-weight: bold;
 }
 
 .panel-footer {
@@ -363,6 +151,37 @@ button:hover, .panel-button:hover, .vocabulary-load-btn:hover, .poetry-button:ho
     line-height: 1.4;
     margin-top: auto;
     background-color: rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-slogan {
+    margin: 15px 10px 20px 10px;
+    padding: 15px 8px;
+    border-radius: 6px;
+    background-color: var(--primary-color);
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-slogan p {
+    margin: 0;
+    line-height: 1.6;
+    font-size: 0.8rem;
+}
+
+.sidebar-slogan p:first-child {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-style: italic;
+    margin-bottom: 5px;
+}
+
+.sidebar-slogan p:last-child {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.panel-footer p {
+    margin: 0 0 3px 0;
 }
 
 .footer-links {
@@ -519,23 +338,21 @@ button:hover, .panel-button:hover, .vocabulary-load-btn:hover, .poetry-button:ho
 
 textarea#user-input {
     width: 100%;
-    min-height: 120px;
-    padding: 1.2rem;
+    min-height: 100px;
+    padding: 1rem;
     border: 1px solid var(--border-color);
-    border-radius: 15px;
+    border-radius: 4px;
     resize: vertical;
     font-size: 1rem;
-    line-height: 1.6;
+    line-height: 1.5;
     color: var(--text-color);
-    transition: all 0.3s ease;
-    background-color: var(--ghibli-cloud);
-    box-shadow: inset 0 1px 5px rgba(0,0,0,0.05);
+    transition: border-color var(--transition-speed) ease;
 }
 
 textarea#user-input:focus {
     outline: none;
     border-color: var(--secondary-color);
-    box-shadow: 0 0 0 3px rgba(115, 162, 142, 0.2), inset 0 1px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
 .button-container {
@@ -549,94 +366,51 @@ textarea#user-input:focus {
     gap: 10px;
 }
 
-/* Buttons - Ghibli style */
+/* Buttons */
 button {
-    padding: 0.7rem 1.2rem;
+    padding: 0.6rem 1rem;
     border: none;
-    border-radius: 12px;
-    background-color: var(--ghibli-sky);
+    border-radius: 4px;
+    background-color: #f0f0f0;
     color: var(--text-color);
     cursor: pointer;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-    font-family: var(--body-font);
-    font-weight: 500;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-    position: relative;
-    overflow: hidden;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
 }
 
 button:hover {
-    background-color: #9cc1d9;
-    transform: translateY(-3px);
-    box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+    background-color: #e0e0e0;
 }
 
 button:active {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    background-color: #d0d0d0;
 }
 
 #submit-button {
     background-color: var(--secondary-color);
     color: white;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 #submit-button:hover {
-    background-color: #5c8d79;
+    background-color: #2980b9;
 }
 
 #optimize-button {
-    background-color: var(--ghibli-cloud);
+    background-color: #f8f9fa;
     color: var(--text-color);
     border: 1px solid var(--border-color);
     font-weight: 500;
 }
 
 #optimize-button:hover {
-    background-color: #e9e6df;
+    background-color: #e9ecef;
 }
 
-/* Form elements */
-textarea, input, select {
-    font-family: var(--body-font);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
-    padding: 0.8rem;
-    background-color: var(--ghibli-cloud);
-}
-
-textarea:focus, input:focus, select:focus {
-    outline: none;
-    border-color: var(--secondary-color);
-    box-shadow: 0 0 0 3px rgba(115, 162, 142, 0.2);
-}
-
-/* Vocabulary load button */
-.vocabulary-load-btn {
-    padding: 8px 16px;
-    background-color: var(--secondary-color);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    margin-left: 10px;
-    display: inline-block;
-    font-weight: 500;
-    font-size: 15px;
-    font-family: var(--body-font);
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-}
-
-.vocabulary-load-btn:hover {
-    background-color: #5c8d79;
-    color: white;
-    transform: translateY(-3px) rotate(1deg);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+#optimize-button.optimizing {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: wait;
 }
 
 /* Output container */
@@ -987,17 +761,16 @@ textarea:focus, input:focus, select:focus {
 
 /* Questions display container */
 .questions-display-container {
-    background-color: var(--card-bg);
-    border-radius: 18px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border-color);
-    position: relative;
-    overflow: hidden;
-    margin-top: 15px;
+    background-color: #fff;
+    border-radius: 8px;
     padding: 1.5rem 2rem;
+    margin-top: 15px;
+    box-shadow: var(--shadow);
+    transition: all var(--transition-speed) ease;
     width: 100%;
     margin-bottom: 20px;
     flex: 1;
+    position: relative;
     z-index: 10;
 }
 
@@ -1071,12 +844,11 @@ textarea:focus, input:focus, select:focus {
 }
 
 /* Navigation controls */
-/*
 .navigation-controls {
     position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
     bottom: 20px;
+    left: calc(50% + (var(--sidebar-width) / 2));
+    transform: translateX(-50%);
     background: var(--card-bg);
     padding: 15px 30px;
     display: flex;
@@ -1091,41 +863,32 @@ textarea:focus, input:focus, select:focus {
     width: 90%;
     max-width: 600px;
     min-width: 300px;
+    transition: left var(--transition-speed) ease;
 }
-*/
 
-/* Remove or comment out this rule since we now have absolute centering */
-/* .left-panel.hidden ~ .content-area .navigation-controls {
+/* When sidebar is hidden, adjust the navigation controls position */
+.left-panel.hidden ~ .content-area .navigation-controls {
     left: 50%;
-} */
+}
 
 .navigation-controls:hover {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 .nav-button {
-    background-color: var(--ghibli-cloud);
-    border: 1px solid var(--border-color);
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-}
-
-.nav-button:hover:not(:disabled) {
-    background-color: var(--secondary-color);
+    padding: 10px 20px;
+    background-color: #4299e1;
     color: white;
-    transform: scale(1.1) rotate(5deg);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 16px;
+    font-weight: 500;
 }
 
 .nav-button:disabled {
-    opacity: 0.5;
+    background-color: #cbd5e0;
     cursor: not-allowed;
 }
 
@@ -1369,24 +1132,20 @@ textarea:focus, input:focus, select:focus {
 }
 
 .poem-nav-button {
-    background-color: var(--ghibli-cloud);
+    background-color: var(--button-bg);
     border: 1px solid var(--border-color);
     border-radius: 50%;
-    width: 45px;
-    height: 45px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    transition: background-color 0.2s;
 }
 
 .poem-nav-button:hover:not(:disabled) {
-    background-color: var(--secondary-color);
-    color: white;
-    transform: scale(1.1) rotate(5deg);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    background-color: var(--button-hover-bg);
 }
 
 .poem-nav-button:disabled {
@@ -1401,61 +1160,82 @@ textarea:focus, input:focus, select:focus {
 
 /* Poem Display */
 .poem-display {
-    background-color: var(--card-bg);
-    border-radius: 20px;
-    padding: 3.5rem 3rem;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    background-color: white;
+    border-radius: 12px;
+    padding: 3rem 2.5rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     position: relative;
     overflow: hidden;
     margin-bottom: 2rem;
-    border: 1px solid var(--border-color);
 }
 
 .poem-display:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
 }
 
+/* Fix for poem-display::before and poem-display::after syntax errors */
 .poem-display::before {
-    content: "\201C";
+    content: "\201C"; /* Unicode for opening double quote */
     position: absolute;
-    top: 20px;
-    left: 30px;
-    font-size: 150px;
-    color: rgba(156, 123, 148, 0.1);
-    font-family: var(--accent-font);
+    top: 10px;
+    left: 20px;
+    font-size: 120px;
+    color: rgba(142, 68, 173, 0.08);
+    font-family: serif;
     line-height: 1;
 }
 
 .poem-display::after {
-    content: '🍃';
+    content: "\201D"; /* Unicode for closing double quote */
     position: absolute;
     bottom: 10px;
-    right: 10px;
-    font-size: 40px;
-    opacity: 0.1;
+    right: 20px;
+    font-size: 120px;
+    color: rgba(142, 68, 173, 0.08);
+    font-family: serif;
+    line-height: 1;
 }
 
 .poem-title {
-    font-family: var(--title-font);
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
-    color: var(--poetry-accent);
-    margin-bottom: 1rem;
+    color: #2c3e50;
+    margin-bottom: 0.8rem;
     text-align: center;
     position: relative;
     padding-bottom: 15px;
-    letter-spacing: 1px;
+}
+
+.poem-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: var(--poetry-accent, #8e44ad);
+    border-radius: 3px;
+}
+
+.poem-author {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    margin-bottom: 2.5rem;
+    text-align: center;
+    font-style: italic;
 }
 
 .poem-content {
-    font-family: var(--body-font);
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     line-height: 2.2;
     text-align: center;
     margin-bottom: 2.5rem;
-    color: var(--text-color);
+    color: #34495e;
+    transition: color 0.3s;
+    white-space: pre-wrap;
     position: relative;
     z-index: 1;
 }
@@ -1525,13 +1305,15 @@ textarea:focus, input:focus, select:focus {
 
 /* Add subtle decorative element */
 .poem-section::after {
-    content: '✦';
+    content: '';
     position: absolute;
-    bottom: 5px;
-    right: 5px;
-    font-size: 20px;
-    opacity: 0.05;
-    pointer-events: none;
+    top: 10px;
+    right: 10px;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(142, 68, 173, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 50%;
+    z-index: 0;
 }
 
 /* Responsive adjustments */
@@ -1889,7 +1671,6 @@ textarea:focus, input:focus, select:focus {
 }
 
 /* Fix navigation controls at the bottom while scrolling */
-/*
 .navigation-controls {
     position: sticky;
     bottom: 20px;
@@ -1904,8 +1685,6 @@ textarea:focus, input:focus, select:focus {
     transition: box-shadow 0.3s ease;
     order: 3;
 }
-*/
-
 
 .navigation-controls:hover {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
@@ -2216,9 +1995,9 @@ textarea:focus, input:focus, select:focus {
 }
 
 .word-card {
-    background-color: var(--card-bg);
-    border-radius: 20px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
     padding: 35px 40px;
     width: 100%;
     max-width: 1200px;
@@ -2229,24 +2008,22 @@ textarea:focus, input:focus, select:focus {
     flex-direction: column;
     animation: cardEntrance 0.6s ease-out;
     gap: 20px;
-    border: 1px solid var(--border-color);
-    position: relative;
-    overflow: hidden;
 }
 
-.word-card::after {
-    content: '📚';
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    font-size: 40px;
-    opacity: 0.1;
-    pointer-events: none;
+@keyframes cardEntrance {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .word-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
 }
 
 .word-header {
@@ -2259,11 +2036,10 @@ textarea:focus, input:focus, select:focus {
 }
 
 .word-english {
-    font-family: var(--title-font);
-    font-size: 42px;
+    font-size: 38px;
     font-weight: 700;
-    color: var(--primary-color);
-    letter-spacing: 1px;
+    color: var(--primary-color, #2c3e50);
+    animation: fadeIn 0.8s ease-out;
 }
 
 .word-details {
@@ -2344,27 +2120,16 @@ textarea:focus, input:focus, select:focus {
 
 .example-item {
     background-color: #f8fafc;
-    border-radius: 15px;
-    padding: 18px 22px;
+    border-radius: 10px;
+    padding: 15px 20px;
     margin-bottom: 15px;
-    border-left: 4px solid var(--secondary-color);
+    border-left: 4px solid var(--secondary-color, #3498db);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-    overflow: hidden;
 }
 
 .example-item:hover {
     transform: translateX(5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-}
-
-.example-item::after {
-    content: '✓';
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    font-size: 20px;
-    opacity: 0.1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
 .example-english {
@@ -2477,24 +2242,24 @@ textarea:focus, input:focus, select:focus {
 
 /* Navigation buttons styling to match the site theme */
 .nav-button {
-    background-color: var(--ghibli-cloud);
-    border: 1px solid var(--border-color);
+    background-color: #f1f5f9;
+    color: #64748b;
+    border: none;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    width: 45px;
-    height: 45px;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    font-size: 18px;
 }
 
 .nav-button:hover:not(:disabled) {
-    background-color: var(--secondary-color);
+    background-color: var(--secondary-color, #3498db);
     color: white;
-    transform: scale(1.1) rotate(5deg);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    transform: scale(1.1);
 }
 
 .nav-button:active:not(:disabled) {
@@ -2603,12 +2368,10 @@ textarea:focus, input:focus, select:focus {
     color: #dc3545;
 }
 
-/* Fix the navigation controls positioning */
 .navigation-controls {
     position: fixed;
     bottom: 20px;
-    /* Center within the content area, not the whole window */
-    left: calc(50% + var(--sidebar-width)/2);
+    left: calc(50% + (var(--sidebar-width) / 2));
     transform: translateX(-50%);
     background: var(--card-bg);
     padding: 15px 30px;
@@ -2621,17 +2384,10 @@ textarea:focus, input:focus, select:focus {
     z-index: 100;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
     border-radius: 12px;
-    /* Reduce width to prevent overflow */
-    width: 80%;
-    max-width: 500px;
+    width: 90%;
+    max-width: 600px;
     min-width: 300px;
-    /* Ensure it transitions with sidebar state */
     transition: left var(--transition-speed) ease;
-}
-
-/* When sidebar is hidden, adjust the left position */
-.left-panel.hidden ~ .content-area .navigation-controls {
-    left: 50%; /* Center in window when sidebar is hidden */
 }
 
 #vocabulary-container {
@@ -2854,106 +2610,4 @@ textarea:focus, input:focus, select:focus {
         padding: 0.8em;
         margin: 1em 0;
     }
-}
-
-/* Whimsical animations */
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-.fonts-loaded .container {
-    animation: fadeIn 1s ease;
-}
-
-.fonts-loaded .sidebar-slogan {
-    animation: float 6s ease-in-out infinite;
-}
-
-.fonts-loaded .poem-title, 
-.fonts-loaded .poem-author {
-    animation: fadeIn 1.2s ease;
-}
-
-.fonts-loaded .word-english {
-    animation: fadeIn 0.8s ease-out;
-}
-
-.fonts-loaded .example-item:hover::after {
-    opacity: 0.3;
-    animation: pulse 2s infinite;
-}
-
-.fonts-loaded .navigation-controls {
-    animation: float 8s ease-in-out infinite;
-}
-
-/* Typography enhancements for Ghibli theme */
-.vocabulary-header h2, .poetry-header h2, .section-title, .poem-section h3 {
-    font-family: var(--title-font);
-    letter-spacing: 1px;
-    font-size: 1.8rem;
-    color: var(--primary-color);
-    position: relative;
-    display: inline-block;
-    margin-bottom: 0.5rem;
-}
-
-.vocabulary-header h2::after, .poetry-header h2::after, .section-title::after, .poem-section h3::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, var(--secondary-color), transparent);
-    border-radius: 2px;
-}
-
-.word-english {
-    font-family: var(--title-font);
-    font-size: 42px;
-    font-weight: 700;
-    color: var(--primary-color);
-    letter-spacing: 1px;
-}
-
-/* Self-hosted fonts */
-@font-face {
-    font-family: 'Sue Ellen Francisco';
-    src: url('./fonts/sue-ellen-francisco.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Indie Flower';
-    src: url('./fonts/indie-flower.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Quicksand';
-    src: url('./fonts/quicksand-regular.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Quicksand';
-    src: url('./fonts/quicksand-bold.woff2') format('woff2');
-    font-weight: bold;
-    font-style: normal;
-    font-display: swap;
-}
+} 

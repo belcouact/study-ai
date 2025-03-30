@@ -5975,28 +5975,3 @@ function renderRelatedPhrases(phrases) {
         </div>
     `;
 }
-
-// Remove or comment out this function
-/*
-function loadGhibliFonts() {
-    const fontLink = document.createElement('link');
-    fontLink.rel = 'stylesheet';
-    fontLink.href = 'https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Sue+Ellen+Francisco&family=Indie+Flower&display=swap';
-    document.head.appendChild(fontLink);
-    
-    // Add animation for content load
-    setTimeout(() => {
-        document.body.classList.add('fonts-loaded');
-    }, 300);
-}
-*/
-
-// Keep the fonts-loaded class for animations
-document.addEventListener('DOMContentLoaded', function() {
-    // Replace the loadGhibliFonts call with just the class addition
-    setTimeout(() => {
-        document.body.classList.add('fonts-loaded');
-    }, 300);
-    
-    // Rest of your existing code...
-});
