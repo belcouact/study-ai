@@ -195,6 +195,7 @@ button:hover, .panel-button:hover, .vocabulary-load-btn:hover, .poetry-button:ho
     transform: translateX(-100%);
 }
 
+/* Fix 1: Make sidebar toggle button move correctly when sidebar is collapsed */
 .sidebar-toggle {
     position: fixed;
     left: var(--sidebar-width);
@@ -205,13 +206,18 @@ button:hover, .panel-button:hover, .vocabulary-load-btn:hover, .poetry-button:ho
     border-radius: 50%;
     background-color: var(--primary-color);
     color: white;
-    border: 2px solid white;
+    border: a2px solid white;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: left var(--transition-speed) ease, transform var(--transition-speed) ease;
     box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+/* Add this rule to move the toggle button when sidebar is hidden */
+.left-panel.hidden ~ .sidebar-toggle {
+    left: 20px; /* Move to left edge with some padding */
 }
 
 .sidebar-toggle:hover {
@@ -1067,9 +1073,10 @@ textarea:focus, input:focus, select:focus {
 /* Navigation controls */
 .navigation-controls {
     position: fixed;
-    bottom: 20px;
-    left: calc(50% + (var(--sidebar-width) / 2));
+    /* Change positioning to be truly centered */
+    left: 50%;
     transform: translateX(-50%);
+    bottom: 20px;
     background: var(--card-bg);
     padding: 15px 30px;
     display: flex;
@@ -1084,13 +1091,14 @@ textarea:focus, input:focus, select:focus {
     width: 90%;
     max-width: 600px;
     min-width: 300px;
-    transition: left var(--transition-speed) ease;
+    /* Remove the conditional positioning */
+    /* transition: left var(--transition-speed) ease; */
 }
 
-/* When sidebar is hidden, adjust the navigation controls position */
-.left-panel.hidden ~ .content-area .navigation-controls {
+/* Remove or comment out this rule since we now have absolute centering */
+/* .left-panel.hidden ~ .content-area .navigation-controls {
     left: 50%;
-}
+} */
 
 .navigation-controls:hover {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
