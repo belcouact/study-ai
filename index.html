@@ -15,20 +15,11 @@
     <!-- Add MathJax for rendering math formulas with defer -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <!-- Add Google Fonts for Ghibli-inspired typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Caveat&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Add a subtle overlay element for atmosphere -->
-    <div class="ghibli-atmosphere"></div>
-    
     <div class="app-container">
         <!-- Left Panel -->
         <div class="left-panel">
-            <div class="sidebar-header">
-                <img src="logo.png" alt="Logo" class="sidebar-logo">
-                <h1 class="sidebar-title">Study LLM</h1>
-            </div>
             <div class="panel-buttons">
                 <button id="qa-button" class="panel-button active">问答</button>
                 <button id="create-button" class="panel-button">测验</button>
@@ -59,12 +50,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="sidebar-content">
+
+                <!-- Slogan -->
                 <a href="https://study-llm.pages.dev/quote/main" target="_blank" title="click for more inspirational quotes" style="text-decoration: none; color: inherit;">
                     <div class="sidebar-slogan">
-                        Loading quote...
+                        <p>Stay hungry, stay foolish</p>
+                        <p>求知若饥，虚心若愚</p>
                     </div>
                 </a>
             </div>
