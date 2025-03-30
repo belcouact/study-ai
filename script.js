@@ -5975,3 +5975,41 @@ function renderRelatedPhrases(phrases) {
         </div>
     `;
 }
+
+// Add smooth transitions for content loading
+document.addEventListener('DOMContentLoaded', () => {
+    // Add fade-in animation to main content
+    const container = document.querySelector('.container');
+    if (container) {
+        container.style.opacity = '0';
+        container.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            container.style.transition = 'all 0.6s ease-out';
+            container.style.opacity = '1';
+            container.style.transform = 'translateY(0)';
+        }, 100);
+    }
+
+    // Add hover effects to buttons
+    const buttons = document.querySelectorAll('.vocabulary-load-btn, #submit-button, #optimize-button');
+    buttons.forEach(button => {
+        button.addEventListener('mouseover', () => {
+            button.style.transform = 'translateY(-2px)';
+        });
+        
+        button.addEventListener('mouseout', () => {
+            button.style.transform = 'translateY(0)';
+        });
+    });
+});
+
+// Add smooth transition for word cards
+function createWordCard(data) {
+    // ... existing code ...
+    
+    // Add animation class
+    wordCard.classList.add('fade-in');
+    
+    // ... rest of the existing code ...
+}
