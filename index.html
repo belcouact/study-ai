@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study LLM - Ghibli Style</title>
+    <title>AI Study Assistant by Alex</title>
     <link rel="icon" href="logo_btrfly.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
     <!-- Preconnect to external domains -->
@@ -15,89 +15,247 @@
     <!-- Add MathJax for rendering math formulas with defer -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <!-- Add Quicksand font -->
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Add Material Icons for additional Ghibli-style icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 </head>
 <body>
     <div class="app-container">
+        <!-- Left Panel -->
         <div class="left-panel">
-            <div class="sidebar-header">
-                <img src="logo.png" alt="Logo" class="sidebar-logo">
-                <h1 class="sidebar-title">Study LLM</h1>
-            </div>
-            <div class="sidebar-content">
-                <!-- Make the slogan div clickable -->
+            <div class="panel-buttons">
+                <button id="qa-button" class="panel-button active">问答</button>
+                <button id="create-button" class="panel-button">测验</button>
+                <button id="poetry-button" class="panel-button">诗词</button>
+                <button id="word-button" class="panel-button">英语</button>
+                
+                <!-- Dropdown Frames -->
+                <div class="dropdown-frames">
+                    <!-- User Identity Frame -->
+                    <div class="sidebar-frame">
+                        <h3 class="frame-title">我是</h3>
+                        <div class="frame-content">
+                            <div class="dropdown-container">
+                                <label for="school-select-sidebar">学校</label>
+                                <select id="school-select-sidebar" name="school">
+                                    <option value="小学">小学</option>
+                                    <option value="初中">初中</option>
+                                    <option value="高中">高中</option>
+                                </select>
+                            </div>
+                            
+                            <div class="dropdown-container">
+                                <label for="grade-select-sidebar">年级</label>
+                                <select id="grade-select-sidebar" name="grade">
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slogan -->
                 <a href="https://study-llm.pages.dev/quote/main" target="_blank" title="click for more inspirational quotes" style="text-decoration: none; color: inherit;">
                     <div class="sidebar-slogan">
-                        <p>"Knowledge is like a garden: if it is not cultivated, it cannot be harvested."</p>
-                        <p>African Proverb</p>
+                        <p>Stay hungry, stay foolish</p>
+                        <p>求知若饥，虚心若愚</p>
                     </div>
                 </a>
-                
-                <!-- The rest of the sidebar content -->
             </div>
             
-            <!-- Panel buttons -->
-            <div class="panel-buttons">
-                <button class="panel-button active">
-                    <i class="material-icons-round" style="margin-right: 8px;">home</i> Home
-                </button>
-                <button class="panel-button">
-                    <i class="material-icons-round" style="margin-right: 8px;">school</i> Learning
-                </button>
-                <button class="panel-button">
-                    <i class="material-icons-round" style="margin-right: 8px;">book</i> Poetry
-                </button>
-                <button class="panel-button">
-                    <i class="material-icons-round" style="margin-right: 8px;">language</i> Vocabulary
-                </button>
-                <button class="panel-button">
-                    <i class="material-icons-round" style="margin-right: 8px;">settings</i> Settings
-                </button>
-            </div>
-            
-            <!-- Panel footer -->
+            <!-- Footer text -->
             <div class="panel-footer">
-                <p>Study LLM &copy; 2023</p>
-                <p>Learn, explore, grow!</p>
                 <div class="footer-links">
-                    <a href="#">Help</a>
-                    <a href="#">About</a>
-                    <a href="#">Contact</a>
+                    <a href="https://yuanbao.tencent.com/chat/naQivTmsDa" target="_blank" rel="noopener">腾讯元宝</a>
+                    <a href="https://tongyi.aliyun.com/qianwen/" target="_blank" rel="noopener">通义千问</a>
+                    <a href="#" id="about-site-link" onclick="return showAboutModal();">关于本站</a>
                 </div>
             </div>
         </div>
         
-        <button class="sidebar-toggle">
-            <i class="fa fa-chevron-left"></i>
+        <!-- Sidebar Toggle Button -->
+        <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
+            <i class="fas fa-chevron-left"></i>
         </button>
         
+        <!-- Right Content Area -->
         <div class="content-area">
-            <div class="container">
-                <!-- Content goes here depending on which panel is active -->
-                <!-- Example Vocabulary Section -->
-                <div id="vocabulary-content" class="tab-content">
-                    <div class="vocabulary-container">
-                        <div class="vocabulary-card-container">
-                            <div class="vocabulary-header">
-                                <h2>英语常用句子 & 词汇学习</h2>
-                                <div class="vocabulary-actions">
-                                    <a href="https://study-llm.pages.dev/english/main" target="_blank" id="load-sentences-btn" class="vocabulary-load-btn">常用句子</a>
-                                    <button id="load-vocabulary-btn" class="vocabulary-load-btn">加载词汇</button>
-                                </div>
+            <!-- Q&A Chat Container -->
+            <div id="qa-container" class="container">
+                <div class="chat-container">
+                    <div class="input-container">
+                        <div class="welcome-message">你好，我是你的AI老师，有什么我可以帮你的吗？</div>
+                        <textarea id="user-input" placeholder="请输入你的问题..."></textarea>
+                        <div class="button-container">
+                            <div class="right-controls">
+                                <button id="optimize-button" title="优化您的问题以获得更好的回答">优化问题</button>
+                                <button id="submit-button">提交问题</button>
                             </div>
-                            
-                            <div id="vocabulary-container">
-                                <!-- Word cards will be displayed here -->
-                                <div class="initial-message">
-                                    <img src="https://i.imgur.com/JHVHgUq.png" alt="Totoro" style="width: 120px; opacity: 0.6; margin-bottom: 20px;">
-                                    <h3 style="margin-bottom: 15px; color: var(--primary-color);">Welcome to your Vocabulary Journey!</h3>
-                                    <p>Click on "加载词汇" to start learning new words.</p>
-                                </div>
+                        </div>
+                    </div>
+                    
+                    <div class="output-container">
+                        <div id="loading" class="hidden">
+                            <div class="spinner"></div>
+                            <p>出题中...</p>
+                        </div>
+                        <div id="output">
+                            <!-- Output will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Create Questions Container (initially hidden) -->
+            <div id="create-container" class="container hidden">
+                <!-- Add control panel at the top -->
+                <div class="control-panel">
+                    <label for="subject-selectr">科目</label>
+                    <select id="subject-select" name="subject">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+
+                    <label for="semester-select">学期</label>
+                    <select id="semester-select">
+                        <option value="上学期">上学期</option>
+                        <option value="下学期">下学期</option>
+                    </select>
+
+                    <label for="difficulty-select">难度</label>
+                        <select id="difficulty-select">
+                            <option value="容易">容易</option>
+                            <option value="中等">中等</option>
+                            <option value="偏难">偏难</option>
+                        </select>
+
+                        <label for="question-count-select">题数</label>
+                        <select id="question-count-select">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                        </select>
+                    <button id="generate-btn" onclick="handleGenerateQuestionsClick()">出题</button>
+                    <button id="evaluate-btn" onclick="handleEvaluateClick()" disabled>结果评估</button>
+                </div>
+
+                <!-- Questions display container -->
+                <div id="questions-display-container" class="questions-display-container hidden">
+                    <!-- Empty state message -->
+                    <div id="empty-state" class="empty-state">
+                        <i class="fas fa-book-open empty-state-icon"></i>
+                        <h3>准备好开始测验了吗？</h3>
+                        <p>使用左侧边栏选择学校类型、年级、学期、科目、难度和题数，然后点击"出题"按钮生成题目。</p>
+                    </div>
+                    
+                    <!-- Question content will be dynamically inserted here -->
+                    <div id="question-counter" class="question-counter"></div>
+                    <div id="question-text" class="question-text"></div>
+                    <div id="choices-container" class="choices-container"></div>
+                    
+                    <!-- Answer container -->
+                    <div id="answer-container" class="answer-container hidden">
+                        <div id="answer-result" class="answer-result"></div>
+                        <div id="answer-explanation" class="answer-explanation"></div>
+                    </div>
+                </div>
+                
+                <!-- Navigation controls moved to the bottom -->
+                <div class="navigation-controls">
+                    <button id="prev-question-button" class="nav-button" disabled> &#10094; </button>
+                    <button id="next-question-button" class="nav-button" disabled> &#10095; </button>
+                </div>
+            </div>
+            
+            <!-- Poetry Container -->
+            <div id="poetry-container" class="container">
+                <div class="poetry-header">
+                    <div class="poetry-controls">
+                        <div class="poetry-selectors">
+                            <div class="selector-group">
+                                <label for="poetry-type-select">类型</label>
+                                <select id="poetry-type-select" class="poetry-select">
+                                    <option value="诗经">诗经</option>
+                                    <option value="楚辞">楚辞</option>
+                                    <option value="汉赋">汉赋</option>
+                                    <option value="唐诗">唐诗</option>
+                                    <option value="宋词">宋词</option>
+                                    <option value="元曲">元曲</option>
+                                </select>
+                            </div>
+                            <div class="selector-group">
+                                <label for="poetry-style-select">风格</label>
+                                <select id="poetry-style-select" class="poetry-select">
+                                    <option value="任意">任意</option>
+                                    <option value="山水">山水</option>
+                                    <option value="边塞">边塞</option>
+                                    <option value="浪漫">浪漫</option>
+                                    <option value="现实">现实</option>
+                                </select>
+                            </div>
+                            <!-- Poetry Quantity -->
+                            <div class="selector-group">
+                                <label for="poetry-qty-select">数量</label>
+                                <select id="poetry-qty-select" class="poetry-select">
+                                    <option value=5>5</option>
+                                    <option value=10>10</option>
+                                </select>
+                            </div>
+                            <button id="learn-poetry-button" class="primary-button poetry-button"  title="若结果有误，请点击重试">学习诗词</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="poetry-content">
+                    <div id="poetry-empty-state" class="empty-state">
+                        <!-- <img src="assets/poetry-icon.svg" alt="Poetry Icon" class="empty-state-icon"> -->
+                        <h3>开始学习古诗词</h3>
+                        <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成适合您学习阶段的诗词。</p>
+                    </div>
+                    <div id="poetry-display" class="hidden">
+                        <div class="poem-navigation">
+                            <button id="prev-poem-button" class="poem-nav-button" disabled>
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <span class="poem-counter">1 / 5</span>
+                            <button id="next-poem-button" class="poem-nav-button">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div class="poem-display">
+                            <h2 class="poem-title"></h2>
+                            <p class="poem-author"></p>
+                            <div class="poem-content"></div>
+                            <div class="poem-section">
+                                <h3>创作背景</h3>
+                                <div class="poem-background"></div>
+                            </div>
+                            <div class="poem-section">
+                                <h3>赏析</h3>
+                                <div class="poem-explanation"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="vocabulary-content" class="tab-content">
+                <div class="vocabulary-container">
+                    <div class="vocabulary-card-container">
+                        <div class="vocabulary-header">
+                            <h2>英语常用句子 & 词汇学习</h2>
+                            <a href="https://study-llm.pages.dev/english/main" target="_blank" id="load-sentences-btn" class="vocabulary-load-btn">常用句子</a>
+                            <button id="load-vocabulary-btn" class="vocabulary-load-btn">加载词汇</button>
+                        </div>
+                        
+                        <div class="navigation-controls">
+                            <button id="prev-word-btn" class="nav-button" disabled>
+                                <span class="nav-arrow">&#10094;</span>
+                            </button>
+                            <span id="word-counter">0/0</span>
+                            <button id="next-word-btn" class="nav-button" disabled>
+                                <span class="nav-arrow">&#10095;</span>
+                            </button>
+                        </div>
+                        
+                        <div id="vocabulary-container">
+                            <div class="initial-message">
+                                请选择侧边栏中的学校和年级，然后点击"加载词汇"按钮开始学习英语单词
                             </div>
                         </div>
                     </div>
@@ -105,6 +263,7 @@
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+    <!-- Load script at the end with defer -->
+    <script src="script.js" defer></script>
 </body>
 </html> 
