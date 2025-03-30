@@ -2603,10 +2603,12 @@ textarea:focus, input:focus, select:focus {
     color: #dc3545;
 }
 
+/* Fix the navigation controls positioning */
 .navigation-controls {
     position: fixed;
     bottom: 20px;
-    left: calc(50% + (var(--sidebar-width) / 2));
+    /* Center within the content area, not the whole window */
+    left: calc(50% + var(--sidebar-width)/2);
     transform: translateX(-50%);
     background: var(--card-bg);
     padding: 15px 30px;
@@ -2619,10 +2621,17 @@ textarea:focus, input:focus, select:focus {
     z-index: 100;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
     border-radius: 12px;
-    width: 90%;
-    max-width: 600px;
+    /* Reduce width to prevent overflow */
+    width: 80%;
+    max-width: 500px;
     min-width: 300px;
+    /* Ensure it transitions with sidebar state */
     transition: left var(--transition-speed) ease;
+}
+
+/* When sidebar is hidden, adjust the left position */
+.left-panel.hidden ~ .content-area .navigation-controls {
+    left: 50%; /* Center in window when sidebar is hidden */
 }
 
 #vocabulary-container {
