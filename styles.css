@@ -47,7 +47,7 @@ body {
     height: 100vh;
     background-color: var(--ghibli-sky-light); /* Light sky background */
     color: var(--text-color);
-    overflow: hidden;
+    overflow: visible; /* Allow content to overflow for scrolling */
     /* Subtle gradient background */
     background-image: linear-gradient(
         to bottom,
@@ -1282,8 +1282,8 @@ button:disabled {
 }
 
 .poetry-content {
-    flex: 1;
-    overflow-y: auto;
+    /* flex: 1; */ /* Removed: Let container manage height */
+    /* overflow-y: auto; */ /* Removed: Scrolling handled by content-area */
 }
 
 .empty-state {
@@ -1624,11 +1624,12 @@ button:disabled {
 #poetry-container {
     display: flex;
     flex-direction: column;
-    padding: 20px;
-    min-height: calc(100vh - 60px);
+    /* padding: 20px; */ /* Use existing padding */
+    /* min-height: calc(100vh - 60px); */ /* Removed min-height to allow natural flow */
     position: relative;
-    height: auto;
-    overflow: visible;
+    height: auto; /* Ensure height is determined by content */
+    overflow: visible; /* Ensure content isn't clipped */
+    width: 100%; /* Ensure it takes full width */
 }
 
 .poetry-header {
@@ -1687,8 +1688,8 @@ button:disabled {
 }
 
 .poetry-content {
-    flex: 1;
-    overflow-y: auto;
+    /* flex: 1; */ /* Removed: Let container manage height */
+    /* overflow-y: auto; */ /* Removed: Scrolling handled by content-area */
 }
 
 .empty-state {
