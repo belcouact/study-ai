@@ -4,11 +4,20 @@
     <meta charset="UTF-8">
     <!-- This tag is crucial for responsive design -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inspirational Quotes</title>
+    <title>Ghibli Inspirational Quotes</title>
     <link rel="icon" href="logo_btrfly.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&family=Noto+Serif:ital@0;1&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            font-family: 'Noto Serif', serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -16,95 +25,161 @@
             flex-direction: column;
             text-align: center;
             padding: 20px;
-            background-color: #f8f9fa;
-            color: #343a40;
-            /* Add perspective for the 3D flip effect */
+            background-color: #e6f2ff;
+            color: #5d5d5d;
             perspective: 1000px;
+            background-image: url('https://images.unsplash.com/photo-1602940659805-770d1b3b9911?q=80&w=1000');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
         }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.75);
+            z-index: -1;
+        }
+        
         #quote-container {
-            background-color: #ffffff;
-            padding: 30px 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 40px 50px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
             margin-bottom: 25px;
             max-width: 700px;
             width: 90%;
-            /* Make the card clickable */
             cursor: pointer;
-            /* Transition for the flip effect */
-            transition: transform 0.6s;
-            transform-style: preserve-3d; /* Keep children in 3D space */
-            position: relative; /* Needed for absolute positioning of backface if used */
+            transition: transform 0.6s, box-shadow 0.4s;
+            transform-style: preserve-3d;
+            position: relative;
+            border: 2px solid #b4d9e7;
         }
-        /* Class added during flip animation */
+        
+        #quote-container:hover {
+            box-shadow: 0 12px 35px rgba(31, 38, 135, 0.25);
+        }
+        
+        #quote-container::before {
+            content: "";
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            width: 40px;
+            height: 40px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%237ebdc2" d="M30,10 Q50,5 70,10 Q95,15 90,40 Q85,65 70,80 Q55,95 30,90 Q5,85 10,60 Q15,35 30,10 Z"/></svg>');
+            background-size: contain;
+            z-index: -1;
+            opacity: 0.7;
+        }
+        
+        #quote-container::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            width: 30px;
+            height: 30px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23f4b183" d="M30,10 Q50,5 70,10 Q95,15 90,40 Q85,65 70,80 Q55,95 30,90 Q5,85 10,60 Q15,35 30,10 Z"/></svg>');
+            background-size: contain;
+            z-index: -1;
+            opacity: 0.7;
+        }
+        
         #quote-container.flipping {
             transform: rotateY(180deg);
         }
-        /* Hide text during the first half of the flip */
+        
         #quote-container.flipping #english-quote,
         #quote-container.flipping #chinese-quote {
-             visibility: hidden; /* Use visibility to maintain layout */
+             visibility: hidden;
         }
 
         #english-quote {
-            font-size: 1.6em;
-            margin-bottom: 15px;
-            line-height: 1.4;
-            color: #212529;
-            font-style: italic;
-             /* Ensure text is not flipped backwards */
-            backface-visibility: hidden;
-            transform: rotateY(0deg); /* Explicitly set initial state */
-        }
-        #chinese-quote {
-            font-size: 1.3em;
-            color: #495057;
-            font-family: "KaiTi", "SimSun", "Songti SC", serif; /* Common Chinese fonts */
+            font-size: 1.8em;
+            margin-bottom: 20px;
             line-height: 1.5;
-             /* Ensure text is not flipped backwards */
+            color: #5a7d8c;
+            font-style: italic;
             backface-visibility: hidden;
-            transform: rotateY(0deg); /* Explicitly set initial state */
+            transform: rotateY(0deg);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+            position: relative;
+            padding: 10px 0;
         }
-        /* Remove Button Style */
-        /*
-        button {
-            padding: 12px 25px;
-            font-size: 1.1em;
-            cursor: pointer;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        
+        #english-quote::before, 
+        #english-quote::after {
+            content: '"';
+            font-size: 1.5em;
+            color: #7ebdc2;
+            position: relative;
+            line-height: 0;
         }
-        button:hover {
-            background-color: #0056b3;
+        
+        #chinese-quote {
+            font-size: 1.4em;
+            color: #866f54;
+            font-family: "KaiTi", "SimSun", "Songti SC", serif;
+            line-height: 1.6;
+            backface-visibility: hidden;
+            transform: rotateY(0deg);
+            padding: 5px 10px;
+            background-color: rgba(255, 249, 235, 0.5);
+            display: inline-block;
+            border-radius: 8px;
+            margin-top: 5px;
         }
-        button:active {
-            transform: scale(0.98);
+        
+        .totoro-cursor {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23a9a9a9"/><circle cx="35" cy="40" r="8" fill="white"/><circle cx="65" cy="40" r="8" fill="white"/><circle cx="35" cy="40" r="4" fill="black"/><circle cx="65" cy="40" r="4" fill="black"/></svg>');
+            background-size: contain;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s;
+            opacity: 0;
         }
-        */
 
-        /* --- Responsive adjustments for smaller screens --- */
+        footer {
+            font-family: 'Lato', sans-serif;
+            margin-top: 30px;
+            font-size: 0.85em;
+            color: #7a7a7a;
+            text-align: center;
+        }
+
         @media (max-width: 600px) {
             body {
-                padding: 10px; /* Reduce body padding */
+                padding: 15px;
             }
 
             #quote-container {
-                padding: 20px 25px; /* Reduce padding inside the card */
-                width: 95%; /* Allow slightly wider card */
-                margin-bottom: 20px; /* Reduce bottom margin */
+                padding: 25px 30px;
+                width: 95%;
+                margin-bottom: 20px;
             }
 
             #english-quote {
-                font-size: 1.4em; /* Slightly smaller than desktop, but larger than original mobile */
-                margin-bottom: 12px;
+                font-size: 1.5em;
+                margin-bottom: 15px;
             }
 
             #chinese-quote {
-                font-size: 1.2em; /* Slightly smaller than desktop, but larger than original mobile */
+                font-size: 1.3em;
+            }
+            
+            #quote-container::before,
+            #quote-container::after {
+                width: 25px;
+                height: 25px;
             }
         }
     </style>
@@ -116,8 +191,11 @@
     <p id="chinese-quote"></p>
 </div>
 
-<!-- Remove the button -->
-<!-- <button id="next-quote-btn">Next Quote</button> -->
+<footer>
+    Inspired by Studio Ghibli
+</footer>
+
+<div class="totoro-cursor"></div>
 
 <script>
     // --- Function to fetch and parse quotes.csv ---
@@ -176,7 +254,25 @@
     const quoteContainer = document.getElementById('quote-container'); // Get container
     const englishQuoteElement = document.getElementById('english-quote');
     const chineseQuoteElement = document.getElementById('chinese-quote');
-    // const nextQuoteBtn = document.getElementById('next-quote-btn'); // Remove button reference
+    const totoroElement = document.querySelector('.totoro-cursor');
+
+    // Totoro cursor following mouse
+    document.addEventListener('mousemove', (e) => {
+        const x = e.clientX;
+        const y = e.clientY;
+        
+        totoroElement.style.opacity = '1';
+        totoroElement.style.left = `${x - 20}px`;
+        totoroElement.style.top = `${y - 20}px`;
+        
+        // Add a slight delay for smoother movement
+        setTimeout(() => {
+            totoroElement.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                totoroElement.style.transform = 'scale(1)';
+            }, 150);
+        }, 50);
+    });
 
     // Load quotes when the DOM is ready
     window.addEventListener('DOMContentLoaded', async () => {
@@ -197,6 +293,13 @@
             // This case handles if loadQuotesFromCSV returns an empty array
             displayQuote({ english: "No quotes loaded.", chinese: "未能加载语录。" });
         }
+        
+        // Add subtle floating animation to the quote container
+        setInterval(() => {
+            if (!isAnimating) {
+                quoteContainer.style.transform = `translateY(${Math.sin(Date.now() / 1000) * 5}px)`;
+            }
+        }, 50);
     });
 
     // *** Add the missing getRandomQuote function here ***
@@ -255,6 +358,9 @@
 
         isAnimating = true;
         quoteContainer.classList.add('flipping');
+        
+        // Add a magic particle effect on click
+        createParticles(event);
 
         // Wait for the flip animation to be halfway (or slightly less)
         // The duration is 0.6s, so halfway is 300ms.
@@ -274,21 +380,43 @@
 
         }, 300); // 300ms matches half of the 0.6s transition
     });
-
-
-    // Remove event listener for the button
-    // nextQuoteBtn.addEventListener('click', displayRandomQuote);
-
-    // Initial display is handled by DOMContentLoaded listener now
-    /* REMOVE the old initial display call
-       if (quotes && quotes.length > 0) {
-          displayRandomQuote();
-       } else if (!window.loadQuotesFromCSV) { // Check if fetch isn't being used
-          displayQuote({ english: "No quotes defined in the script.", chinese: "脚本中未定义语录。" });
-       }
-    */
-
-
+    
+    // Create magic particles on click
+    function createParticles(e) {
+        const rect = quoteContainer.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        for (let i = 0; i < 15; i++) {
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = '8px';
+            particle.style.height = '8px';
+            particle.style.borderRadius = '50%';
+            particle.style.backgroundColor = i % 2 === 0 ? '#a9dce3' : '#f4d4a8';
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '1000';
+            particle.style.opacity = '0.9';
+            particle.style.transition = 'all 1s ease-out';
+            
+            quoteContainer.appendChild(particle);
+            
+            // Random movement
+            setTimeout(() => {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 50 + Math.random() * 50;
+                particle.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`;
+                particle.style.opacity = '0';
+                
+                // Remove particle after animation
+                setTimeout(() => {
+                    particle.remove();
+                }, 1000);
+            }, 10);
+        }
+    }
 </script>
 
 </body>
