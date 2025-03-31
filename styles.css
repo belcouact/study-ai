@@ -2295,7 +2295,7 @@ textarea#user-input:focus {
     position: relative;
     overflow: hidden;
     background: linear-gradient(to bottom, #87CEEB, var(--ghibli-light-blue));
-    border-bottom: 3px dashed rgba(255, 255, 255, 0.4);
+    /*border-bottom: 3px dashed rgba(255, 255, 255, 0.4);*/
 }
 
 .ghibli-clouds {
