@@ -75,7 +75,7 @@ body {
 .left-panel {
     width: var(--sidebar-width);
     background-color: var(--ghibli-light-blue);
-    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h100v100H0z" fill-opacity="0"/><path fill-opacity=".05" d="M13 19c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7z" /></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h100v100H0z" fill-opacity="0"/><path fill-opacity=".05" d="M13 19c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7z" /></svg>');
     color: #333;
     height: 100%;
     position: fixed;
@@ -2361,21 +2361,21 @@ textarea#user-input:focus {
   position: absolute;
   width: 30px;
   height: 30px;
-  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><circle cx="15" cy="15" r="5" fill="%23FFFFFF" fill-opacity=".4"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M15 3c-4.5 0-8 2-8 7s2 7 4 9c1.5 1.5 2.5 2 4 2s2.5-.5 4-2c2-2 4-4 4-9s-3.5-7-8-7z" fill="%2390CFB0" fill-opacity=".2"/><circle cx="11" cy="10" r="2" fill="white"/><circle cx="19" cy="10" r="2" fill="white"/></svg>');
   top: 10%;
   left: 10%;
-  animation: float 20s infinite alternate ease-in-out;
+  animation: float 25s infinite alternate ease-in-out;
 }
 
 .ghibli-floating-elements::after {
   content: "";
   position: absolute;
-  width: 20px;
-  height: 20px;
-  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="3" fill="%23FFFFFF" fill-opacity=".3"/></svg>');
-  top: 30%;
-  right: 20%;
-  animation: float 15s 2s infinite alternate-reverse ease-in-out;
+  width: 40px;
+  height: 40px;
+  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 5c-8 0-14 4-14 12s3.5 12 7 15c2.5 2.5 4.5 3 7 3s4.5-0.5 7-3c3.5-3 7-7 7-15s-6-12-14-12z" fill="%234A89DC" fill-opacity=".1"/><circle cx="14" cy="17" r="3" fill="white" fill-opacity=".5"/><circle cx="26" cy="17" r="3" fill="white" fill-opacity=".5"/></svg>');
+  top: 40%;
+  right: 15%;
+  animation: float 30s 5s infinite alternate-reverse ease-in-out;
 }
 
 @keyframes float {
@@ -2416,4 +2416,572 @@ textarea#user-input:focus {
   height: 20px;
   background-image: url('data:image/svg+xml;utf8,<svg width="220" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M0 20V10c1-4 3-6 5-8s4 1 5 3c2-4 4-6 6-3 1.5-3 3-5 4.5-3 1-2 3-4 4.5-2 1-3 3-5 5-2 1-4 3-6 5-3 1.5-2 3-4 4.5-1 1.5-3 3-5 4.5-1 2-4 4-6 5-2 2-3 4-5 5-1 2-3 4-5 5-1 2-3 3-4 5-2 2-2 3-3 4-3 1-1 2-3 3-5H0zm110 0V10c1-4 3-6 5-8s4 1 5 3c2-4 4-6 6-3 1.5-3 3-5 4.5-3 1-2 3-4 4.5-2 1-3 3-5 5-2 1-4 3-6 5-3 1.5-2 3-4 4.5-1 1.5-3 3-5 4.5-1 2-4 4-6 5-2 2-3 4-5 5-1 2-3 4-5 5-1 2-3 3-4 5-2 2-2 3-3 4-3 1-1 2-3 3-5h-30z" fill="%2390CFB0" fill-opacity=".3"/></svg>');
   background-repeat: repeat-x;
+}
+
+/* Vocabulary Container Ghibli Style */
+#vocabulary-content {
+  position: relative;
+  overflow: visible;
+}
+
+#vocabulary-content::before {
+  content: "";
+  position: absolute;
+  top: -30px;
+  right: 30px;
+  width: 80px;
+  height: 80px;
+  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 20c-16.569 0-30 13.431-30 30 0 16.569 13.431 30 30 30 16.569 0 30-13.431 30-30 0-16.569-13.431-30-30-30zm-15 30a5 5 0 110-10 5 5 0 010 10zm30 0a5 5 0 110-10 5 5 0 010 10zm-15 15a15 15 0 01-12-6h24a15 15 0 01-12 6z" fill="%234A89DC" fill-opacity=".15"/></svg>');
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.vocabulary-container {
+  background-color: var(--ghibli-cream);
+  border-radius: 15px;
+  box-shadow: 0 5px 0 var(--ghibli-brown), 0 5px 20px rgba(0,0,0,0.1);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.vocabulary-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--ghibli-yellow), var(--ghibli-accent), var(--ghibli-yellow));
+  z-index: 1;
+}
+
+.vocabulary-card-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Vocabulary Header */
+.vocabulary-header {
+  background: linear-gradient(to right, var(--ghibli-light-blue), var(--ghibli-blue));
+  border-radius: 12px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.vocabulary-header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--ghibli-accent), transparent, var(--ghibli-accent));
+}
+
+.vocabulary-header h2 {
+  color: white;
+  margin: 0;
+  font-size: 1.3rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.vocabulary-header h2::before {
+  content: "🌱";
+  margin-right: 8px;
+}
+
+.vocabulary-load-btn {
+  background-color: white;
+  color: var(--ghibli-blue);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.1);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+}
+
+.vocabulary-load-btn::before {
+  content: "📚";
+  margin-right: 6px;
+  font-size: 1rem;
+}
+
+#load-sentences-btn::before {
+  content: "🔤";
+}
+
+.vocabulary-load-btn:hover {
+  background-color: var(--ghibli-yellow);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 rgba(0,0,0,0.1);
+}
+
+.vocabulary-load-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+}
+
+/* Navigation controls */
+#vocabulary-content .navigation-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin: 20px 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 10px;
+  border-radius: 30px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  position: relative;
+  z-index: 2;
+}
+
+#vocabulary-content .nav-button {
+  background-color: var(--ghibli-light-blue);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.1);
+}
+
+#vocabulary-content .nav-button:hover:not(:disabled) {
+  background-color: var(--ghibli-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 rgba(0,0,0,0.1);
+}
+
+#vocabulary-content .nav-button:disabled {
+  background-color: #d1d1d1;
+  cursor: not-allowed;
+  opacity: 0.7;
+  box-shadow: none;
+}
+
+#word-counter {
+  background-color: white;
+  padding: 6px 15px;
+  border-radius: 15px;
+  font-weight: 500;
+  color: var(--ghibli-brown);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+  font-size: 0.9rem;
+}
+
+/* Vocabulary Content */
+#vocabulary-container {
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 3px 0 var(--ghibli-light-green), 0 3px 10px rgba(0,0,0,0.05);
+  position: relative;
+  min-height: 350px;
+}
+
+.initial-message {
+  text-align: center;
+  padding: 30px;
+  color: var(--ghibli-brown);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  background-color: rgba(253, 246, 227, 0.7);
+  border-radius: 10px;
+  position: relative;
+}
+
+.initial-message::before {
+  content: "👋";
+  display: block;
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+/* Word Card Styling */
+.word-card {
+  background-color: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  position: relative;
+  overflow: hidden;
+  animation: cardEntrance 0.6s ease-out;
+  border: 2px dashed rgba(93, 158, 122, 0.2);
+}
+
+.word-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--ghibli-light-green), var(--ghibli-light-blue));
+}
+
+.word-header {
+  margin-bottom: 20px;
+  position: relative;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(93, 158, 122, 0.1);
+}
+
+.word-english {
+  font-size: 2rem;
+  color: var(--ghibli-blue);
+  font-weight: bold;
+  margin: 0 0 10px 0;
+  display: flex;
+  align-items: center;
+}
+
+.word-english::before {
+  content: "🔤";
+  font-size: 1.2rem;
+  margin-right: 10px;
+  opacity: 0.7;
+}
+
+.word-pronunciation {
+  color: var(--ghibli-brown);
+  font-style: italic;
+  margin: 5px 0;
+  padding: 5px 10px;
+  background: rgba(253, 246, 227, 0.5);
+  border-radius: 5px;
+  display: inline-block;
+}
+
+.word-pronunciation::before {
+  content: "🔊";
+  margin-right: 5px;
+  font-size: 0.9rem;
+}
+
+.section-title {
+  color: var(--ghibli-blue);
+  margin: 20px 0 10px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 15px;
+}
+
+.section-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 18px;
+  background-color: var(--ghibli-accent);
+  border-radius: 3px;
+}
+
+.meaning-row {
+  margin-bottom: 15px;
+  padding-left: 10px;
+  position: relative;
+}
+
+.meaning-label {
+  color: white;
+  background-color: var(--ghibli-green);
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.meaning-content {
+  margin-top: 5px;
+  line-height: 1.5;
+  color: #333;
+  padding: 5px 0 5px 15px;
+  border-left: 3px solid rgba(93, 158, 122, 0.2);
+}
+
+/* Example items */
+.example-item {
+  margin: 10px 0;
+  padding: 10px 15px;
+  background-color: rgba(253, 246, 227, 0.5);
+  border-radius: 8px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.example-item:hover {
+  background-color: rgba(253, 246, 227, 0.8);
+  transform: translateY(-2px);
+}
+
+.example-english {
+  color: var(--ghibli-blue);
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.example-chinese {
+  color: var(--ghibli-brown);
+  font-size: 0.95rem;
+}
+
+/* Word family and Collocations */
+.word-family-items, .collocation-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.word-family-item, .collocation-item {
+  background-color: rgba(147, 194, 239, 0.2);
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  color: var(--ghibli-blue);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(74, 137, 220, 0.1);
+}
+
+.word-family-item:hover, .collocation-item:hover {
+  background-color: rgba(147, 194, 239, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Synonyms and Antonyms */
+.word-relationships {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-top: 15px;
+}
+
+@media (min-width: 768px) {
+  .word-relationships {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.synonyms, .antonyms {
+  position: relative;
+}
+
+.synonym-items, .antonym-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.synonym-container, .antonym-container {
+  background-color: rgba(253, 246, 227, 0.5);
+  padding: 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  border-left: 3px solid;
+}
+
+.synonym-container {
+  border-left-color: var(--ghibli-green);
+}
+
+.antonym-container {
+  border-left-color: var(--ghibli-accent);
+}
+
+.synonym-container:hover, .antonym-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+
+.synonym-word, .antonym-word {
+  font-weight: 600;
+  color: var(--ghibli-blue);
+  margin-bottom: 3px;
+}
+
+.synonym-def, .antonym-def {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Learning Tips */
+.learning-tips {
+  background-color: rgba(147, 194, 239, 0.15);
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 20px;
+  position: relative;
+  border-left: 4px solid var(--ghibli-yellow);
+}
+
+.learning-tips h4 {
+  color: var(--ghibli-brown);
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.learning-tips h4::before {
+  content: "💡";
+  margin-right: 8px;
+}
+
+.tip-content {
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Loading and Error States */
+.loading-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.vocabulary-spinner {
+  width: 80px;
+  height: 80px;
+  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M40 50c0 5.523 4.477 10 10 10s10-4.477 10-10-4.477-10-10-10-10 4.477-10 10zm35-20c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 40c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zM25 30c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 40c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5z" fill="%234A89DC"/></svg>');
+  background-repeat: no-repeat;
+  animation: spin 2s infinite linear;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-message p {
+  color: var(--ghibli-blue);
+  font-size: 1.1rem;
+  margin: 0 0 5px 0;
+}
+
+.error-message {
+  background-color: rgba(231, 109, 111, 0.1);
+  border-left: 4px solid var(--ghibli-accent);
+  padding: 15px;
+  border-radius: 8px;
+  color: #333;
+  line-height: 1.5;
+}
+
+.error-message::before {
+  content: "⚠️";
+  margin-right: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .vocabulary-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .word-english {
+    font-size: 1.6rem;
+  }
+  
+  .word-relationships {
+    grid-template-columns: 1fr;
+  }
+  
+  .synonym-items, .antonym-items {
+    grid-template-columns: 1fr;
+  }
+  
+  #vocabulary-content .navigation-controls {
+    padding: 8px;
+  }
+  
+  #vocabulary-content .nav-button {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Additional Ghibli elements for vocabulary page */
+.ghibli-floating-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.ghibli-floating-elements::before {
+  content: "";
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M15 3c-4.5 0-8 2-8 7s2 7 4 9c1.5 1.5 2.5 2 4 2s2.5-.5 4-2c2-2 4-4 4-9s-3.5-7-8-7z" fill="%2390CFB0" fill-opacity=".2"/><circle cx="11" cy="10" r="2" fill="white"/><circle cx="19" cy="10" r="2" fill="white"/></svg>');
+  top: 10%;
+  left: 10%;
+  animation: float 25s infinite alternate ease-in-out;
+}
+
+.ghibli-floating-elements::after {
+  content: "";
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 5c-8 0-14 4-14 12s3.5 12 7 15c2.5 2.5 4.5 3 7 3s4.5-0.5 7-3c3.5-3 7-7 7-15s-6-12-14-12z" fill="%234A89DC" fill-opacity=".1"/><circle cx="14" cy="17" r="3" fill="white" fill-opacity=".5"/><circle cx="26" cy="17" r="3" fill="white" fill-opacity=".5"/></svg>');
+  top: 40%;
+  right: 15%;
+  animation: float 30s 5s infinite alternate-reverse ease-in-out;
+}
+
+.vocabulary-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ghibli-grass-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background-image: url('data:image/svg+xml;utf8,<svg width="220" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M0 20V10c1-4 3-6 5-8s4 1 5 3c2-4 4-6 6-3 1.5-3 3-5 4.5-3 1-2 3-4 4.5-2 1-3 3-5 5-2 1-4 3-6 5-3 1.5-2 3-4 4.5-1 1.5-3 3-5 4.5-1 2-4 4-6 5-2 2-3 4-5 5-1 2-3 4-5 5-1 2-3 3-4 5-2 2-2 3-3 4-3 1-1 2-3 3-5H0zm110 0V10c1-4 3-6 5-8s4 1 5 3c2-4 4-6 6-3 1.5-3 3-5 4.5-3 1-2 3-4 4.5-2 1-3 3-5 5-2 1-4 3-6 5-3 1.5-2 3-4 4.5-1 1.5-3 3-5 4.5-1 2-4 4-6 5-2 2-3 4-5 5-1 2-3 4-5 5-1 2-3 3-4 5-2 2-2 3-3 4-3 1-1 2-3 3-5h-30z" fill="%2390CFB0" fill-opacity=".3"/></svg>');
+  background-repeat: repeat-x;
+  z-index: 1;
 }
