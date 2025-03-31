@@ -6013,3 +6013,139 @@ function createWordCard(data) {
     
     // ... rest of the existing code ...
 }
+
+// Wait for the DOM to fully load
+document.addEventListener('DOMContentLoaded', function() {
+    // Navigation active state management
+    const navButtons = document.querySelectorAll('.nav-btn');
+    
+    navButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    // Animated entrance effects for elements
+    const animateElements = () => {
+        const elements = document.querySelectorAll('.hero, .learning-path, .course-card, .achievement');
+        
+        elements.forEach((element, index) => {
+            // Add initial styles for animation
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            
+            // Delayed appearance for cascading effect
+            setTimeout(() => {
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }, 100 * index);
+        });
+    };
+    
+    animateElements();
+    
+    // Hover effects for path nodes
+    const pathNodes = document.querySelectorAll('.path-node');
+    
+    pathNodes.forEach(node => {
+        node.addEventListener('mouseenter', function() {
+            if (!this.classList.contains('active') && !this.classList.contains('completed')) {
+                this.style.backgroundColor = 'rgba(123, 182, 173, 0.1)';
+            }
+        });
+        
+        node.addEventListener('mouseleave', function() {
+            if (!this.classList.contains('active') && !this.classList.contains('completed')) {
+                this.style.backgroundColor = 'var(--card-bg)';
+            }
+        });
+    });
+    
+    // Interactive achievements
+    const achievements = document.querySelectorAll('.achievement');
+    
+    achievements.forEach(achievement => {
+        achievement.addEventListener('click', function() {
+            if (!this.classList.contains('unlocked')) {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = 'Complete this challenge to unlock!';
+                tooltip.style.position = 'absolute';
+                tooltip.style.top = '-40px';
+                tooltip.style.left = '50%';
+                tooltip.style.transform = 'translateX(-50%)';
+                tooltip.style.backgroundColor = 'var(--text-dark)';
+                tooltip.style.color = 'white';
+                tooltip.style.padding = '0.5rem 1rem';
+                tooltip.style.borderRadius = '5px';
+                tooltip.style.fontSize = '0.9rem';
+                tooltip.style.zIndex = '100';
+                tooltip.style.whiteSpace = 'nowrap';
+                
+                this.style.position = 'relative';
+                this.appendChild(tooltip);
+                
+                setTimeout(() => {
+                    tooltip.remove();
+                }, 2000);
+            }
+        });
+    });
+    
+    // Parallax effect for background elements
+    window.addEventListener('scroll', function() {
+        const scroll = window.scrollY;
+        
+        document.querySelector('.forest-background').style.backgroundPositionY = `${10 + scroll * 0.05}px`;
+        
+        const clouds = document.querySelectorAll('.cloud');
+        clouds.forEach((cloud, index) => {
+            const speed = 0.03 + (index * 0.01);
+            const currentLeft = parseFloat(getComputedStyle(cloud).left);
+            cloud.style.left = `${currentLeft + scroll * speed}px`;
+        });
+    });
+    
+    // Course card hover effects
+    const courseCards = document.querySelectorAll('.course-card');
+    
+    courseCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.querySelector('.course-btn').style.backgroundColor = 'var(--primary-dark)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.querySelector('.course-btn').style.backgroundColor = 'var(--primary)';
+        });
+    });
+    
+    // CTA button effects
+    const ctaButton = document.querySelector('.cta-button');
+    
+    ctaButton.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-3px) scale(1.05)';
+    });
+    
+    ctaButton.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0) scale(1)';
+    });
+    
+    ctaButton.addEventListener('click', function() {
+        // Animate button press
+        this.style.transform = 'translateY(2px) scale(0.95)';
+        setTimeout(() => {
+            this.style.transform = 'translateY(-3px) scale(1.05)';
+        }, 150);
+        
+        // Smoothly scroll to learning path section
+        document.querySelector('.learning-path').scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+
+    // Preserve original functionality from the existing script.js
+    // This is a placeholder assuming there was existing functionality
+    // ... existing code ...
+});

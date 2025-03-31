@@ -3,271 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Study Grove - Ghibli Edition</title>
-    <link rel="icon" href="logo_btrfly.ico" type="image/x-icon">
+    <title>Ghibli Learning Journey</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Preconnect to external domains -->
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="preconnect" href="https://polyfill.io">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Caveat:wght@400;700&family=Indie+Flower&display=swap" rel="stylesheet">
-    <!-- Load critical CSS first -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
-    <!-- Add MathJax for rendering math formulas with defer -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <meta name="theme-color" content="#8cb0b9">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Left Panel -->
-        <div class="left-panel">
-            <div class="panel-buttons">
-                <button id="qa-button" class="panel-button active">问答</button>
-                <button id="create-button" class="panel-button">测验</button>
-                <button id="poetry-button" class="panel-button">诗词</button>
-                <button id="word-button" class="panel-button">英语</button>
-                
-                <!-- Dropdown Frames -->
-                <div class="dropdown-frames">
-                    <!-- User Identity Frame -->
-                    <div class="sidebar-frame">
-                        <h3 class="frame-title">我是</h3>
-                        <div class="frame-content">
-                            <div class="dropdown-container">
-                                <label for="school-select-sidebar">学校</label>
-                                <select id="school-select-sidebar" name="school">
-                                    <option value="小学">小学</option>
-                                    <option value="初中">初中</option>
-                                    <option value="高中">高中</option>
-                                </select>
-                            </div>
-                            
-                            <div class="dropdown-container">
-                                <label for="grade-select-sidebar">年级</label>
-                                <select id="grade-select-sidebar" name="grade">
-                                    <!-- Options will be populated dynamically -->
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slogan -->
-                <a href="https://study-llm.pages.dev/quote/main" target="_blank" title="click for more inspirational quotes" style="text-decoration: none; color: inherit;">
-                    <div class="sidebar-slogan">
-                        <p>Stay hungry, stay foolish</p>
-                        <p>求知若饥，虚心若愚</p>
-                    </div>
-                </a>
-            </div>
-            
-            <!-- Footer text -->
-            <div class="panel-footer">
-                <div class="footer-links">
-                    <a href="https://yuanbao.tencent.com/chat/naQivTmsDa" target="_blank" rel="noopener">腾讯元宝</a>
-                    <a href="https://tongyi.aliyun.com/qianwen/" target="_blank" rel="noopener">通义千问</a>
-                    <a href="#" id="about-site-link" onclick="return showAboutModal();">关于本站</a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Sidebar Toggle Button -->
-        <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        
-        <!-- Right Content Area -->
-        <div class="content-area">
-            <!-- Q&A Chat Container -->
-            <div id="qa-container" class="container">
-                <div class="chat-container">
-                    <div class="input-container">
-                        <div class="welcome-message">你好，我是你的AI老师，有什么我可以帮你的吗？</div>
-                        <textarea id="user-input" placeholder="请输入你的问题..."></textarea>
-                        <div class="button-container">
-                            <div class="right-controls">
-                                <button id="optimize-button" title="优化您的问题以获得更好的回答">优化问题</button>
-                                <button id="submit-button">提交问题</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="output-container">
-                        <div id="loading" class="hidden">
-                            <div class="spinner"></div>
-                            <p>出题中...</p>
-                        </div>
-                        <div id="output">
-                            <!-- Output will appear here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Create Questions Container (initially hidden) -->
-            <div id="create-container" class="container hidden">
-                <!-- Add control panel at the top -->
-                <div class="control-panel">
-                    <label for="subject-selectr">科目</label>
-                    <select id="subject-select" name="subject">
-                        <!-- Options will be populated dynamically -->
-                    </select>
-
-                    <label for="semester-select">学期</label>
-                    <select id="semester-select">
-                        <option value="上学期">上学期</option>
-                        <option value="下学期">下学期</option>
-                    </select>
-
-                    <label for="difficulty-select">难度</label>
-                        <select id="difficulty-select">
-                            <option value="容易">容易</option>
-                            <option value="中等">中等</option>
-                            <option value="偏难">偏难</option>
-                        </select>
-
-                        <label for="question-count-select">题数</label>
-                        <select id="question-count-select">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="15">15</option>
-                        </select>
-                    <button id="generate-btn" onclick="handleGenerateQuestionsClick()">出题</button>
-                    <button id="evaluate-btn" onclick="handleEvaluateClick()" disabled>结果评估</button>
-                </div>
-
-                <!-- Questions display container -->
-                <div id="questions-display-container" class="questions-display-container hidden">
-                    <!-- Empty state message -->
-                    <div id="empty-state" class="empty-state">
-                        <i class="fas fa-book-open empty-state-icon"></i>
-                        <h3>准备好开始测验了吗？</h3>
-                        <p>使用左侧边栏选择学校类型、年级、学期、科目、难度和题数，然后点击"出题"按钮生成题目。</p>
-                    </div>
-                    
-                    <!-- Question content will be dynamically inserted here -->
-                    <div id="question-counter" class="question-counter"></div>
-                    <div id="question-text" class="question-text"></div>
-                    <div id="choices-container" class="choices-container"></div>
-                    
-                    <!-- Answer container -->
-                    <div id="answer-container" class="answer-container hidden">
-                        <div id="answer-result" class="answer-result"></div>
-                        <div id="answer-explanation" class="answer-explanation"></div>
-                    </div>
-                </div>
-                
-                <!-- Navigation controls moved to the bottom -->
-                <div class="navigation-controls">
-                    <button id="prev-question-button" class="nav-button" disabled> &#10094; </button>
-                    <button id="next-question-button" class="nav-button" disabled> &#10095; </button>
-                </div>
-            </div>
-            
-            <!-- Poetry Container -->
-            <div id="poetry-container" class="container">
-                <div class="poetry-header">
-                    <div class="poetry-controls">
-                        <div class="poetry-selectors">
-                            <div class="selector-group">
-                                <label for="poetry-type-select">类型</label>
-                                <select id="poetry-type-select" class="poetry-select">
-                                    <option value="诗经">诗经</option>
-                                    <option value="楚辞">楚辞</option>
-                                    <option value="汉赋">汉赋</option>
-                                    <option value="唐诗">唐诗</option>
-                                    <option value="宋词">宋词</option>
-                                    <option value="元曲">元曲</option>
-                                </select>
-                            </div>
-                            <div class="selector-group">
-                                <label for="poetry-style-select">风格</label>
-                                <select id="poetry-style-select" class="poetry-select">
-                                    <option value="任意">任意</option>
-                                    <option value="山水">山水</option>
-                                    <option value="边塞">边塞</option>
-                                    <option value="浪漫">浪漫</option>
-                                    <option value="现实">现实</option>
-                                </select>
-                            </div>
-                            <!-- Poetry Quantity -->
-                            <div class="selector-group">
-                                <label for="poetry-qty-select">数量</label>
-                                <select id="poetry-qty-select" class="poetry-select">
-                                    <option value=5>5</option>
-                                    <option value=10>10</option>
-                                </select>
-                            </div>
-                            <button id="learn-poetry-button" class="primary-button poetry-button"  title="若结果有误，请点击重试">学习诗词</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="poetry-content">
-                    <div id="poetry-empty-state" class="empty-state">
-                        <!-- <img src="assets/poetry-icon.svg" alt="Poetry Icon" class="empty-state-icon"> -->
-                        <h3>开始学习古诗词</h3>
-                        <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成适合您学习阶段的诗词。</p>
-                    </div>
-                    <div id="poetry-display" class="hidden">
-                        <div class="poem-navigation">
-                            <button id="prev-poem-button" class="poem-nav-button" disabled>
-                                <i class="fas fa-arrow-left"></i>
-                            </button>
-                            <span class="poem-counter">1 / 5</span>
-                            <button id="next-poem-button" class="poem-nav-button">
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
-                        <div class="poem-display">
-                            <h2 class="poem-title"></h2>
-                            <p class="poem-author"></p>
-                            <div class="poem-content"></div>
-                            <div class="poem-section">
-                                <h3>创作背景</h3>
-                                <div class="poem-background"></div>
-                            </div>
-                            <div class="poem-section">
-                                <h3>赏析</h3>
-                                <div class="poem-explanation"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="vocabulary-content" class="tab-content">
-                <div class="vocabulary-container">
-                    <div class="vocabulary-card-container">
-                        <div class="vocabulary-header">
-                            <h2>英语常用句子 & 词汇学习</h2>
-                            <a href="https://study-llm.pages.dev/english/main" target="_blank" id="load-sentences-btn" class="vocabulary-load-btn">常用句子</a>
-                            <button id="load-vocabulary-btn" class="vocabulary-load-btn">加载词汇</button>
-                        </div>
-                        
-                        <div class="navigation-controls">
-                            <button id="prev-word-btn" class="nav-button" disabled>
-                                <span class="nav-arrow">&#10094;</span>
-                            </button>
-                            <span id="word-counter">0/0</span>
-                            <button id="next-word-btn" class="nav-button" disabled>
-                                <span class="nav-arrow">&#10095;</span>
-                            </button>
-                        </div>
-                        
-                        <div id="vocabulary-container">
-                            <div class="initial-message">
-                                请选择侧边栏中的学校和年级，然后点击"加载词汇"按钮开始学习英语单词
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="forest-background"></div>
+    <div class="floating-clouds">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
     </div>
-    <!-- Load script at the end with defer -->
-    <script src="script.js" defer></script>
+
+    <header>
+        <div class="logo-container">
+            <div class="logo">
+                <img src="https://i.imgur.com/8tBh7nA.png" alt="Learning Journey Logo">
+            </div>
+            <h1>Learning Adventure</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#" class="nav-btn active">Home</a></li>
+                <li><a href="#" class="nav-btn">Courses</a></li>
+                <li><a href="#" class="nav-btn">Progress</a></li>
+                <li><a href="#" class="nav-btn">Resources</a></li>
+            </ul>
+        </nav>
+        <div class="user-profile">
+            <span class="username">Student</span>
+            <div class="avatar">
+                <img src="https://i.imgur.com/JoqDPPB.png" alt="Totoro Avatar">
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Begin Your Learning Adventure</h2>
+                <p>Explore magical worlds of knowledge and grow your skills!</p>
+                <button class="cta-button">Start Journey</button>
+            </div>
+            <div class="hero-image">
+                <img src="https://i.imgur.com/NXldQw8.png" alt="Learning Journey">
+            </div>
+        </section>
+
+        <section class="learning-path">
+            <h2>Your Learning Path</h2>
+            <div class="path-container">
+                <div class="path-node completed">
+                    <div class="node-icon">1</div>
+                    <div class="node-content">
+                        <h3>Foundations</h3>
+                        <p>Master the basics</p>
+                    </div>
+                    <div class="completion-badge">✓</div>
+                </div>
+                <div class="path-connector"></div>
+                <div class="path-node active">
+                    <div class="node-icon">2</div>
+                    <div class="node-content">
+                        <h3>Core Concepts</h3>
+                        <p>Build understanding</p>
+                    </div>
+                    <div class="progress-indicator">
+                        <div class="progress-bar" style="width: 65%"></div>
+                    </div>
+                </div>
+                <div class="path-connector"></div>
+                <div class="path-node">
+                    <div class="node-icon">3</div>
+                    <div class="node-content">
+                        <h3>Advanced Skills</h3>
+                        <p>Refine your abilities</p>
+                    </div>
+                </div>
+                <div class="path-connector"></div>
+                <div class="path-node">
+                    <div class="node-icon">4</div>
+                    <div class="node-content">
+                        <h3>Mastery</h3>
+                        <p>Become an expert</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="featured-courses">
+            <h2>Featured Learning Adventures</h2>
+            <div class="course-cards">
+                <div class="course-card">
+                    <div class="course-image">
+                        <img src="https://i.imgur.com/F3mP7sg.jpg" alt="Course 1">
+                    </div>
+                    <div class="course-content">
+                        <h3>Nature of Algorithms</h3>
+                        <p>Explore the magical forest of algorithms and data structures</p>
+                        <div class="course-meta">
+                            <span class="duration">8 weeks</span>
+                            <span class="difficulty">Intermediate</span>
+                        </div>
+                        <button class="course-btn">Continue</button>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="course-image">
+                        <img src="https://i.imgur.com/jBFnlEP.jpg" alt="Course 2">
+                    </div>
+                    <div class="course-content">
+                        <h3>Creative Coding Journey</h3>
+                        <p>Create magical animations and interactive experiences</p>
+                        <div class="course-meta">
+                            <span class="duration">6 weeks</span>
+                            <span class="difficulty">Beginner</span>
+                        </div>
+                        <button class="course-btn">Explore</button>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="course-image">
+                        <img src="https://i.imgur.com/zVVPh0O.jpg" alt="Course 3">
+                    </div>
+                    <div class="course-content">
+                        <h3>Web Development Wonders</h3>
+                        <p>Craft beautiful websites with enchanting user experiences</p>
+                        <div class="course-meta">
+                            <span class="duration">10 weeks</span>
+                            <span class="difficulty">Advanced</span>
+                        </div>
+                        <button class="course-btn">Discover</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="achievements">
+            <h2>Your Achievements</h2>
+            <div class="achievements-grid">
+                <div class="achievement unlocked">
+                    <div class="achievement-icon">🌱</div>
+                    <h3>First Steps</h3>
+                    <p>Begin your learning journey</p>
+                </div>
+                <div class="achievement unlocked">
+                    <div class="achievement-icon">🌿</div>
+                    <h3>Growing Knowledge</h3>
+                    <p>Complete 5 lessons</p>
+                </div>
+                <div class="achievement unlocked">
+                    <div class="achievement-icon">🌲</div>
+                    <h3>Steady Growth</h3>
+                    <p>Study for 7 days in a row</p>
+                </div>
+                <div class="achievement">
+                    <div class="achievement-icon">⭐</div>
+                    <h3>Star Catcher</h3>
+                    <p>Earn your first perfect score</p>
+                </div>
+                <div class="achievement">
+                    <div class="achievement-icon">🦉</div>
+                    <h3>Night Owl</h3>
+                    <p>Study after sunset</p>
+                </div>
+                <div class="achievement">
+                    <div class="achievement-icon">🏞️</div>
+                    <h3>Explorer</h3>
+                    <p>Visit all course categories</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="https://i.imgur.com/8tBh7nA.png" alt="Learning Journey Logo">
+                <h3>Learning Adventure</h3>
+            </div>
+            <div class="footer-links">
+                <div class="link-group">
+                    <h4>Learn</h4>
+                    <ul>
+                        <li><a href="#">Courses</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li><a href="#">Resources</a></li>
+                    </ul>
+                </div>
+                <div class="link-group">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="#">Forums</a></li>
+                        <li><a href="#">Events</a></li>
+                        <li><a href="#">Connect</a></li>
+                    </ul>
+                </div>
+                <div class="link-group">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Feedback</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 Learning Adventure. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html> 
