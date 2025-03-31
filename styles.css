@@ -3834,3 +3834,47 @@ textarea#user-input:focus {
     gap: 8px;
     }
 } 
+
+/* Update empty state default visibility */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 300px;
+    padding: 30px 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    margin-top: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+    border: 2px dashed rgba(93, 158, 122, 0.2);
+}
+
+/* Update poetry display default visibility */
+#poetry-display {
+    display: none; /* Change from .hidden class to explicitly set display: none */
+}
+
+/* When poems are loaded, hide empty state and show poetry display */
+#poetry-display.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+.empty-state.hidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
