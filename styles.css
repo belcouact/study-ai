@@ -43,7 +43,7 @@ body {
     width: 100%;
 }
 
-/* Update content area to be responsive when sidebar is collapsed */
+/* Update content area to expand when sidebar is collapsed */
 .content-area {
     margin-left: var(--sidebar-width);
     padding: 20px;
@@ -190,7 +190,7 @@ body {
     opacity: 0.3;
 }
 
-/* Update panel footer to accommodate the new button */
+/* Update panel footer to accommodate new button */
 .panel-footer {
     width: 100%;
     padding: 12px;
@@ -199,35 +199,37 @@ body {
     text-align: center;
     line-height: 1.5;
     margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-/* Update footer links to include the new button */
+/* Style for footer buttons */
 .footer-links {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 8px;
+    align-items: center;
 }
 
 .footer-links a {
-    padding: 8px 12px;
-    border-radius: 8px;
-    background-color: var(--ghibli-cream);
-    color: var(--ghibli-dark);
+    padding: 8px 16px;
+    background-color: var(--ghibli-light-green);
+    color: var(--ghibli-dark-green);
     text-decoration: none;
-    transition: all 0.3s ease;
+    border-radius: 20px;
     font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    transition: all 0.3s ease;
+    width: 80%;
+    text-align: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .footer-links a:hover {
+    background-color: var(--ghibli-green);
+    color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    background-color: var(--ghibli-light-green);
 }
 
 /* External services section */
@@ -355,14 +357,8 @@ body {
     padding: 20px;
     background-color: var(--ghibli-cream);
     border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     position: relative;
-    transition: max-width var(--transition-speed) ease;
-}
-
-/* When sidebar is collapsed, allow chat container to expand more */
-.left-panel.hidden ~ .content-area .chat-container {
-    max-width: 1400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .chat-container::before {
@@ -378,8 +374,6 @@ body {
 
 /* Input Container */
 .input-container {
-    width: 100%;
-    transition: width var(--transition-speed) ease;
     background-color: rgba(255, 255, 255, 0.7);
     border-radius: 12px;
     padding: 15px;
@@ -474,8 +468,6 @@ textarea#user-input:focus {
 
 /* Output Container */
 .output-container {
-    width: 100%;
-    transition: width var(--transition-speed) ease;
     background: rgba(255, 255, 255, 0.9);
     border-radius: 12px;
     padding: 15px;
@@ -2250,7 +2242,7 @@ textarea#user-input:focus {
         padding: 0.8em;
         margin: 1em 0;
     }
-}
+} 
 
 /* Add these new Ghibli theme elements after the left-panel styling */
 
