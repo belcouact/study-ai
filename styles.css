@@ -4308,3 +4308,124 @@ textarea#user-input:focus {
     width: 100%;
     padding: 0;
 } 
+
+/* 1. Center the qa-container and make it wider */
+#qa-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: var(--ghibli-cream);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Ensure content area is properly set up for centering */
+.content-area {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    min-height: 100vh;
+    transition: margin-left var(--transition-speed) ease, width var(--transition-speed) ease;
+    width: calc(100% - var(--sidebar-width));
+    margin-left: var(--sidebar-width);
+}
+
+/* Adjust content area when sidebar is hidden */
+.left-panel.hidden + .content-area {
+    margin-left: 0;
+    width: 100%;
+}
+
+/* 2. Adjust vocabulary-header to display labels next to dropdowns */
+.vocabulary-header {
+    background-color: var(--ghibli-light-blue);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+
+.vocabulary-header h2 {
+    width: 100%;
+    color: var(--ghibli-dark-green);
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+/* Create a wrapper for each label+dropdown pair */
+.vocabulary-filter-group {
+    display: flex;
+    align-items: center;
+    flex: 1 1 200px;
+    gap: 10px;
+}
+
+.vocabulary-header label {
+    font-weight: 500;
+    color: var(--ghibli-dark-green);
+    margin: 0;
+    white-space: nowrap;
+}
+
+.vocabulary-header select {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 2px solid var(--ghibli-light-green);
+    background-color: var(--ghibli-cream);
+    color: var(--ghibli-dark-green);
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.vocabulary-header select:focus {
+    outline: none;
+    border-color: var(--ghibli-accent);
+    box-shadow: 0 0 0 2px rgba(255, 188, 64, 0.3);
+}
+
+.vocabulary-load-btn {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    #qa-container {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    .vocabulary-header {
+        padding: 15px;
+        gap: 10px;
+    }
+    
+    .vocabulary-header h2 {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+    
+    .vocabulary-filter-group {
+        flex: 1 1 100%;
+    }
+    
+    .vocabulary-header select {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .vocabulary-load-btn {
+        width: 100%;
+        margin-top: 10px;
+    }
+}
