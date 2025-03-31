@@ -6032,59 +6032,31 @@ function handlePoetryDisplayState() {
   const loadingElement = document.getElementById('poetry-loading');
   const poetryDisplay = document.getElementById('poetry-display');
   
+  // Check if elements exist before manipulating them
+  if (!poetryDisplay || !emptyState) {
+    console.warn('Poetry display elements not found in DOM');
+    return;
+  }
+
   // Initially hide poetry display, show empty state
   poetryDisplay.classList.remove('active');
   emptyState.style.display = 'flex';
   
   // When learn-poetry-button is clicked
-  document.getElementById('learn-poetry-button').addEventListener('click', function() {
-    // Hide empty state, show loading
-    emptyState.style.display = 'none';
-    if (loadingElement) {
-      loadingElement.style.display = 'flex';
-    }
-    
-    // The existing poetry fetch logic would go here...
-    // Once data is received and poems are parsed, call showPoetryDisplay()
-  });
-}
-
-// Function to display poetry content after loading
-function showPoetryDisplay() {
-  const emptyState = document.getElementById('poetry-empty-state');
-  const loadingElement = document.getElementById('poetry-loading');
-  const poetryDisplay = document.getElementById('poetry-display');
-  
-  // Hide loading and empty state
-  emptyState.style.display = 'none';
-  if (loadingElement) {
-    loadingElement.style.display = 'none';
+  const learnButton = document.getElementById('learn-poetry-button');
+  if (learnButton) {
+    learnButton.addEventListener('click', function() {
+      // Hide empty state, show loading
+      emptyState.style.display = 'none';
+      if (loadingElement) {
+        loadingElement.style.display = 'flex';
+      }
+    });
   }
-  
-  // Remove any potential 'hidden' class
-  poetryDisplay.classList.remove('hidden');
-  
-  // Show poetry display with animation
-  poetryDisplay.classList.add('active');
-  
-  // Also set the inline style explicitly to override any potential conflicts
-  poetryDisplay.style.display = 'block';
-  
-  // Initialize poem animation
-  animatePoemDisplay();
 }
 
-// Add this to your existing DOMContentLoaded listener
+// Make sure DOM is loaded before running the function
 document.addEventListener('DOMContentLoaded', function() {
-  // ... existing code
-  handlePoetryDisplayState();
+  // Delay the execution slightly to ensure all elements are available
+  setTimeout(handlePoetryDisplayState, 0);
 });
-
-// After poems are successfully loaded and parsed
-// (This might be in an event listener or API callback)
-function handleSuccessfulPoemLoad() {
-  // Your existing code to parse and prepare poem data...
-  
-  // Then explicitly call the showPoetryDisplay function
-  showPoetryDisplay();
-}
