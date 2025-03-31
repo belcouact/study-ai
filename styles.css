@@ -1631,12 +1631,14 @@ textarea#user-input:focus {
 }
 
 .vocabulary-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    position: relative;
+    padding: 15px;
     margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
 }
 
 .vocabulary-header h2 {
@@ -2476,9 +2478,13 @@ textarea#user-input:focus {
   position: relative;
   background-color: var(--ghibli-cream);
   border-radius: 15px;
-  box-shadow: 0 5px 0 var(--ghibli-brown), 0 5px 20px rgba(0,0,0,0.1);
-  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  padding: 25px;
   overflow: hidden;
+  position: relative;
+  margin: 0 auto; /* Center horizontally */
+  max-width: 1000px; /* Set a max-width */
+  width: 100%; /* Take full available width up to max-width */
 }
 
 #qa-container::before {
@@ -4307,4 +4313,9 @@ textarea#user-input:focus {
 .vocabulary-card-container {
     width: 100%;
     padding: 0;
+}
+
+/* Maintain centering when sidebar is toggled */
+.left-panel.hidden + .content-area #qa-container {
+    margin: 0 auto; /* Ensure it stays centered */
 }
