@@ -54,9 +54,7 @@
                             
                             <div class="dropdown-container">
                                 <label for="grade-select-sidebar">年级</label>
-                                <select id="grade-select-sidebar" name="grade">
-                                    <!-- Options will be populated dynamically -->
-                                </select>
+                                <select id="grade-select-sidebar" name="grade"></select>
                             </div>
                         </div>
                     </div>
@@ -282,5 +280,24 @@
     </div>
     <!-- Load script at the end with defer -->
     <script src="script.js" defer></script>
+    <!-- About Modal -->
+    <div id="about-modal" class="modal-overlay hidden">
+        <div class="about-modal">
+            <div class="ghibli-floating-elements"></div>
+            <button class="about-modal-close" onclick="hideAboutModal()">×</button>
+            <div class="about-modal-content">
+                <h2>关于本站</h2>
+                <p>欢迎来到AI学习助手！这是一个融合了人工智能与教育的创新平台，旨在为学生提供个性化的学习体验。</p>
+                <p>本站特色功能：</p>
+                <ul>
+                    <li>智能问答：解答您的学习疑问</li>
+                    <li>自动出题：根据您的学习阶段生成适合的练习题</li>
+                    <li>诗词学习：探索中国传统诗词的魅力</li>
+                    <li>英语学习：掌握实用的英语词汇和表达</li>
+                </ul>
+                <p>希望这个平台能够帮助您在学习的道路上走得更远！</p>
+            </div>
+        </div>
+    </div>
 </body>
 </html> 
