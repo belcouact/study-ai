@@ -227,8 +227,29 @@
                         <h3>开始学习古诗词</h3>
                         <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成适合您学习阶段的诗词。</p>
                     </div>
-                    <div id="poetry-display">
-                        <!-- Poetry content here -->
+                    <div id="poetry-display" class="hidden">
+                        <div class="poem-navigation">
+                            <button id="prev-poem-button" class="poem-nav-button" disabled>
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <span class="poem-counter">1 / 5</span>
+                            <button id="next-poem-button" class="poem-nav-button">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div class="poem-display">
+                            <h2 class="poem-title"></h2>
+                            <p class="poem-author"></p>
+                            <div class="poem-content"></div>
+                            <div class="poem-section">
+                                <h3>创作背景</h3>
+                                <div class="poem-background"></div>
+                            </div>
+                            <div class="poem-section">
+                                <h3>赏析</h3>
+                                <div class="poem-explanation"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

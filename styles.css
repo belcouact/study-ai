@@ -75,7 +75,7 @@ body {
 .left-panel {
     width: var(--sidebar-width);
     background-color: var(--ghibli-light-blue);
-    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h100v100H0z" fill-opacity="0"/><path fill-opacity=".05" d="M13 19c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7z" /></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h100v100H0z" fill-opacity="0"/><path fill-opacity=".05" d="M13 19c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7zm0 20c5 0 10-3 13-7 3 4 8 7 13 7 5 0 10-3 13-7 3 4 8 7 13 7v3c-5 0-10 3-13 7-3-4-8-7-13-7-5 0-10 3-13 7-3-4-8-7-13-7z" /></svg>');
     color: #333;
     height: 100%;
     position: fixed;
@@ -602,7 +602,7 @@ textarea#user-input:focus {
   height: 40px;
   top: 20%;
   left: 15%;
-  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 5c-8 0-14 4-14 12s3.5 12 7 15c2.5 2.5 4.5 3 7 3s4.5-0.5 7-3c3.5-3 7-7 7-15s-6-12-14-12z" fill="%234A89DC"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 5c-8 0-14 4-14 12s3.5 12 7 15c2.5 2.5 4.5 3 7 3s4.5-.5 7-2c3.5-3 7-7 7-15s-6-12-14-12z" fill="%234A89DC"/></svg>');
   animation: float 20s infinite alternate ease-in-out;
 }
 
@@ -656,7 +656,7 @@ textarea#user-input:focus {
     right: 15px;
     width: 100px;
     height: 100px;
-    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M75 25c-5.523 0-10 4.477-10 10s4.477 10 10 10 10-4.477 10-10-4.477-10-10-10zm0 3a7 7 0 1 1 0 14 7 7 0 0 1 0-14z" fill="%234A89DC" fill-opacity=".1"/><path d="M25 50c-5.523 0-10 4.477-10 10s4.477 10 10 10 10-4.477 10-10-4.477-10-10-10zm0 3a7 7 0 1 1 0 14 7 7 0 0 1 0-14z" fill="%235D9E7A" fill-opacity=".1"/><path d="M50 10c-5.523 0-10 4.477-10 10s4.477 10 10 10 10-4.477 10-10-4.477-10-10-10zm0 3a7 7 0 1 1 0 14 7 7 0 0 1 0-14z" fill="%23E76D6F" fill-opacity=".1"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M75 25c-5.523 0-10 4.477-10 12s4.477 12 10 15c2.5 2.5 4.5 3 7 3s4.5-.5 7-2c3.5-3 7-7 7-15s-6-12-14-12zm0 3a7 7 0 1 1 0 14 7 7 0 0 1 0-14z" fill="%234A89DC" fill-opacity=".1"/><path d="M25 50c-5.523 0-10 4.477-10 10s4.477 10 10 10 10-4.477 10-10-4.477-10-10-10zm0 3a7 7 0 1 1 0 14 7 7 0 0 1 0-14z" fill="%235D9E7A" fill-opacity=".1"/><path d="M50 10c-5.523 0-10 4.477-10 10s4.477 10 10 10 10-4.477 10-10-4.477-10-10-10zm0 3a7 7 0 1 1 0 14 7 7 0 0 1 0-14z" fill="%23E76D6F" fill-opacity=".1"/></svg>');
     background-repeat: no-repeat;
     opacity: 0.5;
     pointer-events: none;
@@ -3834,47 +3834,3 @@ textarea#user-input:focus {
     gap: 8px;
     }
 } 
-
-/* Update empty state default visibility */
-.empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    min-height: 300px;
-    padding: 30px 20px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 12px;
-    margin-top: 20px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
-    border: 2px dashed rgba(93, 158, 122, 0.2);
-}
-
-/* Update poetry display default visibility */
-#poetry-display {
-    display: none; /* Change from .hidden class to explicitly set display: none */
-}
-
-/* When poems are loaded, hide empty state and show poetry display */
-#poetry-display.active {
-    display: block;
-    animation: fadeIn 0.5s ease;
-}
-
-.empty-state.hidden {
-    display: none;
-}
-
-@keyframes fadeIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(10px); 
-    }
-    to { 
-        opacity: 1; 
-        transform: translateY(0); 
-    }
-}
