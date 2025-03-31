@@ -6061,27 +6061,31 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(handlePoetryDisplayState, 0);
 });
 
-// Show about modal
 function showAboutModal() {
+    const overlay = document.getElementById('modal-overlay');
     const modal = document.getElementById('about-modal');
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-    return false;
+    
+    overlay.classList.add('active');
+    setTimeout(() => {
+        modal.classList.add('active');
+    }, 100);
+    
+    return false; // Prevent default link behavior
 }
 
-// Hide about modal
 function hideAboutModal() {
+    const overlay = document.getElementById('modal-overlay');
     const modal = document.getElementById('about-modal');
-    modal.classList.add('hidden');
-    document.body.style.overflow = 'auto';
+    
+    modal.classList.remove('active');
+    setTimeout(() => {
+        overlay.classList.remove('active');
+    }, 300);
 }
 
 // Close modal when clicking outside
-document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.getElementById('about-modal');
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            hideAboutModal();
-        }
-    });
+document.getElementById('modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'modal-overlay') {
+        hideAboutModal();
+    }
 });

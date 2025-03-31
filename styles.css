@@ -590,7 +590,7 @@ textarea#user-input:focus {
     
     #submit-button, #optimize-button {
         width: 100%;
-        justify-content: center;
+    justify-content: center;
     }
     
     .welcome-message {
@@ -3805,9 +3805,9 @@ textarea#user-input:focus {
 #poetry-display.active {
   display: block;
   animation: fadeIn 0.5s ease-out;
-}
+} 
 
-/* Add Ghibli styling for about modal */
+/* Add Ghibli-styled modal styles */
 .about-modal {
     position: fixed;
     top: 50%;
@@ -3820,7 +3820,15 @@ textarea#user-input:focus {
     width: 90%;
     z-index: 1000;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    animation: modalAppear 0.3s ease-out;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.about-modal.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
 }
 
 .about-modal::before {
@@ -3838,42 +3846,55 @@ textarea#user-input:focus {
     border-radius: 15px 15px 0 0;
 }
 
-.about-modal-content {
+.about-modal-header {
+    text-align: center;
+    margin-bottom: 20px;
     position: relative;
-    padding: 20px;
-    color: var(--ghibli-dark-brown);
 }
 
-.about-modal h2 {
+.about-modal-header h2 {
     color: var(--ghibli-dark-green);
     font-size: 1.8em;
-    margin-bottom: 20px;
-    text-align: center;
-    font-weight: 600;
+    margin-bottom: 10px;
 }
 
-.about-modal p {
+.about-modal-content {
     line-height: 1.6;
+    color: #555;
+    margin-bottom: 20px;
+    position: relative;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+}
+
+.about-modal-content p {
     margin-bottom: 15px;
-    font-size: 1.1em;
 }
 
 .about-modal-close {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
+    top: -10px;
+    right: -10px;
+    width: 30px;
+    height: 30px;
+    background-color: var(--ghibli-light-green);
     border: none;
-    font-size: 1.5em;
-    color: var(--ghibli-dark-brown);
+    border-radius: 50%;
     cursor: pointer;
-    padding: 5px;
-    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ghibli-dark-green);
+    font-size: 1.2em;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .about-modal-close:hover {
+    background-color: var(--ghibli-green);
+    color: white;
     transform: rotate(90deg);
-    color: var(--ghibli-accent);
 }
 
 .modal-overlay {
@@ -3885,46 +3906,73 @@ textarea#user-input:focus {
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(3px);
     z-index: 999;
-    animation: overlayAppear 0.3s ease-out;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
 }
 
-.about-modal .ghibli-floating-elements {
-    opacity: 0.1;
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.about-modal-footer {
+    text-align: center;
+    color: var(--ghibli-dark-green);
+    font-size: 0.9em;
+    margin-top: 20px;
+}
+
+/* Add floating elements to modal */
+.about-modal-decorations {
+    position: absolute;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
+    overflow: hidden;
+    border-radius: 15px;
 }
 
-@keyframes modalAppear {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -60%);
+.about-modal-decorations::before,
+.about-modal-decorations::after {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    animation: modalFloat 6s ease-in-out infinite;
+}
+
+.about-modal-decorations::before {
+    top: 20px;
+    left: 20px;
+    background-image: url('path-to-your-leaf-image.png');
+}
+
+.about-modal-decorations::after {
+    bottom: 20px;
+    right: 20px;
+    background-image: url('path-to-your-flower-image.png');
+    animation-delay: -3s;
+}
+
+@keyframes modalFloat {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
     }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%);
+    50% {
+        transform: translateY(-10px) rotate(5deg);
     }
 }
 
-@keyframes overlayAppear {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-/* Mobile responsiveness */
 @media (max-width: 768px) {
     .about-modal {
         width: 95%;
         padding: 20px;
     }
     
-    .about-modal h2 {
+    .about-modal-header h2 {
         font-size: 1.5em;
-    }
-    
-    .about-modal p {
-        font-size: 1em;
     }
 }
