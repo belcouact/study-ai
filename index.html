@@ -97,14 +97,22 @@
         <div class="content-area">
             <!-- Q&A Chat Container -->
             <div id="qa-container" class="container">
+                <div class="ghibli-floating-elements"></div>
                 <div class="chat-container">
                     <div class="input-container">
-                        <div class="welcome-message">你好，我是你的AI老师，有什么我可以帮你的吗？</div>
+                        <div class="welcome-message">
+                            <i class="ghibli-icon-welcome"></i>
+                            你好，我是你的AI老师，有什么我可以帮你的吗？
+                        </div>
                         <textarea id="user-input" placeholder="请输入你的问题..."></textarea>
                         <div class="button-container">
                             <div class="right-controls">
-                                <button id="optimize-button" title="优化您的问题以获得更好的回答">优化问题</button>
-                                <button id="submit-button">提交问题</button>
+                                <button id="optimize-button" title="优化您的问题以获得更好的回答">
+                                    <i class="ghibli-icon-optimize"></i> 优化问题
+                                </button>
+                                <button id="submit-button">
+                                    <i class="ghibli-icon-submit"></i> 提交问题
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -112,7 +120,7 @@
                     <div class="output-container">
                         <div id="loading" class="hidden">
                             <div class="spinner"></div>
-                            <p>出题中...</p>
+                            <p>思考中...</p>
                         </div>
                         <div id="output">
                             <!-- Output will appear here -->
