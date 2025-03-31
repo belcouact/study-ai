@@ -88,14 +88,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to handle text-to-speech for sentence cards
     function speakEnglishSentence(englishText, cardElement) {
         if ('speechSynthesis' in window) {
-            // If there's a currently speaking card, remove its speaking class
+            // Stop tracking speaking cards
             if (currentlySpeakingSentenceCard) {
-                currentlySpeakingSentenceCard.classList.remove('speaking');
+                currentlySpeakingSentenceCard = null;
             }
-            
-            // Set the new speaking card and add the speaking class
-            currentlySpeakingSentenceCard = cardElement;
-            cardElement.classList.add('speaking');
             
             // Animate the Totoro icon if it exists
             if (totoro) {
@@ -122,14 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (femaleVoice) {
                 utterance.voice = femaleVoice;
             }
-            
-            // When speech ends, remove the speaking class
-            utterance.onend = () => {
-                if (cardElement) {
-                    cardElement.classList.remove('speaking');
-                }
-                currentlySpeakingSentenceCard = null;
-            };
             
             window.speechSynthesis.speak(utterance);
 
