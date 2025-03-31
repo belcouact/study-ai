@@ -320,6 +320,7 @@ body {
     box-shadow: 0 4px 0 var(--ghibli-brown), 0 4px 10px rgba(0,0,0,0.1);
     overflow: hidden;
     transition: transform 0.3s ease;
+    width: calc(100% - 20px);
 }
 
 .sidebar-frame:hover {
@@ -348,20 +349,25 @@ body {
 }
 
 .dropdown-container {
+    display: flex;
+    align-items: center;
     margin-bottom: 10px;
+    gap: 8px;
 }
 
 .dropdown-container label {
-    display: block;
-    margin-bottom: 5px;
+    display: inline-block;
     font-size: 0.8rem;
     color: var(--ghibli-brown);
     font-weight: 500;
+    min-width: 35px;
+    margin-bottom: 0;
+    flex-shrink: 0;
 }
 
 .dropdown-container select {
-    width: 100%;
-    padding: 8px 10px;
+    flex: 1;
+    padding: 6px 10px;
     border-radius: 20px;
     border: 2px solid var(--ghibli-light-green);
     background-color: white;
