@@ -133,11 +133,14 @@ body {
     padding: 0.8rem;
     flex-grow: 1;
     position: relative;
-    width: 100%;  /* Ensure full width */
+    align-items: center; /* Center the buttons and other elements */
+    width: 100%;
 }
 
 .panel-button {
-    width: 100%;  /* Ensure full width */
+    width: calc(100% - 20px); /* Account for padding */
+    max-width: 180px; /* Optional: set a max-width if needed */
+    text-align: center;
     background-color: var(--ghibli-cream);
     color: #333;
     border: none;
@@ -200,17 +203,17 @@ body {
 }
 
 .sidebar-slogan {
-    margin: 15px 0;  /* Remove horizontal margin */
+    width: calc(100% - 20px);
+    max-width: 180px;
+    margin: 15px auto; /* Center the slogan */
     padding: 16px 12px;
     border-radius: 12px;
     background-color: var(--ghibli-blue);
-    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h100v100H0z" fill-opacity="0"/><path fill="%23FFFFFF" fill-opacity=".05" d="M30 20c-5.523 0-10 4.477-10 10a10 10 0 1 0 20 0c0-5.523-4.477-10-10-10zm40 0c-5.523 0-10 4.477-10 10a10 10 0 1 0 20 0c0-5.523-4.477-10-10-10zM30 60c-5.523 0-10 4.477-10 10a10 10 0 1 0 20 0c0-5.523-4.477-10-10-10zm40 0c-5.523 0-10 4.477-10 10a10 10 0 1 0 20 0c0-5.523-4.477-10-10-10z"/></svg>');
     text-align: center;
     box-shadow: 0 5px 0 rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: hidden;
     border: 2px dashed rgba(255, 255, 255, 0.3);
-    width: 100%;  /* Take full width of parent */
 }
 
 .sidebar-slogan::before {
@@ -313,17 +316,18 @@ body {
 
 /* Dropdown Frames in Sidebar */
 .dropdown-frames {
-    padding: 0 0.8rem;  /* Match the panel-buttons padding */
+    margin: 0.5rem 0 1rem 0;
 }
 
 .sidebar-frame {
-    margin: 15px 0;  /* Remove horizontal margin */
+    width: calc(100% - 20px);
+    max-width: 180px;
+    margin: 15px auto; /* Center the frame */
     background-color: var(--ghibli-cream);
     border-radius: 12px;
     box-shadow: 0 4px 0 var(--ghibli-brown), 0 4px 10px rgba(0,0,0,0.1);
     overflow: hidden;
     transition: transform 0.3s ease;
-    width: 100%;  /* Take full width of parent */
 }
 
 .sidebar-frame:hover {
@@ -352,10 +356,8 @@ body {
 }
 
 .dropdown-container {
-    display: flex;
-    align-items: center;
+    width: 100%;
     margin-bottom: 10px;
-    gap: 8px;
 }
 
 .dropdown-container label {
@@ -369,6 +371,7 @@ body {
 }
 
 .dropdown-container select {
+    width: 100%;
     flex: 1;
     padding: 6px 10px;
     border-radius: 20px;
@@ -444,7 +447,7 @@ body {
 }
 
 textarea#user-input {
-  width: 100%;
+    width: 100%;
   min-height: 80px;
   border: 2px solid var(--ghibli-light-blue);
   border-radius: 10px;
@@ -452,31 +455,31 @@ textarea#user-input {
   font-size: 0.95rem;
   background-color: white;
   transition: all 0.3s ease;
-  resize: vertical;
+    resize: vertical;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
 }
 
 textarea#user-input:focus {
-  outline: none;
+    outline: none;
   border-color: var(--ghibli-accent);
   box-shadow: 0 0 0 3px rgba(231, 109, 111, 0.2);
 }
 
 /* Button Container */
 .button-container {
-  display: flex;
-  justify-content: flex-end;
+    display: flex;
+    justify-content: flex-end;
   margin-top: 10px;
-  gap: 10px;
+    gap: 10px;
 }
 
 #submit-button, #optimize-button {
   background-color: var(--ghibli-blue);
   color: white;
-  border: none;
+    border: none;
   border-radius: 20px;
   padding: 8px 16px;
-  font-size: 0.9rem;
+    font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 3px 0 rgba(0,0,0,0.1);
@@ -542,10 +545,10 @@ textarea#user-input:focus {
 
 /* Loading Animation */
 #loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   padding: 30px;
 }
 
@@ -571,8 +574,8 @@ textarea#user-input:focus {
 #loading p {
   margin-top: 15px;
   color: var(--ghibli-blue);
-  font-weight: 500;
-  font-size: 1rem;
+    font-weight: 500;
+    font-size: 1rem;
 }
 
 /* Floating Elements */
@@ -2390,7 +2393,6 @@ textarea#user-input:focus {
     padding: 0.8rem;
     flex-grow: 1;
     position: relative;
-    width: 100%;  /* Ensure full width */
 }
 
 /* Update panel footer for positioning */
@@ -3828,5 +3830,5 @@ textarea#user-input:focus {
 
   .choices-container {
     gap: 8px;
-  }
-}
+    }
+} 
