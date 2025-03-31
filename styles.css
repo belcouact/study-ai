@@ -4309,123 +4309,115 @@ textarea#user-input:focus {
     padding: 0;
 } 
 
-/* 1. Center the qa-container and make it wider */
+/* 1. Center qa-container and make it wider */
 #qa-container {
     width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 1100px;
+    margin: 20px auto;
     background-color: var(--ghibli-cream);
-    border-radius: 15px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     padding: 25px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    position: relative;
     overflow: hidden;
+    position: relative;
     transition: all 0.3s ease;
 }
 
-/* Ensure content area is properly set up for centering */
-.content-area {
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-    min-height: 100vh;
-    transition: margin-left var(--transition-speed) ease, width var(--transition-speed) ease;
-    width: calc(100% - var(--sidebar-width));
-    margin-left: var(--sidebar-width);
+/* Ensure qa-container is centered regardless of sidebar state */
+.left-panel.hidden + .content-area #qa-container {
+    margin: 20px auto;
 }
 
-/* Adjust content area when sidebar is hidden */
-.left-panel.hidden + .content-area {
-    margin-left: 0;
-    width: 100%;
-}
-
-/* 2. Adjust vocabulary-header to display labels next to dropdowns */
-.vocabulary-header {
-    background-color: var(--ghibli-light-blue);
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    position: relative;
+/* 2. Adjust poetry-header layout */
+.poetry-selectors {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
-    align-items: center;
-}
-
-.vocabulary-header h2 {
-    width: 100%;
-    color: var(--ghibli-dark-green);
+    justify-content: center;
     margin-bottom: 15px;
-    font-size: 1.5rem;
-    text-align: center;
 }
 
-/* Create a wrapper for each label+dropdown pair */
-.vocabulary-filter-group {
+.selector-group {
     display: flex;
     align-items: center;
-    flex: 1 1 200px;
-    gap: 10px;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 200px;
+    max-width: 300px;
 }
 
-.vocabulary-header label {
-    font-weight: 500;
+.selector-group label {
+    font-size: 0.95rem;
     color: var(--ghibli-dark-green);
-    margin: 0;
+    font-weight: 600;
+    margin-right: 8px;
     white-space: nowrap;
+    flex-shrink: 0;
+    transition: color 0.3s ease;
 }
 
-.vocabulary-header select {
+.poetry-select {
     flex: 1;
     padding: 8px 12px;
     border-radius: 10px;
-    border: 2px solid var(--ghibli-light-green);
-    background-color: var(--ghibli-cream);
-    color: var(--ghibli-dark-green);
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.5);
     font-size: 0.9rem;
+    color: var(--ghibli-dark-green);
+    appearance: none;
+    cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.vocabulary-header select:focus {
-    outline: none;
-    border-color: var(--ghibli-accent);
-    box-shadow: 0 0 0 2px rgba(255, 188, 64, 0.3);
+/* Make poetry container responsive */
+.poetry-header {
+    padding: 20px;
+    background: linear-gradient(135deg, var(--ghibli-light-blue), var(--ghibli-blue));
+    border-radius: 12px 12px 0 0;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
 }
 
-.vocabulary-load-btn {
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Mobile responsiveness */
+/* Responsive adjustments for mobile */
 @media (max-width: 768px) {
     #qa-container {
         width: 95%;
         padding: 15px;
+        margin: 10px auto;
     }
     
-    .vocabulary-header {
-        padding: 15px;
+    .poetry-selectors {
+        flex-direction: column;
         gap: 10px;
     }
     
-    .vocabulary-header h2 {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
+    .selector-group {
+        flex-direction: column;
+        align-items: flex-start;
+        min-width: 100%;
+        max-width: 100%;
     }
     
-    .vocabulary-filter-group {
-        flex: 1 1 100%;
-    }
-    
-    .vocabulary-header select {
-        padding: 6px 10px;
+    .selector-group label {
+        margin-bottom: 5px;
         font-size: 0.85rem;
     }
     
-    .vocabulary-load-btn {
+    .poetry-select {
         width: 100%;
-        margin-top: 10px;
+    }
+}
+
+/* For medium screens - adjust the layout to fit better */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .selector-group {
+        min-width: 180px;
+    }
+    
+    .selector-group label {
+        font-size: 0.85rem;
     }
 }
