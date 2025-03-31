@@ -215,22 +215,68 @@ body {
 
 .footer-links a {
     padding: 8px 12px;
-    background-color: var(--ghibli-light-green);
+    background-color: var(--ghibli-cream);
     color: var(--ghibli-dark-green);
     text-decoration: none;
     border-radius: 20px;
-    font-size: 0.85rem; /* Reduced font size */
+    font-size: 0.85rem;
     transition: all 0.3s ease;
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     width: 100%;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 3px 0 var(--ghibli-brown), 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.footer-links a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        var(--ghibli-yellow),
+        var(--ghibli-accent),
+        var(--ghibli-yellow)
+    );
+    border-radius: 20px 20px 0 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .footer-links a:hover {
-    background-color: var(--ghibli-green);
-    color: white;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background-color: var(--ghibli-light-green);
+    color: var(--ghibli-dark-green);
+    box-shadow: 0 5px 0 var(--ghibli-brown), 0 6px 8px rgba(0,0,0,0.15);
+}
+
+.footer-links a:hover::before {
+    opacity: 1;
+}
+
+.footer-links a:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 var(--ghibli-brown), 0 3px 4px rgba(0,0,0,0.1);
+}
+
+/* Add floating animation for buttons */
+@keyframes gentleButtonFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-1px);
+    }
+}
+
+.footer-links a {
+    animation: gentleButtonFloat 3s ease-in-out infinite;
+}
+
+.footer-links a:hover {
+    animation: none;
 }
 
 /* External services section */
