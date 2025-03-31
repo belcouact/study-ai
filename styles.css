@@ -3834,3 +3834,62 @@ textarea#user-input:focus {
     gap: 8px;
     }
 } 
+
+/* Empty state - visible by default */
+#poetry-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 300px;
+    padding: 30px 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    margin-top: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+    border: 2px dashed rgba(93, 158, 122, 0.2);
+}
+
+/* Loading state - hidden by default */
+#poetry-loading {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+}
+
+/* Show loading state when it has 'show' class */
+#poetry-loading.show {
+    display: flex;
+}
+
+/* Poetry display - hidden by default */
+#poetry-display {
+    display: none;
+}
+
+/* Show poetry display when it has 'show' class */
+#poetry-display.show {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+/* Hide empty state when it has 'hidden' class */
+#poetry-empty-state.hidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
