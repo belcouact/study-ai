@@ -4211,7 +4211,7 @@ textarea#user-input:focus {
 /* Style for side navigation buttons */
 #vocabulary-content .nav-button {
     position: fixed;
-    top: 50%;
+    top: 50vh;
     transform: translateY(-50%);
     width: 40px;
     height: 40px;
@@ -4224,12 +4224,12 @@ textarea#user-input:focus {
     justify-content: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
-    z-index: 10;
+    z-index: 100;
 }
 
 /* Position previous button */
 #vocabulary-content .nav-button:first-child {
-    left: 20px;
+    left: calc(var(--sidebar-width) + 20px);
 }
 
 /* Position next button */
@@ -4240,29 +4240,21 @@ textarea#user-input:focus {
 /* Update word counter position */
 #word-counter {
     position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
+    left: 50%;
+    transform: translateX(-50%);
+    top: 20px;
     font-size: 0.9rem;
     color: var(--ghibli-dark-green);
     background-color: var(--ghibli-cream);
     padding: 8px 15px;
     border-radius: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
 }
 
-/* Hover effects for nav buttons */
-#vocabulary-content .nav-button:hover:not(:disabled) {
-    background-color: var(--ghibli-light-green);
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Disabled state for nav buttons */
-#vocabulary-content .nav-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background-color: var(--ghibli-cream);
+/* Adjust for when sidebar is collapsed */
+.left-panel.hidden + .content-area #vocabulary-content .nav-button:first-child {
+    left: 20px;
 }
 
 /* Media query for mobile responsiveness */
@@ -4283,5 +4275,6 @@ textarea#user-input:focus {
     #word-counter {
         font-size: 0.8rem;
         padding: 6px 12px;
+        top: 15px;
     }
 }
