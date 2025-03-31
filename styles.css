@@ -43,16 +43,19 @@ body {
     width: 100%;
 }
 
+/* Update content area to be responsive when sidebar is collapsed */
 .content-area {
     margin-left: var(--sidebar-width);
-    padding: 1.5rem;
-    height: 100vh;
-    overflow-y: auto;
+    padding: 20px;
+    min-height: 100vh;
     transition: margin-left var(--transition-speed) ease;
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    padding-top: 20px;
+    width: calc(100% - var(--sidebar-width));
+}
+
+/* Add new style for when sidebar is collapsed */
+.left-panel.hidden + .content-area {
+    margin-left: 0;
+    width: 100%;
 }
 
 .content-area.full-width {
@@ -412,148 +415,160 @@ body {
 
 /* Chat container Ghibli Style */
 .chat-container {
-  background-color: var(--ghibli-cream);
-  border-radius: 15px;
-  box-shadow: 0 5px 0 var(--ghibli-brown), 0 5px 20px rgba(0,0,0,0.1);
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--ghibli-cream);
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    transition: max-width var(--transition-speed) ease;
+}
+
+/* When sidebar is collapsed, allow chat container to expand more */
+.left-panel.hidden ~ .content-area .chat-container {
+    max-width: 1400px;
 }
 
 .chat-container::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background: linear-gradient(90deg, var(--ghibli-yellow), var(--ghibli-accent), var(--ghibli-yellow));
-  z-index: 1;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--ghibli-yellow), var(--ghibli-accent), var(--ghibli-yellow));
+    z-index: 1;
 }
 
 /* Input Container */
 .input-container {
-  background-color: rgba(255, 255, 255, 0.7);
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 20px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-  border: 2px dashed rgba(93, 158, 122, 0.3);
-  position: relative;
+    width: 100%;
+    transition: width var(--transition-speed) ease;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    border: 2px dashed rgba(93, 158, 122, 0.3);
+    position: relative;
 }
 
 .welcome-message {
-  color: var(--ghibli-brown);
-  font-size: 1.1rem;
-  margin-bottom: 15px;
-  text-align: center;
-  font-weight: 500;
-  padding: 10px;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 8px;
-  border-left: 3px solid var(--ghibli-blue);
+    color: var(--ghibli-brown);
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 500;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    border-left: 3px solid var(--ghibli-blue);
 }
 
 .welcome-message .ghibli-icon-welcome {
-  margin-right: 8px;
-  opacity: 0.8;
+    margin-right: 8px;
+    opacity: 0.8;
 }
 
 textarea#user-input {
     width: 100%;
-  min-height: 80px;
-  border: 2px solid var(--ghibli-light-blue);
-  border-radius: 10px;
-  padding: 12px;
-  font-size: 0.95rem;
-  background-color: white;
-  transition: all 0.3s ease;
+    min-height: 80px;
+    border: 2px solid var(--ghibli-light-blue);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.95rem;
+    background-color: white;
+    transition: all 0.3s ease;
     resize: vertical;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
 }
 
 textarea#user-input:focus {
     outline: none;
-  border-color: var(--ghibli-accent);
-  box-shadow: 0 0 0 3px rgba(231, 109, 111, 0.2);
+    border-color: var(--ghibli-accent);
+    box-shadow: 0 0 0 3px rgba(231, 109, 111, 0.2);
 }
 
 /* Button Container */
 .button-container {
     display: flex;
     justify-content: flex-end;
-  margin-top: 10px;
+    margin-top: 10px;
     gap: 10px;
 }
 
 #submit-button, #optimize-button {
-  background-color: var(--ghibli-blue);
-  color: white;
+    background-color: var(--ghibli-blue);
+    color: white;
     border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
+    border-radius: 20px;
+    padding: 8px 16px;
     font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 3px 0 rgba(0,0,0,0.1);
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 #optimize-button {
-  background-color: var(--ghibli-green);
+    background-color: var(--ghibli-green);
 }
 
 #submit-button:hover, #optimize-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 0 rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 rgba(0,0,0,0.1);
 }
 
 #submit-button:hover {
-  background-color: var(--ghibli-accent);
+    background-color: var(--ghibli-accent);
 }
 
 #optimize-button:hover {
-  background-color: var(--ghibli-light-green);
+    background-color: var(--ghibli-light-green);
 }
 
 #submit-button:active, #optimize-button:active {
-  transform: translateY(1px);
-  box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+    transform: translateY(1px);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.1);
 }
 
 /* Output Container */
 .output-container {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 3px 0 var(--ghibli-light-green), 0 3px 10px rgba(0,0,0,0.05);
-  position: relative;
-  min-height: 200px;
+    width: 100%;
+    transition: width var(--transition-speed) ease;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 3px 0 var(--ghibli-light-green), 0 3px 10px rgba(0,0,0,0.05);
+    position: relative;
+    min-height: 200px;
 }
 
 /* AI Message Styling */
 .ai-message {
-  background-color: rgba(144, 207, 176, 0.15);
-  border-left: 3px solid var(--ghibli-green);
-  padding: 15px;
-  margin: 10px 0;
-  border-radius: 0 8px 8px 0;
-  position: relative;
-  animation: messageAppear 0.3s ease-out;
+    background-color: rgba(144, 207, 176, 0.15);
+    border-left: 3px solid var(--ghibli-green);
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 0 8px 8px 0;
+    position: relative;
+    animation: messageAppear 0.3s ease-out;
 }
 
 .ai-message::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -3px;
-  bottom: 0;
-  width: 3px;
-  background: linear-gradient(to bottom, var(--ghibli-green), var(--ghibli-light-green));
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -3px;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--ghibli-green), var(--ghibli-light-green));
 }
 
 /* Loading Animation */
@@ -562,99 +577,99 @@ textarea#user-input:focus {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-  padding: 30px;
+    padding: 30px;
 }
 
 .spinner {
-  width: 60px;
-  height: 60px;
-  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 10C33.431 10 20 23.431 20 40c0 10 5 18 10 24 5 6 12 8 20 8s15-2 20-8c5-6 10-14 10-24 0-16.569-13.431-30-30-30z" fill="%234A89DC"/><ellipse cx="35" cy="39" rx="8" ry="10" fill="white"/><ellipse cx="65" cy="39" rx="8" ry="10" fill="white"/><ellipse cx="35" cy="42" rx="5" ry="7" fill="black"/><ellipse cx="65" cy="42" rx="5" ry="7" fill="black"/></svg>');
-  background-size: contain;
-  background-repeat: no-repeat;
-  animation: bounce 1s infinite alternate ease-in-out;
+    width: 60px;
+    height: 60px;
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 10C33.431 10 20 23.431 20 40c0 10 5 18 10 24 5 6 12 8 20 8s15-2 20-8c5-6 10-14 10-24 0-16.569-13.431-30-30-30z" fill="%234A89DC"/><ellipse cx="35" cy="39" rx="8" ry="10" fill="white"/><ellipse cx="65" cy="39" rx="8" ry="10" fill="white"/><ellipse cx="35" cy="42" rx="5" ry="7" fill="black"/><ellipse cx="65" cy="42" rx="5" ry="7" fill="black"/></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    animation: bounce 1s infinite alternate ease-in-out;
 }
 
 @keyframes bounce {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-10px); }
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-10px); }
 }
 
 @keyframes messageAppear {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 #loading p {
-  margin-top: 15px;
-  color: var(--ghibli-blue);
+    margin-top: 15px;
+    color: var(--ghibli-blue);
     font-weight: 500;
     font-size: 1rem;
 }
 
 /* Floating Elements */
 .ghibli-floating-elements {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
 }
 
 .ghibli-floating-elements::before,
 .ghibli-floating-elements::after {
-  content: "";
-  position: absolute;
-  background-repeat: no-repeat;
-  opacity: 0.1;
+    content: "";
+    position: absolute;
+    background-repeat: no-repeat;
+    opacity: 0.1;
 }
 
 .ghibli-floating-elements::before {
-  width: 40px;
-  height: 40px;
-  top: 20%;
-  left: 15%;
-  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 5c-8 0-14 4-14 12s3.5 12 7 15c2.5 2.5 4.5 3 7 3s4.5-0.5 7-3c3.5-3 7-7 7-15s-6-12-14-12z" fill="%234A89DC"/></svg>');
-  animation: float 20s infinite alternate ease-in-out;
+    width: 40px;
+    height: 40px;
+    top: 20%;
+    left: 15%;
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 5c-8 0-14 4-14 12s3.5 12 7 15c2.5 2.5 4.5 3 7 3s4.5-0.5 7-3c3.5-3 7-7 7-15s-6-12-14-12z" fill="%234A89DC"/></svg>');
+    animation: float 20s infinite alternate ease-in-out;
 }
 
 .ghibli-floating-elements::after {
-  width: 30px;
-  height: 30px;
-  top: 60%;
-  right: 10%;
-  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M15 3c-4.5 0-8 2-8 7s2 7 4 9c1.5 1.5 2.5 2 4 2s2.5-.5 4-2c2-2 4-4 4-9s-3.5-7-8-7z" fill="%2390CFB0"/></svg>');
-  animation: float 25s 5s infinite alternate-reverse ease-in-out;
+    width: 30px;
+    height: 30px;
+    top: 60%;
+    right: 10%;
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M15 3c-4.5 0-8 2-8 7s2 7 4 9c1.5 1.5 2.5 2 4 2s2.5-.5 4-2c2-2 4-4 4-9s-3.5-7-8-7z" fill="%2390CFB0"/></svg>');
+    animation: float 25s 5s infinite alternate-reverse ease-in-out;
 }
 
 @keyframes float {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  25% { transform: translate(10px, 20px) rotate(5deg); }
-  50% { transform: translate(20px, 10px) rotate(0deg); }
-  75% { transform: translate(10px, -10px) rotate(-5deg); }
-  100% { transform: translate(-10px, 10px) rotate(0deg); }
+    0% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(10px, 20px) rotate(5deg); }
+    50% { transform: translate(20px, 10px) rotate(0deg); }
+    75% { transform: translate(10px, -10px) rotate(-5deg); }
+    100% { transform: translate(-10px, 10px) rotate(0deg); }
 }
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-  .chat-container {
-    padding: 15px;
-  }
-  
-  .button-container {
-    flex-direction: column;
-  }
-  
-  #submit-button, #optimize-button {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .welcome-message {
-    font-size: 1rem;
-  }
+    .chat-container {
+        padding: 15px;
+    }
+    
+    .button-container {
+        flex-direction: column;
+    }
+    
+    #submit-button, #optimize-button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .welcome-message {
+        font-size: 1rem;
+    }
 }
 
 /* Additional container decoration */
