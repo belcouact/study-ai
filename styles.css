@@ -3870,13 +3870,11 @@ textarea#user-input:focus {
 /* Poetry display - hidden by default */
 #poetry-display {
     display: none;
-    opacity: 0;
 }
 
 /* Show poetry display when it has 'show' class */
 #poetry-display.show {
     display: block;
-    opacity: 1;
     animation: fadeIn 0.5s ease;
 }
 
