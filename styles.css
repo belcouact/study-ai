@@ -190,7 +190,7 @@ body {
     opacity: 0.3;
 }
 
-/* Update panel footer to remove background color */
+/* Update panel footer to accommodate the new button */
 .panel-footer {
     width: 100%;
     padding: 12px;
@@ -199,101 +199,35 @@ body {
     text-align: center;
     line-height: 1.5;
     margin-top: auto;
-    /* Remove background color */
-    background-color: transparent;
 }
 
-.sidebar-slogan {
-    margin: 15px 0;
-    padding: 16px 12px;
-    border-radius: 12px;
-    background-color: var(--ghibli-blue);
-    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h100v100H0z" fill-opacity="0"/><path fill="%23FFFFFF" fill-opacity=".05" d="M30 20c-5.523 0-10 4.477-10 10a10 10 0 1 0 20 0c0-5.523-4.477-10-10-10zm40 0c-5.523 0-10 4.477-10 10a10 10 0 1 0 20 0c0-5.523-4.477-10-10-10zM30 60c-5.523 0-10 4.477-10 10a10 10 0 1 0 20 0c0-5.523-4.477-10-10-10zm40 0c-5.523 0-10 4.477-10 10a10 10 0 1 0 20 0c0-5.523-4.477-10-10-10z"/></svg>');
-    text-align: center;
-    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.1);
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.sidebar-slogan:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
-    animation: gentleFloat 3s ease-in-out infinite;
-}
-
-/* Add gentle floating animation keyframes */
-@keyframes gentleFloat {
-    0%, 100% {
-        transform: translateY(-5px);
-    }
-    50% {
-        transform: translateY(-8px);
-    }
-}
-
-.sidebar-slogan::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--ghibli-yellow), var(--ghibli-accent), var(--ghibli-yellow));
-}
-
-.sidebar-slogan::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--ghibli-yellow), var(--ghibli-accent), var(--ghibli-yellow));
-}
-
-.sidebar-slogan p {
-    margin: 0;
-    line-height: 1.6;
-    font-size: 0.9rem;
-}
-
-.sidebar-slogan p:first-child {
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 600;
-    font-style: italic;
-    margin-bottom: 5px;
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
-}
-
-.sidebar-slogan p:last-child {
-    color: rgba(255, 255, 255, 0.9);
-}
-
+/* Update footer links to include the new button */
 .footer-links {
-    margin-top: 10px;
-    padding-top: 8px;
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
 }
 
 .footer-links a {
-    color: var(--ghibli-brown);
+    padding: 8px 12px;
+    border-radius: 8px;
+    background-color: var(--ghibli-cream);
+    color: var(--ghibli-dark);
     text-decoration: none;
-    font-size: 0.8rem;
-    padding: 4px 8px;
-    border-radius: 12px;
-    background-color: rgba(255, 255, 255, 0.5);
     transition: all 0.3s ease;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .footer-links a:hover {
-    background-color: var(--ghibli-yellow);
-    color: var(--ghibli-brown);
     transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background-color: var(--ghibli-light-green);
 }
 
 /* External services section */
