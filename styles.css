@@ -210,7 +210,23 @@ body {
     box-shadow: 0 5px 0 rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: hidden;
-    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sidebar-slogan:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    animation: gentleFloat 3s ease-in-out infinite;
+}
+
+/* Add gentle floating animation keyframes */
+@keyframes gentleFloat {
+    0%, 100% {
+        transform: translateY(-5px);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
 }
 
 .sidebar-slogan::before {
