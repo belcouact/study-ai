@@ -88,7 +88,7 @@ body {
     overflow-y: auto;
     /* Remove any top border and keep only the right border */
     border: none;
-    border-right: 1px solid var(--ghibli-blue);
+    /*border-right: 1px solid var(--ghibli-blue);*/
 }
 
 .left-panel.hidden {
