@@ -133,9 +133,11 @@ body {
     padding: 0.8rem;
     flex-grow: 1;
     position: relative;
+    width: 100%;  /* Ensure full width */
 }
 
 .panel-button {
+    width: 100%;  /* Ensure full width */
     background-color: var(--ghibli-cream);
     color: #333;
     border: none;
@@ -198,7 +200,7 @@ body {
 }
 
 .sidebar-slogan {
-    margin: 20px 15px;
+    margin: 15px 0;  /* Remove horizontal margin */
     padding: 16px 12px;
     border-radius: 12px;
     background-color: var(--ghibli-blue);
@@ -208,6 +210,7 @@ body {
     position: relative;
     overflow: hidden;
     border: 2px dashed rgba(255, 255, 255, 0.3);
+    width: 100%;  /* Take full width of parent */
 }
 
 .sidebar-slogan::before {
@@ -310,17 +313,17 @@ body {
 
 /* Dropdown Frames in Sidebar */
 .dropdown-frames {
-    margin: 0.5rem 0 1rem 0;
+    padding: 0 0.8rem;  /* Match the panel-buttons padding */
 }
 
 .sidebar-frame {
-    margin: 15px 10px;
+    margin: 15px 0;  /* Remove horizontal margin */
     background-color: var(--ghibli-cream);
     border-radius: 12px;
     box-shadow: 0 4px 0 var(--ghibli-brown), 0 4px 10px rgba(0,0,0,0.1);
     overflow: hidden;
     transition: transform 0.3s ease;
-    width: calc(100% - 20px);
+    width: 100%;  /* Take full width of parent */
 }
 
 .sidebar-frame:hover {
@@ -2387,6 +2390,7 @@ textarea#user-input:focus {
     padding: 0.8rem;
     flex-grow: 1;
     position: relative;
+    width: 100%;  /* Ensure full width */
 }
 
 /* Update panel footer for positioning */
