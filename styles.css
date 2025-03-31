@@ -4210,9 +4210,8 @@ textarea#user-input:focus {
 
 /* Style for side navigation buttons */
 #vocabulary-content .nav-button {
-    position: fixed;
-    top: 50vh;
-    transform: translateY(-50%);
+    position: absolute;
+    top: 300px; /* Position vertically at mid-page */
     width: 40px;
     height: 40px;
     background-color: var(--ghibli-cream);
@@ -4227,22 +4226,22 @@ textarea#user-input:focus {
     z-index: 100;
 }
 
-/* Position previous button */
+/* Position previous button to the left */
 #vocabulary-content .nav-button:first-child {
-    left: calc(var(--sidebar-width) + 20px);
+    left: 20px;
 }
 
-/* Position next button */
+/* Position next button to the right */
 #vocabulary-content .nav-button:last-child {
     right: 20px;
 }
 
-/* Update word counter position */
+/* Update word counter position to the center of header */
 #word-counter {
     position: absolute;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    top: 20px;
+    transform: translate(-50%, -50%);
     font-size: 0.9rem;
     color: var(--ghibli-dark-green);
     background-color: var(--ghibli-cream);
@@ -4252,9 +4251,9 @@ textarea#user-input:focus {
     z-index: 10;
 }
 
-/* Adjust for when sidebar is collapsed */
-.left-panel.hidden + .content-area #vocabulary-content .nav-button:first-child {
-    left: 20px;
+/* Make sure the vocabulary header is properly positioned for the counter */
+.vocabulary-header {
+    position: relative;
 }
 
 /* Media query for mobile responsiveness */
@@ -4262,6 +4261,7 @@ textarea#user-input:focus {
     #vocabulary-content .nav-button {
         width: 35px;
         height: 35px;
+        top: 200px; /* Adjust for mobile */
     }
 
     #vocabulary-content .nav-button:first-child {
@@ -4275,6 +4275,5 @@ textarea#user-input:focus {
     #word-counter {
         font-size: 0.8rem;
         padding: 6px 12px;
-        top: 15px;
     }
 }
