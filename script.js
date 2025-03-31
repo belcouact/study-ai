@@ -902,8 +902,12 @@ function displayCurrentQuestion() {
                 `;
                 
                 const resultText = isCorrect 
-                    ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 正确！答案是：${correctAnswer}`
-                    : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg> 错误。正确答案是：${correctAnswer}`;
+                    ? `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+                      </svg> 正确！答案是：${correctAnswer}`
+                    : `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" fill="none"/>
+                      </svg> 错误。正确答案是：${correctAnswer}`;
                 
                 answerResult.innerHTML = formatMathExpressions(resultText);
             }
@@ -6057,8 +6061,14 @@ function showPoetryDisplay() {
     loadingElement.style.display = 'none';
   }
   
+  // Remove any potential 'hidden' class
+  poetryDisplay.classList.remove('hidden');
+  
   // Show poetry display with animation
   poetryDisplay.classList.add('active');
+  
+  // Also set the inline style explicitly to override any potential conflicts
+  poetryDisplay.style.display = 'block';
   
   // Initialize poem animation
   animatePoemDisplay();
@@ -6069,3 +6079,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // ... existing code
   handlePoetryDisplayState();
 });
+
+// After poems are successfully loaded and parsed
+// (This might be in an event listener or API callback)
+function handleSuccessfulPoemLoad() {
+  // Your existing code to parse and prepare poem data...
+  
+  // Then explicitly call the showPoetryDisplay function
+  showPoetryDisplay();
+}
