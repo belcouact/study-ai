@@ -1,63 +1,28 @@
 /* Base styles and variables */
 :root {
-    --sidebar-width: 230px; /* Slightly wider for a softer feel */
-    /* Ghibli-inspired color palette */
-    --ghibli-sky-light: #e0f2f7;   /* Very light blue */
-    --ghibli-sky-mid: #a5d1e1;    /* Soft sky blue */
-    --ghibli-green-light: #c8e6c9; /* Light meadow green */
-    --ghibli-green-mid: #81c784;   /* Meadow green */
-    --ghibli-green-dark: #558b2f;  /* Forest green */
-    --ghibli-cream: #fff9e6;      /* Warm cream */
-    --ghibli-brown-light: #d7ccc8; /* Light stone/wood */
-    --ghibli-brown-mid: #a1887f;   /* Stone/wood */
-    --ghibli-text: #4e443e;       /* Dark warm brown for text */
-    --ghibli-text-secondary: #795548; /* Lighter brown text */
-    --ghibli-accent-warm: #ffcc80; /* Warm sun/flower accent */
-    --ghibli-accent-cool: #90caf9; /* Cool water/sky accent */
-    --ghibli-shadow-light: rgba(117, 85, 72, 0.1); /* Soft brown shadow */
-    --ghibli-shadow-mid: rgba(117, 85, 72, 0.15);
-
-    /* Map Ghibli colors to existing role names */
-    --primary-color: #6d8c9e; /* Muted blue-grey, refined */
-    --secondary-color: var(--ghibli-green-mid);
-    --text-color: var(--ghibli-text);
-    --light-bg: var(--ghibli-cream);
-    --border-color: var(--ghibli-brown-light);
-    --shadow: var(--ghibli-shadow-mid);
+    --sidebar-width: 220px;
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --text-color: #333;
+    --light-bg: #f9f9f9;
+    --border-color: #e0e0e0;
+    --shadow: 0 2px 10px rgba(0,0,0,0.05);
     --transition-speed: 0.3s;
-    --poetry-accent: var(--ghibli-accent-warm); /* Warm accent for poetry */
-    --ghibli-cloud: #ffffff; /* Keep white for contrast */
-    --ghibli-dark: var(--primary-color); /* Reuse primary */
-    --ghibli-light: var(--light-bg); /* Reuse light bg */
-    --ghibli-accent: var(--ghibli-accent-cool); /* Use cool accent */
+    --poetry-accent: #8e44ad;
 }
-
-/* Remove old font import if it exists */
-/* @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap'); */
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    /* Use Nunito as the base font, Caveat/Indie Flower for headings later */
-    font-family: 'Nunito', sans-serif;
 }
 
 body {
     height: 100vh;
-    background-color: var(--ghibli-sky-light); /* Light sky background */
+    background-color: #f5f5f5;
     color: var(--text-color);
-    overflow: visible; /* Allow content to overflow for scrolling */
-    /* Subtle gradient background */
-    background-image: linear-gradient(
-        to bottom,
-        var(--ghibli-sky-mid) 0%,
-        var(--ghibli-sky-light) 30%,
-        var(--ghibli-cream) 100%
-    );
-    background-attachment: fixed;
-    /* Add a subtle texture - replace with a suitable Ghibli-esque pattern */
-    /* background-image: url('path/to/subtle-ghibli-pattern.png'), linear-gradient(...); */
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Layout containers */
@@ -70,14 +35,14 @@ body {
 
 .content-area {
     margin-left: var(--sidebar-width);
-    padding: 2rem; /* Increase padding */
+    padding: 1.5rem;
     height: 100vh;
     overflow-y: auto;
     transition: margin-left var(--transition-speed) ease;
     flex: 1;
     display: flex;
     justify-content: center;
-    padding-top: 30px; /* Adjust top padding */
+    padding-top: 20px;
 }
 
 .content-area.full-width {
@@ -89,37 +54,28 @@ body {
     width: 100%;
     max-width: 1200px;
     margin: 0;
-    padding: 1.5rem 2rem; /* Adjust padding */
-    background-color: rgba(255, 255, 255, 0.85); /* Slightly more transparent */
-    backdrop-filter: blur(12px); /* Increase blur */
-    border-radius: 25px; /* More rounded */
-    box-shadow: 0 10px 35px var(--ghibli-shadow-light); /* Softer shadow */
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 1rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
     min-height: 80vh;
-    border-top: 5px solid var(--ghibli-green-light); /* Add top border accent */
 }
 
 /* Left panel / Sidebar */
 .left-panel {
     width: var(--sidebar-width);
-    /* Use a Ghibli green gradient */
-    background: linear-gradient(
-        135deg,
-        var(--ghibli-green-dark) 0%,
-        var(--ghibli-green-mid) 100%
-    );
-    box-shadow: 5px 0px 15px var(--ghibli-shadow-light); /* Softer shadow */
-    color: var(--ghibli-cream); /* Use cream for text */
+    background-color: var(--primary-color);
+    color: white;
     height: 100%;
     position: fixed;
     left: 0;
     top: 0;
     z-index: 10;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
     transition: transform var(--transition-speed) ease;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    border-right: 3px solid var(--ghibli-brown-light); /* Add a subtle border */
 }
 
 .left-panel.hidden {
@@ -134,8 +90,8 @@ body {
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background-color: var(--ghibli-green-dark); /* Match sidebar */
-    color: var(--ghibli-cream);
+    background-color: var(--primary-color);
+    color: white;
     border: none;
     display: flex;
     align-items: center;
@@ -143,11 +99,10 @@ body {
     cursor: pointer;
     transition: left var(--transition-speed) ease, transform var(--transition-speed) ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    border: 2px solid var(--ghibli-brown-light);
 }
 
 .sidebar-toggle:hover {
-    background-color: var(--ghibli-green-mid);
+    background-color: var(--secondary-color);
 }
 
 .sidebar-toggle.collapsed i {
@@ -167,68 +122,62 @@ body {
 
 .panel-button {
     background-color: transparent;
-    color: var(--ghibli-cream); /* Cream text */
+    color: white;
     border: none;
-    padding: 0.8rem 1rem; /* Adjust padding */
-    margin-bottom: 0.6rem; /* Adjust margin */
-    border-radius: 15px; /* More rounded */
+    padding: 0.7rem 0.8rem;
+    margin-bottom: 0.8rem;
+    border-radius: 4px;
     cursor: pointer;
     text-align: left;
-    font-size: 1rem; /* Slightly larger font */
-    font-weight: 600;
-    transition: all 0.3s ease;
-    border-left: 5px solid transparent; /* For active state */
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
 }
 
 .panel-button:hover {
-    background-color: rgba(255, 249, 230, 0.15); /* Cream hover */
-    transform: translateX(8px);
-    border-left-color: var(--ghibli-accent-warm);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .panel-button.active {
-    background-color: rgba(255, 249, 230, 0.2); /* Cream active */
-    font-weight: 700; /* Bold active */
-    border-left-color: var(--ghibli-accent-warm);
-    color: white;
+    background-color: rgba(255, 255, 255, 0.2);
+    font-weight: bold;
 }
 
 .panel-footer {
     width: 100%;
     padding: 10px;
     font-size: 0.7rem;
-    color: rgba(255, 249, 230, 0.7); /* Lighter cream text */
+    color: rgba(255, 255, 255, 0.6);
     text-align: center;
     line-height: 1.4;
     margin-top: auto;
-    background-color: rgba(0, 0, 0, 0.2); /* Darker footer bg */
+    background-color: rgba(0, 0, 0, 0.15);
 }
 
 .sidebar-slogan {
-    margin: 20px 10px 25px 10px; /* Adjust margins */
-    padding: 18px 10px; /* Adjust padding */
-    border-radius: 12px; /* Rounded */
-    background-color: rgba(0, 0, 0, 0.15); /* Slightly darker bg */
+    margin: 15px 10px 20px 10px;
+    padding: 15px 8px;
+    border-radius: 6px;
+    background-color: var(--primary-color);
     text-align: center;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    font-family: 'Caveat', cursive; /* Whimsical font */
-    font-size: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .sidebar-slogan p {
     margin: 0;
-    line-height: 1.5;
+    line-height: 1.6;
+    font-size: 0.8rem;
 }
 
 .sidebar-slogan p:first-child {
-    color: rgba(255, 249, 230, 0.95); /* Cream */
-    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-style: italic;
     margin-bottom: 5px;
 }
 
 .sidebar-slogan p:last-child {
-    color: rgba(255, 249, 230, 0.85); /* Lighter Cream */
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .panel-footer p {
@@ -246,19 +195,19 @@ body {
 }
 
 .footer-links a {
-    color: rgba(255, 249, 230, 0.85); /* Cream links */
+    color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
-    font-size: 0.85rem; /* Slightly larger */
+    font-size: 0.8rem;
     transition: color 0.2s ease;
     padding: 2px 5px;
 }
 
 .footer-links a:hover {
-    color: var(--ghibli-accent-warm); /* Warm accent hover */
-    text-decoration: none;
+    color: white;
+    text-decoration: underline;
 }
 
-/* External services section (If applicable) */
+/* External services section */
 .external-services {
     margin-top: 1rem;
     margin-bottom: 0.8rem;
@@ -297,34 +246,29 @@ body {
 }
 
 .sidebar-frame {
-    background-color: rgba(255, 255, 255, 0.05); /* Less contrast */
-    border-radius: 10px;
-    padding: 0.8rem;
-    margin-bottom: 1rem;
-    border: 1px dashed rgba(255, 249, 230, 0.2); /* Dashed border */
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 0.7rem;
+    margin-bottom: 0.8rem;
 }
 
 .frame-title {
-    font-size: 0.9rem;
-    font-weight: 700;
-    margin-bottom: 0.6rem;
-    color: var(--ghibli-accent-warm); /* Warm accent */
-    font-family: 'Caveat', cursive; /* Whimsical font */
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #ecf0f1;
     display: flex;
     align-items: center;
 }
 
 .frame-title::before {
-    /* Maybe use a leaf or sparkle icon if possible */
-    content: '🍃'; /* Example: Leaf emoji */
+    content: '';
     display: inline-block;
-    /* width: 4px; */
-    /* height: 14px; */
-    /* background-color: var(--ghibli-accent-warm); */
-    margin-right: 8px;
-    /* border-radius: 2px; */
-    font-size: 1em;
-    color: var(--ghibli-green-light);
+    width: 4px;
+    height: 14px;
+    background-color: var(--secondary-color);
+    margin-right: 6px;
+    border-radius: 2px;
 }
 
 .frame-content {
@@ -342,32 +286,30 @@ body {
 }
 
 .dropdown-container label {
-    font-size: 0.85rem;
-    color: var(--ghibli-cream); /* Cream label */
-    width: 40px; /* Adjust width */
+    font-size: 0.8rem;
+    color: #bdc3c7;
+    width: 35px;
     flex-shrink: 0;
-    font-weight: 600;
 }
 
 .dropdown-container select {
-    padding: 0.4rem 0.5rem;
-    border: 1px solid rgba(255, 249, 230, 0.3); /* Cream border */
-    border-radius: 8px; /* Rounded */
-    background-color: rgba(0, 0, 0, 0.2); /* Darker background */
+    padding: 0.35rem 0.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.07);
     color: white;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     flex-grow: 1;
-    cursor: pointer;
 }
 
 .dropdown-container select:focus {
     outline: none;
-    border-color: var(--ghibli-accent-warm);
-    background-color: rgba(0, 0, 0, 0.3);
+    border-color: var(--secondary-color);
+    background-color: rgba(255, 255, 255, 0.12);
 }
 
 .dropdown-container select option {
-    background-color: var(--ghibli-green-dark); /* Match sidebar */
+    background-color: var(--primary-color);
     color: white;
 }
 
@@ -380,44 +322,37 @@ body {
 }
 
 .input-container {
-    padding: 1.5rem;
-    border-bottom: 2px dashed var(--ghibli-brown-light); /* Dashed border */
-    background-color: transparent; /* Use container background */
-    border-radius: 15px 15px 0 0; /* Match container */
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: white;
+    border-radius: 8px 8px 0 0;
 }
 
 .welcome-message {
     margin-bottom: 1rem;
-    padding: 1rem;
-    background-color: var(--ghibli-green-light); /* Light green bg */
-    color: var(--ghibli-text);
-    border-radius: 12px;
-    font-size: 1rem;
+    padding: 0.8rem;
+    color: #555;
+    font-size: 0.95rem;
     text-align: left;
-    border-left: 5px solid var(--ghibli-green-mid);
-    font-weight: 600;
 }
 
 textarea#user-input {
     width: 100%;
-    min-height: 120px; /* Taller */
+    min-height: 100px;
     padding: 1rem;
-    border: 2px solid var(--ghibli-brown-light); /* Brown border */
-    border-radius: 15px; /* Rounded */
-    font-family: 'Nunito', sans-serif;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.9); /* Keep light */
-    backdrop-filter: blur(5px);
-    color: var(--ghibli-text);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    resize: vertical;
     font-size: 1rem;
-    line-height: 1.6;
+    line-height: 1.5;
+    color: var(--text-color);
+    transition: border-color var(--transition-speed) ease;
 }
 
 textarea#user-input:focus {
     outline: none;
-    border-color: var(--ghibli-green-mid); /* Green focus */
-    box-shadow: 0 0 0 4px rgba(129, 199, 132, 0.2); /* Green shadow */
-    background: white;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
 .button-container {
@@ -432,280 +367,198 @@ textarea#user-input:focus {
 }
 
 /* Buttons */
-button, .button /* Add class for consistent styling if needed */ {
-    padding: 0.7rem 1.2rem; /* Adjust padding */
+button {
+    padding: 0.6rem 1rem;
     border: none;
-    border-radius: 12px; /* Rounded */
-    background-color: var(--ghibli-brown-light); /* Light brown default */
-    color: var(--ghibli-text);
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    color: var(--text-color);
     cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 600; /* Bolder */
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 5px var(--ghibli-shadow-light);
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
 }
 
-button:hover:not(:disabled) {
-    background-color: var(--ghibli-brown-mid); /* Darker brown hover */
+button:hover {
+    background-color: #e0e0e0;
+}
+
+button:active {
+    background-color: #d0d0d0;
+}
+
+#submit-button {
+    background-color: var(--secondary-color);
     color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 10px var(--ghibli-shadow-light);
+    font-weight: 500;
 }
 
-button:active:not(:disabled) {
-    transform: translateY(0px);
-    box-shadow: 0 2px 4px var(--ghibli-shadow-light);
+#submit-button:hover {
+    background-color: #2980b9;
 }
 
-button:disabled {
-    background-color: #e0e0e0; /* Grey disabled */
-    color: #a0a0a0;
-    cursor: not-allowed;
-    box-shadow: none;
+#optimize-button {
+    background-color: #f8f9fa;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    font-weight: 500;
 }
 
-/* Primary Action Buttons */
-#submit-button, #optimize-button, #generate-btn, #learn-poetry-button, .vocabulary-load-btn, #evaluate-btn.ready /* Style ready state */ {
-    background: var(--ghibli-green-mid); /* Green primary action */
-    color: white;
-    box-shadow: 0 4px 10px rgba(129, 199, 132, 0.4);
-}
-
-#submit-button:hover:not(:disabled),
-#optimize-button:hover:not(:disabled),
-#generate-btn:hover:not(:disabled),
-#learn-poetry-button:hover:not(:disabled),
-.vocabulary-load-btn:hover:not(:disabled),
-#evaluate-btn.ready:hover:not(:disabled) {
-    background: var(--ghibli-green-dark); /* Darker green hover */
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(85, 139, 47, 0.4);
+#optimize-button:hover {
+    background-color: #e9ecef;
 }
 
 #optimize-button.optimizing {
-    background-color: var(--ghibli-accent-warm); /* Warm color while optimizing */
-    color: var(--ghibli-text);
+    background-color: #e9ecef;
+    color: #6c757d;
     cursor: wait;
-    box-shadow: none;
 }
-
-/* Secondary/Specific Buttons */
-#evaluate-btn { /* Default evaluate button */
-    background-color: var(--ghibli-accent-cool); /* Cool accent */
-    color: white;
-}
-#evaluate-btn:hover:not(:disabled) {
-    background-color: #64b5f6; /* Darker cool */
-}
-
 
 /* Output container */
 .output-container {
     flex: 1;
-    padding: 1.5rem;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    background-color: transparent; /* Use container background */
-    border-radius: 0 0 15px 15px; /* Match container */
+    background-color: var(--light-bg);
+    border-radius: 0 0 8px 8px;
 }
 
 #output {
     min-height: 100px;
-    line-height: 1.7; /* Increase line height */
+    line-height: 1.6;
     width: 100%;
-    font-size: 1.05rem; /* Slightly larger text */
 }
 
 /* Output content styling */
 #output p {
-    margin-bottom: 1.2rem; /* More spacing */
-    line-height: 1.7;
+    margin-bottom: 1rem;
+    line-height: 1.6;
 }
 
-#output h1, #output h2, #output h3, #output h4, #output h5, #output h6 {
-    margin-top: 1.8rem;
+#output h1, #output h2, #output h3 {
+    margin-top: 1.5rem;
     margin-bottom: 1rem;
-    color: var(--ghibli-text); /* Main text color */
-    font-family: 'Caveat', cursive; /* Whimsical heading font */
-    font-weight: 700;
-    line-height: 1.3;
+    color: var(--primary-color);
+    font-weight: 600;
 }
 
 #output h1 {
-    font-size: 2rem;
-    border-bottom: 3px dotted var(--ghibli-brown-light); /* Dotted border */
-    padding-bottom: 0.6rem;
-    color: var(--ghibli-green-dark); /* Dark green for h1 */
+    font-size: 1.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
 }
 
 #output h2 {
-    font-size: 1.7rem;
-    color: var(--ghibli-green-mid); /* Mid green for h2 */
+    font-size: 1.3rem;
 }
 
 #output h3 {
-    font-size: 1.4rem;
-    color: var(--ghibli-text-secondary); /* Secondary text brown */
+    font-size: 1.1rem;
 }
 
 #output ul, #output ol {
     margin-left: 1.5rem;
-    margin-bottom: 1.2rem;
-    padding-left: 1.5rem; /* More padding */
-    list-style: none; /* Remove default */
+    margin-bottom: 1rem;
+    padding-left: 1rem;
 }
 
 #output li {
-    margin-bottom: 0.8rem; /* More spacing */
-    position: relative;
+    margin-bottom: 0.5rem;
 }
-
-/* Custom list bullets */
-#output ul > li::before {
-    content: '🌿'; /* Leaf bullet */
-    position: absolute;
-    left: -1.8rem;
-    color: var(--ghibli-green-mid);
-    font-size: 1em;
-}
-#output ol {
-    counter-reset: ghibli-counter;
-}
-#output ol > li {
-    counter-increment: ghibli-counter;
-}
-#output ol > li::before {
-    content: counter(ghibli-counter) ". ";
-    position: absolute;
-    left: -2rem;
-    color: var(--ghibli-brown-mid);
-    font-weight: 600;
-}
-
 
 #output code {
-    background-color: var(--ghibli-cream); /* Cream background */
-    padding: 0.2rem 0.5rem;
-    border-radius: 6px; /* Rounded */
+    background-color: #f0f0f0;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
     font-family: 'Courier New', monospace;
-    font-size: 0.95rem;
-    color: var(--ghibli-accent-warm); /* Warm color */
-    border: 1px solid var(--ghibli-brown-light);
+    font-size: 0.9rem;
+    color: #e74c3c;
 }
 
 #output pre {
-    background-color: rgba(255, 249, 230, 0.5); /* Light cream background */
-    padding: 1.2rem;
-    border-radius: 10px;
+    background-color: #f5f5f5;
+    padding: 1rem;
+    border-radius: 5px;
     overflow-x: auto;
-    margin-bottom: 1.2rem;
-    border: 1px solid var(--ghibli-brown-light);
-    border-left: 5px solid var(--ghibli-green-mid); /* Green left border */
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1rem;
+    border-left: 3px solid var(--secondary-color);
 }
 
 #output pre code {
     background-color: transparent;
     padding: 0;
-    color: var(--ghibli-text); /* Main text color */
-    font-size: 0.95rem;
-    border: none;
+    color: #333;
+    font-size: 0.9rem;
 }
 
 #output blockquote {
-    border-left: 5px solid var(--ghibli-accent-cool); /* Cool accent border */
-    padding-left: 1.5rem;
-    margin-left: 0.5rem;
-    margin-bottom: 1.2rem;
-    color: var(--ghibli-text-secondary); /* Secondary text color */
-    font-style: italic;
-    background-color: rgba(144, 202, 249, 0.08); /* Light cool bg */
-    padding-top: 0.8rem;
-    padding-bottom: 0.8rem;
-    border-radius: 0 8px 8px 0;
+    border-left: 3px solid var(--secondary-color);
+    padding-left: 1rem;
+    margin-left: 0;
+    margin-bottom: 1rem;
+    color: #555;
 }
 
 #output table {
-    border-collapse: separate; /* Use separate */
+    border-collapse: collapse;
     width: 100%;
-    margin-bottom: 1.5rem;
-    border: 1px solid var(--ghibli-brown-light);
-    border-spacing: 0;
-    border-radius: 10px; /* Rounded table */
-    overflow: hidden; /* Clip corners */
-    box-shadow: 0 3px 8px var(--ghibli-shadow-light);
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
 }
 
 #output th, #output td {
-    padding: 0.8rem 1rem; /* Adjust padding */
+    padding: 0.5rem;
     text-align: left;
-    border-bottom: 1px solid var(--ghibli-brown-light);
-    border-right: 1px solid var(--ghibli-brown-light);
-}
-#output th:last-child, #output td:last-child {
-    border-right: none;
-}
-#output tr:last-child td {
-    border-bottom: none;
+    border: 1px solid var(--border-color);
 }
 
 #output th {
-    background-color: var(--ghibli-green-light); /* Light green header */
-    font-weight: 700;
-    color: var(--ghibli-text);
-    font-family: 'Nunito', sans-serif; /* Use body font for headers */
+    background-color: #f5f5f5;
+    font-weight: 600;
 }
 
-#output tr:nth-child(even) td {
-    background-color: rgba(255, 249, 230, 0.3); /* Very light cream */
-}
-#output tr:hover td {
-    background-color: rgba(129, 199, 132, 0.15); /* Light green hover */
+#output tr:nth-child(even) {
+    background-color: #f9f9f9;
 }
 
 #output a {
-    color: var(--ghibli-green-dark); /* Dark green links */
+    color: var(--secondary-color);
     text-decoration: none;
-    border-bottom: 2px dotted var(--ghibli-accent-warm); /* Dotted warm underline */
-    font-weight: 600;
-    transition: all var(--transition-speed) ease;
+    border-bottom: 1px dotted var(--secondary-color);
 }
 
 #output a:hover {
-    color: var(--ghibli-accent-warm); /* Warm hover */
-    border-bottom: 2px solid var(--ghibli-accent-warm); /* Solid warm underline */
+    border-bottom: 1px solid var(--secondary-color);
 }
 
 /* System messages */
 .system-message {
-    padding: 1rem 1.5rem;
-    border-radius: 12px; /* Rounded */
-    margin: 1rem 0;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 15px 0;
     display: flex;
     align-items: center;
-    animation: slideInFromTop 0.4s ease-out; /* Smoother animation */
-    box-shadow: 0 4px 10px var(--ghibli-shadow-light);
-    font-weight: 600;
-    border-left-width: 6px; /* Thicker border */
+    animation: slideInFromTop 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 .system-message.info {
-    background-color: var(--ghibli-sky-light);
-    border-left-color: var(--ghibli-accent-cool);
-    color: #1e3a8a; /* Darker blue text */
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196F3;
+    color: #0d47a1;
 }
 
 .system-message.error {
-    background-color: #ffebee; /* Keep light red */
-    border-left-color: #e57373; /* Softer red */
-    color: #c62828; /* Darker red text */
+    background-color: #ffebee;
+    border-left: 4px solid #f44336;
+    color: #b71c1c;
 }
 
 .system-message.success {
-    background-color: var(--ghibli-green-light);
-    border-left-color: var(--ghibli-green-mid);
-    color: var(--ghibli-green-dark);
+    background-color: #e8f5e9;
+    border-left: 4px solid #4CAF50;
+    color: #1b5e20;
 }
 
 @keyframes slideInFromTop {
@@ -715,15 +568,14 @@ button:disabled {
 
 /* AI message */
 .ai-message {
-    background-color: rgba(255, 255, 255, 0.7); /* More transparent */
-    border-radius: 12px; /* Rounded */
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 6px var(--ghibli-shadow-light);
-    font-size: 1.05rem; /* Match output text */
-    color: var(--ghibli-text);
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    font-size: 1rem;
+    color: #333;
     width: 100%;
-    border-left: 5px solid var(--ghibli-brown-light); /* Subtle border */
 }
 
 /* Loading indicator */
@@ -733,17 +585,17 @@ button:disabled {
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    color: var(--ghibli-text-secondary);
-    font-size: 1rem;
+    color: #6c757d;
+    font-size: 0.9rem;
 }
 
 .spinner {
-    width: 45px;
-    height: 45px;
-    border: 4px solid rgba(129, 199, 132, 0.2); /* Light green border */
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(0,0,0,0.1);
     border-radius: 50%;
-    border-top-color: var(--ghibli-green-mid); /* Green top */
-    animation: spin 1s linear infinite;
+    border-top-color: var(--secondary-color);
+    animation: spin 1s ease-in-out infinite;
     margin-bottom: 1rem;
 }
 
@@ -909,18 +761,17 @@ button:disabled {
 
 /* Questions display container */
 .questions-display-container {
-    background-color: rgba(255, 255, 255, 0.6); /* More transparent */
-    border-radius: 15px; /* Rounded */
-    padding: 2rem;
-    margin-top: 20px; /* Adjust spacing */
-    box-shadow: 0 5px 15px var(--ghibli-shadow-light);
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin-top: 15px;
+    box-shadow: var(--shadow);
     transition: all var(--transition-speed) ease;
     width: 100%;
-    margin-bottom: 90px; /* More space for fixed nav */
+    margin-bottom: 20px;
     flex: 1;
     position: relative;
     z-index: 10;
-    border: 1px solid var(--ghibli-brown-light);
 }
 
 #question-navigation {
@@ -933,167 +784,118 @@ button:disabled {
 }
 
 #question-counter {
-    font-weight: 700;
-    color: var(--ghibli-brown-mid); /* Brown counter */
-    font-size: 1rem;
-    background-color: var(--ghibli-cream);
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
+    font-weight: 500;
+    color: var(--primary-color);
 }
 
 .question-text {
-    font-size: 1.3rem; /* Larger question text */
-    line-height: 1.8;
-    margin-bottom: 2.5rem;
-    color: var(--ghibli-text);
-    padding: 1rem;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
+    font-size: 1.2rem;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    color: var(--text-color);
+    padding: 0 1rem;
 }
 
 .choices-container {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .choice-item {
     display: flex;
-    align-items: center; /* Center align radio and text */
+    align-items: flex-start;
     margin-bottom: 1rem;
     padding: 1rem 1.5rem;
-    border: 2px solid var(--ghibli-brown-light); /* Thicker border */
-    border-radius: 12px; /* Rounded */
-    transition: all 0.2s ease-in-out;
-    background-color: rgba(255, 255, 255, 0.9);
-    cursor: pointer;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    transition: background-color 0.2s;
 }
 
 .choice-item:hover {
-    background-color: var(--ghibli-cream); /* Cream hover */
-    border-color: var(--ghibli-green-mid);
-    transform: scale(1.02); /* Slight scale effect */
+    background-color: #f5f9ff;
 }
 
 .choice-item input[type="radio"] {
-    margin-right: 1rem; /* More space */
-    accent-color: var(--ghibli-green-mid); /* Green radio */
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
+    margin-top: 0.2rem;
+    margin-right: 0.8rem;
 }
 
 .choice-item label {
     flex: 1;
     cursor: pointer;
-    font-size: 1.05rem;
-    color: var(--ghibli-text);
 }
-
-/* Style checked state */
-.choice-item input[type="radio"]:checked + label {
-    font-weight: 700;
-    color: var(--ghibli-green-dark);
-}
-.choice-item:has(input[type="radio"]:checked) {
-    background-color: var(--ghibli-green-light);
-    border-color: var(--ghibli-green-dark);
-}
-
 
 .answer-container {
-    background-color: var(--ghibli-cream); /* Cream background */
-    border-radius: 10px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
     padding: 1.5rem 2rem;
     margin-bottom: 1.5rem;
-    border: 1px solid var(--ghibli-brown-light);
-    border-left: 6px solid var(--ghibli-green-mid); /* Green accent */
-    box-shadow: 0 3px 8px var(--ghibli-shadow-light);
+    border-left: 4px solid var(--secondary-color);
 }
 
-.answer-header { /* If you add a header */
-    font-weight: 700;
-    margin-bottom: 1rem;
-    color: var(--ghibli-green-dark);
-    font-family: 'Caveat', cursive;
-    font-size: 1.5rem;
+.answer-header {
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    color: var(--primary-color);
 }
 
 .answer-explanation {
-    line-height: 1.7;
-    color: var(--ghibli-text);
-    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--text-color);
 }
 
-/* Navigation controls - CRITICAL: ALWAYS STICKY BOTTOM CENTER */
+/* Navigation controls */
 .navigation-controls {
-    position: fixed; /* Ensure it's fixed to the viewport */
-    bottom: 20px;    /* Stick to the bottom */
-    left: 50%;       /* Position the left edge at the center */
-    transform: translateX(-50%); /* Shift left by half its width to center */
-    z-index: 100;    /* Ensure it's above other content */
-    width: 90%;      /* Default width (adjusts in media query) */
-    max-width: 600px; /* Max width */
-    min-width: 300px; /* Min width */
-    transition: box-shadow var(--transition-speed) ease; /* Keep existing transitions */
-
-    /* --- Appearance Changes (Keep these from previous Ghibli style) --- */
-    background: rgba(255, 249, 230, 0.9); /* Cream background */
-    backdrop-filter: blur(10px);
-    padding: 12px 25px; /* Adjust padding */
-    display: flex; /* Keep flex */
-    justify-content: center; /* Keep center */
-    align-items: center; /* Keep center */
-    gap: 25px; /* Adjust gap */
-    border: 1px solid var(--ghibli-brown-light); /* Add border */
-    border-top: 3px solid var(--ghibli-brown-mid); /* Thicker top border */
-    box-shadow: 0 -3px 15px var(--ghibli-shadow-light); /* Softer shadow */
-    border-radius: 15px; /* Rounded */
-    /* Remove margin-top as it's not needed for fixed positioning */
-    /* margin-top: 20px; */
+    position: fixed;
+    bottom: 20px;
+    left: calc(50% + (var(--sidebar-width) / 2));
+    transform: translateX(-50%);
+    background: var(--card-bg);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    border-top: 1px solid var(--border-color);
+    margin-top: 20px;
+    z-index: 100;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    min-width: 300px;
+    transition: left var(--transition-speed) ease;
 }
 
-/* Remove this rule as centering is now independent of sidebar */
-/* .left-panel.hidden ~ .content-area .navigation-controls {
+/* When sidebar is hidden, adjust the navigation controls position */
+.left-panel.hidden ~ .content-area .navigation-controls {
     left: 50%;
-} */
+}
 
 .navigation-controls:hover {
-     /* Keep existing hover shadow or adjust appearance only */
-    box-shadow: 0 -4px 20px var(--ghibli-shadow-mid);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 .nav-button {
-    /* Keep existing font-size if needed, or adjust */
-    padding: 10px 18px; /* Adjust padding */
-    background-color: var(--ghibli-brown-mid); /* Brown buttons */
+    padding: 10px 20px;
+    background-color: #4299e1;
     color: white;
     border: none;
-    border-radius: 10px; /* Rounded */
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-weight: 700;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    font-size: 16px;
+    font-weight: 500;
 }
 
 .nav-button:disabled {
-    background-color: var(--ghibli-brown-light); /* Lighter disabled */
-    color: rgba(255, 255, 255, 0.7);
+    background-color: #cbd5e0;
     cursor: not-allowed;
-    box-shadow: none;
 }
 
 .nav-button:not(:disabled):hover {
-    background-color: var(--ghibli-text); /* Darker brown hover */
-    transform: translateY(-2px) scale(1.05); /* Add scale effect */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    background-color: #3182ce;
+    transform: translateY(-1px);
 }
-/* Specific nav button styles if needed, e.g., for word nav */
-#prev-word-btn, #next-word-btn {
-    width: 45px; /* Adjust size */
-    height: 45px;
-    border-radius: 50%; /* Circular */
-    font-size: 1.2rem;
-}
-
 
 /* Empty state styling */
 .empty-state {
@@ -1102,125 +904,95 @@ button:disabled {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 50px 30px;
-    background-color: rgba(255, 249, 230, 0.5); /* Light cream bg */
-    border-radius: 20px; /* Rounded */
+    padding: 60px 30px;
+    background-color: #f8fafc;
+    border-radius: 12px;
     margin: 30px 0;
     transition: all 0.3s ease;
-    border: 2px dashed var(--ghibli-brown-light); /* Dashed border */
+    border: 2px dashed #e0e0e0;
     order: 1;
 }
 
-.empty-state:hover {
-    border-color: var(--ghibli-green-mid);
-    background-color: rgba(129, 199, 132, 0.1);
-}
-
 .empty-state h3 {
-    margin-bottom: 1rem;
-    font-size: 1.8rem; /* Larger */
-    color: var(--ghibli-text);
-    font-family: 'Caveat', cursive; /* Whimsical */
+    margin-bottom: 15px;
+    font-size: 22px;
+    color: #333;
 }
 
 .empty-state p {
-    color: var(--ghibli-text-secondary); /* Secondary text */
+    color: #666;
     max-width: 500px;
     margin: 0 auto 20px;
-    line-height: 1.7;
-    font-size: 1.05rem;
+    line-height: 1.6;
 }
 
-.empty-state img, .empty-state i.empty-state-icon /* Style FontAwesome icons too */ {
-    width: 80px; /* Adjust size */
+.empty-state img {
+    width: 120px;
     height: auto;
-    margin-bottom: 1.5rem;
-    opacity: 0.7;
+    margin-bottom: 20px;
+    opacity: 0.8;
     transition: all 0.3s ease;
-    color: var(--ghibli-green-mid); /* Color icon */
 }
 
-.empty-state:hover img, .empty-state:hover i.empty-state-icon {
+.empty-state:hover img {
     opacity: 1;
-    transform: scale(1.1) rotate(3deg); /* Slight rotation */
+    transform: scale(1.05);
 }
 
+/* Utility classes */
+.hidden {
+    display: none !important;
+}
 
-/* Control panel (for Quiz/Poetry) */
-.control-panel, .poetry-header { /* Apply to both */
-    position: sticky; /* Keep sticky */
-    top: 0; /* Keep sticky */
-    z-index: 100; /* Keep sticky */
+.highlight {
+    background-color: rgba(255, 255, 0, 0.3);
+    padding: 0.1rem 0.2rem;
+    border-radius: 2px;
+}
+
+/* Create container */
+#create-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px; /* Adjust gap */
-    margin-bottom: 2rem; /* More space */
-    padding: 1rem 1.5rem; /* Adjust padding */
-    background-color: rgba(255, 249, 230, 0.85); /* Cream background */
-    backdrop-filter: blur(8px);
-    border-radius: 15px; /* Rounded */
-    box-shadow: 0 4px 15px var(--ghibli-shadow-light);
+    flex-direction: column;
+    padding: 20px;
+    min-height: calc(100vh - 60px);
+    position: relative;
+    height: auto;
+    overflow: visible;
+}
+
+/* Loading indicator for tests */
+#test-loading-indicator {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    transition: all 0.3s ease;
-    order: -1; /* Keep order */
-    width: 100%;
-    border: 1px solid var(--ghibli-brown-light);
-    border-bottom: 3px solid var(--ghibli-brown-mid);
-}
-
-.control-panel label, .selector-group label {
-    font-weight: 600;
-    color: var(--ghibli-text-secondary); /* Secondary brown */
-    font-size: 0.9rem;
-    margin-bottom: 0;
-    white-space: nowrap;
-    min-width: auto; /* Adjust width */
-    margin-right: 5px; /* Space after label */
-}
-
-.control-panel select, .poetry-select {
-    padding: 0.6rem 1rem; /* Adjust padding */
-    border: 1px solid var(--ghibli-brown-light);
-    border-radius: 8px; /* Rounded */
+    justify-content: center;
+    padding: 40px;
     background-color: white;
-    min-width: 150px; /* Adjust width */
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23a1887f'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E"); /* Brown arrow */
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 16px;
-    padding-right: 35px;
-    cursor: pointer;
-    color: var(--ghibli-text);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin: 20px auto;
+    width: 80%;
+    max-width: 500px;
 }
 
-.control-panel select:hover, .poetry-select:hover {
-    border-color: var(--ghibli-brown-mid);
+.spinner-icon {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e2e8f0;
+    border-top: 4px solid #4299e1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
 }
 
-.control-panel select:focus, .poetry-select:focus {
-    outline: none;
-    border-color: var(--ghibli-green-mid);
-    box-shadow: 0 0 0 3px rgba(129, 199, 132, 0.2);
-}
-
-/* Style the main buttons in the control panel */
-.control-panel button, .poetry-button {
-    /* Uses general button styles, primary button styles applied above */
-    margin-left: 5px; /* Adjust margin */
-    align-self: center; /* Keep alignment */
-}
-
-
-/* --- Poetry Specific Styles --- */
+/* Poetry panel specific styles */
+/* Removing the poetry-config-frame style since we removed that section */
 
 #poetry-container {
     display: flex;
     flex-direction: column;
-    padding: 1rem 1.5rem; /* Adjust padding */
+    padding: 2rem;
     height: auto;
     min-height: calc(100vh - 60px);
     overflow-y: visible;
@@ -1229,94 +1001,142 @@ button:disabled {
 .poetry-header {
     display: flex;
     flex-direction: column;
+    padding: 18px;
+    margin-bottom: 25px;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+.poetry-header:hover {
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.poetry-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.poetry-selectors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 0;
+    padding: 0;
+    transition: background-color 0.3s ease;
+}
+
+.selector-group {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 38px;
+    min-width: 220px;
+    gap: 10px;
+}
+
+.selector-group label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+    margin-bottom: 0;
+    white-space: nowrap;
+    min-width: 50px;
+}
+
+.selector-group:hover label {
+    color: var(--poetry-accent, #8e44ad);
+}
+
+.poetry-select {
+    flex: 1;
+    height: 38px;
+    padding: 10px 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: white;
+    color: #333;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    padding-right: 35px;
+}
+
+.poetry-select:hover {
+    border-color: #bdbdbd;
+}
+
+.poetry-select:focus {
+    outline: none;
+    border-color: var(--poetry-accent, #8e44ad);
+    box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.2);
+}
+
+.poetry-button {
+    margin-top: 0;
+    height: 38px;
+    padding: 0 20px;
+    background-color: var(--poetry-accent, #8e44ad);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.3s;
+    box-shadow: 0 2px 6px rgba(142, 68, 173, 0.4);
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.poetry-button:hover {
+    background-color: #7d3c98;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(142, 68, 173, 0.5);
+}
+
+.poetry-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(142, 68, 173, 0.4);
+}
+
+.poetry-content {
+    padding: 0 1rem 1rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Poetry Navigation */
+.poem-navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
 }
 
-.poetry-header h2 {
-    margin: 0;
-    color: var(--primary-color);
-}
-
-.poetry-config-frame {
-    display: flex;
-    flex-wrap: wrap; /* Allow wrapping if needed, or remove for strict single row */
-    flex-direction: row; /* Arrange items horizontally */
-    align-items: center; /* Vertically align items in the row */
-    gap: 1rem; /* Keep existing gap, adjust as needed */
-    padding: 0.8rem 1rem; /* Slightly reduce padding */
-    background-color: rgba(245, 245, 245, 0.8); /* Slightly transparent */
-    border-radius: 12px; /* More rounded */
-    margin-bottom: 1rem; /* Keep margin below frame */
-    border: 1px solid var(--ghibli-brown-light); /* Added border for consistency */
-}
-
-.config-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.config-row label {
-    font-weight: 500;
-    min-width: 80px;
-}
-
-.config-row select {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    min-width: 120px;
-}
-
-.poetry-button {
-    padding: 0.75rem 1.5rem;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    /* align-self: flex-start; */ /* Remove specific alignment, let parent handle */
-    margin-left: auto; /* Push button to the right */
-}
-
-.poetry-button:hover {
-    background-color: #0056b3;
-}
-
-.empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    padding: 2rem;
-    text-align: center;
-    color: #666;
-}
-
-#poetry-display {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.poem-navigation {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1.5rem; /* More gap */
-    margin-bottom: 2rem; /* More space */
-}
-
 .poem-nav-button {
-    background-color: var(--ghibli-cream); /* Cream background */
-    border: 1px solid var(--ghibli-brown-light);
+    background-color: var(--button-bg);
+    border: 1px solid var(--border-color);
     border-radius: 50%;
-    width: 40px; /* Larger */
-    height: 40px; /* Larger */
-    color: var(--ghibli-brown-mid); /* Brown icon */
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1325,9 +1145,7 @@ button:disabled {
 }
 
 .poem-nav-button:hover:not(:disabled) {
-    background-color: var(--ghibli-accent-warm); /* Warm hover */
-    color: var(--ghibli-text);
-    border-color: var(--ghibli-brown-mid);
+    background-color: var(--button-hover-bg);
 }
 
 .poem-nav-button:disabled {
@@ -1336,26 +1154,25 @@ button:disabled {
 }
 
 .poem-counter {
-    font-size: 1rem;
-    color: var(--ghibli-text-secondary);
-    font-weight: 600;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 0.3rem 0.8rem;
-    border-radius: 15px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
 }
 
 /* Poem Display */
 .poem-display {
-    background: rgba(255, 255, 255, 0.9); /* Slightly less transparent */
-    backdrop-filter: blur(10px);
-    border-radius: 20px; /* Rounded */
-    box-shadow: 0 8px 25px var(--ghibli-shadow-light); /* Softer shadow */
-    border: 1px solid var(--ghibli-brown-light);
+    background-color: white;
+    border-radius: 12px;
+    padding: 3rem 2.5rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     position: relative;
     overflow: hidden;
     margin-bottom: 2rem;
-    padding: 2rem 2.5rem; /* More padding */
+}
+
+.poem-display:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
 }
 
 /* Fix for poem-display::before and poem-display::after syntax errors */
@@ -1365,7 +1182,7 @@ button:disabled {
     top: 10px;
     left: 20px;
     font-size: 120px;
-    color: rgba(161, 136, 127, 0.1); /* Softer brown quote */
+    color: rgba(142, 68, 173, 0.08);
     font-family: serif;
     line-height: 1;
 }
@@ -1376,20 +1193,19 @@ button:disabled {
     bottom: 10px;
     right: 20px;
     font-size: 120px;
-    color: rgba(161, 136, 127, 0.1); /* Softer brown quote */
+    color: rgba(142, 68, 173, 0.08);
     font-family: serif;
     line-height: 1;
 }
 
 .poem-title {
-    font-size: 2.2rem; /* Larger */
+    font-size: 2rem;
     font-weight: 700;
-    color: var(--ghibli-green-dark); /* Dark green title */
-    margin-bottom: 1rem;
+    color: #2c3e50;
+    margin-bottom: 0.8rem;
     text-align: center;
     position: relative;
-    padding-bottom: 1rem;
-    font-family: 'Caveat', cursive; /* Whimsical font */
+    padding-bottom: 15px;
 }
 
 .poem-title::after {
@@ -1398,46 +1214,44 @@ button:disabled {
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 100px; /* Wider */
-    height: 4px; /* Thicker */
-    background-color: var(--ghibli-accent-warm); /* Warm accent */
+    width: 80px;
+    height: 3px;
+    background-color: var(--poetry-accent, #8e44ad);
     border-radius: 3px;
 }
 
 .poem-author {
-    font-size: 1.2rem; /* Larger */
-    color: var(--ghibli-text-secondary);
+    font-size: 1.1rem;
+    color: #7f8c8d;
     margin-bottom: 2.5rem;
     text-align: center;
     font-style: italic;
-    font-weight: 600;
 }
 
 .poem-content {
-    font-size: 1.3rem; /* Larger */
-    line-height: 2.2; /* More line height */
+    font-size: 1.4rem;
+    line-height: 2.2;
     text-align: center;
-    margin-bottom: 3rem;
-    color: var(--ghibli-text);
+    margin-bottom: 2.5rem;
+    color: #34495e;
     transition: color 0.3s;
     white-space: pre-wrap;
     position: relative;
     z-index: 1;
-    font-family: 'Times New Roman', serif; /* Serif for poem content */
-    background-color: rgba(255, 249, 230, 0.3);
-    padding: 1.5rem;
-    border-radius: 10px;
 }
 
 .poem-section {
-    background-color: rgba(255, 249, 230, 0.6); /* Lighter cream */
-    border-radius: 12px;
-    padding: 1.5rem 2rem; /* Adjust padding */
-    margin-bottom: 2rem;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.8rem;
+    margin-bottom: 1.5rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
-    border: 1px solid var(--ghibli-brown-light);
-    border-left: 5px solid var(--ghibli-accent-warm); /* Warm accent */
+    border-left: 4px solid var(--poetry-accent, #8e44ad);
+    position: relative;
+    overflow: hidden;
+    display: block !important;
+    opacity: 1 !important;
 }
 
 .poem-section:hover {
@@ -1446,13 +1260,12 @@ button:disabled {
 }
 
 .poem-section h3 {
-    font-size: 1.5rem; /* Larger */
-    color: var(--ghibli-brown-mid); /* Brown heading */
-    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    color: var(--poetry-accent, #8e44ad);
+    margin-bottom: 1.2rem;
     position: relative;
-    padding-bottom: 0.8rem;
-    font-weight: 700;
-    font-family: 'Caveat', cursive; /* Whimsical font */
+    padding-bottom: 10px;
+    font-weight: 600;
 }
 
 .poem-section h3::after {
@@ -1460,9 +1273,9 @@ button:disabled {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 60px;
-    height: 3px; /* Thicker */
-    background-color: var(--ghibli-accent-warm);
+    width: 50px;
+    height: 2px;
+    background-color: var(--poetry-accent, #8e44ad);
     border-radius: 2px;
 }
 
@@ -1485,7 +1298,7 @@ button:disabled {
 .poem-explanation {
     font-size: 1.05rem;
     line-height: 1.8;
-    color: var(--ghibli-text); /* Main text color */
+    color: #34495e;
     display: block !important;
     opacity: 1 !important;
 }
@@ -1623,12 +1436,11 @@ button:disabled {
 #poetry-container {
     display: flex;
     flex-direction: column;
-    /* padding: 20px; */ /* Use existing padding */
-    /* min-height: calc(100vh - 60px); */ /* Removed min-height to allow natural flow */
+    padding: 20px;
+    min-height: calc(100vh - 60px);
     position: relative;
-    height: auto; /* Ensure height is determined by content */
-    overflow: visible; /* Ensure content isn't clipped */
-    width: 100%; /* Ensure it takes full width */
+    height: auto;
+    overflow: visible;
 }
 
 .poetry-header {
@@ -1684,6 +1496,11 @@ button:disabled {
 
 .poetry-button:hover {
     background-color: #0056b3;
+}
+
+.poetry-content {
+    flex: 1;
+    overflow-y: auto;
 }
 
 .empty-state {
@@ -1808,14 +1625,21 @@ button:disabled {
 
 /* Control panel - scroll with page but stick at top when scrolled to */
 .control-panel {
-    /* position: sticky; */ /* Removed sticky positioning */
-    /* top: 0; */ /* Removed top property */
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 25px;
+    padding: 18px;
     background-color: #f8f9fa;
-    padding: 10px;
-    z-index: 10; /* Kept z-index, might be adjusted later if needed */
-    border-bottom: 1px solid #dee2e6;
-    /* Add some margin or padding if needed for spacing */
-    margin-bottom: 15px; /* Added some margin for spacing */
+    border-radius: 10px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+    align-items: center;
+    transition: all 0.3s ease;
+    order: -1;
+    width: 100%;
 }
 
 /* Create container adjustments */
@@ -1846,48 +1670,117 @@ button:disabled {
     z-index: 10;
 }
 
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    /* ... other mobile styles ... */
-
-    /* Adjust navigation controls for mobile */
-    .navigation-controls {
-        /* Keep fixed positioning and centering from the main rule */
-        /* Remove mobile-specific position, left, transform overrides */
-        /* position: sticky; */ /* Removed */
-        /* left: 10px; */ /* Removed */
-        /* transform: translateX(0); */ /* Removed */
-
-        /* Keep mobile size/spacing adjustments */
-        width: calc(100% - 20px); /* Near full width */
-        bottom: 10px; /* Closer to bottom */
-        padding: 10px 15px;
-        gap: 15px;
-        max-width: none; /* Allow full width minus margins */
-        min-width: unset; /* Remove min-width on mobile */
-    }
-    /* Remove mobile sidebar-dependent positioning override */
-     /* .left-panel.hidden ~ .content-area .navigation-controls,
-     .left-panel:not(.hidden) ~ .content-area .navigation-controls {
-        left: 10px;
-        transform: translateX(0);
-     } */
-
-    /* ... other mobile styles ... */
-}
-
-/* Remove duplicated/conflicting rule if it exists near the end */
-/*
+/* Fix navigation controls at the bottom while scrolling */
 .navigation-controls {
-    position: fixed;
+    position: sticky;
     bottom: 20px;
-    left: calc(50% + (var(--sidebar-width) / 2));
-    transform: translateX(-50%);
-    // ... other duplicated styles ...
+    z-index: 90;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding: 15px;
+    background: rgb(108, 103, 103);
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+    order: 3;
 }
-*/
 
-/* ... existing code ... */
+.navigation-controls:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Style dropdowns more attractively */
+.control-panel select {
+    padding: 10px 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: white;
+    min-width: 140px;
+    font-size: 14px;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    padding-right: 35px;
+}
+
+.control-panel select:hover {
+    border-color: #bdbdbd;
+}
+
+.control-panel select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+/* Enhance the generate button */
+.control-panel button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--secondary-color);
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-left: 10px;
+}
+
+.control-panel button:hover {
+    background-color: #2980b9;
+}
+
+.control-panel button:active {
+    background-color: #2472a4;
+}
+
+.control-panel button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+#evaluate-btn {
+    background-color: #27ae60;
+}
+
+#evaluate-btn:hover {
+    background-color: #219a52;
+}
+
+#evaluate-btn:active {
+    background-color: #1e8449;
+}
+
+#evaluate-btn:disabled {
+    background-color: #bdc3c7;
+}
+
+/* Enhance loading indicator */
+.loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.loading-spinner {
+    border: 4px solid rgba(76, 175, 80, 0.2);
+    border-radius: 50%;
+    border-top: 4px solid #4CAF50;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
 /* Add fade in animation for questions */
 .question-item {
@@ -2043,16 +1936,13 @@ button:disabled {
 .vocabulary-card-container {
     flex: 1;
     overflow-y: auto;
-    padding: 2rem 2.5rem; /* Adjust padding */
-    background: rgba(255, 255, 255, 0.85); /* Match main container */
-    backdrop-filter: blur(12px);
-    border-radius: 25px; /* Match main container */
-    box-shadow: 0 10px 35px var(--ghibli-shadow-light); /* Match main container */
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: relative;
-    padding-bottom: 100px; /* Space for nav */
+    padding-bottom: 80px;
     width: 100%;
-    border-top: 5px solid var(--ghibli-accent-warm); /* Warm accent top */
 }
 
 .vocabulary-header {
@@ -2060,77 +1950,64 @@ button:disabled {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    padding-bottom: 1rem;
-    border-bottom: 2px dashed var(--ghibli-brown-light); /* Dashed border */
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .vocabulary-header h2 {
     margin: 0;
-    color: var(--ghibli-brown-mid); /* Brown title */
-    font-size: 1.8rem; /* Larger */
-    font-family: 'Caveat', cursive;
+    color: var(--text-color);
+    font-size: 1.5rem;
 }
 
 .vocabulary-load-btn {
-    padding: 10px 20px;
-    background: var(--ghibli-grass);
-    color: white;
-    border-radius: 12px;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    padding: 8px 16px;
+    background: var(--secondary-color); 
+    color: white;                     
     border: none;
-    box-shadow: 0 4px 15px rgba(123, 166, 154, 0.3);
-    text-decoration: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none;            
     margin-left: 10px;
-    display: inline-block;
-    vertical-align: middle;
-    font-size: 15px;
+    display: inline-block;            
+    font-weight: 500; 
+    font-size: 15px; 
+    vertical-align: middle; 
 }
 
 .vocabulary-load-btn:hover {
-    background: var(--ghibli-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(74, 102, 112, 0.4);
+    background: #2980b9; 
+    color: white; 
 }
 
 .initial-message {
     text-align: center;
-    color: var(--ghibli-text-secondary);
-    font-size: 1.1rem;
+    color: #64748b;
+    font-size: 18px;
     padding: 50px 30px;
-    border-radius: 15px;
-    background-color: rgba(255, 249, 230, 0.7); /* Cream bg */
+    border-radius: 10px;
+    background-color: white;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     width: 100%;
-    max-width: 600px; /* Adjust width */
+    max-width: 800px;
     margin: 40px auto;
-    border: 2px dashed var(--ghibli-brown-light);
-}
-.initial-message::before { /* Add decorative element */
-    content: '📖';
-    font-size: 2.5rem;
-    display: block;
-    margin-bottom: 1rem;
-    color: var(--ghibli-green-mid);
 }
 
 .word-card {
-    background: rgba(255, 255, 255, 0.9); /* Light background */
-    backdrop-filter: blur(5px);
-    border-radius: 20px; /* Rounded */
-    box-shadow: 0 6px 20px var(--ghibli-shadow-light);
-    border: 1px solid var(--ghibli-brown-light);
-    padding: 2.5rem; /* More padding */
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    padding: 35px 40px;
     width: 100%;
-    max-width: 100%; /* Use full width of container */
+    max-width: 1200px;
     margin: 0 auto;
-    min-height: 450px; /* Adjust height */
+    min-height: 500px;
     transition: transform 0.4s ease, box-shadow 0.4s ease;
     display: flex;
     flex-direction: column;
     animation: cardEntrance 0.6s ease-out;
-    gap: 1.5rem; /* Adjust gap */
-    border-top: 5px solid var(--ghibli-green-mid); /* Green top accent */
+    gap: 20px;
 }
 
 @keyframes cardEntrance {
@@ -2145,25 +2022,24 @@ button:disabled {
 }
 
 .word-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 30px var(--ghibli-shadow-mid); /* Stronger shadow */
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
 }
 
 .word-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px dotted var(--ghibli-brown-light); /* Dotted border */
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e2e8f0;
 }
 
 .word-english {
-    font-size: 2.8rem; /* Larger */
+    font-size: 38px;
     font-weight: 700;
-    color: var(--ghibli-green-dark); /* Dark green word */
+    color: var(--primary-color, #2c3e50);
     animation: fadeIn 0.8s ease-out;
-    font-family: 'Nunito', sans-serif; /* Keep readable */
 }
 
 .word-details {
@@ -2173,151 +2049,121 @@ button:disabled {
 }
 
 .word-form {
-    font-size: 0.9rem; /* Smaller */
-    color: var(--ghibli-text-secondary);
-    background-color: var(--ghibli-green-light); /* Light green tag */
-    padding: 0.4rem 0.9rem;
-    border-radius: 15px;
-    font-weight: 600;
+    font-size: 16px;
+    color: #64748b;
+    background-color: #f1f5f9;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 500;
     animation: slideIn 0.8s ease-out;
-    border: 1px solid var(--ghibli-green-mid);
 }
 
 .word-pronunciation {
-    font-family: 'Courier New', monospace; /* Keep mono */
-    color: var(--ghibli-text-secondary);
-    font-size: 0.95rem;
-    background-color: var(--ghibli-cream); /* Cream tag */
-    padding: 0.4rem 0.9rem;
-    border-radius: 15px;
-    border: 1px solid var(--ghibli-brown-light);
+    font-family: monospace;
+    color: #64748b;
+    font-size: 16px;
+    background-color: #f1f5f9;
+    padding: 6px 14px;
+    border-radius: 20px;
 }
 
 .word-meanings {
-    margin-bottom: 1.5rem;
+    margin-bottom: 25px;
     animation: fadeInUp 1s ease-out;
 }
 
 .meaning-row {
     display: flex;
-    margin-bottom: 1rem;
-    background-color: rgba(255, 249, 230, 0.3); /* Light cream row bg */
-    padding: 0.8rem 1rem;
-    border-radius: 8px;
-    border-left: 4px solid var(--ghibli-accent-cool); /* Cool accent */
+    margin-bottom: 15px;
 }
 
 .meaning-label {
-    width: 80px; /* Adjust width */
-    font-weight: 700;
-    color: var(--ghibli-text);
-    flex-shrink: 0; /* Prevent shrinking */
-    margin-right: 1rem; /* Space after label */
-    font-size: 0.95rem;
+    width: 100px;
+    font-weight: 600;
+    color: #334155;
 }
 
 .meaning-content {
     flex: 1;
-    color: var(--ghibli-text);
-    line-height: 1.7;
-    font-size: 1rem;
+    color: #475569;
+    line-height: 1.6;
+    font-size: 16px;
 }
 
 .section-title {
-    font-size: 1.3rem; /* Larger */
-    font-weight: 700;
-    color: var(--ghibli-brown-mid); /* Brown title */
-    margin-bottom: 1rem;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-color, #2c3e50);
+    margin-bottom: 12px;
     position: relative;
-    padding-left: 20px; /* Space for icon */
-    font-family: 'Caveat', cursive; /* Whimsical */
+    padding-left: 15px;
 }
 
 .section-title::before {
-    content: '🍃'; /* Leaf icon */
+    content: '';
     position: absolute;
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    /* height: 18px; */
-    /* width: 4px; */
-    /* background-color: var(--ghibli-green-mid); */ /* Use icon color */
-    /* border-radius: 2px; */
-    color: var(--ghibli-green-mid);
-    font-size: 1.2em;
+    height: 18px;
+    width: 4px;
+    background-color: var(--secondary-color, #3498db);
+    border-radius: 2px;
 }
 
-/* Sub-section styling (Examples, Family etc.) */
-.word-examples, .word-family, .collocations, .word-relationships, .learning-tips, .related-phrases {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px dashed var(--ghibli-brown-light); /* Dashed border */
+.word-examples, .word-family, .collocations, .word-relationships, .learning-tips {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #f1f5f9;
     animation: fadeInUp 1.3s ease-out;
 }
 
-.example-item, .phrase-item /* Style phrases similarly */ {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(5px);
-    border-radius: 12px; /* Rounded */
-    border: 1px solid var(--ghibli-brown-light);
-    transition: all 0.3s ease;
-    padding: 1rem 1.5rem;
-    margin-bottom: 1rem;
-    border-left: 4px solid var(--ghibli-green-mid); /* Green accent */
+.example-item {
+    background-color: #f8fafc;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-left: 4px solid var(--secondary-color, #3498db);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.example-item:hover, .phrase-item:hover {
-    transform: translateX(6px); /* More shift */
-    box-shadow: 0 4px 12px var(--ghibli-shadow-light); /* Softer shadow */
-    border-left-color: var(--ghibli-green-dark); /* Darker green */
+.example-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
-.example-english, .phrase-english {
-    color: var(--ghibli-text);
-    margin-bottom: 0.5rem;
-    font-weight: 600; /* Bolder */
-    font-size: 1.05rem;
+.example-english {
+    color: #334155;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 16px;
 }
 
-.example-chinese, .phrase-chinese {
-    color: var(--ghibli-text-secondary);
-    font-size: 1rem;
+.example-chinese {
+    color: #64748b;
+    font-size: 15px;
 }
-.phrase-usage { /* Specific style for phrase usage */
-    color: var(--ghibli-text-secondary);
-    font-size: 0.9rem;
-    font-style: italic;
-    padding-top: 0.5rem;
-    margin-top: 0.5rem;
-    border-top: 1px dotted var(--ghibli-brown-light);
-}
-
 
 .word-family-items, .collocation-items {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 0.8rem;
+    gap: 10px;
+    margin-top: 12px;
 }
 
 .word-family-item, .collocation-item {
-    background: var(--ghibli-cream); /* Cream background */
-    border-radius: 15px; /* Pill shape */
-    border: 1px solid var(--ghibli-brown-light);
-    transition: all 0.3s ease;
-    padding: 0.5rem 1rem;
-    font-size: 0.95rem;
-    color: var(--ghibli-text-secondary);
-    cursor: default; /* Non-interactive appearance */
+    background-color: #eef2ff;
+    color: #4338ca;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: transform 0.2s, background-color 0.2s;
 }
 
 .word-family-item:hover, .collocation-item:hover {
-    background-color: var(--ghibli-accent-warm); /* Warm hover */
-    color: var(--ghibli-text);
+    background-color: #4338ca;
+    color: white;
     transform: translateY(-2px);
-    border-color: var(--ghibli-brown-mid);
-    box-shadow: 0 2px 5px var(--ghibli-shadow-light);
 }
 
 .word-relationships {
@@ -2339,83 +2185,105 @@ button:disabled {
 .synonym-items, .antonym-items {
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
-    margin-top: 0.8rem;
+    gap: 10px;
+    margin-top: 12px;
 }
 
 .synonym-container, .antonym-container {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
-    padding: 0.8rem 1rem;
-    background-color: rgba(255, 255, 255, 0.8); /* Light background */
-    border-radius: 10px; /* Rounded */
-    border: 1px solid var(--ghibli-brown-light);
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    gap: 10px;
+    padding: 10px 15px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
 }
-/* Different accents for synonyms/antonyms */
-.synonyms .synonym-container { border-left: 4px solid var(--ghibli-green-mid); }
-.antonyms .antonym-container { border-left: 4px solid var(--ghibli-accent-warm); }
-
 
 .synonym-container:hover, .antonym-container:hover {
     transform: translateX(5px);
-    box-shadow: 0 2px 5px var(--ghibli-shadow-light);
-    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .synonym-word, .antonym-word {
-    font-weight: 700; /* Bolder */
-    color: var(--ghibli-text);
+    font-weight: 600;
+    color: #334155;
 }
 
 .synonym-def, .antonym-def {
-    color: var(--ghibli-text-secondary);
-    font-size: 0.9rem; /* Smaller */
+    color: #64748b;
+    font-size: 14px;
 }
 
 .learning-tips {
-    background-color: var(--ghibli-green-light); /* Light green */
-    border-left: 4px solid var(--ghibli-green-dark); /* Dark green border */
-    padding: 1.2rem 1.5rem;
-    border-radius: 10px;
-    margin-top: 1.5rem;
+    background-color: #ecfdf5;
+    border-left: 4px solid #10b981;
+    padding: 18px 20px;
+    border-radius: 8px;
+    margin-top: 20px;
 }
-.learning-tips .section-title::before { content: '💡'; color: var(--ghibli-accent-warm); } /* Lightbulb */
-.learning-tips .section-title { color: var(--ghibli-green-dark); }
-
 
 .tip-content {
-    color: var(--ghibli-text); /* Main text */
-    line-height: 1.7;
-    font-size: 1rem;
+    color: #065f46;
+    line-height: 1.6;
+    font-size: 15px;
 }
 
 .error-message {
-    background-color: #ffcdd2; /* Softer red */
-    border-left: 4px solid #e57373; /* Softer red border */
-    padding: 1.5rem;
-    border-radius: 12px;
-    color: #b71c1c; /* Dark red text */
+    background-color: #fee2e2;
+    border-left: 4px solid #ef4444;
+    padding: 20px;
+    border-radius: 10px;
+    color: #b91c1c;
     text-align: center;
     width: 100%;
-    max-width: 700px;
+    max-width: 800px;
     margin: 40px auto;
-    font-weight: 600;
-}
-.error-message::before {
-    content: '⚠️ ';
 }
 
-/* Nav button styles updated earlier */
-/* #word-counter style updated earlier with .poem-counter */
+/* Navigation buttons styling to match the site theme */
+.nav-button {
+    background-color: #f1f5f9;
+    color: #64748b;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 18px;
+}
 
-/* Loading spinner for vocabulary */
-.loading-spinner { /* Used by optimize button etc */
+.nav-button:hover:not(:disabled) {
+    background-color: var(--secondary-color, #3498db);
+    color: white;
+    transform: scale(1.1);
+}
+
+.nav-button:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.nav-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#word-counter {
+    font-size: 16px;
+    color: #64748b;
+    font-weight: 500;
+    margin: 0 15px;
+}
+
+/* Add loading spinner for the load button */
+.loading-spinner {
     display: inline-block;
     width: 18px;
     height: 18px;
-    border: 2px solid rgba(255, 255, 255, 0.4); /* White border */
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     border-top-color: white;
     animation: spin 0.8s linear infinite;
@@ -2470,30 +2338,29 @@ button:disabled {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 50px;
+    padding: 40px;
     text-align: center;
 }
 
 .vocabulary-spinner {
-    width: 55px;
-    height: 55px;
-    border: 5px solid rgba(129, 199, 132, 0.2); /* Light green */
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(52, 152, 219, 0.2);
     border-radius: 50%;
-    border-top-color: var(--ghibli-green-mid); /* Green */
+    border-top-color: var(--secondary-color, #3498db);
     animation: spin 1s ease-in-out infinite;
-    margin-bottom: 1.5rem;
+    margin-bottom: 20px;
 }
 
 .loading-message p {
-    color: var(--ghibli-text-secondary);
-    font-size: 1.1rem;
+    color: #64748b;
+    font-size: 18px;
     margin: 5px 0;
-    font-weight: 600;
 }
 
 .loading-message p:last-child {
-    color: var(--ghibli-brown-mid); /* Brown italic */
-    font-size: 1rem;
+    color: #94a3b8;
+    font-size: 16px;
     font-style: italic;
 }
 
