@@ -406,7 +406,7 @@ body {
     border-radius: 15px;
     position: relative;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: width var(--transition-speed) ease, margin var(--transition-speed) ease;
+    transition: all var(--transition-speed) ease;
 }
 
 .chat-container::before {
@@ -629,9 +629,12 @@ textarea#user-input:focus {
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .chat-container {
-        width: 100%;
-        margin: 0;
         padding: 15px;
+        margin: 10px;
+    }
+    
+    .content-area {
+        padding: 10px;
     }
     
     .button-container {
