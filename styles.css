@@ -4277,3 +4277,34 @@ textarea#user-input:focus {
         padding: 6px 12px;
     }
 }
+
+/* Hide navigation controls and word counter */
+#vocabulary-content .navigation-controls {
+    display: none;
+}
+
+#vocabulary-content .nav-button {
+    display: none;
+}
+
+#word-counter {
+    display: none;
+}
+
+/* Make sure no space is allocated for these elements */
+.vocabulary-header {
+    position: relative;
+    padding-right: 0;
+}
+
+/* Adjust the vocabulary container to account for removed navigation */
+.vocabulary-container {
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Ensure the word cards flow properly without navigation buttons */
+.vocabulary-card-container {
+    width: 100%;
+    padding: 0;
+}
