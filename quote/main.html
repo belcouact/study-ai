@@ -25,25 +25,14 @@
             flex-direction: column;
             text-align: center;
             padding: 20px;
-            background-color: #e6f2ff;
             color: #5d5d5d;
             perspective: 1000px;
-            background-image: url('https://images.unsplash.com/photo-1602940659805-770d1b3b9911?q=80&w=1000');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background: linear-gradient(135deg, #e6f7ff 0%, #f0f9ff 50%, #e6f2ff 100%);
             position: relative;
         }
         
         body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.75);
-            z-index: -1;
+            content: none;
         }
         
         #quote-container {
@@ -137,15 +126,7 @@
         }
         
         .totoro-cursor {
-            position: fixed;
-            width: 40px;
-            height: 40px;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23a9a9a9"/><circle cx="35" cy="40" r="8" fill="white"/><circle cx="65" cy="40" r="8" fill="white"/><circle cx="35" cy="40" r="4" fill="black"/><circle cx="65" cy="40" r="4" fill="black"/></svg>');
-            background-size: contain;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.1s;
-            opacity: 0;
+            display: none;
         }
 
         footer {
@@ -256,7 +237,8 @@
     const chineseQuoteElement = document.getElementById('chinese-quote');
     const totoroElement = document.querySelector('.totoro-cursor');
 
-    // Totoro cursor following mouse
+    // Remove Totoro cursor following mouse
+    /*
     document.addEventListener('mousemove', (e) => {
         const x = e.clientX;
         const y = e.clientY;
@@ -273,6 +255,7 @@
             }, 150);
         }, 50);
     });
+    */
 
     // Load quotes when the DOM is ready
     window.addEventListener('DOMContentLoaded', async () => {
