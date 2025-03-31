@@ -3870,17 +3870,59 @@ textarea#user-input:focus {
 /* Poetry display - hidden by default */
 #poetry-display {
     display: none;
+    opacity: 0;
 }
 
 /* Show poetry display when it has 'show' class */
 #poetry-display.show {
     display: block;
+    opacity: 1;
     animation: fadeIn 0.5s ease;
 }
 
 /* Hide empty state when it has 'hidden' class */
 #poetry-empty-state.hidden {
     display: none;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Poem navigation - hidden by default */
+.poem-navigation {
+    display: none;
+    opacity: 0;
+}
+
+/* Show poem navigation when parent has 'show' class */
+#poetry-display.show .poem-navigation {
+    display: flex;
+    opacity: 1;
+    animation: fadeIn 0.5s ease;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+}
+
+/* Poem content - hidden by default */
+.poem-content {
+    display: none;
+    opacity: 0;
+}
+
+/* Show poem content when parent has 'show' class */
+#poetry-display.show .poem-content {
+    display: block;
+    opacity: 1;
+    animation: fadeIn 0.5s ease 0.2s;
 }
 
 @keyframes fadeIn {
