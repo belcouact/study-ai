@@ -4311,8 +4311,8 @@ textarea#user-input:focus {
 
 /* 1. Center qa-container and make it wider */
 #qa-container {
-    width: 90%;
-    max-width: 1100px;
+    width: 95%;
+    max-width: 1400px;
     margin: 20px auto;
     background-color: var(--ghibli-cream);
     border-radius: 12px;
@@ -4328,7 +4328,7 @@ textarea#user-input:focus {
     margin: 20px auto;
 }
 
-/* 2. Adjust poetry-header layout */
+/* 2. Redesign poetry-header to be more compact */
 .poetry-selectors {
     display: flex;
     flex-wrap: wrap;
@@ -4372,13 +4372,101 @@ textarea#user-input:focus {
 
 /* Make poetry container responsive */
 .poetry-header {
-    padding: 20px;
+    padding: 15px;
     background: linear-gradient(135deg, var(--ghibli-light-blue), var(--ghibli-blue));
     border-radius: 12px 12px 0 0;
     color: white;
     position: relative;
     overflow: hidden;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.poetry-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h100v100H0z" fill-opacity="0"/><path fill="%23FFFFFF" fill-opacity=".05" d="M30 20c-5.523 0-10 4.477-10 10a10 10 0 1 0 20 0c0-5.523-4.477-10-10-10zm40 0c-5.523 0-10 4.477-10 10a10 10 0 1 0 20 0c0-5.523-4.477-10-10-10zM30 60c-5.523 0-10 4.477-10 10a10 10 0 1 0 20 0c0-5.523-4.477-10-10-10zm40 0c-5.523 0-10 4.477-10 10a10 10 0 1 0 20 0c0-5.523-4.477-10-10-10z"/></svg>');
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+.poetry-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.poetry-selectors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+}
+
+.selector-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: unset;
+    max-width: unset;
+    flex: 0 1 auto;
+}
+
+.selector-group label {
+    font-size: 0.85rem;
+    color: white;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.poetry-select {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.2);
+    font-size: 0.85rem;
+    color: white;
+    appearance: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.poetry-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
+}
+
+.poetry-button {
+    margin-top: 5px;
+    padding: 8px 15px;
+    background-color: var(--ghibli-green);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-self: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.poetry-button:hover {
+    background-color: var(--ghibli-dark-green);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Responsive adjustments for mobile */
@@ -4391,33 +4479,45 @@ textarea#user-input:focus {
     
     .poetry-selectors {
         flex-direction: column;
-        gap: 10px;
+        gap: 8px;
+        align-items: stretch;
     }
     
     .selector-group {
-        flex-direction: column;
-        align-items: flex-start;
-        min-width: 100%;
-        max-width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
     }
     
     .selector-group label {
-        margin-bottom: 5px;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
+        width: 30%;
+        text-align: left;
     }
     
     .poetry-select {
+        width: 68%;
+        min-width: unset;
+    }
+    
+    .poetry-button {
         width: 100%;
+        margin-top: 10px;
     }
 }
 
-/* For medium screens - adjust the layout to fit better */
+/* For tablets */
 @media (min-width: 769px) and (max-width: 1024px) {
-    .selector-group {
-        min-width: 180px;
+    .poetry-selectors {
+        flex-wrap: wrap;
+        justify-content: space-between;
     }
     
-    .selector-group label {
-        font-size: 0.85rem;
+    .selector-group {
+        flex: 0 0 48%;
+    }
+    
+    .poetry-button {
+        margin-top: 10px;
     }
 }
