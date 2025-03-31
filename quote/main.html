@@ -294,12 +294,8 @@
             displayQuote({ english: "No quotes loaded.", chinese: "未能加载语录。" });
         }
         
-        // Add subtle floating animation to the quote container
-        setInterval(() => {
-            if (!isAnimating) {
-                quoteContainer.style.transform = `translateY(${Math.sin(Date.now() / 1000) * 5}px)`;
-            }
-        }, 50);
+        // Start the floating animation
+        floatingAnimation();
     });
 
     // *** Add the missing getRandomQuote function here ***
@@ -357,29 +353,59 @@
         }
 
         isAnimating = true;
-        quoteContainer.classList.add('flipping');
+        
+        // Reset any existing transform from the floating animation
+        quoteContainer.style.transform = '';
         
         // Add a magic particle effect on click
         createParticles(event);
+        
+        // Force a reflow before adding the class to ensure animation runs
+        void quoteContainer.offsetWidth;
+        
+        // Add flipping class for first half of animation
+        quoteContainer.classList.add('flipping');
 
-        // Wait for the flip animation to be halfway (or slightly less)
-        // The duration is 0.6s, so halfway is 300ms.
+        // Wait for the flip animation to be halfway
         setTimeout(() => {
             // Change the quote content while it's hidden
             showNextQuote();
 
-            // After content is updated, remove the class to flip back
-            // We might need another short delay or use transitionend event
-            // for smoother visual effect, but this is simpler.
-             quoteContainer.classList.remove('flipping');
+            // After content is updated, prepare to flip back
+            // We remove the class but add a style to maintain the 180deg rotation
+            quoteContainer.classList.remove('flipping');
+            quoteContainer.style.transform = 'rotateY(180deg)';
+            
+            // Force a reflow to ensure the transition is triggered
+            void quoteContainer.offsetWidth;
+            
+            // Animate back to 0deg (normal state)
+            quoteContainer.style.transform = 'rotateY(0deg)';
 
-            // Use transitionend event to unlock animation flag *after* flip back finishes
+            // Use transitionend event to unlock animation flag after flip back finishes
             quoteContainer.addEventListener('transitionend', () => {
-                 isAnimating = false;
-             }, { once: true }); // Ensure listener runs only once per click
+                isAnimating = false;
+                
+                // Resume floating animation after flip is complete
+                // But with a small delay to ensure smoothness
+                setTimeout(() => {
+                    if (!isAnimating) {
+                        // Resume the floating animation
+                        floatingAnimation();
+                    }
+                }, 100);
+            }, { once: true });
 
         }, 300); // 300ms matches half of the 0.6s transition
     });
+    
+    // Separate the floating animation into its own function
+    function floatingAnimation() {
+        if (!isAnimating) {
+            quoteContainer.style.transform = `translateY(${Math.sin(Date.now() / 1000) * 5}px)`;
+            requestAnimationFrame(floatingAnimation);
+        }
+    }
     
     // Create magic particles on click
     function createParticles(e) {
