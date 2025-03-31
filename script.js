@@ -5975,3 +5975,49 @@ function renderRelatedPhrases(phrases) {
         </div>
     `;
 }
+
+// Add Ghibli-style animations to the poem display when it appears
+function animatePoemDisplay() {
+  const poemSections = document.querySelectorAll('.poem-section');
+  
+  // Add animation class with delay to each section
+  poemSections.forEach((section, index) => {
+    setTimeout(() => {
+      section.classList.add('animate-in');
+    }, 300 + (index * 150));
+  });
+  
+  // Format poem content with animation for each line
+  const poemContent = document.querySelector('.poem-content');
+  if (poemContent && poemContent.textContent) {
+    const lines = poemContent.textContent.split('\n').filter(line => line.trim());
+    poemContent.innerHTML = '';
+    
+    lines.forEach((line, index) => {
+      const lineElement = document.createElement('div');
+      lineElement.className = 'poem-line';
+      lineElement.textContent = line;
+      lineElement.style.animationDelay = `${index * 100}ms`;
+      poemContent.appendChild(lineElement);
+    });
+  }
+}
+
+// Call this function after the poem display is populated with content
+document.getElementById('next-poem-button').addEventListener('click', () => {
+  setTimeout(animatePoemDisplay, 100);
+});
+
+document.getElementById('prev-poem-button').addEventListener('click', () => {
+  setTimeout(animatePoemDisplay, 100);
+});
+
+// Also trigger on initial load
+document.getElementById('learn-poetry-button').addEventListener('click', () => {
+  // This would run after API response is received and content is displayed
+  setTimeout(() => {
+    if (!document.getElementById('poetry-display').classList.contains('hidden')) {
+      animatePoemDisplay();
+    }
+  }, 1000);
+});

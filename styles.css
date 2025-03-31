@@ -2991,3 +2991,453 @@ textarea#user-input:focus {
   background-repeat: repeat-x;
   z-index: 1;
 }
+
+/* Poetry Container Ghibli Style */
+#poetry-container {
+  position: relative;
+  background-color: var(--ghibli-cream);
+  border-radius: 15px;
+  box-shadow: 0 5px 0 var(--ghibli-brown), 0 5px 20px rgba(0,0,0,0.1);
+  padding: 20px;
+  overflow: hidden;
+}
+
+#poetry-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--ghibli-yellow), var(--ghibli-accent), var(--ghibli-yellow));
+  z-index: 1;
+}
+
+#poetry-container::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background-image: url('data:image/svg+xml;utf8,<svg width="220" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M0 20V10c1-4 3-6 5-8s4 1 5 3c2-4 4-6 6-3 1.5-3 3-5 4.5-3 1-2 3-4 4.5-2 1-3 3-5 5-2 1-4 3-6 5-3 1.5-2 3-4 4.5-1 1.5-3 3-5 4.5-1 2-4 4-6 5-2 2-3 4-5 5-1 2-3 4-5 5-1 2-3 3-4 5-2 2-2 3-3 4-3 1-1 2-3 3-5H0zm110 0V10c1-4 3-6 5-8s4 1 5 3c2-4 4-6 6-3 1.5-3 3-5 4.5-3 1-2 3-4 4.5-2 1-3 3-5 5-2 1-4 3-6 5-3 1.5-2 3-4 4.5-1 1.5-3 3-5 4.5-1 2-4 4-6 5-2 2-3 4-5 5-1 2-3 4-5 5-1 2-3 3-4 5-2 2-2 3-3 4-3 1-1 2-3 3-5h-30z" fill="%2390CFB0" fill-opacity=".3"/></svg>');
+  background-repeat: repeat-x;
+}
+
+/* Poetry Header */
+.poetry-header {
+  background: linear-gradient(to right, var(--ghibli-light-blue), var(--ghibli-blue));
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.poetry-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M25 20c5.523 0 10 4.477 10 10s-4.477 10-10 10-10-4.477-10-10 4.477-10 10-10zm50 0c5.523 0 10 4.477 10 10s-4.477 10-10 10-10-4.477-10-10 4.477-10 10-10zm-25 40c5.523 0 10 4.477 10 10s-4.477 10-10 10-10-4.477-10-10 4.477-10 10-10z" fill="%23FFFFFF" fill-opacity=".05"/></svg>');
+  opacity: 0.3;
+  z-index: -1;
+}
+
+.poetry-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  z-index: 2;
+}
+
+.poetry-selectors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.selector-group {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-width: 120px;
+}
+
+.selector-group label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  font-weight: 500;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.poetry-select {
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 2px solid white;
+  background-color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6" viewBox="0 0 12 6"><path fill="%235D9E7A" d="M0 0l6 6 6-6z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.poetry-select:hover {
+  border-color: var(--ghibli-yellow);
+  transform: translateY(-2px);
+}
+
+.poetry-select:focus {
+  outline: none;
+  border-color: var(--ghibli-accent);
+}
+
+.poetry-button {
+  background-color: var(--ghibli-green);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1);
+  margin-left: auto;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+}
+
+.poetry-button::before {
+  content: "🌸";
+  margin-right: 6px;
+}
+
+.poetry-button:hover {
+  background-color: var(--ghibli-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.1);
+}
+
+.poetry-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Poetry Content */
+.poetry-content {
+  min-height: 300px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 300px;
+  padding: 30px 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  margin-top: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+  border: 2px dashed rgba(93, 158, 122, 0.2);
+}
+
+.empty-state::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M20 50c0-16.569 13.431-30 30-30 16.569 0 30 13.431 30 30 0 16.569-13.431 30-30 30-16.569 0-30-13.431-30-30zm15 0a15 15 0 1130 0 15 15 0 01-30 0z" fill="%234A89DC" fill-opacity=".03"/></svg>');
+  background-repeat: repeat;
+  z-index: -1;
+}
+
+.empty-state h3 {
+  color: var(--ghibli-blue);
+  margin-bottom: 10px;
+  font-size: 1.3rem;
+}
+
+.empty-state p {
+  color: var(--ghibli-brown);
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 500px;
+}
+
+/* Poem navigation */
+.poem-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 15px 0;
+  gap: 20px;
+}
+
+.poem-nav-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--ghibli-light-blue);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.poem-nav-button:hover:not(:disabled) {
+  background-color: var(--ghibli-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.1);
+}
+
+.poem-nav-button:disabled {
+  background-color: #d1d1d1;
+  cursor: not-allowed;
+  opacity: 0.7;
+  box-shadow: none;
+}
+
+.poem-counter {
+  font-size: 0.9rem;
+  color: var(--ghibli-brown);
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 5px 15px;
+  border-radius: 20px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Poem Display */
+.poem-display {
+  background-color: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+  position: relative;
+  overflow: hidden;
+  border: 2px dashed rgba(93, 158, 122, 0.2);
+  animation: fadeIn 0.5s ease;
+}
+
+.poem-display::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(180deg, rgba(244, 244, 244, 0.3) 0%, rgba(255, 255, 255, 0) 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.poem-title {
+  color: var(--ghibli-blue);
+  font-size: 1.6rem;
+  margin-bottom: 5px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.poem-title::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--ghibli-accent), transparent);
+  margin: 10px auto;
+}
+
+.poem-author {
+  color: var(--ghibli-brown);
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 20px;
+  font-style: italic;
+  position: relative;
+  z-index: 1;
+}
+
+.poem-content {
+  font-size: 1.1rem;
+  line-height: 2;
+  margin: 20px 0;
+  padding: 15px;
+  background-color: rgba(253, 246, 227, 0.5);
+  border-radius: 10px;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.poem-section {
+  margin-top: 25px;
+  position: relative;
+  border-radius: 10px;
+  background-color: white;
+  padding: 15px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+  transition: transform 0.3s ease;
+  border-left: 4px solid var(--ghibli-light-blue);
+}
+
+.poem-section:hover {
+  transform: translateY(-2px);
+}
+
+.poem-section h3 {
+  color: var(--ghibli-blue);
+  font-size: 1.1rem;
+  margin-top: 0;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.poem-section h3::before {
+  content: "✦";
+  margin-right: 8px;
+  color: var(--ghibli-accent);
+  font-size: 1rem;
+}
+
+.poem-background, .poem-explanation {
+  color: #333;
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.poem-line {
+  margin: 8px 0;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.poem-line:hover {
+  transform: translateX(5px);
+  color: var(--ghibli-blue);
+}
+
+/* Loading state */
+#poetry-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+#poetry-loading .spinner {
+  width: 70px;
+  height: 70px;
+  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 20c-16.569 0-30 13.431-30 30 0 16.569 13.431 30 30 30 16.569 0 30-13.431 30-30 0-16.569-13.431-30-30-30zm-7 15a3 3 0 11-6 0 3 3 0 016 0zm20 0a3 3 0 11-6 0 3 3 0 016 0zm-16 30a10 5 0 0120 0" fill="none" stroke="%234A89DC" stroke-width="3"/><animate attributeName="stroke-dashoffset" from="0" to="502" dur="2s" repeatCount="indefinite"/></svg>');
+  background-repeat: no-repeat;
+  animation: spin 3s infinite linear;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Add floating elements for Ghibli atmosphere */
+.poetry-floating-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.poetry-floating-elements::before {
+  content: "";
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 5c-1 0-2 1-2 2s1 2 2 2 2-1 2-2-1-2-2-2zm-9 7c-1 0-2 1-2 2s1 2 2 2 2-1 2-2-1-2-2-2zm18 0c-1 0-2 1-2 2s1 2 2 2 2-1 2-2-1-2-2-2zm-9 18c-1 0-2 1-2 2s1 2 2 2 2-1 2-2-1-2-2-2z" fill="%234A89DC" fill-opacity=".2"/></svg>');
+  top: 20%;
+  left: 15%;
+  animation: floatPoem 20s infinite alternate ease-in-out;
+}
+
+.poetry-floating-elements::after {
+  content: "";
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg"><path d="M12.5 3c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zm-3 7a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zm-3 6a3 3 0 100 6 3 3 0 000-6z" fill="%235D9E7A" fill-opacity=".15"/></svg>');
+  top: 40%;
+  right: 20%;
+  animation: floatPoem 25s 5s infinite alternate-reverse ease-in-out;
+}
+
+@keyframes floatPoem {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(10px, -10px) rotate(5deg); }
+  40% { transform: translate(15px, 5px) rotate(0deg); }
+  60% { transform: translate(5px, 10px) rotate(-5deg); }
+  80% { transform: translate(-5px, 5px) rotate(0deg); }
+  100% { transform: translate(-10px, -5px) rotate(5deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .selector-group {
+    min-width: 100px;
+  }
+  
+  .poetry-selectors {
+    gap: 8px;
+  }
+  
+  .poetry-button {
+    margin-top: 10px;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .poem-title {
+    font-size: 1.3rem;
+  }
+  
+  .poem-content {
+    font-size: 1rem;
+    padding: 10px;
+  }
+}
