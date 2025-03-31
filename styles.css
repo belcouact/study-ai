@@ -3834,3 +3834,22 @@ textarea#user-input:focus {
     gap: 8px;
     }
 } 
+
+/* Make sure poetry-display is hidden by default */
+#poetry-display {
+  display: none;
+}
+
+/* Make sure empty-state is visible by default */
+#poetry-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* When poetry-display needs to be shown */
+#poetry-display.active {
+  display: block;
+  animation: fadeIn 0.5s ease-out;
+}
