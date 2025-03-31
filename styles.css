@@ -4198,3 +4198,56 @@ textarea#user-input:focus {
         font-size: 1.5em;
     }
 }
+
+/* Update navigation controls positioning */
+#vocabulary-content .navigation-controls {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    pointer-events: none; /* This ensures the buttons don't interfere with other content */
+    z-index: 10;
+}
+
+#vocabulary-content .nav-button {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: var(--ghibli-cream);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    pointer-events: auto; /* Re-enable pointer events for the buttons */
+}
+
+#vocabulary-content .nav-button:hover:not(:disabled) {
+    transform: scale(1.1);
+    background-color: var(--ghibli-light-green);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#vocabulary-content .nav-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: var(--ghibli-cream);
+}
+
+/* Adjust for mobile screens */
+@media (max-width: 768px) {
+    #vocabulary-content .navigation-controls {
+        padding: 0 10px;
+    }
+
+    #vocabulary-content .nav-button {
+        width: 40px;
+        height: 40px;
+    }
+}
