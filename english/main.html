@@ -3,28 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Sentence Learning Fun!</title>
+    <title>Studio Ghibli English Learning</title>
     <link rel="icon" href="logo_btrfly.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
+            <div class="ghibli-clouds"></div>
             <h1 class="category-header"><span id="category-title">Loading...</span></h1>
+            <div class="totoro-icon"></div>
         </header>
 
         <main id="sentence-cards-container">
             <!-- Sentence cards will be loaded here by JavaScript -->
         </main>
 
-        <!-- New Navigation Buttons Container -->
+        <!-- Navigation Buttons Container -->
         <div class="navigation-controls">
-            <button id="prev-button" class="nav-button">◄</button>
-            <button id="next-button" class="nav-button">►</button>
+            <button id="prev-button" class="nav-button" aria-label="Previous category">◄</button>
+            <button id="next-button" class="nav-button" aria-label="Next category">►</button>
         </div>
+        
+        <footer class="ghibli-footer">
+            <div class="footer-grass"></div>
+        </footer>
     </div>
 
     <script type="module" src="script.js"></script>
