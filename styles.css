@@ -4655,3 +4655,46 @@ textarea#user-input:focus {
 .poem-line:nth-child(9) { animation-delay: 0.9s; }
 .poem-line:nth-child(10) { animation-delay: 1.0s; }
 .poem-line:nth-child(n+11) { animation-delay: 1.1s; }
+
+/* 1. Center poetry container regardless of sidebar state */
+#poetry-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: var(--ghibli-cream);
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Make sure container is centered even when sidebar is collapsed */
+.left-panel.hidden + .content-area #poetry-container {
+    margin: 20px auto;
+}
+
+/* 2. Change dropdown font color to black in poetry header */
+.poetry-select {
+    color: #000; /* Set font color to black */
+    background-color: rgba(255, 255, 255, 0.7); /* Slightly more opaque background for better contrast */
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Make sure the dropdown options are also black */
+.poetry-select option {
+    color: #000;
+    background-color: white;
+}
+
+/* Make sure the dropdown is still clearly interactive */
+.poetry-select:hover, .poetry-select:focus {
+    border-color: var(--ghibli-light-green);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
+    background-color: white;
+}
