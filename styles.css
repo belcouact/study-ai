@@ -3704,14 +3704,16 @@ textarea#user-input:focus {
 }
 
 .choice-item {
-  background-color: white;
-  border: 2px solid var(--ghibli-light-blue);
-  border-radius: 10px;
+  position: relative;
   padding: 12px 15px;
+  margin-bottom: 10px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: flex-start;
 }
 
 .choice-item:hover {
@@ -3721,9 +3723,21 @@ textarea#user-input:focus {
 }
 
 .choice-item.selected {
-  background-color: var(--ghibli-light-blue);
-  border-color: var(--ghibli-blue);
-  color: white;
+  background-color: var(--ghibli-light-green);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 3px solid var(--ghibli-green);
+}
+
+/* Ensure choice content is properly contained */
+.choice-item .choice-content {
+  width: 100%;
+  overflow: hidden; /* Prevent content overflow */
+}
+
+/* Hide answer content that might be in choices */
+.choice-item .answer-content,
+.choice-item .explanation-content {
+  display: none !important;
 }
 
 /* Answer Container */

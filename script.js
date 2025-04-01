@@ -6452,3 +6452,34 @@ window.setupPoemNavigationButtons = function() {
     }
 };
 
+// In your function that displays question choices:
+function displayQuestionChoices(question) {
+    const choicesContainer = document.querySelector('.choices-container');
+    choicesContainer.innerHTML = '';
+    
+    // Get choices from the question object
+    const choices = question.choices || [];
+    
+    // Create choice elements with proper content separation
+    choices.forEach((choice, index) => {
+        const choiceLabel = String.fromCharCode(65 + index); // A, B, C, D
+        const choiceContent = choice.text || choice; // Handle both object and string formats
+        
+        // Create choice item with clear structure
+        const choiceItem = document.createElement('div');
+        choiceItem.className = 'choice-item';
+        choiceItem.setAttribute('data-choice', choiceLabel);
+        
+        // Ensure only the choice content is displayed, not the answer
+        choiceItem.innerHTML = `
+            <div class="choice-label">${choiceLabel}</div>
+            <div class="choice-content">${choiceContent}</div>
+        `;
+        
+        // Add event listener for selection
+        choiceItem.addEventListener('click', () => selectChoice(choiceItem, choiceLabel));
+        
+        choicesContainer.appendChild(choiceItem);
+    });
+}
+
