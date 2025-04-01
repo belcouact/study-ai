@@ -4173,7 +4173,7 @@ document.addEventListener('DOMContentLoaded', function() {
     handleTabSwitch('qa');
     
     // Global state for poems
-    const poemState = {
+    let poemState = {
         poems: [],
         currentIndex: 0
     };
@@ -4514,6 +4514,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Store the poems and display the first one
                 currentPoems = poems;
                 currentPoemIndex = 0;
+                
+                // IMPORTANT: Update poemState with the parsed poems
+                poemState = {
+                    poems: poems,
+                    currentIndex: 0
+                };
                 
                 // Hide loading, show poetry display
                 const loadingIndicator = document.getElementById('poetry-loading');
@@ -6200,6 +6206,17 @@ function showPoetryDisplay() {
     // Show poetry display with animation
     poetryDisplay.classList.add('active');
     
+    // Check if we have poems to display
+    if (poemState && poemState.poems && poemState.poems.length > 0) {
+        console.log(`Showing ${poemState.poems.length} poems, current index: ${poemState.currentIndex}`);
+        // Display the current poem
+        displayCurrentPoem();
+        // Setup navigation buttons
+        setupPoemNavigationButtons();
+    } else {
+        console.warn('No poems available to display in showPoetryDisplay');
+    }
+    
     // Animate the poem elements
     animatePoemDisplay();
 }
@@ -6251,11 +6268,17 @@ function handlePoetryDisplayState() {
 function fetchAndProcessPoems() {
     console.log('Fetching and processing poems');
     
-    // Simulate API delay
-    setTimeout(() => {
-        // After poems are fetched and processed successfully
-        showPoetryDisplay();
-    }, 1500);
+    // Call the actual poem fetching function
+    if (typeof window.handleLearnPoetryClick === 'function') {
+        window.handleLearnPoetryClick();
+    } else {
+        console.error('handleLearnPoetryClick function not found');
+        
+        // Fallback just to show the UI transition for testing
+        setTimeout(() => {
+            showPoetryDisplay();
+        }, 1500);
+    }
 }
 
 // Make sure DOM is loaded before running the function
