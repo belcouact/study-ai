@@ -4961,3 +4961,88 @@ textarea#user-input:focus {
         padding: 6px 12px;
     }
 }
+
+/* Add a more specific selector for create container navigation controls */
+#create-container .navigation-controls {
+    width: 90%;
+    max-width: 1000px;
+    margin: 15px auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    position: relative;
+    background-color: var(--ghibli-light-blue);
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Remove any absolute positioning or offsets */
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    transform: none;
+    /* Prevent inheritance from other navigation-controls selectors */
+    float: none;
+}
+
+/* Make sure create container has proper positioning context */
+#create-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: var(--ghibli-cream);
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    /* Important for child positioning */
+    position: relative;
+    /* Ensure proper containment of children */
+    overflow: visible;
+    padding: 20px;
+    transition: all 0.3s ease;
+    /* Make sure it's centered regardless of sidebar */
+    left: 0;
+    right: 0;
+}
+
+/* Specificity override for any conflicting rules */
+html body .content-area #create-container .navigation-controls {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    left: 0 !important;
+    right: 0 !important;
+    position: relative !important;
+}
+
+/* Ensure create container is centered when sidebar is collapsed */
+.left-panel.hidden + .content-area #create-container {
+    margin: 20px auto;
+}
+
+/* Center question counter in navigation controls */
+#create-container .question-counter {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--ghibli-cream);
+    color: var(--ghibli-dark-green);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #create-container {
+        width: 95%;
+        padding: 15px;
+        margin: 10px auto;
+    }
+    
+    #create-container .navigation-controls {
+        width: 95%;
+        padding: 8px 15px;
+        margin: 10px auto;
+    }
+}
