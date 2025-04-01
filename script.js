@@ -6191,6 +6191,7 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             //const tabTarget = this.getAttribute('data-page');
             const tabTarget = this.getAttribute('.panel-button');
+            console.log('Tab target:', tabTarget);
             
             // Only show vocabulary navigation buttons when on vocabulary tab
             const prevNav = document.querySelector('.vocabulary-side-nav-prev');
@@ -6198,6 +6199,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (prevNav && nextNav) {
                 //if (tabTarget === 'vocabulary') {
+                console.log('Tab target:', tabTarget);
                 if (tabTarget === 'word-button') {
                     if (vocabularyWords && vocabularyWords.length > 0) {
                         prevNav.style.display = 'block';
