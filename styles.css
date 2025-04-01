@@ -4824,37 +4824,33 @@ textarea#user-input:focus {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
+    padding: 10px 20px;
     position: relative;
     background-color: var(--ghibli-light-blue);
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    left: 0;
-    right: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box; /* Ensure padding is included in width calculation */
+    overflow: hidden; /* Prevent content from extending outside */
 }
 
-/* Ensure navigation controls remain centered when sidebar is collapsed */
-.left-panel.hidden + .content-area .navigation-controls {
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Position question counter in the center */
+/* Position question counter in center */
 .question-counter {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     background-color: var(--ghibli-cream);
     color: var(--ghibli-dark-green);
-    padding: 8px 15px;
+    padding: 6px 15px;
     border-radius: 20px;
     font-size: 0.9rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 2;
+    white-space: nowrap; /* Prevent line breaks in counter */
 }
 
 /* Style navigation buttons */
 .nav-button {
+    position: relative;
     background-color: var(--ghibli-light-green);
     color: var(--ghibli-dark-green);
     border: none;
@@ -4869,6 +4865,7 @@ textarea#user-input:focus {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     z-index: 1;
+    flex-shrink: 0; /* Prevent buttons from shrinking */
 }
 
 .nav-button:hover:not(:disabled) {
@@ -4885,17 +4882,18 @@ textarea#user-input:focus {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    #create-container {
-        width: 95%;
-        margin: 10px auto;
-    }
-    
     .navigation-controls {
-        padding: 10px 15px;
+        width: 95%;
+        padding: 8px 10px;
     }
     
     .question-counter {
         font-size: 0.8rem;
-        padding: 6px 12px;
+        padding: 4px 10px;
+    }
+    
+    .nav-button {
+        width: 36px;
+        height: 36px;
     }
 }
