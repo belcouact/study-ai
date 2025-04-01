@@ -4327,6 +4327,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show loading state
         const poetryEmptyState = document.getElementById('poetry-empty-state');
         const poetryDisplay = document.getElementById('poetry-display');
+        let loadingIndicator = document.getElementById('poetry-loading');
         
         // Hide empty state, show loading
         if (poetryEmptyState) poetryEmptyState.style.display = 'none';
@@ -4334,21 +4335,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Create and show loading indicator
         if (!loadingIndicator) {
-            const newLoadingIndicator = document.createElement('div');
-            newLoadingIndicator.id = 'poetry-loading';
-            newLoadingIndicator.innerHTML = `
+            loadingIndicator = document.createElement('div');
+            loadingIndicator.id = 'poetry-loading';
+            loadingIndicator.innerHTML = `
                 <div class="spinner"></div>
                 <p>十里走马正疾驰，五里扬鞭未敢停...</p>
             `;
-            newLoadingIndicator.style.display = 'flex';
-            newLoadingIndicator.style.flexDirection = 'column';
-            newLoadingIndicator.style.alignItems = 'center';
-            newLoadingIndicator.style.justifyContent = 'center';
-            newLoadingIndicator.style.padding = '3rem';
+            loadingIndicator.style.display = 'flex';
+            loadingIndicator.style.flexDirection = 'column';
+            loadingIndicator.style.alignItems = 'center';
+            loadingIndicator.style.justifyContent = 'center';
+            loadingIndicator.style.padding = '3rem';
             
             const poetryContent = document.querySelector('.poetry-content');
             if (poetryContent) {
-                poetryContent.appendChild(newLoadingIndicator);
+                poetryContent.appendChild(loadingIndicator);
             }
         } else {
             loadingIndicator.style.display = 'flex';
