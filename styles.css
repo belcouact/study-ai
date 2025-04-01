@@ -4932,3 +4932,96 @@ textarea#user-input:focus {
         padding: 6px 12px;
     }
 }
+
+/* Center create-container and ensure it stays centered regardless of sidebar state */
+#create-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: var(--ghibli-cream);
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Reset any existing styles that might affect centering */
+.left-panel.hidden + .content-area #create-container {
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+}
+
+/* Override navigation controls to ensure proper centering */
+.navigation-controls {
+    position: relative;
+    width: 100%;
+    margin: 15px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--ghibli-light-blue);
+    border-radius: 10px;
+    padding: 15px;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+/* Handle the question counter positioning */
+.question-counter {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--ghibli-cream);
+    color: var(--ghibli-dark-green);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+    white-space: nowrap;
+}
+
+/* Ensure buttons have proper positioning */
+.nav-button {
+    position: relative;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    background-color: var(--ghibli-light-green);
+    color: var(--ghibli-dark-green);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 1;
+    margin: 0;
+}
+
+/* Media query for responsive design */
+@media (max-width: 768px) {
+    #create-container {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    .navigation-controls {
+        padding: 10px;
+    }
+    
+    .nav-button {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .question-counter {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+}
