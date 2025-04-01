@@ -6126,15 +6126,34 @@ function addVocabularySideNavButtons() {
 function adjustButtonPositionForSidebar() {
     const leftPanel = document.querySelector('.left-panel');
     const prevButton = document.querySelector('.vocabulary-side-nav-prev');
+    const nextButton = document.querySelector('.vocabulary-side-nav-next');
     
-    if (!prevButton) return;
+    if (!prevButton || !nextButton) return;
     
+    // Only adjust buttons if we're on the vocabulary page
+    const wordButton = document.getElementById('word-button');
+    const isVocabularyActive = wordButton && wordButton.classList.contains('active');
+    
+    // If not on vocabulary page, hide the buttons
+    if (!isVocabularyActive) {
+        prevButton.style.display = 'none';
+        nextButton.style.display = 'none';
+        return;
+    }
+    
+    // If on vocabulary page, show the buttons and adjust position
     if (leftPanel && leftPanel.classList.contains('hidden')) {
         // Force the position update by adding an inline style
         prevButton.style.left = '20px';
     } else {
         // Reset to the CSS-defined position
         prevButton.style.left = '';
+    }
+    
+    // Make sure buttons are visible if on vocabulary page
+    if (vocabularyWords && vocabularyWords.length > 0) {
+        prevButton.style.display = 'block';
+        nextButton.style.display = 'block';
     }
 }
 
@@ -6162,3 +6181,32 @@ function updateSideNavigationButtons() {
         nextButton.disabled = currentWordIndex >= vocabularyWords.length - 1;
     }
 }
+
+// Add event listeners to all tab buttons to ensure vocabulary navigation buttons are hidden
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all panel buttons that switch tabs
+    const tabButtons = document.querySelectorAll('.panel-button');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const tabTarget = this.getAttribute('data-page');
+            
+            // Only show vocabulary navigation buttons when on vocabulary tab
+            const prevNav = document.querySelector('.vocabulary-side-nav-prev');
+            const nextNav = document.querySelector('.vocabulary-side-nav-next');
+            
+            if (prevNav && nextNav) {
+                if (tabTarget === 'vocabulary') {
+                    if (vocabularyWords && vocabularyWords.length > 0) {
+                        prevNav.style.display = 'block';
+                        nextNav.style.display = 'block';
+                        updateSideNavigationButtons();
+                    }
+                } else {
+                    prevNav.style.display = 'none';
+                    nextNav.style.display = 'none';
+                }
+            }
+        });
+    });
+});
