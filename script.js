@@ -4267,7 +4267,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Previous poem button clicked directly');
                 if (window.poemState.currentIndex > 0) {
                     window.poemState.currentIndex--;
-                    displayCurrentPoem();
+                    window.displayCurrentPoem();
                 }
             });
         }
@@ -4282,7 +4282,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Next poem button clicked directly');
                 if (window.poemState.currentIndex < window.poemState.poems.length - 1) {
                     window.poemState.currentIndex++;
-                    displayCurrentPoem();
+                    window.displayCurrentPoem();
                 }
             });
         }
@@ -6214,25 +6214,45 @@ function showPoetryDisplay() {
     // Show poetry display with animation
     poetryDisplay.classList.add('active');
     
-    // Make sure we access the window-scoped poemState
-    if (window.poemState && window.poemState.poems && window.poemState.poems.length > 0) {
-        console.log(`Showing ${window.poemState.poems.length} poems, current index: ${window.poemState.currentIndex}`);
-        // Display the current poem
-        displayCurrentPoem();
-        // Setup navigation buttons
-        setupPoemNavigationButtons();
-    } else {
-        console.warn('No poems available to display in showPoetryDisplay');
-        // Create empty message
+    try {
+        // Check if we have poems to display
+        if (window.poemState && window.poemState.poems && window.poemState.poems.length > 0) {
+            console.log(`Showing ${window.poemState.poems.length} poems, current index: ${window.poemState.currentIndex}`);
+            
+            // Call the global displayCurrentPoem function
+            if (typeof window.displayCurrentPoem === 'function') {
+                window.displayCurrentPoem();
+            } else {
+                console.error('displayCurrentPoem function not found in global scope');
+                throw new Error('displayCurrentPoem function not available');
+            }
+            
+            // Setup navigation buttons if function exists
+            if (typeof window.setupPoemNavigationButtons === 'function') {
+                window.setupPoemNavigationButtons();
+            }
+        } else {
+            console.warn('No poems available to display in showPoetryDisplay');
+            // Create empty message
+            const poetryContent = poetryDisplay.querySelector('.poem-content') || poetryDisplay;
+            if (poetryContent) {
+                poetryContent.innerHTML = '<div class="empty-poem-message">暂无诗词内容，请重新生成</div>';
+            }
+        }
+    } catch (error) {
+        console.error('Error in showPoetryDisplay:', error);
+        // Handle the error gracefully
         const poetryContent = poetryDisplay.querySelector('.poem-content') || poetryDisplay;
         if (poetryContent) {
-            poetryContent.innerHTML = '<div class="empty-poem-message">暂无诗词内容，请重新生成</div>';
+            poetryContent.innerHTML = `<div class="error-message">加载诗词时出错: ${error.message}</div>`;
         }
     }
     
     // Animate the poem elements
     try {
-        animatePoemDisplay();
+        if (typeof animatePoemDisplay === 'function') {
+            animatePoemDisplay();
+        }
     } catch (error) {
         console.error('Error animating poem display:', error);
     }
@@ -6302,4 +6322,104 @@ document.addEventListener('DOMContentLoaded', function() {
     // Delay the execution slightly to ensure all elements are available
     setTimeout(handlePoetryDisplayState, 100);
 });
+
+// Add this function in the global scope
+window.displayCurrentPoem = function() {
+    if (!window.poemState || !window.poemState.poems || window.poemState.poems.length === 0) {
+        console.error('No poems available to display');
+        return;
+    }
+    
+    const poem = window.poemState.poems[window.poemState.currentIndex];
+    console.log('Displaying poem:', poem, 'Current index:', window.poemState.currentIndex);
+    
+    // Get poem elements
+    const poemTitle = document.querySelector('.poem-title');
+    const poemAuthor = document.querySelector('.poem-author');
+    const poemContent = document.querySelector('.poem-content');
+    const poemBackground = document.querySelector('.poem-background');
+    const poemExplanation = document.querySelector('.poem-explanation');
+    const poemCounter = document.querySelector('.poem-counter');
+    
+    // Display poem data with null checks
+    if (poemTitle) poemTitle.textContent = poem.title || '无标题';
+    if (poemAuthor) poemAuthor.textContent = poem.author || '佚名';
+    
+    // Handle content with null check
+    if (poemContent) {
+        if (poem.content) {
+            poemContent.innerHTML = poem.content.replace ? poem.content.replace(/\n/g, '<br>') : poem.content;
+        } else {
+            poemContent.innerHTML = '无内容';
+        }
+    }
+    
+    // Handle background with null check
+    if (poemBackground) {
+        poemBackground.innerHTML = poem.background || '无背景信息';
+    }
+    
+    // Handle explanation with null check
+    if (poemExplanation) {
+        poemExplanation.innerHTML = poem.explanation || '无赏析';
+    }
+    
+    if (poemCounter) {
+        poemCounter.textContent = `${window.poemState.currentIndex + 1} / ${window.poemState.poems.length}`;
+    }
+    
+    // Update navigation buttons
+    if (typeof window.updatePoemNavigationButtons === 'function') {
+        window.updatePoemNavigationButtons();
+    }
+};
+
+// Add a global version of the navigation update function
+window.updatePoemNavigationButtons = function() {
+    const prevButton = document.getElementById('prev-poem-button');
+    const nextButton = document.getElementById('next-poem-button');
+    
+    if (prevButton) {
+        prevButton.disabled = window.poemState.currentIndex === 0;
+    }
+    
+    if (nextButton) {
+        nextButton.disabled = window.poemState.currentIndex >= window.poemState.poems.length - 1;
+    }
+};
+
+// Add a global version of the navigation setup function
+window.setupPoemNavigationButtons = function() {
+    console.log('Setting up poem navigation buttons');
+    
+    // Remove any existing event listeners by cloning and replacing
+    const prevButton = document.getElementById('prev-poem-button');
+    const nextButton = document.getElementById('next-poem-button');
+    
+    if (prevButton) {
+        const newPrevButton = prevButton.cloneNode(true);
+        prevButton.parentNode.replaceChild(newPrevButton, prevButton);
+        
+        newPrevButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            if (window.poemState.currentIndex > 0) {
+                window.poemState.currentIndex--;
+                window.displayCurrentPoem();
+            }
+        });
+    }
+    
+    if (nextButton) {
+        const newNextButton = nextButton.cloneNode(true);
+        nextButton.parentNode.replaceChild(newNextButton, nextButton);
+        
+        newNextButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            if (window.poemState.currentIndex < window.poemState.poems.length - 1) {
+                window.poemState.currentIndex++;
+                window.displayCurrentPoem();
+            }
+        });
+    }
+};
 
