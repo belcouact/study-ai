@@ -4328,27 +4328,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const poetryEmptyState = document.getElementById('poetry-empty-state');
         const poetryDisplay = document.getElementById('poetry-display');
         
-        if (poetryEmptyState) poetryEmptyState.classList.add('hidden');
-        if (poetryDisplay) poetryDisplay.classList.add('hidden');
+        // Hide empty state, show loading
+        if (poetryEmptyState) poetryEmptyState.style.display = 'none';
+        if (poetryDisplay) poetryDisplay.classList.remove('active');
         
         // Create and show loading indicator
-        let loadingIndicator = document.getElementById('poetry-loading');
         if (!loadingIndicator) {
-            loadingIndicator = document.createElement('div');
-            loadingIndicator.id = 'poetry-loading';
-            loadingIndicator.innerHTML = `
+            const newLoadingIndicator = document.createElement('div');
+            newLoadingIndicator.id = 'poetry-loading';
+            newLoadingIndicator.innerHTML = `
                 <div class="spinner"></div>
                 <p>十里走马正疾驰，五里扬鞭未敢停...</p>
             `;
-            loadingIndicator.style.display = 'flex';
-            loadingIndicator.style.flexDirection = 'column';
-            loadingIndicator.style.alignItems = 'center';
-            loadingIndicator.style.justifyContent = 'center';
-            loadingIndicator.style.padding = '3rem';
+            newLoadingIndicator.style.display = 'flex';
+            newLoadingIndicator.style.flexDirection = 'column';
+            newLoadingIndicator.style.alignItems = 'center';
+            newLoadingIndicator.style.justifyContent = 'center';
+            newLoadingIndicator.style.padding = '3rem';
             
             const poetryContent = document.querySelector('.poetry-content');
             if (poetryContent) {
-                poetryContent.appendChild(loadingIndicator);
+                poetryContent.appendChild(newLoadingIndicator);
             }
         } else {
             loadingIndicator.style.display = 'flex';
@@ -4485,119 +4485,80 @@ document.addEventListener('DOMContentLoaded', function() {
                         poems = JSON.parse(jsonMatch[0]);
                         console.log('Extracted and parsed JSON from text');
                     } else {
-                        throw new Error('No JSON found in response');
-                    }
-                }
-            } catch (parseError) {
-                console.error('Error parsing poems from response:', parseError);
-                
-                // Fallback: Try to extract structured content
-                console.log('Trying to extract structured content');
-                const sections = responseText.split(/(?=\d+\.\s*题目[:：])/);
-                console.log('Found', sections.length - 1, 'potential poem sections');
-                
-                for (let i = 1; i < sections.length; i++) {
-                    const section = sections[i];
-                    
-                    const titleMatch = section.match(/题目[:：]\s*(.+?)(?=\n|$)/);
-                    const authorMatch = section.match(/作者[:：]\s*(.+?)(?=\n|$)/);
-                    const contentMatch = section.match(/原文[:：]\s*([\s\S]+?)(?=\n\d+\.\s*创作背景[:：]|$)/);
-                    const backgroundMatch = section.match(/创作背景[:：]\s*([\s\S]+?)(?=\n\d+\.\s*赏析[:：]|$)/);
-                    const explanationMatch = section.match(/赏析[:：]\s*([\s\S]+?)(?=\n\d+\.\s*题目[:：]|$)/);
-                    
-                    if (titleMatch && authorMatch && contentMatch) {
-                        poems.push({
-                            title: titleMatch[1].trim(),
-                            author: authorMatch[1].trim(),
-                            content: contentMatch[1].trim(),
-                            background: backgroundMatch ? backgroundMatch[1].trim() : "暂无背景信息",
-                            explanation: explanationMatch ? explanationMatch[1].trim() : "暂无赏析"
-                        });
+                        throw new Error('Could not find JSON in response');
                     }
                 }
                 
-                // If still no poems, try one more approach with a different pattern
-                if (poems.length === 0) {
-                    console.log('Trying alternative parsing approach');
-                    
-                    // Look for numbered poems (1. 2. 3. etc.)
-                    const poemSections = responseText.split(/(?=\d+\.)/);
-                    
-                    for (let i = 1; i < poemSections.length; i++) {
-                        const section = poemSections[i];
-                        
-                        // Extract what we can
-                        const titleMatch = section.match(/(?:题目[:：]|《(.+?)》)/);
-                        const authorMatch = section.match(/(?:作者[:：]|[\(（](.+?)[\)）])/);
-                        
-                        // If we found at least a title, create a basic poem entry
-                        if (titleMatch) {
-                            const title = titleMatch[1] || titleMatch[0].replace(/题目[:：]/, '').trim();
-                            const author = authorMatch ? (authorMatch[1] || authorMatch[0].replace(/作者[:：]/, '').trim()) : "未知";
-                            
-                            // Get the rest of the content
-                            const contentStart = section.indexOf(titleMatch[0]) + titleMatch[0].length;
-                            let content = section.substring(contentStart).trim();
-                            
-                            // Basic poem with what we could extract
-                            poems.push({
-                                title: title,
-                                author: author,
-                                content: content,
-                                background: "暂无背景信息",
-                                explanation: "暂无赏析"
-                            });
-                        }
+                // Validate the parsed poems
+                if (!Array.isArray(poems) || poems.length === 0) {
+                    throw new Error('No valid poems found in the response');
+                }
+                
+                for (let i = 0; i < poems.length; i++) {
+                    const poem = poems[i];
+                    if (!poem.title || !poem.author || !poem.content) {
+                        console.warn(`Poem at index ${i} is missing required fields`);
+                        poems[i] = {
+                            title: poem.title || 'Unknown Title',
+                            author: poem.author || 'Unknown Author',
+                            content: poem.content || 'No content available',
+                            background: poem.background || 'No background information available',
+                            explanation: poem.explanation || poem.analysis || 'No explanation available'
+                        };
                     }
                 }
                 
-                // Last resort: if we still have no poems, create a single poem from the entire response
-                if (poems.length === 0 && responseText.length > 0) {
-                    console.log('Creating fallback poem from entire response');
-                    poems.push({
-                        title: `${poetryType}·${poetryStyle}`,
-                        author: "古代诗人",
-                        content: responseText.substring(0, 200), // Take first 200 chars as content
-                        background: "这是根据您的要求查找的内容，但解析遇到了困难。",
-                        explanation: "由于解析困难，无法提供完整赏析。请尝试重新生成。"
-                    });
-                }
-            }
-            
-            // Validate poem objects
-            poems = poems.map(poem => {
-                return {
-                    title: poem.title || '无标题',
-                    author: poem.author || '佚名',
-                    content: poem.content || '无内容',
-                    background: poem.background || '无背景信息',
-                    explanation: poem.explanation || '无赏析'
-                };
-            });
-            
-            // Remove loading indicator
-            if (loadingIndicator) {
-                loadingIndicator.style.display = 'none';
-            }
-            
-            if (poems.length > 0) {
-                console.log('Successfully parsed', poems.length, 'poems');
-                // Store poems in state
-                poemState.poems = poems;
-                poemState.currentIndex = 0;
+                console.log(`Successfully parsed ${poems.length} poems`);
                 
-                // Display poems
-                if (poetryDisplay) poetryDisplay.classList.remove('hidden');
+                // Store the poems and display the first one
+                currentPoems = poems;
+                currentPoemIndex = 0;
+                
+                // Hide loading, show poetry display
+                const loadingIndicator = document.getElementById('poetry-loading');
+                if (loadingIndicator) {
+                    loadingIndicator.style.display = 'none';
+                }
+                
+                // Show poetry display and display the poem
+                showPoetryDisplay();
                 displayCurrentPoem();
                 
-                // Set up navigation buttons after poems are loaded
-                setTimeout(() => {
-                    setupPoemNavigationButtons();
-                }, 100);
-            } else {
-                // Show error message
-                if (poetryEmptyState) poetryEmptyState.classList.remove('hidden');
-                showSystemMessage(`无法生成${poetryType}的${poetryStyle}风格诗词，请稍后再试`, 'error');
+                // Update navigation buttons if they exist
+                if (typeof updatePoemNavigationButtons === 'function') {
+                    updatePoemNavigationButtons();
+                }
+                
+                console.log('Poetry display updated successfully');
+                
+            } catch (jsonParseError) {
+                console.error('Error parsing poems from API response:', jsonParseError);
+                
+                // Hide loading indicator
+                const loadingIndicator = document.getElementById('poetry-loading');
+                if (loadingIndicator) {
+                    loadingIndicator.style.display = 'none';
+                }
+                
+                // Show error in empty state
+                const poetryEmptyState = document.getElementById('poetry-empty-state');
+                if (poetryEmptyState) {
+                    poetryEmptyState.innerHTML = `
+                        <div class="error-icon">⚠️</div>
+                        <h3>解析诗词失败</h3>
+                        <p>${jsonParseError.message || '无法解析服务器返回的数据。'}</p>
+                        <button class="retry-button">重试</button>
+                    `;
+                    poetryEmptyState.style.display = 'flex';
+                    
+                    // Add event listener to retry button
+                    const retryButton = poetryEmptyState.querySelector('.retry-button');
+                    if (retryButton) {
+                        retryButton.addEventListener('click', handleLearnPoetryClick);
+                    }
+                }
+                
+                throw jsonParseError;
             }
         } catch (error) {
             console.error('Error generating poems:', error);
@@ -6209,4 +6170,95 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+});
+
+// Add function to show poetry display
+function showPoetryDisplay() {
+    console.log('Showing poetry display');
+    
+    // Get elements
+    const emptyState = document.getElementById('poetry-empty-state');
+    const loadingElement = document.getElementById('poetry-loading');
+    const poetryDisplay = document.getElementById('poetry-display');
+    
+    // Check if elements exist before manipulating them
+    if (!poetryDisplay) {
+        console.warn('Poetry display element not found in DOM');
+        return;
+    }
+    
+    // Hide empty state and loading, show poetry display
+    if (emptyState) {
+        emptyState.style.display = 'none';
+    }
+    
+    if (loadingElement) {
+        loadingElement.style.display = 'none';
+    }
+    
+    // Show poetry display with animation
+    poetryDisplay.classList.add('active');
+    
+    // Animate the poem elements
+    animatePoemDisplay();
+}
+
+// Function to handle poetry display state
+function handlePoetryDisplayState() {
+    const emptyState = document.getElementById('poetry-empty-state');
+    const loadingElement = document.getElementById('poetry-loading');
+    const poetryDisplay = document.getElementById('poetry-display');
+    
+    // Check if elements exist before manipulating them
+    if (!poetryDisplay || !emptyState) {
+        console.warn('Poetry display elements not found in DOM');
+        return;
+    }
+
+    // Initially hide poetry display, show empty state
+    poetryDisplay.classList.remove('active');
+    emptyState.style.display = 'flex';
+    
+    if (loadingElement) {
+        loadingElement.style.display = 'none';
+    }
+    
+    // When learn-poetry-button is clicked
+    const learnButton = document.getElementById('learn-poetry-button');
+    if (learnButton) {
+        learnButton.addEventListener('click', function() {
+            console.log('Learn poetry button clicked');
+            // Hide empty state, show loading
+            emptyState.style.display = 'none';
+            if (loadingElement) {
+                loadingElement.style.display = 'flex';
+            }
+            
+            // Call the existing fetch/parse poems function
+            // This should eventually call showPoetryDisplay() when poems are loaded
+            setTimeout(() => {
+                // This is a temporary solution - the actual function that fetches poems 
+                // should call showPoetryDisplay() when complete
+                fetchAndProcessPoems();
+            }, 100);
+        });
+    }
+}
+
+// Placeholder function to simulate fetching and processing poems
+// This should be replaced with or integrated into your actual poem fetching code
+function fetchAndProcessPoems() {
+    console.log('Fetching and processing poems');
+    
+    // Simulate API delay
+    setTimeout(() => {
+        // After poems are fetched and processed successfully
+        showPoetryDisplay();
+    }, 1500);
+}
+
+// Make sure DOM is loaded before running the function
+document.addEventListener('DOMContentLoaded', function() {
+    // Delay the execution slightly to ensure all elements are available
+    setTimeout(handlePoetryDisplayState, 100);
 });

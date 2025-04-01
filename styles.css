@@ -3844,6 +3844,8 @@ textarea#user-input:focus {
 /* Make sure poetry-display is hidden by default */
 #poetry-display {
   display: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
 /* Make sure empty-state is visible by default */
@@ -3852,12 +3854,23 @@ textarea#user-input:focus {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 300px;
+}
+
+/* Show loading element when needed */
+#poetry-loading {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
 }
 
 /* When poetry-display needs to be shown */
 #poetry-display.active {
   display: block;
-  animation: fadeIn 0.5s ease-out;
+  opacity: 1;
+  animation: fadeIn 0.8s ease;
 } 
 
 /* Add Ghibli-styled modal styles */
@@ -4598,3 +4611,47 @@ textarea#user-input:focus {
         font-size: 1.2rem;
     }
 } 
+
+/* Add animation styles for poem sections */
+.poem-section {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    margin-bottom: 20px;
+}
+
+.poem-section.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.poem-line {
+    display: block;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Add staggered delay to poem lines */
+.poem-line:nth-child(1) { animation-delay: 0.1s; }
+.poem-line:nth-child(2) { animation-delay: 0.2s; }
+.poem-line:nth-child(3) { animation-delay: 0.3s; }
+.poem-line:nth-child(4) { animation-delay: 0.4s; }
+.poem-line:nth-child(5) { animation-delay: 0.5s; }
+.poem-line:nth-child(6) { animation-delay: 0.6s; }
+.poem-line:nth-child(7) { animation-delay: 0.7s; }
+.poem-line:nth-child(8) { animation-delay: 0.8s; }
+.poem-line:nth-child(9) { animation-delay: 0.9s; }
+.poem-line:nth-child(10) { animation-delay: 1.0s; }
+.poem-line:nth-child(n+11) { animation-delay: 1.1s; }
