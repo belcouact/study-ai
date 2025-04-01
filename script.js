@@ -6108,6 +6108,17 @@ function addVocabularySideNavButtons() {
     // Add event listeners
     document.getElementById('vocab-prev-btn').addEventListener('click', () => navigateWordCard(-1));
     document.getElementById('vocab-next-btn').addEventListener('click', () => navigateWordCard(1));
+    
+    // Initially check if sidebar is collapsed and position buttons accordingly
+    const leftPanel = document.querySelector('.left-panel');
+    if (leftPanel && leftPanel.classList.contains('hidden')) {
+        // Ensure the CSS selector for collapsed sidebar works properly
+        prevNav.style.left = '20px';
+    }
+    
+    // Hide by default, will be shown when on vocabulary page
+    prevNav.style.display = 'none';
+    nextNav.style.display = 'none';
 }
 
 // Update side navigation buttons based on current word index
@@ -6123,3 +6134,26 @@ function updateSideNavigationButtons() {
         nextButton.disabled = currentWordIndex >= vocabularyWords.length - 1;
     }
 }
+
+// Add an event listener for sidebar toggle to update the navigation button positions
+document.addEventListener('DOMContentLoaded', function() {
+    // Find the sidebar toggle button
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            // Check if we're on vocabulary page and update the navigation buttons
+            const vocabularyContainer = document.getElementById('vocabulary-container');
+            if (vocabularyContainer && window.getComputedStyle(vocabularyContainer).display !== 'none') {
+                // Force layout recalculation for navigation buttons
+                const prevNav = document.querySelector('.vocabulary-side-nav-prev');
+                if (prevNav) {
+                    prevNav.style.display = 'none';
+                    setTimeout(() => {
+                        prevNav.style.display = 'block';
+                    }, 50);
+                }
+            }
+        });
+    }
+});
