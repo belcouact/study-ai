@@ -4816,7 +4816,7 @@ async function handleLoadVocabularyClick() {
     const vocabularyContainer = document.getElementById('vocabulary-container');
     
     loadBtn.disabled = true;
-    loadBtn.innerHTML = '<span class="loading-spinner"></span> 加载中...';
+    loadBtn.innerHTML = '加载中...';
     
     // Display loading message in the vocabulary container
     vocabularyContainer.innerHTML = `
@@ -4841,66 +4841,25 @@ async function handleLoadVocabularyClick() {
         const school = schoolSelect.value;
         const grade = gradeSelect.value;
         
-        // Validate that we have values
-        if (!school || !grade) {
-            throw new Error('请先在侧边栏选择学校和年级');
-        }
+        // Add side navigation buttons if they don't exist
+        addVocabularySideNavButtons();
         
-        console.log('Fetching vocabulary for school:', school, 'grade:', grade);
+        // Fetch vocabulary words
+        vocabularyWords = await fetchVocabularyWords(school, grade);
         
-        // Fetch vocabulary words from API
-        const words = await fetchVocabularyWords(school, grade);
-        
-        // Display words
-        if (words && words.length > 0) {
-            vocabularyWords = words;
-            console.log('Vocabulary words:', vocabularyWords);
+        if (vocabularyWords && vocabularyWords.length > 0) {
             currentWordIndex = 0;
-            
-            // Display the first word
             displayWordCard(currentWordIndex);
-
-            // Remove existing event listeners by cloning and replacing buttons
-            const prevButton = document.getElementById('prev-word-btn');
-            const nextButton = document.getElementById('next-word-btn');
-
-            if (prevButton) {
-                const newPrevButton = prevButton.cloneNode(true);
-                prevButton.parentNode.replaceChild(newPrevButton, prevButton);
-                
-                // Add single event listener
-                newPrevButton.onclick = () => {
-                    if (currentWordIndex > 0) {
-                        currentWordIndex--;
-                        displayWordCard(currentWordIndex);
-                        updateNavigationControls();
-                    }
-                };
-            }
-
-            if (nextButton) {
-                const newNextButton = nextButton.cloneNode(true);
-                nextButton.parentNode.replaceChild(newNextButton, nextButton);
-                
-                // Add single event listener
-                newNextButton.onclick = () => {
-                    if (currentWordIndex < vocabularyWords.length - 1) {
-                        currentWordIndex++;
-                        displayWordCard(currentWordIndex);
-                        updateNavigationControls();
-                    }
-                };
-            }
-
-            // Initialize navigation controls
-            updateNavigationControls();
+            updateSideNavigationButtons();
+        } else {
+            throw new Error('无法获取词汇列表，请检查选择的学校和年级');
         }
     } catch (error) {
         console.error('Error loading vocabulary:', error);
         showVocabularyError(error.message);
     } finally {
         loadBtn.disabled = false;
-        loadBtn.innerHTML = '加载词汇';
+        loadBtn.innerHTML = '学习词汇';
     }
 }
 
@@ -5100,8 +5059,14 @@ function displayWordCard(index) {
     
     vocabularyContainer.innerHTML = cardHTML;
     
-    // Update counter
-    document.getElementById('word-counter').textContent = `${index + 1}/${vocabularyWords.length}`;
+    // Update word counter if it exists
+    const wordCounter = document.getElementById('word-counter');
+    if (wordCounter) {
+        wordCounter.textContent = `${index + 1}/${vocabularyWords.length}`;
+    }
+    
+    // Update side navigation buttons
+    updateSideNavigationButtons();
 }
 
 // Safe property getter with default value
@@ -5553,23 +5518,22 @@ function navigateWordCard(direction) {
         currentWordIndex = newIndex;
         displayWordCard(currentWordIndex);
         updateNavigationControls();
+        updateSideNavigationButtons();
     }
 }
 
 // Update the navigation controls function
 function updateNavigationControls() {
-    const prevButton = document.getElementById('prev-word-btn');
-    const nextButton = document.getElementById('next-word-btn');
+    const prevButton = document.getElementById('vocab-prev-btn');
+    const nextButton = document.getElementById('vocab-next-btn');
     const wordCounter = document.getElementById('word-counter');
 
     if (prevButton) {
         prevButton.disabled = currentWordIndex <= 0;
-        prevButton.style.cursor = currentWordIndex <= 0 ? 'not-allowed' : 'pointer';
     }
 
     if (nextButton) {
         nextButton.disabled = currentWordIndex >= vocabularyWords.length - 1;
-        nextButton.style.cursor = currentWordIndex >= vocabularyWords.length - 1 ? 'not-allowed' : 'pointer';
     }
 
     if (wordCounter && vocabularyWords.length > 0) {
@@ -5594,6 +5558,12 @@ function handleTabSwitch(containerType) {
     if (poetryContainer) poetryContainer.style.display = 'none';
     if (vocabularyContainer) vocabularyContainer.style.display = 'none';
     if (questionsContainer) questionsContainer.style.display = 'none';
+    
+    // Hide side navigation buttons by default
+    const prevNav = document.querySelector('.vocabulary-side-nav-prev');
+    const nextNav = document.querySelector('.vocabulary-side-nav-next');
+    if (prevNav) prevNav.style.display = 'none';
+    if (nextNav) nextNav.style.display = 'none';
     
     // Reset active states for all buttons
     const qaButton = document.getElementById('qa-button');
@@ -5634,6 +5604,13 @@ function handleTabSwitch(containerType) {
             if (vocabularyContainer) {
                 vocabularyContainer.style.display = 'block';
                 if (wordButton) wordButton.classList.add('active');
+                
+                // Show side navigation buttons if vocabulary words exist
+                if (vocabularyWords && vocabularyWords.length > 0) {
+                    if (prevNav) prevNav.style.display = 'block';
+                    if (nextNav) nextNav.style.display = 'block';
+                    updateSideNavigationButtons();
+                }
             }
             break;
     }
@@ -6089,3 +6066,60 @@ document.getElementById('modal-overlay').addEventListener('click', (e) => {
         hideAboutModal();
     }
 });
+
+// Add a function to create side navigation buttons
+function addVocabularySideNavButtons() {
+    // Remove any existing buttons first
+    const existingPrevNav = document.querySelector('.vocabulary-side-nav-prev');
+    const existingNextNav = document.querySelector('.vocabulary-side-nav-next');
+    
+    if (existingPrevNav) {
+        existingPrevNav.remove();
+    }
+    
+    if (existingNextNav) {
+        existingNextNav.remove();
+    }
+    
+    // Create previous button
+    const prevNav = document.createElement('div');
+    prevNav.className = 'vocabulary-side-nav vocabulary-side-nav-prev';
+    prevNav.innerHTML = `
+        <button id="vocab-prev-btn" aria-label="Previous word">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    `;
+    document.body.appendChild(prevNav);
+    
+    // Create next button
+    const nextNav = document.createElement('div');
+    nextNav.className = 'vocabulary-side-nav vocabulary-side-nav-next';
+    nextNav.innerHTML = `
+        <button id="vocab-next-btn" aria-label="Next word">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    `;
+    document.body.appendChild(nextNav);
+    
+    // Add event listeners
+    document.getElementById('vocab-prev-btn').addEventListener('click', () => navigateWordCard(-1));
+    document.getElementById('vocab-next-btn').addEventListener('click', () => navigateWordCard(1));
+}
+
+// Update side navigation buttons based on current word index
+function updateSideNavigationButtons() {
+    const prevButton = document.getElementById('vocab-prev-btn');
+    const nextButton = document.getElementById('vocab-next-btn');
+    
+    if (prevButton) {
+        prevButton.disabled = currentWordIndex <= 0;
+    }
+    
+    if (nextButton) {
+        nextButton.disabled = currentWordIndex >= vocabularyWords.length - 1;
+    }
+}

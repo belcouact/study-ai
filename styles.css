@@ -4521,3 +4521,79 @@ textarea#user-input:focus {
         margin-top: 10px;
     }
 }
+
+/* Side navigation buttons for vocabulary */
+.vocabulary-side-nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+}
+
+.vocabulary-side-nav-prev {
+    left: calc(var(--sidebar-width) + 20px);
+}
+
+.left-panel.hidden ~ .content-area .vocabulary-side-nav-prev {
+    left: 20px;
+}
+
+.vocabulary-side-nav-next {
+    right: 20px;
+}
+
+.vocabulary-side-nav button {
+    width: 44px;
+    height: 44px;
+    background-color: var(--ghibli-cream);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    font-size: 1.5rem;
+    color: var(--ghibli-dark-green);
+}
+
+.vocabulary-side-nav button:hover:not(:disabled) {
+    background-color: var(--ghibli-light-green);
+    transform: scale(1.1);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+}
+
+.vocabulary-side-nav button:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.vocabulary-side-nav button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Hide original navigation controls */
+#vocabulary-content .navigation-controls {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .vocabulary-side-nav-prev {
+        left: 10px;
+    }
+    
+    .left-panel.hidden ~ .content-area .vocabulary-side-nav-prev {
+        left: 10px;
+    }
+    
+    .vocabulary-side-nav-next {
+        right: 10px;
+    }
+    
+    .vocabulary-side-nav button {
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem;
+    }
+}
