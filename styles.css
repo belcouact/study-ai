@@ -3758,27 +3758,29 @@ textarea#user-input:focus {
 /* Navigation Controls */
 .navigation-controls {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 15px;
-  margin-top: 20px;
-  padding: 10px;
+  padding: 15px 10px;
+  margin: 15px 0;
+  position: relative;
+  width: 100%;
 }
 
 .nav-button {
-  background-color: var(--ghibli-light-blue);
-  color: white;
-  border: none;
+  position: relative;
   width: 40px;
   height: 40px;
+  background-color: var(--ghibli-light-green);
+  color: var(--ghibli-dark-green);
+  border: none;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
   cursor: pointer;
+  font-size: 1.2rem;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  box-shadow: 0 3px 0 rgba(0,0,0,0.1);
 }
 
 .nav-button:hover:not(:disabled) {
@@ -4780,91 +4782,4 @@ textarea#user-input:focus {
     .poetry-select {
         width: 70%;
     }
-}
-
-/* Update navigation controls layout */
-.navigation-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 15px 0;
-    position: relative;
-}
-
-/* Position the question counter in the center */
-.question-counter {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 8px 15px;
-    background-color: var(--ghibli-cream);
-    border-radius: 20px;
-    font-size: 0.9rem;
-    color: var(--ghibli-dark-green);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-weight: 500;
-    text-align: center;
-    z-index: 2;
-}
-
-/* Move navigation buttons further apart */
-.nav-button {
-    width: 40px;
-    height: 40px;
-    background-color: var(--ghibli-light-green);
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--ghibli-dark-green);
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin: 0 10px;
-}
-
-/* Style previous button */
-.nav-button:first-child {
-    margin-left: 20px;
-}
-
-/* Style next button */
-.nav-button:last-child {
-    margin-right: 20px;
-}
-
-/* Hover effect for navigation buttons */
-.nav-button:hover:not(:disabled) {
-    background-color: var(--ghibli-green);
-    color: white;
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Disabled state for navigation buttons */
-.nav-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Make sure it's responsive */
-@media (max-width: 768px) {
-    .navigation-controls {
-        padding: 10px 0;
-    }
-    
-    .question-counter {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-    }
-    
-    .nav-button:first-child {
-        margin-left: 10px;
-    }
-    
-    .nav-button:last-child {
-        margin-right: 10px;
-    }
-}
+} 

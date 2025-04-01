@@ -4551,10 +4551,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Hide loading indicator
                 const loadingIndicator = document.getElementById('poetry-loading');
-                if (loadingIndicator) {
-                    loadingIndicator.style.display = 'none';
-                }
-                
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
+            
                 // Show error in empty state
                 const poetryEmptyState = document.getElementById('poetry-empty-state');
                 if (poetryEmptyState) {
