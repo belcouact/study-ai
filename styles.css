@@ -4818,9 +4818,9 @@ textarea#user-input:focus {
 
 /* Center navigation controls bar */
 .navigation-controls {
-    width: calc(100% - 40px);
+    width: 100%;
     max-width: 100%;
-    margin: 15px auto;
+    margin: 15px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -4829,9 +4829,7 @@ textarea#user-input:focus {
     background-color: var(--ghibli-light-blue);
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    left: 0;
-    right: 0;
-    overflow: hidden;
+    box-sizing: border-box;
 }
 
 /* Make sure the navigation controls stay contained within create-container */
@@ -4840,6 +4838,10 @@ textarea#user-input:focus {
     margin-left: auto;
     margin-right: auto;
     box-sizing: border-box;
+    left: 0;
+    right: 0;
+    overflow: visible;
+    position: relative;
 }
 
 /* Position nav buttons properly */
