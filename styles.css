@@ -4521,3 +4521,49 @@ textarea#user-input:focus {
         margin-top: 10px;
     }
 }
+
+/* Make poem page centered regardless of sidebar state */
+#poetry-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: var(--ghibli-cream);
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Ensure poetry container is centered regardless of sidebar state */
+.left-panel.hidden + .content-area #poetry-container {
+    margin: 20px auto;
+}
+
+/* Adjust poetry content to work better within centered container */
+.poetry-content {
+    padding: 20px;
+    position: relative;
+    background-color: white;
+    min-height: 300px;
+}
+
+/* Ensure poetry display is properly centered */
+.poem-display {
+    width: 100%;
+    padding: 25px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Media query adjustments for smaller screens */
+@media (max-width: 768px) {
+    #poetry-container {
+        width: 95%;
+        margin: 10px auto;
+    }
+}
