@@ -4818,8 +4818,8 @@ textarea#user-input:focus {
 
 /* Center navigation controls bar */
 .navigation-controls {
-    width: 90%;
-    max-width: 1000px;
+    width: calc(100% - 40px);
+    max-width: 100%;
     margin: 15px auto;
     display: flex;
     justify-content: space-between;
@@ -4829,30 +4829,63 @@ textarea#user-input:focus {
     background-color: var(--ghibli-light-blue);
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box; /* Ensure padding is included in width calculation */
-    overflow: visible; /* Allow counter to extend outside */
+    left: 0;
+    right: 0;
+    overflow: hidden;
+}
+
+/* Make sure the navigation controls stay contained within create-container */
+#create-container .navigation-controls {
+    width: calc(100% - 40px);
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
+/* Position nav buttons properly */
+.nav-button {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    min-width: 40px; /* Prevent shrinking */
+    background-color: var(--ghibli-light-green);
+    color: var(--ghibli-dark-green);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+/* Make responsive adjustments */
+@media (max-width: 768px) {
+    #create-container .navigation-controls {
+        width: calc(100% - 20px);
+        padding: 8px 10px;
+    }
 }
 
 /* Position question counter in center */
 .question-counter {
     position: absolute;
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     background-color: var(--ghibli-cream);
     color: var(--ghibli-dark-green);
-    padding: 6px 12px;
+    padding: 8px 15px;
     border-radius: 20px;
     font-size: 0.9rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    white-space: nowrap; /* Prevent line breaks in counter */
-    min-width: fit-content;
+    z-index: 2;
 }
 
 /* Style navigation buttons */
 .nav-button {
-    position: relative;
     background-color: var(--ghibli-light-green);
     color: var(--ghibli-dark-green);
     border: none;
@@ -4867,7 +4900,6 @@ textarea#user-input:focus {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     z-index: 1;
-    flex-shrink: 0; /* Prevent buttons from shrinking */
 }
 
 .nav-button:hover:not(:disabled) {
@@ -4882,30 +4914,19 @@ textarea#user-input:focus {
     cursor: not-allowed;
 }
 
-/* Explicitly set the right margin for right nav button */
-.nav-button:last-child {
-    margin-right: 0;
-}
-
-/* Explicitly set the left margin for left nav button */
-.nav-button:first-child {
-    margin-left: 0;
-}
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .navigation-controls {
+    #create-container {
         width: 95%;
-        padding: 8px 10px;
+        margin: 10px auto;
+    }
+    
+    .navigation-controls {
+        padding: 8px 15px;
     }
     
     .question-counter {
         font-size: 0.8rem;
-        padding: 4px 10px;
-    }
-    
-    .nav-button {
-        width: 36px;
-        height: 36px;
+        padding: 6px 12px;
     }
 }
