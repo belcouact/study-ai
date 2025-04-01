@@ -4758,9 +4758,38 @@ function loadPoemDetails(poem) {
     }
     
     // Populate analysis section
+    let analysisContent = '';
+
+    if (!poem.analysis && !poem.explanation) {
+        analysisContent = '暂无赏析信息';
+    } else {
+        const analysis = poem.analysis || poem.explanation;
+        
+        if (typeof analysis === 'object') {
+            try {
+                // Check if it has a text or content property
+                if (analysis.text) {
+                    analysisContent = analysis.text;
+                } else if (analysis.content) {
+                    analysisContent = analysis.content;
+                } else {
+                    // If no known property, stringify the object with formatting
+                    analysisContent = Object.entries(analysis)
+                        .map(([key, value]) => `<strong>${key}:</strong> ${value}`)
+                        .join('<br>');
+                }
+            } catch (error) {
+                console.error('Error formatting analysis:', error);
+                analysisContent = '赏析格式错误，请重新生成';
+            }
+        } else {
+            analysisContent = analysis;
+        }
+    }
+
     analysisSection.innerHTML = `
         <h3>赏析</h3>
-        <div class="poem-explanation">${poem.analysis || '暂无赏析信息'}</div>
+        <div class="poem-explanation">${analysisContent}</div>
     `;
     
     // Make sections visible
