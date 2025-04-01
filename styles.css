@@ -4830,22 +4830,24 @@ textarea#user-input:focus {
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     box-sizing: border-box; /* Ensure padding is included in width calculation */
-    overflow: hidden; /* Prevent content from extending outside */
+    overflow: visible; /* Allow counter to extend outside */
 }
 
 /* Position question counter in center */
 .question-counter {
     position: absolute;
     left: 50%;
-    transform: translateX(-50%);
+    top: 50%;
+    transform: translate(-50%, -50%);
     background-color: var(--ghibli-cream);
     color: var(--ghibli-dark-green);
-    padding: 6px 15px;
+    padding: 6px 12px;
     border-radius: 20px;
     font-size: 0.9rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 2;
+    z-index: 10;
     white-space: nowrap; /* Prevent line breaks in counter */
+    min-width: fit-content;
 }
 
 /* Style navigation buttons */
@@ -4878,6 +4880,16 @@ textarea#user-input:focus {
 .nav-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* Explicitly set the right margin for right nav button */
+.nav-button:last-child {
+    margin-right: 0;
+}
+
+/* Explicitly set the left margin for left nav button */
+.nav-button:first-child {
+    margin-left: 0;
 }
 
 /* Responsive adjustments */
