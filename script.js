@@ -6201,8 +6201,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (prevNav && nextNav) {
                 //if (tabTarget === 'vocabulary') {
-                console.log('Tab target:', tab_id);
                 if (tab_id === 'word-button') {
+                    console.log('Tab target:', tab_id);
                     if (vocabularyWords && vocabularyWords.length > 0) {
                         prevNav.style.display = 'block';
                         nextNav.style.display = 'block';
