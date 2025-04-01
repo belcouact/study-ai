@@ -4818,20 +4818,28 @@ textarea#user-input:focus {
 
 /* Center navigation controls bar */
 .navigation-controls {
-    width: 100%;
+    width: 90%;
     max-width: 1000px;
     margin: 15px auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 12px 20px;
     position: relative;
     background-color: var(--ghibli-light-blue);
     border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    left: 0;
+    right: 0;
 }
 
-/* Position question counter in center */
+/* Ensure navigation controls remain centered when sidebar is collapsed */
+.left-panel.hidden + .content-area .navigation-controls {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Position question counter in the center */
 .question-counter {
     position: absolute;
     left: 50%;
@@ -4883,7 +4891,7 @@ textarea#user-input:focus {
     }
     
     .navigation-controls {
-        padding: 8px 15px;
+        padding: 10px 15px;
     }
     
     .question-counter {
