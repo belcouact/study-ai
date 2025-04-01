@@ -7,6 +7,12 @@ let currentWordIndex = 0;
 // Global variables
 let vocabularyWords = [];
 
+// Global poem state
+window.poemState = {
+    poems: [],
+    currentIndex: 0
+};
+
 // Function to parse questions from API response
 function parseQuestionsFromResponse(response) {
     console.log('Parsing questions from response:', response);
@@ -6206,19 +6212,38 @@ function showPoetryDisplay() {
     // Show poetry display with animation
     poetryDisplay.classList.add('active');
     
-    // Check if we have poems to display
-    if (poemState && poemState.poems && poemState.poems.length > 0) {
-        console.log(`Showing ${poemState.poems.length} poems, current index: ${poemState.currentIndex}`);
-        // Display the current poem
-        displayCurrentPoem();
-        // Setup navigation buttons
-        setupPoemNavigationButtons();
-    } else {
-        console.warn('No poems available to display in showPoetryDisplay');
+    try {
+        // Check if we have poems to display with proper existence checks
+        if (typeof window.poemState !== 'undefined' && window.poemState && 
+            window.poemState.poems && window.poemState.poems.length > 0) {
+            console.log(`Showing ${window.poemState.poems.length} poems, current index: ${window.poemState.currentIndex}`);
+            // Display the current poem
+            displayCurrentPoem();
+            // Setup navigation buttons
+            setupPoemNavigationButtons();
+        } else {
+            console.warn('No poems available to display in showPoetryDisplay');
+            // Show empty state message
+            const poetryContent = poetryDisplay.querySelector('.poem-content') || poetryDisplay;
+            if (poetryContent) {
+                poetryContent.innerHTML = '<div class="empty-poem-message">暂无诗词内容，请重新生成</div>';
+            }
+        }
+    } catch (error) {
+        console.error('Error displaying poetry:', error);
+        // Handle the error gracefully
+        const poetryContent = poetryDisplay.querySelector('.poem-content') || poetryDisplay;
+        if (poetryContent) {
+            poetryContent.innerHTML = '<div class="error-message">加载诗词时出错，请重试</div>';
+        }
     }
     
-    // Animate the poem elements
-    animatePoemDisplay();
+    // Animate the poem elements with error handling
+    try {
+        animatePoemDisplay();
+    } catch (error) {
+        console.error('Error animating poem display:', error);
+    }
 }
 
 // Function to handle poetry display state
