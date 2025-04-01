@@ -5046,3 +5046,53 @@ html body .content-area #create-container .navigation-controls {
         margin: 10px auto;
     }
 }
+
+/* Position question counter in center of navigation controls for create container */
+#create-container .navigation-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 10px 20px;
+    background-color: var(--ghibli-light-blue);
+    border-radius: 10px;
+    width: 90%;
+    max-width: 1000px;
+    margin: 15px auto;
+}
+
+/* Center the question counter in the navigation controls */
+#create-container .question-counter {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    background-color: var(--ghibli-cream);
+    color: var(--ghibli-dark-green);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* Ensure navigation buttons are clearly visible */
+#create-container .nav-button {
+    position: relative;
+    z-index: 4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #create-container .navigation-controls {
+        padding: 8px 15px;
+        width: 95%;
+    }
+    
+    #create-container .question-counter {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+}
