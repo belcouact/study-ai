@@ -4186,13 +4186,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to display the current poem
     function displayCurrentPoem() {
-        if (!poemState.poems || poemState.poems.length === 0) {
+        if (!window.poemState || !window.poemState.poems || window.poemState.poems.length === 0) {
             console.error('No poems available to display');
             return;
         }
         
-        const poem = poemState.poems[poemState.currentIndex];
-        console.log('Displaying poem:', poem, 'Current index:', poemState.currentIndex);
+        const poem = window.poemState.poems[window.poemState.currentIndex];
+        console.log('Displaying poem:', poem, 'Current index:', window.poemState.currentIndex);
         
         // Get poem elements
         const poemTitle = document.querySelector('.poem-title');
@@ -4226,7 +4226,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (poemCounter) {
-            poemCounter.textContent = `${poemState.currentIndex + 1} / ${poemState.poems.length}`;
+            poemCounter.textContent = `${window.poemState.currentIndex + 1} / ${window.poemState.poems.length}`;
         }
         
         // Update navigation buttons
@@ -4239,12 +4239,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const nextButton = document.getElementById('next-poem-button');
         
         if (prevButton) {
-            prevButton.disabled = poemState.currentIndex === 0;
+            prevButton.disabled = window.poemState.currentIndex === 0;
             console.log('Prev button disabled:', prevButton.disabled);
         }
         
         if (nextButton) {
-            nextButton.disabled = poemState.currentIndex === poemState.poems.length - 1;
+            nextButton.disabled = window.poemState.currentIndex === window.poemState.poems.length - 1;
             console.log('Next button disabled:', nextButton.disabled);
         }
     }
@@ -4265,8 +4265,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 event.preventDefault();
                 event.stopPropagation(); // Stop event from bubbling up to document
                 console.log('Previous poem button clicked directly');
-                if (poemState.currentIndex > 0) {
-                    poemState.currentIndex--;
+                if (window.poemState.currentIndex > 0) {
+                    window.poemState.currentIndex--;
                     displayCurrentPoem();
                 }
             });
@@ -4280,8 +4280,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 event.preventDefault();
                 event.stopPropagation(); // Stop event from bubbling up to document
                 console.log('Next poem button clicked directly');
-                if (poemState.currentIndex < poemState.poems.length - 1) {
-                    poemState.currentIndex++;
+                if (window.poemState.currentIndex < window.poemState.poems.length - 1) {
+                    window.poemState.currentIndex++;
                     displayCurrentPoem();
                 }
             });
@@ -4521,11 +4521,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentPoems = poems;
                 currentPoemIndex = 0;
                 
-                // IMPORTANT: Update poemState with the parsed poems
-                poemState = {
+                // Update the poemState with the parsed poems
+                window.poemState = {
                     poems: poems,
                     currentIndex: 0
                 };
+                
+                console.log('Poems stored in poemState:', window.poemState.poems.length, 'poems');
                 
                 // Hide loading, show poetry display
                 const loadingIndicator = document.getElementById('poetry-loading');
@@ -6212,33 +6214,23 @@ function showPoetryDisplay() {
     // Show poetry display with animation
     poetryDisplay.classList.add('active');
     
-    try {
-        // Check if we have poems to display with proper existence checks
-        if (typeof window.poemState !== 'undefined' && window.poemState && 
-            window.poemState.poems && window.poemState.poems.length > 0) {
-            console.log(`Showing ${window.poemState.poems.length} poems, current index: ${window.poemState.currentIndex}`);
-            // Display the current poem
-            displayCurrentPoem();
-            // Setup navigation buttons
-            setupPoemNavigationButtons();
-        } else {
-            console.warn('No poems available to display in showPoetryDisplay');
-            // Show empty state message
-            const poetryContent = poetryDisplay.querySelector('.poem-content') || poetryDisplay;
-            if (poetryContent) {
-                poetryContent.innerHTML = '<div class="empty-poem-message">暂无诗词内容，请重新生成</div>';
-            }
-        }
-    } catch (error) {
-        console.error('Error displaying poetry:', error);
-        // Handle the error gracefully
+    // Make sure we access the window-scoped poemState
+    if (window.poemState && window.poemState.poems && window.poemState.poems.length > 0) {
+        console.log(`Showing ${window.poemState.poems.length} poems, current index: ${window.poemState.currentIndex}`);
+        // Display the current poem
+        displayCurrentPoem();
+        // Setup navigation buttons
+        setupPoemNavigationButtons();
+    } else {
+        console.warn('No poems available to display in showPoetryDisplay');
+        // Create empty message
         const poetryContent = poetryDisplay.querySelector('.poem-content') || poetryDisplay;
         if (poetryContent) {
-            poetryContent.innerHTML = '<div class="error-message">加载诗词时出错，请重试</div>';
+            poetryContent.innerHTML = '<div class="empty-poem-message">暂无诗词内容，请重新生成</div>';
         }
     }
     
-    // Animate the poem elements with error handling
+    // Animate the poem elements
     try {
         animatePoemDisplay();
     } catch (error) {
