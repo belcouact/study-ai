@@ -6280,9 +6280,9 @@ function fetchAndProcessPoems() {
         }, 1500);
     }
 }
-
 // Make sure DOM is loaded before running the function
 document.addEventListener('DOMContentLoaded', function() {
     // Delay the execution slightly to ensure all elements are available
     setTimeout(handlePoetryDisplayState, 100);
 });
+
