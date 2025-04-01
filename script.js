@@ -6190,8 +6190,9 @@ document.addEventListener('DOMContentLoaded', function() {
     tabButtons.forEach(button => {
         button.addEventListener('click', function() {
             //const tabTarget = this.getAttribute('data-page');
-            const tab = this.querySelector('.panel-button');
-            const tab_id = tab.id
+            //const tab = this.querySelector('.panel-button');
+            //const tab_id = tab.id
+            const tab_id = button.id
             console.log('Tab target:', tab_id);
             
             // Only show vocabulary navigation buttons when on vocabulary tab
