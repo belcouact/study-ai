@@ -4965,14 +4965,15 @@ textarea#user-input:focus {
 /* Add a more specific selector for create container navigation controls */
 #create-container .navigation-controls {
     width: 90%;
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 15px auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
     position: relative;
-    background-color: var(--ghibli-light-blue);
+    /*background-color: var(--ghibli-light-blue);*/
+    background-color: transparent;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     /* Remove any absolute positioning or offsets */
