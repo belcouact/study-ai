@@ -1671,7 +1671,13 @@ function handleGenerateQuestionsClick() {
     
     currentQuestionIndex = 0;
     
-    // Get valu es from the dropdowns using the new IDs (without -sidebar suffix)
+    // Hide empty state explicitly when generate button is clicked
+    const emptyState = document.querySelector('.empty-state');
+    if (emptyState) {
+        emptyState.style.display = 'none';
+    }
+    
+    // Get values from the dropdowns using the new IDs (without -sidebar suffix)
     const schoolSelect = document.getElementById('school-select-sidebar');
     const gradeSelect = document.getElementById('grade-select-sidebar');
     const subjectSelect = document.getElementById('subject-select');
@@ -1679,7 +1685,6 @@ function handleGenerateQuestionsClick() {
     const difficultySelect = document.getElementById('difficulty-select');
     const questionCountSelect = document.getElementById('question-count-select');
     const questionsDisplayContainer = document.getElementById('questions-display-container');
-    const emptyState = document.querySelector('.empty-state'); // Use class selector if ID is not available
     
     // Validate that we have all the required elements and values
     if (!schoolSelect || !schoolSelect.value ||
@@ -1996,6 +2001,30 @@ function setupNavigationButtons() {
         }
     }
     
+    // Helper function to clear displayed answers
+    function clearDisplayedAnswers() {
+        // Hide answer container
+        const answerContainer = document.getElementById('answer-container');
+        if (answerContainer) {
+            answerContainer.classList.add('hidden');
+        }
+        
+        // Clear selected choices
+        const choiceItems = document.querySelectorAll('.choice-item.selected');
+        choiceItems.forEach(item => {
+            item.classList.remove('selected');
+        });
+        
+        // Reset choice cells
+        const choiceCells = document.querySelectorAll('.choice-cell');
+        choiceCells.forEach(cell => {
+            cell.classList.remove('selected');
+            // Remove any selection styling
+            cell.style.borderColor = '#e2e8f0';
+            cell.style.backgroundColor = 'white';
+        });
+    }
+    
     // Create prev button if it doesn't exist
     if (!prevButton) {
         const newPrevButton = document.createElement('button');
@@ -2016,6 +2045,7 @@ function setupNavigationButtons() {
         
         newPrevButton.addEventListener('click', function() {
             if (currentQuestionIndex > 0) {
+                clearDisplayedAnswers();
                 currentQuestionIndex--;
                 displayCurrentQuestion();
                 updateNavigationButtons();
@@ -2031,6 +2061,7 @@ function setupNavigationButtons() {
         // Add new event listener
         newPrevButton.addEventListener('click', function() {
             if (currentQuestionIndex > 0) {
+                clearDisplayedAnswers();
                 currentQuestionIndex--;
                 displayCurrentQuestion();
                 updateNavigationButtons();
@@ -2058,6 +2089,7 @@ function setupNavigationButtons() {
         
         newNextButton.addEventListener('click', function() {
             if (window.questions && currentQuestionIndex < window.questions.length - 1) {
+                clearDisplayedAnswers();
                 currentQuestionIndex++;
                 displayCurrentQuestion();
                 updateNavigationButtons();
@@ -2073,6 +2105,7 @@ function setupNavigationButtons() {
         // Add new event listener
         newNextButton.addEventListener('click', function() {
             if (window.questions && currentQuestionIndex < window.questions.length - 1) {
+                clearDisplayedAnswers();
                 currentQuestionIndex++;
                 displayCurrentQuestion();
                 updateNavigationButtons();
