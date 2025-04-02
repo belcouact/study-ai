@@ -463,12 +463,6 @@ function displayCurrentQuestion() {
             width: fit-content;
         `;
         questionCounter.textContent = `题目 ${currentQuestionIndex + 1} / ${window.questions.length}`;
-        
-        // Ensure counter is at the top of the container
-        if (questionCounter.parentNode === questionsDisplayContainer) {
-            questionsDisplayContainer.insertBefore(questionCounter, questionsDisplayContainer.firstChild);
-        }
-        
         console.log('Updated question counter:', questionCounter.textContent);
     } else {
         console.error('Question counter element not found');
@@ -488,13 +482,7 @@ function displayCurrentQuestion() {
             width: fit-content;
         `;
         newCounter.textContent = `题目 ${currentQuestionIndex + 1} / ${window.questions.length}`;
-        
-        // Add at the very top of the questions container
-        if (questionsDisplayContainer.firstChild) {
-            questionsDisplayContainer.insertBefore(newCounter, questionsDisplayContainer.firstChild);
-        } else {
-            questionsDisplayContainer.appendChild(newCounter);
-        }
+        questionsContainer.appendChild(newCounter);
     }
     
     // Format and display question text with responsive styling
