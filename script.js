@@ -1855,10 +1855,10 @@ function handleGenerateQuestionsClick() {
                 }
                 
                 // If it exists, make sure it's visible
-                questionState.classList.remove('hidden');
-                choiceState.classList.remove('hidden');
-                answerState.classList.remove('hidden');
-                navigationState.classList.remove('hidden');
+                questionState.style.display = 'block';
+                choiceState.style.display = 'block';
+                answerState.style.display = 'block';
+                navigationState.style.display = 'block';
 
                 // Now we can safely use questionsDisplayContainer
                 // Display the first question
