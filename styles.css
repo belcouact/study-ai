@@ -4950,7 +4950,7 @@ textarea#user-input:focus {
         margin: 10px auto;
     }
     
-    .navigation-controls {
+    #create-container .navigation-controls {
         width: 95%;
         padding: 8px 15px;
         margin: 10px auto;
@@ -5047,3 +5047,71 @@ html body .content-area #create-container .navigation-controls {
         margin: 10px auto;
     }
 } 
+
+#create-container .navigation-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    max-width: 800px;
+    margin: 15px auto;
+    padding: 10px 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+#create-container .navigation-controls .question-counter {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(14px, 2.5vw, 16px);
+    color: #4a5568;
+    font-weight: 500;
+    padding: 8px 16px;
+    background: #edf2f7;
+    border-radius: 20px;
+    white-space: nowrap;
+    z-index: 1;
+}
+
+#create-container .navigation-controls .nav-button {
+    position: relative;
+    z-index: 2;
+    padding: 8px 16px;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: clamp(14px, 2.5vw, 16px);
+    color: #4a5568;
+}
+
+#create-container .navigation-controls .nav-button:hover:not(:disabled) {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+}
+
+#create-container .navigation-controls .nav-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    #create-container .navigation-controls {
+        width: 95%;
+        padding: 8px 12px;
+    }
+    
+    #create-container .navigation-controls .question-counter {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+    
+    #create-container .navigation-controls .nav-button {
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+}
