@@ -5046,18 +5046,3 @@ html body .content-area #create-container .navigation-controls {
         margin: 10px auto;
     }
 } 
-
-.system-message {
-    padding: 10px;
-    margin: 10px 0;
-    background-color: var(--ghibli-cream);
-    border-radius: 8px;
-    color: var(--ghibli-text);
-    font-size: 1rem;
-}
-
-.chat-message {
-    display: block;
-    width: 100%;
-    margin-bottom: 10px;
-}
