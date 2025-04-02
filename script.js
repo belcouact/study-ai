@@ -548,37 +548,37 @@ function displayCurrentQuestion() {
             ">
                 ${['A', 'B', 'C', 'D'].map(letter => `
                     <div class="choice-cell" data-value="${letter}" style="
-                        padding: clamp(10px, 2vw, 15px);
-                        border: 2px solid #e2e8f0;
-                        border-radius: 12px;
-                        background-color: white;
+                    padding: clamp(10px, 2vw, 15px);
+                    border: 2px solid #e2e8f0;
+                    border-radius: 12px;
+                    background-color: white;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    user-select: none;
+                    -webkit-tap-highlight-color: transparent;
+                ">
+                    <div class="choice-indicator" style="
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 50%;
+                        background: #edf2f7;
                         display: flex;
                         align-items: center;
-                        gap: 12px;
-                        cursor: pointer;
-                        transition: all 0.2s ease;
-                        user-select: none;
-                        -webkit-tap-highlight-color: transparent;
-                    ">
-                        <div class="choice-indicator" style="
-                            width: 28px;
-                            height: 28px;
-                            border-radius: 50%;
-                            background: #edf2f7;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-weight: 500;
-                            color: #4a5568;
-                            flex-shrink: 0;
+                        justify-content: center;
+                        font-weight: 500;
+                        color: #4a5568;
+                        flex-shrink: 0;
                         ">${letter}</div>
-                        <div class="choice-text" style="
-                            flex: 1;
-                            font-size: clamp(14px, 2.5vw, 16px);
-                            color: #2d3748;
-                            line-height: 1.5;
+                    <div class="choice-text" style="
+                        flex: 1;
+                        font-size: clamp(14px, 2.5vw, 16px);
+                        color: #2d3748;
+                        line-height: 1.5;
                         ">${formatMathExpressions(question.choices[letter])}</div>
-                    </div>
+                </div>
                 `).join('')}
             </div>
             <div class="submit-button-container" style="
@@ -5918,8 +5918,7 @@ function showAboutSiteModal() {
             modalContainer.remove();
         });
     }
-    
-    // Close modal when clicking outside content
+        // Close modal when clicking outside content
     modalContainer.addEventListener('click', function(e) {
         if (e.target === modalContainer) {
             console.log('Clicked outside modal content');
@@ -6516,3 +6515,4 @@ function displayQuestionChoices(question) {
     });
 }
 
+    
