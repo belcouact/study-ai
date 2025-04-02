@@ -1677,7 +1677,7 @@ function handleGenerateQuestionsClick() {
         emptyState.style.display = 'none';
     }
 
-    /*
+    // hide all controls during question loading
     const questionState = document.querySelector('.question-text');
     if (questionState) {
         questionState.style.display = 'none';
@@ -1697,7 +1697,6 @@ function handleGenerateQuestionsClick() {
     if (navigationState) {
         navigationState.style.display = 'none';
     }
-    */
 
     // Get values from the dropdowns using the new IDs (without -sidebar suffix)
     const schoolSelect = document.getElementById('school-select-sidebar');
@@ -1707,11 +1706,6 @@ function handleGenerateQuestionsClick() {
     const difficultySelect = document.getElementById('difficulty-select');
     const questionCountSelect = document.getElementById('question-count-select');
     const questionsDisplayContainer = document.getElementById('questions-display-container');
-
-    // Hide the question display when generating questions
-    if (questionsDisplayContainer) {
-        questionsDisplayContainer.style.display = 'none';
-    }
     
     // Validate that we have all the required elements and values
     if (!schoolSelect || !schoolSelect.value ||
@@ -1854,11 +1848,18 @@ function handleGenerateQuestionsClick() {
                     
                     // Hide the empty state if it exists
                     const emptyState = document.getElementById('empty-state');
-                if (emptyState) {
-                    emptyState.style.display = 'none';
-                    }
+
+                    if (emptyState) {
+                        emptyState.style.display = 'none';
+                        }
                 }
                 
+                // If it exists, make sure it's visible
+                questionState.classList.remove('hidden');
+                choiceState.classList.remove('hidden');
+                answerState.classList.remove('hidden');
+                navigationState.classList.remove('hidden');
+
                 // Now we can safely use questionsDisplayContainer
                 // Display the first question
                 displayCurrentQuestion();
