@@ -2593,13 +2593,13 @@ textarea#user-input:focus {
 }
 
 .vocabulary-load-btn::before {
-  content: "📚";
+  content: "🔤";
   margin-right: 6px;
   font-size: 1rem;
 }
 
 #load-sentences-btn::before {
-  content: "🔤";
+  content: "📚";
 }
 
 .vocabulary-load-btn:hover {
