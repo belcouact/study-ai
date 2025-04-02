@@ -3104,6 +3104,12 @@ function createChatInterface() {
     }
     
     console.log('Creating new chat interface elements');
+
+    // Add welcome message
+    const welcomeMessage = document.createElement('div');
+    welcomeMessage.className = 'chat-message system-message';
+    welcomeMessage.innerHTML = '你好，我是你的AI老师，有什么我可以帮你的吗？';
+    qaContainer.appendChild(welcomeMessage);
     
     // Create the chat interface
     const chatInterface = document.createElement('div');
