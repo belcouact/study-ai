@@ -3097,13 +3097,6 @@ function createChatInterface() {
             document.body.appendChild(qaContainer);
         }
     }
-    
-    // Add welcome message
-    const welcomeMessage = document.createElement('div');
-    welcomeMessage.className = 'chat-message system-message';
-    welcomeMessage.innerHTML = '你好，我是你的AI老师，有什么我可以帮你的吗？';
-    chatContainer.appendChild(welcomeMessage);
-    
     // Check if the chat interface already exists
     if (document.getElementById('chat-interface')) {
         console.log('Chat interface already exists');
