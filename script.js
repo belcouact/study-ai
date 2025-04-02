@@ -3146,9 +3146,15 @@ function createChatInterface() {
     chatResponse.className = 'chat-response';
     chatResponse.style.cssText = 'background-color: #f8fafc; border-radius: 8px; padding: 20px; min-height: 100px; max-height: 500px; overflow-y: auto;';
     
-    // Add the welcome message as the first child of chatResponse
+    // Create a container for messages
+    const messagesContainer = document.createElement('div');
+    messagesContainer.className = 'messages-container';
+    messagesContainer.style.cssText = 'display: flex; flex-direction: column; gap: 10px;';
+    
+    // Add the welcome message as the first child of messagesContainer
     const welcomeMessage = document.createElement('div');
     welcomeMessage.className = 'welcome-message';
+    welcomeMessage.style.cssText = 'display: block;'; // Ensure it's visible
     welcomeMessage.innerHTML = `
         <div style="text-align: center; color: #718096; padding: 20px;">
             <i class="fas fa-comment-dots" style="font-size: 24px; margin-bottom: 10px;"></i>
@@ -3156,7 +3162,10 @@ function createChatInterface() {
             <p style="margin: 0; font-size: 14px;">在上方输入您的问题，点击"提交问题"获取回答</p>
         </div>
     `;
-    chatResponse.appendChild(welcomeMessage);
+    messagesContainer.appendChild(welcomeMessage);
+    
+    // Add messages container to chat response
+    chatResponse.appendChild(messagesContainer);
     
     // Add input area and response area to chat interface
     chatInterface.appendChild(chatInputArea);
@@ -3170,7 +3179,8 @@ function createChatInterface() {
         chatInput,
         chatResponse,
         optimizeButton,
-        submitButton
+        submitButton,
+        messagesContainer // Add this to the returned object
     };
 }
 
