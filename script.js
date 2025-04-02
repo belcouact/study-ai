@@ -451,6 +451,17 @@ function displayCurrentQuestion() {
     // Update question counter with responsive styling
     const questionCounter = document.getElementById('question-counter');
     if (questionCounter) {
+        questionCounter.style.cssText = `
+            font-size: clamp(14px, 2.5vw, 16px);
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: #edf2f7;
+            border-radius: 20px;
+            display: inline-block;
+            width: fit-content;
+        `;
         questionCounter.textContent = `题目 ${currentQuestionIndex + 1} / ${window.questions.length}`;
         console.log('Updated question counter:', questionCounter.textContent);
     } else {
@@ -459,6 +470,17 @@ function displayCurrentQuestion() {
         const newCounter = document.createElement('div');
         newCounter.id = 'question-counter';
         newCounter.className = 'question-counter';
+        newCounter.style.cssText = `
+            font-size: clamp(14px, 2.5vw, 16px);
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: #edf2f7;
+            border-radius: 20px;
+            display: inline-block;
+            width: fit-content;
+        `;
         newCounter.textContent = `题目 ${currentQuestionIndex + 1} / ${window.questions.length}`;
         questionsContainer.appendChild(newCounter);
     }
