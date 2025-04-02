@@ -3308,6 +3308,9 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, submitButton) {
     console.log('Setting up button event listeners');
     
+    // Store the welcome message
+    const welcomeMessage = chatResponse.querySelector('.welcome-message');
+    
     // Set up optimize button
     if (optimizeButton) {
         // Remove any existing event listeners
@@ -3391,7 +3394,18 @@ function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, subm
             // Show loading state
             submitButton.disabled = true;
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
-            chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
+            
+            // Create loading indicator without clearing the welcome message
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'loading-indicator';
+            loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在思考...';
+            
+            // Insert loading indicator after the welcome message
+            if (welcomeMessage) {
+                welcomeMessage.insertAdjacentElement('afterend', loadingIndicator);
+            } else {
+                chatResponse.appendChild(loadingIndicator);
+            }
             
             // Prepare the prompt for the AI with simplified educational context
             const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
@@ -3418,30 +3432,53 @@ function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, subm
                     // Get simplified context summary for display
                     const contextSummary = getSimplifiedContextSummary();
                     
-                    // Display the response with educational context
-                    chatResponse.innerHTML = `
+                    // Create response container
+                    const responseContainer = document.createElement('div');
+                    responseContainer.innerHTML = `
                         <div class="response-header">
                             <i class="fas fa-robot"></i> AI 助手回答
                             ${contextSummary ? `<span class="context-badge">${contextSummary}</span>` : ''}
                         </div>
                         <div class="response-content">
                             ${formattedResponse}
-                </div>
-            `;
+                        </div>
+                    `;
+                    
+                    // Remove loading indicator
+                    loadingIndicator.remove();
+                    
+                    // Insert response after welcome message
+                    if (welcomeMessage) {
+                        welcomeMessage.insertAdjacentElement('afterend', responseContainer);
+                    } else {
+                        chatResponse.appendChild(responseContainer);
+                    }
                     
                     // Render MathJax in the response
                     if (window.MathJax) {
-                        MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
+                        MathJax.typesetPromise([responseContainer]).catch(err => console.error('MathJax error:', err));
                     }
                 })
                 .catch(error => {
                     console.error('Error submitting question:', error);
-                    chatResponse.innerHTML = `
-                        <div class="error-message">
-                            <i class="fas fa-exclamation-circle"></i>
-                            抱歉，处理您的问题时出现了错误。请重试。
-            </div>
-        `;
+                    // Remove loading indicator
+                    loadingIndicator.remove();
+                    
+                    // Create error message
+                    const errorContainer = document.createElement('div');
+                    errorContainer.className = 'error-message';
+                    errorContainer.innerHTML = `
+                        <i class="fas fa-exclamation-circle"></i>
+                        抱歉，处理您的问题时出现了错误。请重试。
+                    `;
+                    
+                    // Insert error message after welcome message
+                    if (welcomeMessage) {
+                        welcomeMessage.insertAdjacentElement('afterend', errorContainer);
+                    } else {
+                        chatResponse.appendChild(errorContainer);
+                    }
+                    
                     showSystemMessage('提交问题时出错，请重试。', 'error');
                 })
                 .finally(() => {
