@@ -908,7 +908,7 @@ function displayCurrentQuestion() {
                 `;
                 
                 const resultText = isCorrect 
-                    ? `<svg width="20" height="240" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    ? `<svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M20,6 L9,17 L4,12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                         </svg> 正确！答案是：${correctAnswer}`
                     : `<svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -3131,13 +3131,14 @@ function createChatInterface() {
         }
     }
     
-    // Check if the chat interface already exists
+    // 
+    // heck if the chat interface already exists
     if (document.getElementById('chat-interface')) {
         console.log('Chat interface already exists');
         return; // Already exists, no need to create it
     }
     
-    console.log('Creating new chat interface elements');
+    //console.log('Creating new chat interface elements');
     
     // Create the chat interface
     const chatInterface = document.createElement('div');
