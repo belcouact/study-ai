@@ -1676,7 +1676,29 @@ function handleGenerateQuestionsClick() {
     if (emptyState) {
         emptyState.style.display = 'none';
     }
-    
+
+    /*
+    const questionState = document.querySelector('.question-text');
+    if (questionState) {
+        questionState.style.display = 'none';
+    }
+
+    const choiceState = document.querySelector('.choices-container');
+    if (choiceState) {
+        choiceState.style.display = 'none';
+    }
+
+    const answerState = document.querySelector('.answer-container');
+    if (answerState) {
+        answerState.style.display = 'none';
+    }
+
+    const navigationState = document.querySelector('.navigation-controls');
+    if (navigationState) {
+        navigationState.style.display = 'none';
+    }
+    */
+
     // Get values from the dropdowns using the new IDs (without -sidebar suffix)
     const schoolSelect = document.getElementById('school-select-sidebar');
     const gradeSelect = document.getElementById('grade-select-sidebar');
@@ -1685,6 +1707,11 @@ function handleGenerateQuestionsClick() {
     const difficultySelect = document.getElementById('difficulty-select');
     const questionCountSelect = document.getElementById('question-count-select');
     const questionsDisplayContainer = document.getElementById('questions-display-container');
+
+    // Hide the question display when generating questions
+    if (questionsDisplayContainer) {
+        questionsDisplayContainer.style.display = 'none';
+    }
     
     // Validate that we have all the required elements and values
     if (!schoolSelect || !schoolSelect.value ||
