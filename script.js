@@ -3082,19 +3082,30 @@ function createChatInterface() {
     let qaContainer = document.getElementById('qa-container');
     if (!qaContainer) {
         console.log('QA container not found, creating it');
+        // Create the QA container if it doesn't exist
         qaContainer = document.createElement('div');
         qaContainer.id = 'qa-container';
         qaContainer.className = 'qa-container';
         qaContainer.style.cssText = 'display: block; height: 100%; padding: 20px;';
         
+        // Find a suitable parent to append it to
         const contentArea = document.querySelector('.content-area');
         if (contentArea) {
             contentArea.appendChild(qaContainer);
         } else {
+            // If content area not found, append to body
             document.body.appendChild(qaContainer);
         }
     }
-
+    
+    // Check if the chat interface already exists
+    if (document.getElementById('chat-interface')) {
+        console.log('Chat interface already exists');
+        return; // Already exists, no need to create it
+    }
+    
+    console.log('Creating new chat interface elements');
+    
     // Create the chat interface
     const chatInterface = document.createElement('div');
     chatInterface.id = 'chat-interface';
@@ -3146,26 +3157,14 @@ function createChatInterface() {
     chatResponse.className = 'chat-response';
     chatResponse.style.cssText = 'background-color: #f8fafc; border-radius: 8px; padding: 20px; min-height: 100px; max-height: 500px; overflow-y: auto;';
     
-    // Create a container for messages
-    const messagesContainer = document.createElement('div');
-    messagesContainer.className = 'messages-container';
-    messagesContainer.style.cssText = 'display: flex; flex-direction: column; gap: 10px;';
-    
-    // Add the welcome message as the first child of messagesContainer
-    const welcomeMessage = document.createElement('div');
-    welcomeMessage.className = 'welcome-message';
-    welcomeMessage.style.cssText = 'display: block;'; // Ensure it's visible
-    welcomeMessage.innerHTML = `
-        <div style="text-align: center; color: #718096; padding: 20px;">
+    // Add a welcome message
+    chatResponse.innerHTML = `
+        <div class="welcome-message" style="text-align: center; color: #718096;">
             <i class="fas fa-comment-dots" style="font-size: 24px; margin-bottom: 10px;"></i>
-            <h3 style="margin: 0 0 10px 0; font-size: 18px;">你好，我是你的AI老师，有什么我可以帮你的吗？</h3>
+            <h3 style="margin: 0 0 10px 0; font-size: 18px;">欢迎使用AI学习助手</h3>
             <p style="margin: 0; font-size: 14px;">在上方输入您的问题，点击"提交问题"获取回答</p>
         </div>
     `;
-    messagesContainer.appendChild(welcomeMessage);
-    
-    // Add messages container to chat response
-    chatResponse.appendChild(messagesContainer);
     
     // Add input area and response area to chat interface
     chatInterface.appendChild(chatInputArea);
@@ -3175,13 +3174,71 @@ function createChatInterface() {
     qaContainer.innerHTML = ''; // Clear any existing content
     qaContainer.appendChild(chatInterface);
     
-    return {
-        chatInput,
-        chatResponse,
-        optimizeButton,
-        submitButton,
-        messagesContainer // Add this to the returned object
-    };
+    // Add CSS for the chat interface
+    const style = document.createElement('style');
+    style.textContent = `
+        .chat-button:hover {
+            opacity: 0.9;
+        }
+        .chat-button:active {
+            transform: translateY(1px);
+        }
+        .chat-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .loading-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #718096;
+            font-size: 16px;
+                                padding: 20px;
+        }
+        .response-header {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .context-badge {
+            font-size: 12px;
+            background-color: #ebf8ff;
+            color: #3182ce;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+        .response-content {
+            line-height: 1.6;
+                                    color: #4a5568;
+            white-space: pre-wrap;
+        }
+        .error-message {
+            color: #e53e3e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Add event listener for Ctrl+Enter to submit
+    chatInput.addEventListener('keydown', function(event) {
+        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+            event.preventDefault();
+            submitButton.click();
+        }
+    });
+    
+    console.log('Chat interface created successfully');
+    return { chatInput, chatResponse, optimizeButton, submitButton };
 }
 
 // Now let's fix the grade and subject dropdowns by ensuring they're populated
@@ -3308,9 +3365,6 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, submitButton) {
     console.log('Setting up button event listeners');
     
-    // Store the welcome message
-    const welcomeMessage = chatResponse.querySelector('.welcome-message');
-    
     // Set up optimize button
     if (optimizeButton) {
         // Remove any existing event listeners
@@ -3394,18 +3448,7 @@ function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, subm
             // Show loading state
             submitButton.disabled = true;
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
-            
-            // Create loading indicator without clearing the welcome message
-            const loadingIndicator = document.createElement('div');
-            loadingIndicator.className = 'loading-indicator';
-            loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在思考...';
-            
-            // Insert loading indicator after the welcome message
-            if (welcomeMessage) {
-                welcomeMessage.insertAdjacentElement('afterend', loadingIndicator);
-            } else {
-                chatResponse.appendChild(loadingIndicator);
-            }
+            chatResponse.innerHTML = '<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> 正在思考...</div>';
             
             // Prepare the prompt for the AI with simplified educational context
             const prompt = `请根据以下教育背景回答这个问题，提供详细且教育性的解答：
@@ -3432,53 +3475,30 @@ function setupButtonEventListeners(chatInput, chatResponse, optimizeButton, subm
                     // Get simplified context summary for display
                     const contextSummary = getSimplifiedContextSummary();
                     
-                    // Create response container
-                    const responseContainer = document.createElement('div');
-                    responseContainer.innerHTML = `
+                    // Display the response with educational context
+                    chatResponse.innerHTML = `
                         <div class="response-header">
                             <i class="fas fa-robot"></i> AI 助手回答
                             ${contextSummary ? `<span class="context-badge">${contextSummary}</span>` : ''}
                         </div>
                         <div class="response-content">
                             ${formattedResponse}
-                        </div>
-                    `;
-                    
-                    // Remove loading indicator
-                    loadingIndicator.remove();
-                    
-                    // Insert response after welcome message
-                    if (welcomeMessage) {
-                        welcomeMessage.insertAdjacentElement('afterend', responseContainer);
-                    } else {
-                        chatResponse.appendChild(responseContainer);
-                    }
+                </div>
+            `;
                     
                     // Render MathJax in the response
                     if (window.MathJax) {
-                        MathJax.typesetPromise([responseContainer]).catch(err => console.error('MathJax error:', err));
+                        MathJax.typesetPromise([chatResponse]).catch(err => console.error('MathJax error:', err));
                     }
                 })
                 .catch(error => {
                     console.error('Error submitting question:', error);
-                    // Remove loading indicator
-                    loadingIndicator.remove();
-                    
-                    // Create error message
-                    const errorContainer = document.createElement('div');
-                    errorContainer.className = 'error-message';
-                    errorContainer.innerHTML = `
-                        <i class="fas fa-exclamation-circle"></i>
-                        抱歉，处理您的问题时出现了错误。请重试。
-                    `;
-                    
-                    // Insert error message after welcome message
-                    if (welcomeMessage) {
-                        welcomeMessage.insertAdjacentElement('afterend', errorContainer);
-                    } else {
-                        chatResponse.appendChild(errorContainer);
-                    }
-                    
+                    chatResponse.innerHTML = `
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            抱歉，处理您的问题时出现了错误。请重试。
+            </div>
+        `;
                     showSystemMessage('提交问题时出错，请重试。', 'error');
                 })
                 .finally(() => {
