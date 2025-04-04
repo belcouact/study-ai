@@ -4284,7 +4284,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Handle explanation with null check
         if (poemExplanation) {
-            poemExplanation.innerHTML = poem.explanation || '无赏析';
+            if (poem.explanation) {
+                // Convert explanation to string if it's an object
+                const explanationText = typeof poem.explanation === 'object' 
+                    ? JSON.stringify(poem.explanation, null, 2) 
+                    : poem.explanation;
+                poemExplanation.innerHTML = explanationText;
+            } else {
+                poemExplanation.innerHTML = '无赏析';
+            }
         }
         
         if (poemCounter) {
