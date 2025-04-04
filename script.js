@@ -3278,7 +3278,7 @@ function createChatInterface() {
     qaContainer.appendChild(chatInterface);
     
     // Add CSS for the chat interface
-    const style = document.createElement('style');
+    // const style = document.createElement('style');
     style.textContent = `
         .chat-button:hover {
             opacity: 0.9;
