@@ -5764,7 +5764,7 @@ function showAboutSiteModal() {
                 padding-left: 20px;
                 margin: 15px 0;
             ">
-                <li>内容提供：Kimi API</li>
+                <li>DeepSeek-V3 API</li>
                 <li>代码：Claude-3.7-sonnet</li>
                 <li>编译器：Cursor / VS Code</li>
                 <li>网页部署：Github / Cloudflare</li>
@@ -5809,7 +5809,7 @@ function showAboutSiteModal() {
                 padding-left: 20px;
                 margin: 15px 0;
             ">
-                <li>Content provider: Kimi API</li>
+                <li>Content provider: DeepSeek-V3 API</li>
                 <li>Coding: Claude-3.7-sonnet</li>
                 <li>Code Editor: Cursor / VS Code</li>
                 <li>Web deployment: Github / Cloudflare</li>
