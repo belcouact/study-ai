@@ -5047,3 +5047,15 @@ html body .content-area #create-container .navigation-controls {
         margin: 10px auto;
     }
 } 
+
+.navigation-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.question-counter {
+    margin: 0 15px;
+    font-weight: bold;
+}

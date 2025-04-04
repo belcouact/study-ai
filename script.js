@@ -3160,39 +3160,20 @@ function createChatInterface() {
         }
     }
     
-    // Check if the chat interface already exists
+    // 
+    // heck if the chat interface already exists
     if (document.getElementById('chat-interface')) {
         console.log('Chat interface already exists');
         return; // Already exists, no need to create it
     }
+    
+    //console.log('Creating new chat interface elements');
     
     // Create the chat interface
     const chatInterface = document.createElement('div');
     chatInterface.id = 'chat-interface';
     chatInterface.className = 'chat-interface';
     chatInterface.style.cssText = 'display: flex; flex-direction: column; height: 100%; padding: 20px; gap: 20px;';
-    
-    // Create the welcome message
-    const welcomeMessage = document.createElement('div');
-    welcomeMessage.className = 'welcome-message';
-    welcomeMessage.style.cssText = `
-        background-color: #f8fafc;
-        border-radius: 8px;
-        padding: 15px 20px;
-        margin-bottom: 15px;
-        color: #4a5568;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    `;
-    welcomeMessage.innerHTML = `
-        <i class="ghibli-icon-welcome" style="
-            font-size: 20px;
-            color: #4299e1;
-        "></i>
-        你好，我是你的AI老师，有什么我可以帮你的吗？
-    `;
     
     // Create the chat input area
     const chatInputArea = document.createElement('div');
@@ -3239,8 +3220,16 @@ function createChatInterface() {
     chatResponse.className = 'chat-response';
     chatResponse.style.cssText = 'background-color: #f8fafc; border-radius: 8px; padding: 20px; min-height: 100px; max-height: 500px; overflow-y: auto;';
     
-    // Add welcome message, input area and response area to chat interface
-    chatInterface.appendChild(welcomeMessage);
+    // Add a welcome message
+    chatResponse.innerHTML = `
+        <div class="welcome-message" style="text-align: center; color: #718096;">
+            <i class="fas fa-comment-dots" style="font-size: 24px; margin-bottom: 10px;"></i>
+            <h3 style="margin: 0 0 10px 0; font-size: 18px;">欢迎使用AI学习助手</h3>
+            <p style="margin: 0; font-size: 14px;">在上方输入您的问题，点击"提交问题"获取回答</p>
+        </div>
+    `;
+    
+    // Add input area and response area to chat interface
     chatInterface.appendChild(chatInputArea);
     chatInterface.appendChild(chatResponse);
     
@@ -3268,12 +3257,12 @@ function createChatInterface() {
             gap: 10px;
             color: #718096;
             font-size: 16px;
-            padding: 20px;
+                                padding: 20px;
         }
         .response-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
             font-weight: 600;
             color: #2d3748;
             margin-bottom: 10px;
@@ -3290,7 +3279,7 @@ function createChatInterface() {
         }
         .response-content {
             line-height: 1.6;
-            color: #4a5568;
+                                    color: #4a5568;
             white-space: pre-wrap;
         }
         .error-message {
