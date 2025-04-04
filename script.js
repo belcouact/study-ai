@@ -3160,20 +3160,39 @@ function createChatInterface() {
         }
     }
     
-    // 
-    // heck if the chat interface already exists
+    // Check if the chat interface already exists
     if (document.getElementById('chat-interface')) {
         console.log('Chat interface already exists');
         return; // Already exists, no need to create it
     }
-    
-    //console.log('Creating new chat interface elements');
     
     // Create the chat interface
     const chatInterface = document.createElement('div');
     chatInterface.id = 'chat-interface';
     chatInterface.className = 'chat-interface';
     chatInterface.style.cssText = 'display: flex; flex-direction: column; height: 100%; padding: 20px; gap: 20px;';
+    
+    // Create the welcome message
+    const welcomeMessage = document.createElement('div');
+    welcomeMessage.className = 'welcome-message';
+    welcomeMessage.style.cssText = `
+        background-color: #f8fafc;
+        border-radius: 8px;
+        padding: 15px 20px;
+        margin-bottom: 15px;
+        color: #4a5568;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    `;
+    welcomeMessage.innerHTML = `
+        <i class="ghibli-icon-welcome" style="
+            font-size: 20px;
+            color: #4299e1;
+        "></i>
+        你好，我是你的AI老师，有什么我可以帮你的吗？
+    `;
     
     // Create the chat input area
     const chatInputArea = document.createElement('div');
@@ -3218,58 +3237,10 @@ function createChatInterface() {
     const chatResponse = document.createElement('div');
     chatResponse.id = 'chat-response';
     chatResponse.className = 'chat-response';
-    chatResponse.style.cssText = `
-        background-color: #f8fafc;
-        border-radius: 8px;
-        padding: 20px;
-        min-height: 100px;
-        max-height: 500px;
-        overflow-y: auto;
-    `;
+    chatResponse.style.cssText = 'background-color: #f8fafc; border-radius: 8px; padding: 20px; min-height: 100px; max-height: 500px; overflow-y: auto;';
     
-    // Add a welcome message with Ghibli-style design
-    chatResponse.innerHTML = `
-        <div class="welcome-message" style="
-            text-align: center;
-            padding: 2rem;
-            background: linear-gradient(to bottom, #ebf8ff, #f0f9ff);
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            animation: fadeIn 0.5s ease;
-        ">
-            <div class="welcome-icon" style="
-                font-size: 48px;
-                color: #4299e1;
-                margin-bottom: 1rem;
-            ">
-                <i class="ghibli-icon-welcome"></i>
-            </div>
-            <h3 style="
-                margin: 0 0 1rem 0;
-                color: #2d3748;
-                font-size: 1.5rem;
-                font-weight: 600;
-            ">你好，我是你的AI老师</h3>
-            <p style="
-                margin: 0;
-                color: #4a5568;
-                font-size: 1.1rem;
-                line-height: 1.5;
-            ">有什么我可以帮你的吗？</p>
-        </div>
-    `;
-    
-    // Add animation keyframes
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // Add input area and response area to chat interface
+    // Add welcome message, input area and response area to chat interface
+    chatInterface.appendChild(welcomeMessage);
     chatInterface.appendChild(chatInputArea);
     chatInterface.appendChild(chatResponse);
     
@@ -3278,7 +3249,7 @@ function createChatInterface() {
     qaContainer.appendChild(chatInterface);
     
     // Add CSS for the chat interface
-    // const style = document.createElement('style');
+    const style = document.createElement('style');
     style.textContent = `
         .chat-button:hover {
             opacity: 0.9;
@@ -3297,12 +3268,12 @@ function createChatInterface() {
             gap: 10px;
             color: #718096;
             font-size: 16px;
-                                padding: 20px;
+            padding: 20px;
         }
         .response-header {
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-weight: 600;
             color: #2d3748;
             margin-bottom: 10px;
@@ -3319,7 +3290,7 @@ function createChatInterface() {
         }
         .response-content {
             line-height: 1.6;
-                                    color: #4a5568;
+            color: #4a5568;
             white-space: pre-wrap;
         }
         .error-message {
@@ -5698,19 +5669,9 @@ function handleTabSwitch(containerType) {
             if (qaContainer) {
                 qaContainer.style.display = 'block';
                 if (qaButton) qaButton.classList.add('active');
-                
-                // Ensure chat interface is created if it doesn't exist
-                if (!document.getElementById('chat-interface')) {
-                    createChatInterface();
-                }
-                
-                // Make sure the container is visible
-                const chatInterface = document.getElementById('chat-interface');
-                if (chatInterface) {
-                    chatInterface.style.display = 'flex';
-                }
             }
             break;
+            
         case 'create':
             if (createContainer) {
                 createContainer.style.display = 'block';
@@ -5718,12 +5679,14 @@ function handleTabSwitch(containerType) {
                 if (questionsContainer) questionsContainer.style.display = 'block';
             }
             break;
+            
         case 'poetry':
             if (poetryContainer) {
                 poetryContainer.style.display = 'block';
                 if (poetryButton) poetryButton.classList.add('active');
             }
             break;
+            
         case 'vocabulary':
             if (vocabularyContainer) {
                 vocabularyContainer.style.display = 'block';
