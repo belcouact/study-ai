@@ -1772,6 +1772,7 @@ function handleGenerateQuestionsClick() {
     4. 难度必须符合年级水平
     5. 解析必须详尽，有教育意义
     6. 不出带图形的题目
+    7. 确保选项ABCD里必须有且只有一个正确答案
     `;
 
     // Call API to generate questions
