@@ -2036,6 +2036,26 @@ function setupNavigationButtons() {
         const answerContainer = document.getElementById('answer-container');
         if (answerContainer) {
             answerContainer.classList.add('hidden');
+            
+            // Reset answer result and explanation
+            const answerResult = document.getElementById('answer-result');
+            if (answerResult) {
+                answerResult.textContent = '';
+            }
+            
+            const answerExplanation = document.getElementById('answer-explanation');
+            if (answerExplanation) {
+                answerExplanation.textContent = '';
+            }
+        }
+        
+        // Reset submit button to enable it for new selection
+        const submitButton = document.getElementById('submit-answer-button');
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.style.opacity = '0.7';
+            submitButton.style.pointerEvents = 'none';
+            submitButton.textContent = '提交答案';
         }
         
         // Clear selected choices
@@ -2051,6 +2071,13 @@ function setupNavigationButtons() {
             // Remove any selection styling
             cell.style.borderColor = '#e2e8f0';
             cell.style.backgroundColor = 'white';
+            
+            // Reset the choice indicator styling
+            const indicator = cell.querySelector('.choice-indicator');
+            if (indicator) {
+                indicator.style.backgroundColor = '#edf2f7';
+                indicator.style.color = '#4a5568';
+            }
         });
     }
     
@@ -5773,7 +5800,7 @@ function showAboutSiteModal() {
                 padding-left: 20px;
                 margin: 15px 0;
             ">
-                <li>DeepSeek-V3 API</li>
+                <li>内容：DeepSeek-V3 API</li>
                 <li>代码：Claude-3.7-sonnet</li>
                 <li>编译器：Cursor / VS Code</li>
                 <li>网页部署：Github / Cloudflare</li>
