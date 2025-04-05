@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>语文学习 - AI学习助手</title>
+    <link rel="icon" href="../../logo_btrfly.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="clouds-bg"></div>
+            <h1 class="subject-header">语文学习</h1>
+            <div class="chinese-icon"></div>
+            <a href="../../index.html" class="home-link">
+                <i class="fas fa-home"></i> 返回首页
+            </a>
+        </header>
+
+        <main>
+            <!-- 主导航 -->
+            <div class="chinese-nav">
+                <button class="nav-btn active" data-target="poetry-appreciation">诗词鉴赏</button>
+                <button class="nav-btn" data-target="writing-guide">写作指导</button>
+                <button class="nav-btn" data-target="idiom-learning">成语学习</button>
+                <button class="nav-btn" data-target="reading-analysis">阅读分析</button>
+            </div>
+            
+            <!-- 内容区域 -->
+            <div class="content-sections">
+                <!-- 诗词鉴赏区域 -->
+                <section id="poetry-appreciation" class="content-section active">
+                    <h2>诗词鉴赏</h2>
+                    <div class="poetry-controls">
+                        <div class="control-group">
+                            <label for="poetry-type">诗词类型：</label>
+                            <select id="poetry-type">
+                                <option value="tang">唐诗</option>
+                                <option value="song">宋词</option>
+                                <option value="yuan">元曲</option>
+                                <option value="modern">现代诗</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="poetry-theme">主题：</label>
+                            <select id="poetry-theme">
+                                <option value="all">全部</option>
+                                <option value="nature">自然风光</option>
+                                <option value="patriotic">爱国情怀</option>
+                                <option value="friendship">友情怀旧</option>
+                                <option value="love">爱情</option>
+                            </select>
+                        </div>
+                        <button id="load-poetry-btn">加载诗词</button>
+                    </div>
+                    
+                    <div class="poetry-container">
+                        <div class="empty-state">
+                            <i class="fas fa-book"></i>
+                            <h3>诗词鉴赏</h3>
+                            <p>请选择诗词类型和主题，然后点击"加载诗词"按钮来欣赏经典诗词。</p>
+                        </div>
+                        
+                        <div id="poetry-display" class="hidden">
+                            <!-- 诗词内容将动态加载 -->
+                            <div class="poetry-navigation">
+                                <button id="prev-poem" class="nav-arrow" disabled>
+                                    <i class="fas fa-arrow-left"></i>
+                                </button>
+                                <span id="poem-counter">1/1</span>
+                                <button id="next-poem" class="nav-arrow">
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="poem-content">
+                                <h3 class="poem-title"></h3>
+                                <p class="poem-author"></p>
+                                <div class="poem-text"></div>
+                                
+                                <div class="poem-analysis">
+                                    <h4>创作背景</h4>
+                                    <div class="poem-background"></div>
+                                    
+                                    <h4>赏析</h4>
+                                    <div class="poem-explanation"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 写作指导区域 -->
+                <section id="writing-guide" class="content-section">
+                    <h2>写作指导</h2>
+                    <div class="writing-categories">
+                        <button class="writing-cat-btn active" data-category="narrative">记叙文</button>
+                        <button class="writing-cat-btn" data-category="argumentative">议论文</button>
+                        <button class="writing-cat-btn" data-category="expository">说明文</button>
+                        <button class="writing-cat-btn" data-category="practical">应用文</button>
+                    </div>
+                    
+                    <div class="writing-sections">
+                        <!-- 记叙文部分 -->
+                        <div id="narrative-section" class="writing-section active">
+                            <h3>记叙文写作指导</h3>
+                            
+                            <div class="guide-card">
+                                <div class="guide-title">记叙文的基本要素</div>
+                                <div class="guide-content">
+                                    <p>记叙文是以记人、叙事、写景、状物为主，通过记叙和描写表达一定情感的文体。</p>
+                                    <h4>六要素</h4>
+                                    <ul>
+                                        <li><strong>时间</strong>：何时发生</li>
+                                        <li><strong>地点</strong>：何地发生</li>
+                                        <li><strong>人物</strong>：谁参与其中</li>
+                                        <li><strong>起因</strong>：为什么发生</li>
+                                        <li><strong>经过</strong>：怎样发展</li>
+                                        <li><strong>结果</strong>：结局如何</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="guide-card">
+                                <div class="guide-title">记叙文的行文结构</div>
+                                <div class="guide-content">
+                                    <h4>基本结构</h4>
+                                    <ol>
+                                        <li><strong>开头</strong>：交代背景，引出事件</li>
+                                        <li><strong>主体</strong>：按一定顺序展开叙述</li>
+                                        <li><strong>结尾</strong>：总结全文，点明主题</li>
+                                    </ol>
+                                    <h4>叙述顺序</h4>
+                                    <ul>
+                                        <li>顺叙：按事情发展的自然顺序</li>
+                                        <li>倒叙：从结果开始，再回溯原因和经过</li>
+                                        <li>插叙：在叙述主要事件过程中，插入交代其他相关事件</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 其他类型（初始隐藏） -->
+                        <div id="argumentative-section" class="writing-section hidden">
+                            <h3>议论文写作指导</h3>
+                            <div class="guide-card">
+                                <div class="guide-title">议论文的结构</div>
+                                <div class="guide-content">
+                                    <p>议论文是通过摆事实、讲道理，表明观点、态度的一种文体。</p>
+                                    <h4>基本结构</h4>
+                                    <ul>
+                                        <li><strong>提出问题</strong>：明确论点</li>
+                                        <li><strong>分析问题</strong>：论证论点</li>
+                                        <li><strong>解决问题</strong>：深化论点</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="expository-section" class="writing-section hidden">
+                            <h3>说明文写作指导</h3>
+                            <div class="guide-card">
+                                <div class="guide-title">说明文的特点</div>
+                                <div class="guide-content">
+                                    <p>说明文是以说明为主要表达方式，解释事物的特征、本质和规律的文体。</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="practical-section" class="writing-section hidden">
+                            <h3>应用文写作指导</h3>
+                            <div class="guide-card">
+                                <div class="guide-title">常见应用文格式</div>
+                                <div class="guide-content">
+                                    <p>应用文是适用于日常生活、工作、学习的实用性文体。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 成语学习区域 -->
+                <section id="idiom-learning" class="content-section">
+                    <h2>成语学习</h2>
+                    <div class="idiom-search">
+                        <input type="text" id="idiom-search-input" placeholder="输入成语或关键词搜索">
+                        <button id="idiom-search-btn">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                    </div>
+                    
+                    <div class="idiom-categories">
+                        <button class="idiom-cat-btn active" data-level="all">全部</button>
+                        <button class="idiom-cat-btn" data-level="primary">小学</button>
+                        <button class="idiom-cat-btn" data-level="junior">初中</button>
+                        <button class="idiom-cat-btn" data-level="senior">高中</button>
+                    </div>
+                    
+                    <div class="idiom-container">
+                        <div class="idiom-list">
+                            <!-- 成语列表将动态加载 -->
+                            <div class="idiom-card">
+                                <div class="idiom-title">画龙点睛</div>
+                                <div class="idiom-content">
+                                    <p><strong>发音：</strong>huà lóng diǎn jīng</p>
+                                    <p><strong>释义：</strong>比喻在关键处用几句话或几笔把情况或人物的特征突出出来。</p>
+                                    <p><strong>出处：</strong>南朝·宋·刘义庆《世说新语·巧艺》记载，顾恺之画龙，最后点上眼睛，龙就活了。</p>
+                                    <p><strong>例句：</strong>这篇文章的结尾画龙点睛，点明了主题。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="idiom-card">
+                                <div class="idiom-title">守株待兔</div>
+                                <div class="idiom-content">
+                                    <p><strong>发音：</strong>shǒu zhū dài tù</p>
+                                    <p><strong>释义：</strong>比喻墨守成规，不知变通。</p>
+                                    <p><strong>出处：</strong>战国韩·韩非《韩非子·五蠹》</p>
+                                    <p><strong>例句：</strong>做事要灵活变通，不能守株待兔。</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="idiom-pagination">
+                            <button id="prev-page" class="page-btn" disabled>上一页</button>
+                            <span id="page-info">第 1 页</span>
+                            <button id="next-page" class="page-btn">下一页</button>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 阅读分析区域 -->
+                <section id="reading-analysis" class="content-section">
+                    <h2>阅读分析</h2>
+                    <div class="reading-levels">
+                        <button class="reading-level-btn active" data-level="primary">小学</button>
+                        <button class="reading-level-btn" data-level="junior">初中</button>
+                        <button class="reading-level-btn" data-level="senior">高中</button>
+                    </div>
+                    
+                    <div class="reading-container">
+                        <div class="empty-state">
+                            <i class="fas fa-file-alt"></i>
+                            <h3>阅读分析</h3>
+                            <p>请选择学习阶段，加载相应的阅读理解练习。</p>
+                        </div>
+                        
+                        <div id="reading-content" class="hidden">
+                            <!-- 阅读内容将动态加载 -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-grass"></div>
+            <p>© 2024 AI学习助手 - 语文学习模块</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 

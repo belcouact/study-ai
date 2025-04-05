@@ -1,0 +1,284 @@
+/* Responsive styles */
+
+/* Large desktop and up */
+@media (min-width: 1200px) {
+    .content-area {
+        padding: 2rem;
+    }
+    
+    .feature-cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Medium devices (tablets, 768px to 992px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    :root {
+        --sidebar-width: 200px;
+    }
+    
+    .site-title {
+        font-size: 1rem;
+    }
+    
+    .panel-button {
+        font-size: 0.9rem;
+        padding: 0.6rem;
+    }
+    
+    .feature-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .feature-card {
+        padding: 1.2rem;
+    }
+    
+    .content-area {
+        padding: 1rem;
+    }
+    
+    .container {
+        padding: 1.2rem;
+    }
+}
+
+/* Small devices (landscape phones, 576px to 768px) */
+@media (min-width: 576px) and (max-width: 767px) {
+    :root {
+        --sidebar-width: 180px;
+    }
+    
+    .left-panel {
+        width: var(--sidebar-width);
+    }
+    
+    .content-area {
+        margin-left: var(--sidebar-width);
+        padding: 0.8rem;
+    }
+    
+    .container {
+        padding: 1rem;
+    }
+    
+    .site-title {
+        font-size: 0.9rem;
+    }
+    
+    .panel-button {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+        margin-bottom: 0.6rem;
+    }
+    
+    .subject-title {
+        font-size: 0.8rem;
+    }
+    
+    .feature-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .feature-card {
+        padding: 1rem;
+    }
+    
+    .feature-card i {
+        font-size: 1.7rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .feature-card h3 {
+        font-size: 1.1rem;
+    }
+}
+
+/* Extra small devices (portrait phones, less than 576px) */
+@media (max-width: 575px) {
+    /* Auto-hide sidebar on mobile */
+    .left-panel {
+        transform: translateX(-100%);
+    }
+    
+    .left-panel.active {
+        transform: translateX(0);
+    }
+    
+    .sidebar-toggle {
+        left: 10px !important;
+    }
+    
+    .content-area {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 0.5rem;
+    }
+    
+    .container {
+        padding: 0.8rem;
+        min-height: calc(100vh - 30px);
+    }
+    
+    .feature-cards {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .welcome-section h1 {
+        font-size: 1.5rem;
+    }
+    
+    .welcome-section p {
+        font-size: 0.9rem;
+    }
+    
+    .button-container {
+        flex-direction: column;
+    }
+    
+    #submit-button, #optimize-button {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+    
+    .chat-container {
+        gap: 10px;
+    }
+    
+    textarea#user-input {
+        height: 100px;
+    }
+    
+    .about-modal {
+        width: 95%;
+    }
+    
+    .about-modal-header h2 {
+        font-size: 1.3rem;
+    }
+    
+    /* Quiz container responsive */
+    .control-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .control-panel label,
+    .control-panel select,
+    .control-panel button {
+        width: 100%;
+        margin: 3px 0;
+    }
+    
+    .navigation-controls {
+        padding: 0.5rem;
+    }
+}
+
+/* Fix for very small height screens */
+@media (max-height: 500px) {
+    .ghibli-header {
+        height: 50px;
+    }
+    
+    .panel-button {
+        padding: 0.4rem;
+        margin-bottom: 0.4rem;
+    }
+    
+    .container {
+        min-height: calc(100vh - 20px);
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-color: #e0e0e0;
+        --light-bg: #2a2a2a;
+        --border-color: #444;
+    }
+    
+    body {
+        background-color: #1a1a1a;
+    }
+    
+    .container, .feature-card, .about-modal {
+        background-color: #252525;
+    }
+    
+    .welcome-section h1 {
+        color: var(--theme-light-blue);
+    }
+    
+    .welcome-section p,
+    .feature-card p {
+        color: #bbb;
+    }
+    
+    .feature-card {
+        border-color: #444;
+    }
+    
+    .feature-card h3 {
+        color: #e0e0e0;
+    }
+    
+    textarea#user-input {
+        background-color: #2c2c2c;
+        color: #e0e0e0;
+        border-color: #444;
+    }
+    
+    #optimize-button {
+        background-color: #2c2c2c;
+        color: #ddd;
+        border-color: #444;
+    }
+    
+    .about-modal-footer {
+        background-color: #222;
+        border-color: #444;
+    }
+    
+    .about-modal-content {
+        color: #e0e0e0;
+    }
+    
+    .dropdown-container select {
+        background-color: #2c2c2c;
+        color: #e0e0e0;
+        border-color: #444;
+    }
+}
+
+/* Print styles */
+@media print {
+    .left-panel, .sidebar-toggle, .feature-cards, .button-container {
+        display: none !important;
+    }
+    
+    .content-area {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 0 !important;
+    }
+    
+    .container {
+        box-shadow: none;
+        min-height: auto;
+    }
+    
+    body {
+        background-color: white !important;
+    }
+    
+    /* Ensure all content is visible without scrolling */
+    .output-container {
+        overflow: visible;
+        height: auto;
+    }
+} 

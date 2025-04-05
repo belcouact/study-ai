@@ -1,51 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Study Assistant by Alex</title>
+    <title>AI学习助手 - 智能学习平台</title>
     <link rel="icon" href="logo_btrfly.ico" type="image/x-icon">
-    <link rel="stylesheet" href="styles.css">
-    <!-- Preconnect to external domains -->
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="preconnect" href="https://polyfill.io">
-    <!-- Load critical CSS first -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
-    <!-- Add MathJax for rendering math formulas with defer -->
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
     <div class="app-container">
-        <!-- Left Panel -->
+        <!-- 左侧导航面板 -->
         <div class="left-panel">
             <div class="ghibli-header">
                 <div class="ghibli-clouds"></div>
+                <h1 class="site-title">AI学习助手</h1>
             </div>
             <div class="panel-buttons">
-                <button id="qa-button" class="panel-button active">
-                    <i class="ghibli-icon-qa"></i>问答
+                <button id="home-button" class="panel-button active">
+                    <i class="fas fa-home"></i> 首页
                 </button>
-                <button id="create-button" class="panel-button">
-                    <i class="ghibli-icon-quiz"></i>测验
+                <button id="qa-button" class="panel-button">
+                    <i class="fas fa-question-circle"></i> 智能问答
                 </button>
-                <button id="poetry-button" class="panel-button">
-                    <i class="ghibli-icon-poetry"></i>诗词
-                </button>
-                <button id="word-button" class="panel-button">
-                    <i class="ghibli-icon-english"></i>英语
+                <button id="quiz-button" class="panel-button">
+                    <i class="fas fa-tasks"></i> 智能测验
                 </button>
                 
-                <!-- Dropdown Frames -->
+                <!-- 学科按钮 -->
+                <div class="subject-section">
+                    <h3 class="subject-title">学科选择</h3>
+                    <button id="math-button" class="panel-button subject-btn">
+                        <i class="fas fa-calculator"></i> 数学
+                    </button>
+                    <button id="chinese-button" class="panel-button subject-btn">
+                        <i class="fas fa-book"></i> 语文
+                    </button>
+                    <button id="english-button" class="panel-button subject-btn">
+                        <i class="fas fa-language"></i> 英语
+                    </button>
+                    <button id="history-button" class="panel-button subject-btn">
+                        <i class="fas fa-landmark"></i> 历史
+                    </button>
+                </div>
+                
+                <!-- 用户身份选择 -->
                 <div class="dropdown-frames">
-                    <!-- User Identity Frame -->
                     <div class="sidebar-frame">
                         <h3 class="frame-title">我是</h3>
                         <div class="frame-content">
                             <div class="dropdown-container">
-                                <label for="school-select-sidebar">学校</label>
-                                <select id="school-select-sidebar" name="school">
+                                <label for="school-level">学校</label>
+                                <select id="school-level" name="school">
                                     <option value="小学">小学</option>
                                     <option value="初中">初中</option>
                                     <option value="高中">高中</option>
@@ -53,50 +62,89 @@
                             </div>
                             
                             <div class="dropdown-container">
-                                <label for="grade-select-sidebar">年级</label>
-                                <select id="grade-select-sidebar" name="grade"></select>
+                                <label for="grade-level">年级</label>
+                                <select id="grade-level" name="grade"></select>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Footer text -->
+            <!-- 页脚链接 -->
             <div class="panel-footer">
                 <div class="footer-links">
-                    <a href="https://yuanbao.tencent.com/chat/naQivTmsDa" target="_blank" rel="noopener">腾讯元宝</a>
-                    <a href="https://tongyi.aliyun.com/qianwen/" target="_blank" rel="noopener">通义千问</a>
-                    <a href="https://study-llm.pages.dev/quote/main" target="_blank" rel="noopener">名人名言</a>
-                    <a href="#" id="about-site-link" onclick="return showAboutModal();">关于本站</a>
+                    <a href="#" id="about-link">关于本站</a>
+                    <a href="#" id="feedback-link">反馈建议</a>
                 </div>
                 <div class="ghibli-grass"></div>
             </div>
         </div>
         
-        <!-- Sidebar Toggle Button -->
-        <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
+        <!-- 侧边栏切换按钮 -->
+        <button id="sidebar-toggle" class="sidebar-toggle" aria-label="切换侧边栏">
             <i class="fas fa-chevron-left"></i>
         </button>
         
-        <!-- Right Content Area -->
+        <!-- 主内容区域 -->
         <div class="content-area">
-            <!-- Q&A Chat Container -->
-            <div id="qa-container" class="container">
+            <!-- 首页内容 -->
+            <div id="home-container" class="container active">
+                <div class="welcome-section">
+                    <h1>欢迎使用AI学习助手</h1>
+                    <p>一站式智能学习平台，为小学到高中学生提供多学科学习支持</p>
+                    
+                    <div class="feature-cards">
+                        <div class="feature-card" onclick="navigateTo('qa-container')">
+                            <i class="fas fa-question-circle"></i>
+                            <h3>智能问答</h3>
+                            <p>针对各科目知识点的疑问，获取智能化解答</p>
+                        </div>
+                        <div class="feature-card" onclick="navigateTo('quiz-container')">
+                            <i class="fas fa-tasks"></i>
+                            <h3>智能测验</h3>
+                            <p>根据学段和科目自动生成测验题目，巩固知识点</p>
+                        </div>
+                        <div class="feature-card" onclick="navigateTo('subjects/chinese/main.html')">
+                            <i class="fas fa-book"></i>
+                            <h3>诗词欣赏</h3>
+                            <p>经典诗词学习与鉴赏，提升文学素养</p>
+                        </div>
+                        <div class="feature-card" onclick="navigateTo('subjects/english/main.html')">
+                            <i class="fas fa-language"></i>
+                            <h3>英语单词</h3>
+                            <p>交互式英语单词学习，提升词汇量</p>
+                        </div>
+                        <div class="feature-card" onclick="navigateTo('subjects/history/main.html')">
+                            <i class="fas fa-landmark"></i>
+                            <h3>历史事件</h3>
+                            <p>重要历史事件追溯与了解</p>
+                        </div>
+                        <div class="feature-card" onclick="navigateTo('subjects/math/main.html')">
+                            <i class="fas fa-calculator"></i>
+                            <h3>数学解题</h3>
+                            <p>数学题目解析与步骤讲解</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 问答容器 (初始隐藏) -->
+            <div id="qa-container" class="container hidden">
                 <div class="ghibli-floating-elements"></div>
                 <div class="chat-container">
                     <div class="input-container">
                         <div class="welcome-message">
-                            <i class="ghibli-icon-welcome"></i>
+                            <i class="fas fa-robot"></i>
                             你好，我是你的AI老师，有什么我可以帮你的吗？
                         </div>
                         <textarea id="user-input" placeholder="请输入你的问题..."></textarea>
                         <div class="button-container">
                             <div class="right-controls">
                                 <button id="optimize-button" title="优化您的问题以获得更好的回答">
-                                    <i class="ghibli-icon-optimize"></i> 优化问题
+                                    <i class="fas fa-magic"></i> 优化问题
                                 </button>
                                 <button id="submit-button">
-                                    <i class="ghibli-icon-submit"></i> 提交问题
+                                    <i class="fas fa-paper-plane"></i> 提交问题
                                 </button>
                             </div>
                         </div>
@@ -108,19 +156,21 @@
                             <p>思考中...</p>
                         </div>
                         <div id="output">
-                            <!-- Output will appear here -->
+                            <!-- 输出将显示在这里 -->
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Create Questions Container (initially hidden) -->
-            <div id="create-container" class="container hidden">
-                <!-- Add control panel at the top -->
+            <!-- 测验容器 (初始隐藏) -->
+            <div id="quiz-container" class="container hidden">
                 <div class="control-panel">
-                    <label for="subject-selectr">科目</label>
+                    <label for="subject-select">科目</label>
                     <select id="subject-select" name="subject">
-                        <!-- Options will be populated dynamically -->
+                        <option value="math">数学</option>
+                        <option value="chinese">语文</option>
+                        <option value="english">英语</option>
+                        <option value="history">历史</option>
                     </select>
 
                     <label for="semester-select">学期</label>
@@ -130,179 +180,78 @@
                     </select>
 
                     <label for="difficulty-select">难度</label>
-                        <select id="difficulty-select">
-                            <option value="容易">容易</option>
-                            <option value="中等">中等</option>
-                            <option value="偏难">偏难</option>
-                        </select>
+                    <select id="difficulty-select">
+                        <option value="容易">容易</option>
+                        <option value="中等">中等</option>
+                        <option value="偏难">偏难</option>
+                    </select>
 
-                        <label for="question-count-select">题数</label>
-                        <select id="question-count-select">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="15">15</option>
-                        </select>
-                    <button id="generate-btn" onclick="handleGenerateQuestionsClick()">出题</button>
-                    <button id="evaluate-btn" onclick="handleEvaluateClick()" disabled>结果评估</button>
+                    <label for="question-count-select">题数</label>
+                    <select id="question-count-select">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                    </select>
+                    <button id="generate-btn">出题</button>
+                    <button id="evaluate-btn" disabled>评估</button>
                 </div>
 
-                <!-- Questions display container -->
-                <div id="questions-display-container" class="questions-display-container hidden">
-                    <!-- Empty state message -->
+                <!-- 问题显示容器 -->
+                <div id="questions-display-container" class="questions-display-container">
+                    <!-- 空状态信息 -->
                     <div id="empty-state" class="empty-state">
                         <i class="fas fa-book-open empty-state-icon"></i>
                         <h3>准备好开始测验了吗？</h3>
-                        <p>使用左侧边栏选择学校类型、年级、学期、科目、难度和题数，然后点击"出题"按钮生成题目。</p>
+                        <p>使用左侧控制面板选择学校类型、年级、学期、科目、难度和题数，然后点击"出题"按钮生成题目。</p>
                     </div>
                     
-                    <!-- Question content will be dynamically inserted here -->
-                    <div id="question-text" class="question-text"></div>
-                    <div id="choices-container" class="choices-container"></div>
+                    <!-- 问题内容将动态插入这里 -->
+                    <div id="question-text" class="question-text hidden"></div>
+                    <div id="choices-container" class="choices-container hidden"></div>
                     
-                    <!-- Answer container -->
+                    <!-- 答案容器 -->
                     <div id="answer-container" class="answer-container hidden">
                         <div id="answer-result" class="answer-result"></div>
                         <div id="answer-explanation" class="answer-explanation"></div>
                     </div>
                 </div>
                 
-                <!-- Navigation controls moved to the bottom -->
-                <div class="navigation-controls">
+                <!-- 导航控制 -->
+                <div class="navigation-controls hidden">
                     <button id="prev-question-button" class="nav-button" disabled> &#10094; </button>
                     <div id="question-counter" class="question-counter"></div>
                     <button id="next-question-button" class="nav-button" disabled> &#10095; </button>
                 </div>
             </div>
-            
-            <!-- Poetry Container -->
-            <div id="poetry-container" class="container">
-                <div class="poetry-floating-elements"></div>
-                <div class="poetry-header">
-                    <div class="poetry-controls">
-                        <div class="poetry-selectors">
-                            <div class="selector-group">
-                                <label for="poetry-type-select">类型</label>
-                                <select id="poetry-type-select" class="poetry-select">
-                                    <option value="诗经">诗经</option>
-                                    <option value="楚辞">楚辞</option>
-                                    <option value="汉赋">汉赋</option>
-                                    <option value="唐诗">唐诗</option>
-                                    <option value="宋词">宋词</option>
-                                    <option value="元曲">元曲</option>
-                                </select>
-                            </div>
-                            <div class="selector-group">
-                                <label for="poetry-style-select">风格</label>
-                                <select id="poetry-style-select" class="poetry-select">
-                                    <option value="任意">任意</option>
-                                    <option value="山水">山水</option>
-                                    <option value="边塞">边塞</option>
-                                    <option value="浪漫">浪漫</option>
-                                    <option value="现实">现实</option>
-                                </select>
-                            </div>
-                            <!-- Poetry Quantity -->
-                            <div class="selector-group">
-                                <label for="poetry-qty-select">数量</label>
-                                <select id="poetry-qty-select" class="poetry-select">
-                                    <option value=5>5</option>
-                                    <option value=10>10</option>
-                                </select>
-                            </div>
-                            <button id="learn-poetry-button" class="poetry-button" title="若结果有误，请点击重试">学习诗词</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="poetry-content">
-                    <div id="poetry-empty-state" class="empty-state">
-                        <h3>开始学习古诗词</h3>
-                        <p>选择诗词类型和风格，然后点击"学习诗词"按钮生成适合您学习阶段的诗词。</p>
-                    </div>
-                    <div id="poetry-display" class="hidden">
-                        <div class="poem-navigation">
-                            <button id="prev-poem-button" class="poem-nav-button" disabled>
-                                <i class="fas fa-arrow-left"></i>
-                            </button>
-                            <span class="poem-counter">1 / 5</span>
-                            <button id="next-poem-button" class="poem-nav-button">
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
-                        <div class="poem-display">
-                            <h2 class="poem-title"></h2>
-                            <p class="poem-author"></p>
-                            <div class="poem-content"></div>
-                            <div class="poem-section">
-                                <h3>创作背景</h3>
-                                <div class="poem-background"></div>
-                            </div>
-                            <div class="poem-section">
-                                <h3>赏析</h3>
-                                <div class="poem-explanation"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="vocabulary-content" class="tab-content">
-                <div class="vocabulary-container">
-                    <div class="ghibli-floating-elements"></div>
-                    <div class="vocabulary-card-container">
-                        <div class="vocabulary-header">
-                            <h2>英语常用句子 & 词汇学习</h2>
-                            <div class="vocabulary-buttons">
-                                <a href="https://study-llm.pages.dev/english/main" target="_blank" id="load-sentences-btn" class="vocabulary-load-btn">常用句子</a>
-                                <button id="load-vocabulary-btn" class="vocabulary-load-btn">加载词汇</button>
-                            </div>
-                        </div>
-                        
-                        <div class="navigation-controls">
-                            <button id="prev-word-btn" class="nav-button" disabled>
-                                <span class="nav-arrow">&#10094;</span>
-                            </button>
-                            <span id="word-counter">0/0</span>
-                            <button id="next-word-btn" class="nav-button" disabled>
-                                <span class="nav-arrow">&#10095;</span>
-                            </button>
-                        </div>
-                        
-                        <div id="vocabulary-container">
-                            <div class="initial-message">
-                                请选择侧边栏中的学校和年级，然后点击"加载词汇"按钮开始学习英语单词
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ghibli-grass-bottom"></div>
-                </div>
-            </div>
         </div>
     </div>
-    <!-- Load script at the end with defer -->
-    <script src="script.js" defer></script>
-    <!-- Add this just before the closing body tag -->
-    <div id="modal-overlay" class="modal-overlay">
-        <div id="about-modal" class="about-modal">
-            <div class="about-modal-decorations"></div>
-            <button class="about-modal-close" onclick="hideAboutModal()">×</button>
+
+    <!-- 关于模态框 -->
+    <div class="modal-overlay" id="about-modal-overlay">
+        <div class="about-modal">
             <div class="about-modal-header">
-                <h2>关于本站</h2>
+                <h2>关于AI学习助手</h2>
+                <button class="about-modal-close" id="about-modal-close">&times;</button>
             </div>
             <div class="about-modal-content">
-                <p>欢迎来到AI学习助手！本站致力于为学生提供个性化的学习体验。</p>
-                <p>我们提供以下功能：</p>
+                <p>AI学习助手是一个面向小学到高中学生的智能学习平台，提供多学科学习支持，包括问答、测验、单词学习、诗词鉴赏和历史事件追溯等功能。</p>
+                <h3>主要功能</h3>
                 <ul>
-                    <li>智能问答辅导</li>
-                    <li>自动出题测验</li>
-                    <li>古诗词学习</li>
-                    <li>英语词汇学习</li>
+                    <li>智能问答：解答各科目学习疑问</li>
+                    <li>智能测验：生成针对性练习题目</li>
+                    <li>诗词鉴赏：学习经典诗词及其背景</li>
+                    <li>英语学习：互动式单词和句子学习</li>
+                    <li>历史探索：了解重要历史事件</li>
+                    <li>数学解题：数学问题分析与讲解</li>
                 </ul>
-                <p>希望这个平台能够帮助你更好地学习和进步！</p>
             </div>
             <div class="about-modal-footer">
-                <p>© 2024 AI Study Assistant</p>
+                <p>© 2024 AI学习助手 - 智能学习平台</p>
             </div>
         </div>
     </div>
+
+    <script src="js/common.js"></script>
+    <script src="js/navigation.js"></script>
 </body>
 </html> 

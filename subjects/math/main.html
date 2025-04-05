@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学学习 - AI学习助手</title>
+    <link rel="icon" href="../../logo_btrfly.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="clouds-bg"></div>
+            <h1 class="subject-header">数学学习</h1>
+            <div class="math-icon"></div>
+            <a href="../../index.html" class="home-link">
+                <i class="fas fa-home"></i> 返回首页
+            </a>
+        </header>
+
+        <main>
+            <!-- 主导航 -->
+            <div class="math-nav">
+                <button class="nav-btn active" data-target="problem-solving">解题技巧</button>
+                <button class="nav-btn" data-target="formula-library">公式库</button>
+                <button class="nav-btn" data-target="practice-zone">练习区</button>
+                <button class="nav-btn" data-target="concept-map">概念图谱</button>
+            </div>
+            
+            <!-- 内容区域 -->
+            <div class="content-sections">
+                <!-- 解题技巧区域 -->
+                <section id="problem-solving" class="content-section active">
+                    <h2>数学解题技巧</h2>
+                    <div class="topic-selection">
+                        <label for="math-topic">选择主题：</label>
+                        <select id="math-topic">
+                            <option value="algebra">代数</option>
+                            <option value="geometry">几何</option>
+                            <option value="calculus">微积分</option>
+                            <option value="probability">概率统计</option>
+                        </select>
+                        <button id="load-techniques-btn">加载技巧</button>
+                    </div>
+                    
+                    <div class="techniques-container">
+                        <div class="empty-state">
+                            <i class="fas fa-square-root-alt"></i>
+                            <h3>解题技巧</h3>
+                            <p>请选择一个数学主题并点击"加载技巧"按钮来查看相关的解题技巧和方法。</p>
+                        </div>
+                        
+                        <div id="techniques-list" class="hidden">
+                            <!-- 技巧内容将动态加载 -->
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 公式库区域 -->
+                <section id="formula-library" class="content-section">
+                    <h2>数学公式库</h2>
+                    <div class="formula-categories">
+                        <button class="formula-cat-btn active" data-category="basic">基础公式</button>
+                        <button class="formula-cat-btn" data-category="algebra">代数公式</button>
+                        <button class="formula-cat-btn" data-category="geometry">几何公式</button>
+                        <button class="formula-cat-btn" data-category="calculus">微积分公式</button>
+                    </div>
+                    
+                    <div class="formulas-container">
+                        <!-- 基础公式部分 -->
+                        <div id="basic-formulas" class="formula-section active">
+                            <h3>基础数学公式</h3>
+                            <div class="formula-card">
+                                <div class="formula-name">二次方程求根公式</div>
+                                <div class="formula-display">$$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$</div>
+                                <div class="formula-explanation">
+                                    <p>适用于形如 \(ax^2 + bx + c = 0\) 的二次方程，其中 \(a \neq 0\)。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="formula-card">
+                                <div class="formula-name">勾股定理</div>
+                                <div class="formula-display">$$a^2 + b^2 = c^2$$</div>
+                                <div class="formula-explanation">
+                                    <p>在直角三角形中，两直角边的平方和等于斜边的平方。</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 其他公式部分（初始隐藏） -->
+                        <div id="algebra-formulas" class="formula-section hidden">
+                            <h3>代数公式</h3>
+                            <div class="formula-card">
+                                <div class="formula-name">平方和公式</div>
+                                <div class="formula-display">$$(a + b)^2 = a^2 + 2ab + b^2$$</div>
+                            </div>
+                        </div>
+                        
+                        <div id="geometry-formulas" class="formula-section hidden">
+                            <h3>几何公式</h3>
+                            <div class="formula-card">
+                                <div class="formula-name">圆的面积</div>
+                                <div class="formula-display">$$A = \pi r^2$$</div>
+                            </div>
+                        </div>
+                        
+                        <div id="calculus-formulas" class="formula-section hidden">
+                            <h3>微积分公式</h3>
+                            <div class="formula-card">
+                                <div class="formula-name">导数基本公式</div>
+                                <div class="formula-display">$$\frac{d}{dx}x^n = nx^{n-1}$$</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 练习区域 -->
+                <section id="practice-zone" class="content-section">
+                    <h2>数学练习区</h2>
+                    <div class="practice-controls">
+                        <div class="control-group">
+                            <label for="practice-difficulty">难度：</label>
+                            <select id="practice-difficulty">
+                                <option value="easy">简单</option>
+                                <option value="medium">中等</option>
+                                <option value="hard">困难</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label for="practice-topic">主题：</label>
+                            <select id="practice-topic">
+                                <option value="arithmetic">算术</option>
+                                <option value="algebra">代数</option>
+                                <option value="geometry">几何</option>
+                                <option value="functions">函数</option>
+                            </select>
+                        </div>
+                        
+                        <button id="generate-practice-btn">生成练习</button>
+                    </div>
+                    
+                    <div class="practice-container">
+                        <div class="empty-state">
+                            <i class="fas fa-pencil-alt"></i>
+                            <h3>数学练习</h3>
+                            <p>选择难度和主题，然后点击"生成练习"按钮开始练习。</p>
+                        </div>
+                        
+                        <div id="practice-questions" class="hidden">
+                            <!-- 练习题目将动态加载 -->
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 概念图谱区域 -->
+                <section id="concept-map" class="content-section">
+                    <h2>数学概念图谱</h2>
+                    <div class="concept-map-container">
+                        <div class="empty-state">
+                            <i class="fas fa-project-diagram"></i>
+                            <h3>概念图谱</h3>
+                            <p>此功能正在开发中，敬请期待。</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-grass"></div>
+            <p>© 2024 AI学习助手 - 数学学习模块</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
